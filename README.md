@@ -44,6 +44,19 @@
 | ![模版首页](https://gitee.com/lande_admin/gohub/raw/master/WX20241220-083130@2x.png) | ![控制台](https://gitee.com/lande_admin/gohub/raw/master/WX20241220-083012@2x.png)   |
 | ![站点配置](https://gitee.com/lande_admin/gohub/raw/master/WX20241220-083101@2x.png) | ![文章管理](https://gitee.com/lande_admin/gohub/raw/master/WX20241220-083042@2x.png) |
 
+### 演示站点
+
+http://demo.badoucms.com/
+
+### 演示后台
+
+http://demo.badoucms.com/index.html
+
+### 演示账号
+
+账号：badoucms
+密码：123456
+
 ### 特别鸣谢
 
 - [BuildAdmin](https://www.buildadmin.com/)

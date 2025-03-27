@@ -23,7 +23,7 @@ require __DIR__ . '/../vendor/autoload.php';
 $app = new App();
 $http = $app->http;
 $route = $app->route;
-$route->rule('/', '\bd\service\Install\Install::index');
+$route->rule('/', '\bd\service\install\Install::index');
 $response = $http->run();
 $response->send();
 
