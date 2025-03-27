@@ -1,0 +1,18 @@
+export default {
+    id: 'id',
+    acode: 'acode',
+    contacts: 'contacts',
+    mobile: 'mobile',
+    content: 'content',
+    user_ip: 'user_ip',
+    user_os: 'user_os',
+    user_bs: 'user_bs',
+    recontent: 'recontent',
+    status: 'status',
+    create_user: 'create_user',
+    update_user: 'update_user',
+    create_time: 'create_time',
+    update_time: 'update_time',
+    uid: 'uid',
+    'quick Search Fields': 'id',
+}

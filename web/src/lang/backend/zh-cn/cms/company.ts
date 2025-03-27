@@ -1,0 +1,18 @@
+export default {
+    id: '站点编号',
+    acode: '区域代码',
+    name: '公司名称',
+    address: '公司地址',
+    postcode: '邮政编码',
+    contact: '公司联系人',
+    mobile: '手机号码',
+    phone: '电话号码',
+    fax: '公司传真',
+    email: '电子邮箱',
+    qq: '公司QQ',
+    weixin: '微信图标',
+    blicense: '营业执照代码',
+    other: '其他信息',
+    'quick Search Fields': '站点编号',
+    basic: '公司信息',
+}

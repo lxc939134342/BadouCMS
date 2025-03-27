@@ -1,0 +1,41 @@
+{extend name="base" /}
+{block name="main"}
+
+<div class="container Wauto">
+    <div class="main w1200">
+        <div class="article w1">
+            <div class="archive-top anim fadeInUp">
+                <div class="archive-title">
+                    <h1 itemprop="headline">{$tag} </h1>
+                    <span></span></div>
+
+            </div>
+
+            <div class="post list">
+                <div class="PostShow">
+                    <ul>
+                        {ld:list cid='0' tags='$tag' }
+                        <li data-id="{$item.id}" class="anim fadeInUp">
+                            <div class="post-img loading"> <a class="pic float-left" href="{$item.url}"
+                                title="{$item.title}" rel="bookmark">
+                                <div class="msk"></div>
+                                <i class="fa fa-search"></i>
+                                <img class="b-lazy" src="{$item.image}"
+                                    data-src="{$item.image}" alt="{$item.title}" /> </a> </div>
+                            <h4><a href="{$item.url}" title="{$item.title}">{$item.title}</a></h4>
+                            <i>	{$item.description}</i>
+                        </li>
+                        {/ld:list}
+                    </ul>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+
+        </div>
+        <div class="text-center">{$pages}</div>
+    </div>
+</div>
+<script>
+    $('.header').removeClass('opaque').addClass('noOpaque')
+</script>
+{/block}

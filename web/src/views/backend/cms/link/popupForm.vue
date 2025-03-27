@@ -1,0 +1,82 @@
+<template>
+    <!-- 对话框表单 -->
+    <!-- 建议使用 Prettier 格式化代码 -->
+    <!-- el-form 内可以混用 el-form-item、FormItem、ba-input 等输入组件 -->
+    <el-dialog class="ba-operate-dialog" :close-on-click-modal="false"
+        :model-value="['Add', 'Edit'].includes(baTable.form.operate!)" @close="baTable.toggleForm" width="50%">
+        <template #header>
+            <div class="title" v-drag="['.ba-operate-dialog', '.el-dialog__header']" v-zoom="'.ba-operate-dialog'">
+                {{ baTable.form.operate ? t(baTable.form.operate) : '' }}
+            </div>
+        </template>
+        <el-scrollbar v-loading="baTable.form.loading" class="ba-table-form-scrollbar">
+            <div class="ba-operate-form" :class="'ba-' + baTable.form.operate + '-form'"
+                :style="config.layout.shrink ? '' : 'width: calc(100% - ' + baTable.form.labelWidth! / 2 + 'px)'">
+                <el-form v-if="!baTable.form.loading" ref="formRef" @submit.prevent=""
+                    @keyup.enter="baTable.onSubmit(formRef)" :model="baTable.form.items"
+                    :label-position="config.layout.shrink ? 'top' : 'right'"
+                    :label-width="baTable.form.labelWidth + 'px'" :rules="rules">
+                    <!-- <FormItem :label="t('cms.link.acode')" type="string" v-model="baTable.form.items!.acode" prop="acode" :placeholder="t('Please input field', { field: t('cms.link.acode') })" /> -->
+
+                    <FormItem :label="t('cms.link.gid')" type="remoteSelect" prop="gid" required="true"
+                        v-model="baTable.form.items!.gid" :input-attr="{
+                            multiple: false, //多选
+                            pk: 'gid',
+                            field: 'gid_text',
+                            remoteUrl: url + 'add',
+                            placeholder: t('Please select field', { field: t('cms.link.gid_text') }),
+                        }" />
+
+                    <FormItem :label="t('cms.link.name')" type="string" v-model="baTable.form.items!.name" prop="name"
+                        :placeholder="t('Please input field', { field: t('cms.link.name') })" required="true" />
+                    <FormItem :label="t('cms.link.link')" type="string" v-model="baTable.form.items!.link" prop="link"
+                        :placeholder="t('Please input field', { field: t('cms.link.link') })" required="true" />
+                    <FormItem :label="t('cms.link.logo')" type="image" v-model="baTable.form.items!.logo" prop="logo"
+                        :placeholder="t('Please input field', { field: t('cms.link.logo') })" />
+                    <FormItem :label="t('cms.link.sorting')" type="number" prop="sorting" :input-attr="{ step: 1 }"
+                        v-model.number="baTable.form.items!.sorting"
+                        :placeholder="t('Please input field', { field: t('cms.link.sorting') })" />
+
+                </el-form>
+            </div>
+        </el-scrollbar>
+        <template #footer>
+            <div :style="'width: calc(100% - ' + baTable.form.labelWidth! / 1.8 + 'px)'">
+                <el-button @click="baTable.toggleForm()">{{ t('Cancel') }}</el-button>
+                <el-button v-blur :loading="baTable.form.submitLoading" @click="baTable.onSubmit(formRef)"
+                    type="primary">
+                    {{ baTable.form.operateIds && baTable.form.operateIds.length > 1 ? t('Save and edit next item') :
+                        t('Save') }}
+                </el-button>
+            </div>
+        </template>
+    </el-dialog>
+</template>
+
+<script setup lang="ts">
+import type { FormInstance, FormItemRule } from 'element-plus'
+import { inject, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import FormItem from '/@/components/formItem/index.vue'
+import { useConfig } from '/@/stores/config'
+import type baTableClass from '/@/utils/baTable'
+import { buildValidatorData } from '/@/utils/validate'
+import { url } from '/@/api/backend/cms/Link'
+
+const config = useConfig()
+const formRef = ref<FormInstance>()
+const baTable = inject('baTable') as baTableClass
+
+const { t } = useI18n()
+
+const rules: Partial<Record<string, FormItemRule[]>> = reactive({
+    gid: [buildValidatorData({ name: 'required', title: t('cms.link.gid') })],
+    name: [buildValidatorData({ name: 'required', title: t('cms.link.name') })],
+    link: [buildValidatorData({ name: 'required', title: t('cms.link.link') })],
+    sorting: [buildValidatorData({ name: 'required', title: t('cms.link.sorting') })],
+    // create_time: [buildValidatorData({ name: 'date', title: t('cms.link.create_time') })],
+    // update_time: [buildValidatorData({ name: 'date', title: t('cms.link.update_time') })],
+})
+</script>
+
+<style scoped lang="scss"></style>

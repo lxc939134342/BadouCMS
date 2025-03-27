@@ -1,0 +1,106 @@
+$--colors: (
+    'primary': (
+        'base': #4e73df,
+    ),
+    'success': (
+        'base': #67c23a,
+    ),
+    'warning': (
+        'base': #f39c13,
+    ),
+    'danger': (
+        'base': #f75545,
+    ),
+    'error': (
+        'base': #f56c6c,
+    ),
+    'info': (
+        'base': #909399,
+    ),
+);
+$button-font-size: (
+    default: 13px,
+);
+$border-radius: (
+    base: 3px,
+);
+
+@forward 'element-plus/theme-chalk/src/common/var.scss' with (
+    $colors: $--colors,
+    $button-font-size: $button-font-size,
+    $border-radius: $border-radius,
+    $date-editor: (
+        'daterange-width': 260px,
+    )
+);
+@use 'element-plus/theme-chalk/src/index.scss' as *;
+
+.el-menu {
+    .el-sub-menu .el-menu {
+        background-color: #191a1f !important;
+    }
+    .el-menu-item {
+        &.is-active {
+            color: #fff !important;
+            .icon {
+                color: #fff !important;
+            }
+        }
+        &:hover {
+            background-color: #353940 !important;
+            color: #ffffff !important;
+            icon {
+                color: #fff !important;
+            }
+        }
+    }
+    .el-sub-menu__title:hover {
+        background-color: #353940 !important;
+        color: #ffffff !important;
+    }
+    .icon {
+        font-size: 14px !important;
+    }
+}
+.el-button {
+    padding: 6px 12px;
+}
+
+.table-com-search {
+    margin-bottom: 10px;
+}
+.bd-right-full-dialog {
+    position: absolute;
+    right: 0 !important;
+    margin: 0;
+    height: calc(100vh);
+    width: calc(100vw - 230px) !important;
+    .el-dialog__body {
+        height: auto !important;
+    }
+    .el-tabs {
+        margin-top: 10px;
+        .el-tab-pane {
+            height: calc(100vh - 180px);
+            overflow-y: auto;
+        }
+        .ba-operate-form {
+            padding-top: 10px;
+        }
+    }
+}
+.el-dialog {
+    padding-bottom: 60px !important;
+}
+.el-dialog__footer {
+    background-color: #fff;
+}
+html.dark {
+    .el-dialog__footer {
+        background: none !important;
+    }
+}
+.dark .ba-editor {
+    background: #fff !important;
+    --w-e-textarea-bg-color: #fff !important;
+}

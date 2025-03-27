@@ -1,0 +1,17 @@
+export default {
+    id: 'id',
+    acode: 'acode',
+    name: 'name',
+    address: 'address',
+    postcode: 'postcode',
+    contact: 'contact',
+    mobile: 'mobile',
+    phone: 'phone',
+    fax: 'fax',
+    email: 'email',
+    qq: 'qq',
+    weixin: 'weixin',
+    blicense: 'blicense',
+    other: 'other',
+    'quick Search Fields': 'id',
+}

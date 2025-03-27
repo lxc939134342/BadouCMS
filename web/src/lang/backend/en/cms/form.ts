@@ -1,0 +1,11 @@
+export default {
+    id: 'id',
+    fcode: 'fcode',
+    form_name: 'form_name',
+    table_name: 'table_name',
+    create_user: 'create_user',
+    update_user: 'update_user',
+    create_time: 'create_time',
+    update_time: 'update_time',
+    'quick Search Fields': 'id',
+}

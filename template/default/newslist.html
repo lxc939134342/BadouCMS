@@ -1,0 +1,72 @@
+{extend name="base" /} {block name="main"}
+<div class="container Wauto">
+  <div class="bnBox cateBn">
+    <div class="cateBnImg" style="background-image: url({$sort.pic})"></div>
+  </div>
+  <div class="main w1200">
+    <div class="article w1">
+      <div class="archive-top anim fadeInUp">
+        <div class="archive-title">
+          <h1 itemprop="headline">{$sort.name}</h1>
+          <span></span>
+        </div>
+        <div class="archive-description">
+          <p>{$sort.description}</p>
+        </div>
+      </div>
+      <div class="subcate anim fadeInUp" data-wow-delay=".3s">
+        <div id="subcate" data-type="sort" data-infoid="2">
+          <ul>
+            {bd:nav parent="$sort['tcode']" }
+            <li class="{if $nav['scode']==$sort['scode']}active{/if}">
+              <a href="{$nav.link}">{$nav.name}</a>
+            </li>
+            {/bd:nav}
+          </ul>
+        </div>
+      </div>
+      <div class="post news top">
+        <div class="PostNews">
+          <ul>
+            {bd:list }
+            <li data-id="{$list.id}" class="anim fadeInUp">
+              <div class="post-img loading">
+                <a
+                  class="pic float-left"
+                  href="{$list.link}"
+                  title="{$list.title}"
+                  rel="bookmark"
+                >
+                  <div class="msk"></div>
+                  <i class="fa fa-search"></i>
+                  <img
+                    class="b-lazy"
+                    src="{$list.ico}"
+                    data-src="{$list.ico}"
+                    alt="{$list.title}"
+                  />
+                </a>
+              </div>
+              <h4>
+                <a href="{$list.link}" title="{$list.title}">{$list.title}</a>
+              </h4>
+              <span class="time">
+                <i class="fa fa-clock-o"></i>
+                {$list.date}
+              </span>
+              <span>
+                <i class="fa fa-eye fa-fw"></i>
+                {$list.visits}
+              </span>
+              <p>{$list.description|substr_both=0,55}</p>
+            </li>
+            {/bd:list}
+          </ul>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="text-center">{$page.bar |raw}</div>
+    </div>
+  </div>
+</div>
+{/block}

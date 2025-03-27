@@ -1,0 +1,15 @@
+export default {
+    id: '序号',
+    acode: '区域编码',
+    gid: '分组(gid)',
+    name: '名称',
+    link: '链接',
+    logo: '图片',
+    sorting: '排序',
+    create_user: '创建人员',
+    update_user: '更新人员',
+    create_time: '创建时间',
+    update_time: '修改时间',
+    gid_text: '新增分组',
+    'quick Search Fields': '序号',
+}

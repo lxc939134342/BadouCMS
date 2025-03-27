@@ -1,0 +1,15 @@
+export default {
+    contentid: 'contentid',
+    comment: 'comment',
+    uid: 'uid',
+    puid: 'puid',
+    likes: 'likes',
+    oppose: 'oppose',
+    status: 'status',
+    user_ip: 'user_ip',
+    user_os: 'user_os',
+    user_bs: 'user_bs',
+    create_time: 'create_time',
+    update_time: 'update_time',
+    'quick Search Fields': 'id',
+}

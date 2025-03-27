@@ -1,0 +1,16 @@
+export default {
+    id: '站点编号',
+    acode: '区域代码',
+    title: '站点标题',
+    subtitle: '站点副标题',
+    domain: '站点地址',
+    logo: '站点LOGO地址',
+    keywords: '站点关键字',
+    description: '站点描述',
+    icp: '站点备案',
+    theme: '站点主题',
+    statistical: '站点统计码',
+    copyright: '版权信息',
+    'quick Search Fields': '站点编号',
+    basic: '站点信息',
+}

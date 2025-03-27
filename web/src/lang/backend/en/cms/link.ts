@@ -1,0 +1,14 @@
+export default {
+    id: 'id',
+    acode: 'acode',
+    gid: 'gid',
+    name: 'name',
+    link: 'link',
+    logo: 'logo',
+    sorting: 'sorting',
+    create_user: 'create_user',
+    update_user: 'update_user',
+    create_time: 'create_time',
+    update_time: 'update_time',
+    'quick Search Fields': 'id',
+}

@@ -1,0 +1,16 @@
+export default {
+    id: '序号',
+    mcode: '编号',
+    name: '名称',
+    type: '类型',
+    urlname: 'URL名称',
+    listtpl: '列表页模板',
+    contenttpl: '内容页模板',
+    status: '状态',
+    issystem: '系统模型',
+    create_user: '创建人员',
+    update_user: '更新人员',
+    create_time: '创建时间',
+    update_time: '更新时间',
+    'quick Search Fields': '序号',
+}

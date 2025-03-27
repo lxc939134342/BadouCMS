@@ -1,0 +1,15 @@
+export default {
+    id: 'id',
+    acode: 'acode',
+    title: 'title',
+    subtitle: 'subtitle',
+    domain: 'domain',
+    logo: 'logo',
+    keywords: 'keywords',
+    description: 'description',
+    icp: 'icp',
+    theme: 'theme',
+    statistical: 'statistical',
+    copyright: 'copyright',
+    'quick Search Fields': 'id',
+}

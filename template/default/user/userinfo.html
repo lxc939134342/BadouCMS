@@ -1,0 +1,58 @@
+<li class="dropdown navbar-userinfo">
+  {if $user}
+  <a
+    href="{:url('/user/index')}"
+    class="dropdown-toggle"
+    role="button"
+    data-toggle="dropdown"
+    aria-expanded="false"
+  >
+    <span class="avatar-img pull-left">
+      <img
+        src="{$user.avatar|full_url|htmlentities}"
+        style="width: 20px; height: 20px; border-radius: 50%"
+        alt=""
+      />
+    </span>
+    <span class="pull-left ml-2">
+      {$user.nickname|htmlentities}
+      <b class="caret"></b>
+    </span>
+  </a>
+  {else /}
+  <a href="{:url('/user/login')}" class="login-btn">登录</a>
+  <a href="{:url('/user/login', ['tab' => 'register'])}" class="login-btn">
+    注册
+  </a>
+  {/if}
+  <ul class="dropdown-menu dropdown-menu-right">
+    {if $user}
+    <li>
+      <a href="{:url('/user/index')}">
+        <i class="fa fa-user fa-fw"></i>
+        会员中心
+      </a>
+    </li>
+
+    <li>
+      <a href="{:url('/user/logout')}">
+        <i class="fa fa-sign-out fa-fw"></i>
+        退出
+      </a>
+    </li>
+    {else /}
+    <li>
+      <a href="{:url('/user/login')}">
+        <i class="fa fa-sign-in fa-fw"></i>
+        登录
+      </a>
+    </li>
+    <li>
+      <a href="{:url('index/user/register')}">
+        <i class="fa fa-user-o fa-fw"></i>
+        注册
+      </a>
+    </li>
+    {/if}
+  </ul>
+</li>
