@@ -10,6 +10,32 @@
 
 > 本项目实现了 pbootcms 的基本功能，功能使用与 pbootcms 基本类似。
 
+### 项目预览
+
+|                                                                                      |                                                                                      |
+| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| ![模版首页](https://gitee.com/lande_admin/gohub/raw/master/WX20241220-083130@2x.png) | ![控制台](https://gitee.com/lande_admin/gohub/raw/master/WX20241220-083012@2x.png)   |
+| ![站点配置](https://gitee.com/lande_admin/gohub/raw/master/WX20241220-083101@2x.png) | ![文章管理](https://gitee.com/lande_admin/gohub/raw/master/WX20241220-083042@2x.png) |
+
+### 演示站点
+
+http://demo.badoucms.com/
+
+### 演示后台
+
+http://demo.badoucms.com/index.html
+
+### 演示账号
+
+账号：badoucms
+密码：123456
+
+### QQ 群
+
+群号：963655847
+
+![QQ 群二维码](https://gitee.com/lande_admin/badoucms_doc/raw/master/docs/public/images/qrcode_qq.jpg)
+
 ### 功能列表
 
 - [x] 区域管理（多语言）
@@ -36,37 +62,11 @@
 - [x] 我的评论
 - [x] 数据库备份
 - [x] 系统升级
-- [ ] PbootCMS 迁移
+- [x] PbootCMS 迁移
 - [ ] 百度推送
 - [ ] 缩略图水印
-
-### 项目预览
-
-|                                                                                      |                                                                                      |
-| ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| ![模版首页](https://gitee.com/lande_admin/gohub/raw/master/WX20241220-083130@2x.png) | ![控制台](https://gitee.com/lande_admin/gohub/raw/master/WX20241220-083012@2x.png)   |
-| ![站点配置](https://gitee.com/lande_admin/gohub/raw/master/WX20241220-083101@2x.png) | ![文章管理](https://gitee.com/lande_admin/gohub/raw/master/WX20241220-083042@2x.png) |
-
-### 演示站点
-
-http://demo.badoucms.com/
-
-### 演示后台
-
-http://demo.badoucms.com/index.html
-
-### 演示账号
-
-账号：badoucms
-密码：123456
 
 ### 特别鸣谢
 
 - [BuildAdmin](https://www.buildadmin.com/)
 - [pbootcms](https://www.pbootcms.com/)
-
-### QQ 群
-
-群号：963655847
-
-![QQ 群二维码](https://gitee.com/lande_admin/badoucms_doc/raw/master/docs/public/images/qrcode_qq.jpg)
