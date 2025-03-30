@@ -226,7 +226,8 @@ class PbootToBadoucms extends Backend
                         $createTableSql = preg_replace('/INTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT/i', 'INT AUTO_INCREMENT PRIMARY KEY', $createTableSql);
                         $createTableSql = preg_replace('/INTEGER(?!\s+PRIMARY\s+KEY)/i', 'INT', $createTableSql);
                         $createTableSql = preg_replace('/DATETIME\s+DEFAULT\s+CURRENT_TIMESTAMP/i', 'DATETIME DEFAULT CURRENT_TIMESTAMP', $createTableSql);
-                        $createTableSql = preg_replace('/TEXT\(\d+\)/i', 'VARCHAR(255)', $createTableSql);
+                        $createTableSql = preg_replace('/TEXT\(\d+\)/i', 'TEXT', $createTableSql);
+                        $createTableSql = preg_replace('/TEXT(?!\()/i', 'LONGTEXT', $createTableSql);
                         $createTableSql = str_replace('"', '`', $createTableSql);
                         $createTableSql = str_replace($customTableName, $targetTable, $createTableSql);
                         // 移除SQLite特有的语法
@@ -275,7 +276,8 @@ class PbootToBadoucms extends Backend
                         $createTableSql = preg_replace('/INTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT/i', 'INT AUTO_INCREMENT PRIMARY KEY', $createTableSql);
                         $createTableSql = preg_replace('/INTEGER(?!\s+PRIMARY\s+KEY)/i', 'INT', $createTableSql);
                         $createTableSql = preg_replace('/DATETIME\s+DEFAULT\s+CURRENT_TIMESTAMP/i', 'DATETIME DEFAULT CURRENT_TIMESTAMP', $createTableSql);
-                        $createTableSql = preg_replace('/TEXT\(\d+\)/i', 'VARCHAR(255)', $createTableSql);
+                        $createTableSql = preg_replace('/TEXT\(\d+\)/i', 'TEXT', $createTableSql);
+                        $createTableSql = preg_replace('/TEXT(?!\()/i', 'LONGTEXT', $createTableSql);
                         $createTableSql = str_replace('"', '`', $createTableSql);
                         $createTableSql = str_replace($tableName, $targetTable, $createTableSql);
                         $createTableSql = preg_replace('/\s*AUTOINCREMENT\s*/i', ' AUTO_INCREMENT ', $createTableSql);
