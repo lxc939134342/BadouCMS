@@ -226,8 +226,11 @@ class PbootToBadoucms extends Backend
                         $createTableSql = preg_replace('/INTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT/i', 'INT AUTO_INCREMENT PRIMARY KEY', $createTableSql);
                         $createTableSql = preg_replace('/INTEGER(?!\s+PRIMARY\s+KEY)/i', 'INT', $createTableSql);
                         $createTableSql = preg_replace('/DATETIME\s+DEFAULT\s+CURRENT_TIMESTAMP/i', 'DATETIME DEFAULT CURRENT_TIMESTAMP', $createTableSql);
-                        $createTableSql = preg_replace('/TEXT\(\d+\)/i', 'TEXT', $createTableSql);
-                        $createTableSql = preg_replace('/TEXT(?!\()/i', 'LONGTEXT', $createTableSql);
+
+                        $createTableSql = preg_replace_callback('/VARCHAR\((\d+)\)/i', function ($matches) {
+                            $length = intval($matches[1]);
+                            return $length <= 255 ? "VARCHAR($length)" : "TEXT";  // 保留<=255的VARCHAR定义
+                        }, $createTableSql);
                         $createTableSql = str_replace('"', '`', $createTableSql);
                         $createTableSql = str_replace($customTableName, $targetTable, $createTableSql);
                         // 移除SQLite特有的语法
@@ -273,11 +276,18 @@ class PbootToBadoucms extends Backend
                     // 创建新表
                     if ($dbType == 'sqlite') {
                         $createTableSql = Db::connect('pboot')->query("SELECT sql FROM sqlite_master WHERE type='table' AND name = ?", [$tableName])[0]['sql'];
+                        p($createTableSql);
+                        halt(111);
+                        // 转换SQLite的建表语句为MySQL格式
                         $createTableSql = preg_replace('/INTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT/i', 'INT AUTO_INCREMENT PRIMARY KEY', $createTableSql);
                         $createTableSql = preg_replace('/INTEGER(?!\s+PRIMARY\s+KEY)/i', 'INT', $createTableSql);
                         $createTableSql = preg_replace('/DATETIME\s+DEFAULT\s+CURRENT_TIMESTAMP/i', 'DATETIME DEFAULT CURRENT_TIMESTAMP', $createTableSql);
-                        $createTableSql = preg_replace('/TEXT\(\d+\)/i', 'TEXT', $createTableSql);
+
+                        // 修改所有可能存储长文本的字段为 LONGTEXT
+                        $createTableSql = preg_replace('/VARCHAR\s*\(\d+\)\s*(?=,|\))/i', 'LONGTEXT', $createTableSql);
+                        $createTableSql = preg_replace('/TEXT\s*\(\d+\)\s*(?=,|\))/i', 'LONGTEXT', $createTableSql);
                         $createTableSql = preg_replace('/TEXT(?!\()/i', 'LONGTEXT', $createTableSql);
+
                         $createTableSql = str_replace('"', '`', $createTableSql);
                         $createTableSql = str_replace($tableName, $targetTable, $createTableSql);
                         $createTableSql = preg_replace('/\s*AUTOINCREMENT\s*/i', ' AUTO_INCREMENT ', $createTableSql);
@@ -400,6 +410,8 @@ class PbootToBadoucms extends Backend
 
         // 获取目标表的字段信息
         $columns = Db::getFields($targetTable);
+
+
         $validFields = array_keys($columns);
 
         foreach ($data as $row) {
@@ -414,6 +426,28 @@ class PbootToBadoucms extends Backend
 
                 // 只保留目标表中存在的字段
                 if (in_array($targetField, $validFields)) {
+                    // 检查字段类型和数据长度
+                    if (isset($columns[$targetField])) {
+                        $type = strtoupper($columns[$targetField]['type']);
+
+                        // 处理可能超长的字段
+                        if (is_string($value)) {
+                            if (preg_match('/VARCHAR\((\d+)\)/i', $type, $matches)) {
+                                $length = intval($matches[1]);
+                                // 如果数据长度超过字段限制，自动转换字段类型为TEXT
+                                if (mb_strlen($value) > floor($length / 4)) {
+                                    try {
+                                        Db::execute("ALTER TABLE {$targetTable} MODIFY COLUMN `{$targetField}` TEXT");
+                                        $columns[$targetField]['type'] = 'TEXT';
+                                        unset($columns[$targetField]['length']);
+                                    } catch (\Exception $e) {
+                                        // 如果无法修改字段类型，则截断数据
+                                        $value = mb_substr($value, 0, floor($length / 4));
+                                    }
+                                }
+                            }
+                        }
+                    }
                     $newRow[$targetField] = $value;
                 }
             }
