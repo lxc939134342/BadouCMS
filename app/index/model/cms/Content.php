@@ -356,7 +356,9 @@ class Content extends Model
                     break;
                 case 'start':
                     // 起始数校验
-                    if (! is_numeric($value) || $value < 1) {
+                    if (is_numeric( $value) ) {
+                        $start = $value;
+                    }else{
                         $start = 0;
                     }
                     break;
