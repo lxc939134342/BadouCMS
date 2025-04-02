@@ -184,7 +184,8 @@ class Backupdb
             $sql .= $brackets;
             $comma = "";
             for ($i = 0; $i < $fieldNnum; $i++) {
-                $sql .= ($comma . "'" . addslashes(decode_string($row[$i])) . "'");
+                $value = decode_string($row[$i]) ?? '';
+                $sql .= ($comma . "'" . addslashes($value) . "'");
                 $comma = ",";
             }
             $sql .= ")";

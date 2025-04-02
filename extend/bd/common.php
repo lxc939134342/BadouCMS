@@ -295,7 +295,7 @@ function escape_string($string)
             $string->$key = escape_string($value);
         }
     } else { // 字符串处理
-        $string = htmlspecialchars(trim($string), ENT_QUOTES, 'UTF-8');
+        $string = htmlspecialchars(trim($string), ENT_QUOTES, 'UTF-8') ?? '';
         $string = addslashes($string);
     }
     return $string;
