@@ -253,6 +253,13 @@
 
                 $('form').on('submit', function (e) {
                     e.preventDefault();
+                    // 添加密码验证
+                    var password = $('input[name="adminpassword"]').val();
+                    if (!/^(?!.*[&<>"'\n\r]).{6,32}$/.test(password)) {
+                        $("#error").show().text("密码必须为6-32位字符，且不能包含 & < > \" ' 等特殊字符");
+                        $("html,body").animate({scrollTop: 0}, 500);
+                        return false;
+                    }
                     var form = this;
                     var $error = $("#error");
                     var $success = $("#success");
@@ -280,7 +287,7 @@
                                     $("#warmtips").html("{:__('Security tips')}" + '<a href="' + url + '">' + url + '</a>').show();
                                     $('<a class="btn" href="' + url + '" id="btn-admin" style="background:#4e73df">' + "{:__('Dashboard')}" + '</a>').appendTo($buttons);
                                 }
-                                localStorage.setItem("fastep", "installed");
+                                localStorage.setItem("badoucmsep", "installed");
                             } else {
                                 $error.show().text(ret.msg);
                                 $button.prop('disabled', false).text("{:__('Install now')}");

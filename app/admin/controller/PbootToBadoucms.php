@@ -432,17 +432,40 @@ class PbootToBadoucms extends Backend
 
                         // 处理可能超长的字段
                         if (is_string($value)) {
-                            if (preg_match('/VARCHAR\((\d+)\)/i', $type, $matches)) {
-                                $length = intval($matches[1]);
-                                // 如果数据长度超过字段限制，自动转换字段类型为TEXT
-                                if (mb_strlen($value) > floor($length / 4)) {
+                            // 检查各种可能的字段类型
+                            if (preg_match('/(VARCHAR|CHAR|TEXT|TINYTEXT|MEDIUMTEXT)\((\d+)\)?/i', $type, $matches)) {
+                                $fieldType = strtoupper($matches[1]);
+                                $length = isset($matches[2]) ? intval($matches[2]) : 0;
+                                
+                                // 根据不同字段类型判断是否需要转换
+                                $needConvert = false;
+                                if ($fieldType === 'VARCHAR' || $fieldType === 'CHAR') {
+                                    $needConvert = mb_strlen($value) > floor($length / 4);
+                                } elseif ($fieldType === 'TINYTEXT' && mb_strlen($value) > 255) {
+                                    $needConvert = true;
+                                } elseif ($fieldType === 'TEXT' && mb_strlen($value) > 65535) {
+                                    $needConvert = true;
+                                } elseif ($fieldType === 'MEDIUMTEXT' && mb_strlen($value) > 16777215) {
+                                    $needConvert = true;
+                                }
+
+                                if ($needConvert) {
                                     try {
-                                        Db::execute("ALTER TABLE {$targetTable} MODIFY COLUMN `{$targetField}` TEXT");
-                                        $columns[$targetField]['type'] = 'TEXT';
+                                        // 转换为 LONGTEXT 类型
+                                        Db::execute("ALTER TABLE {$targetTable} MODIFY COLUMN `{$targetField}` LONGTEXT");
+                                        $columns[$targetField]['type'] = 'LONGTEXT';
                                         unset($columns[$targetField]['length']);
                                     } catch (\Exception $e) {
-                                        // 如果无法修改字段类型，则截断数据
-                                        $value = mb_substr($value, 0, floor($length / 4));
+                                        // 如果无法修改字段类型，则根据原字段类型截断数据
+                                        if ($fieldType === 'VARCHAR' || $fieldType === 'CHAR') {
+                                            $value = mb_substr($value, 0, floor($length / 4));
+                                        } elseif ($fieldType === 'TINYTEXT') {
+                                            $value = mb_substr($value, 0, 255);
+                                        } elseif ($fieldType === 'TEXT') {
+                                            $value = mb_substr($value, 0, 65535);
+                                        } elseif ($fieldType === 'MEDIUMTEXT') {
+                                            $value = mb_substr($value, 0, 16777215);
+                                        }
                                     }
                                 }
                             }
