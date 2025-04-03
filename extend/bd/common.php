@@ -999,6 +999,6 @@ function create_file($path, $content = null, $over = false)
     }
     check_dir(dirname($path), true);
     $handle = fopen($path, 'w') or throw new \Exception('创建文件失败，请检查目录权限！');
-    fwrite($handle, $content);
+    fwrite($handle, $content ?? '');
     return fclose($handle);
 }

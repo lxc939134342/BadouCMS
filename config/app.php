@@ -32,4 +32,5 @@ return [
     'error_message'    => '页面错误！请稍后再试～',
     // 显示错误信息
     'show_error_msg'   => true,
+    'error_reporting' => E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED,
 ];
