@@ -13,6 +13,7 @@
 namespace app\index\model\cms;
 
 use think\Model;
+use think\facade\View;
 
 class ContentSort extends Model
 {
@@ -93,10 +94,15 @@ class ContentSort extends Model
             'b.urlname'
         );
         $order = 'a.pcode,a.sorting,a.id desc';
+        $view = View::instance();
         $data = self::alias('a')->field($field)
             ->where('a.scode', 'in', $scodes)
             ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
             ->order($order)
+            ->filter(function ($row) use ($view) {
+                $row['tcode'] = $view->sort['tcode'] ?? 0;
+                $row['gcode'] = $view->sort['gcode'] ?? 0;
+            })
             ->select();
         $data = $data->toArray();
         return $data;
