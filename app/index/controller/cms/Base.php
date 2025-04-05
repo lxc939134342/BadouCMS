@@ -234,7 +234,22 @@ class Base extends BaseController
             if (!$this->contentSort) {
                 abort(404, __('Not found'));
             }
-            $this->contentSort['tcode'] = $contentSortModel->getSortTopScode($this->contentSort['scode']);
+            $tcode = $contentSortModel->getSortTopScode($this->contentSort['scode']);
+            $this->contentSort['tcode'] = $tcode;
+            // 获取顶级栏目
+            if ($tcode) {
+                $top_sort = $contentSortModel->getSort($tcode);
+                $this->contentSort['topname'] = $top_sort['name'] ?? '';
+                $this->contentSort['toplink'] = $top_sort['link'] ?? '';
+            }
+
+            // 获取父级栏目
+            if ($this->contentSort['pcode']) {
+                $parent_sort = $contentSortModel->getSort($this->contentSort['pcode']);
+                $this->contentSort['parentname'] = $parent_sort['name'] ?? '';
+                $this->contentSort['parentlink'] = $parent_sort['link'] ?? '';
+            }
+
             $this->view->assign('sort', $this->contentSort);
             /*验证权限*/
             if ($this->contentSort['gid']) {
@@ -267,6 +282,8 @@ class Base extends BaseController
             'scaction' => url('/search'),
             'sitemap' => url('/sitemap', [], 'xml'),
             'msgaction' => url('/message'),
+            'sitetplpath' => full_url(DIRECTORY_SEPARATOR.'template'. DIRECTORY_SEPARATOR. $this->site['theme']. DIRECTORY_SEPARATOR) ,
+            'checkcode' => $this->view->config['captchaUrl']
         ];
         $this->view->assign('bd', array_merge($bdassign, $this->site, $this->company, $this->label));
     }

@@ -19,6 +19,9 @@ class Index extends Base
     public function index()
     {
         $this->site['sitetitle'] = $this->site['sitetitle'] . '-' . $this->site['sitesubtitle'];
+        $this->site['pagetitle'] = $this->site['sitetitle'];
+        $this->site['pagedescription'] = $this->site['sitedescription'];
+        $this->site['pagekeywords'] = $this->site['sitekeywords'];
         $this->assignBd();
         return $this->view->fetch('/index');
     }

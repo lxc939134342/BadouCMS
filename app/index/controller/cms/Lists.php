@@ -23,6 +23,10 @@ class Lists extends Base
         $this->site['sitekeywords'] = $this->contentSort['keywords'] ? $this->contentSort['keywords'] : $this->site['sitekeywords'];
         $this->site['sitedescription'] = $this->contentSort['description'] ? $this->contentSort['description'] : $this->site['sitedescription'];
 
+        $this->site['pagetitle'] = $this->site['sitetitle'];
+        $this->site['pagedescription'] = $this->site['sitedescription'];
+        $this->site['pagekeywords'] = $this->site['sitekeywords'];
+
         $this->assignBd();
         return $this->view->fetch('/'.basename($template, '.html'));
     }

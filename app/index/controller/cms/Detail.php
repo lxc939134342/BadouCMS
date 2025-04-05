@@ -57,6 +57,9 @@ class Detail extends Base
         $this->site['sitetitle'] = $this->contentInfo['title'].'-'.$sorttitle.'-'.$this->site['sitetitle'] . '-' . $this->site['sitesubtitle'];
         $this->site['sitekeywords'] = $this->contentInfo['keywords'] ? $this->contentInfo['keywords'] : $this->site['sitekeywords'];
         $this->site['sitedescription'] = $this->contentInfo['description'] ? $this->contentInfo['description'] : $this->site['sitedescription'];
+        $this->site['pagetitle'] = $this->site['sitetitle'];
+        $this->site['pagedescription'] = $this->site['sitedescription'];
+        $this->site['pagekeywords'] = $this->site['sitekeywords'];
         $this->assignBd();
         $this->view->assign('content', $this->contentInfo);
         return $this->view->fetch('/'.basename($template, '.html'));
