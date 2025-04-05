@@ -367,7 +367,7 @@ class PbootToBadoucms extends Backend
         $pbootPath = $this->getPbootPath();
         try {
             $sourcePath = $pbootPath. DIRECTORY_SEPARATOR.'static'.DIRECTORY_SEPARATOR.'upload';
-            $targetPath = public_path(). '/upload';
+            $targetPath = public_path().'static'.DIRECTORY_SEPARATOR.'upload';
             $this->copyDirectory($sourcePath, $targetPath);
         } catch (\Exception $e) {
             return json(['code' => 0,'msg' => '文件迁移失败: '. $e->getMessage()]);
@@ -436,7 +436,7 @@ class PbootToBadoucms extends Backend
                             if (preg_match('/(VARCHAR|CHAR|TEXT|TINYTEXT|MEDIUMTEXT)\((\d+)\)?/i', $type, $matches)) {
                                 $fieldType = strtoupper($matches[1]);
                                 $length = isset($matches[2]) ? intval($matches[2]) : 0;
-                                
+
                                 // 根据不同字段类型判断是否需要转换
                                 $needConvert = false;
                                 if ($fieldType === 'VARCHAR' || $fieldType === 'CHAR') {
