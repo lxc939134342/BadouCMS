@@ -128,6 +128,7 @@ class Bd extends TagLib
         $parse  .= '$page = $__' . $var . '__["page"];';
         $parse  .= ' ?>';
         $parse  .= '{volist name="$__' . $var . '__data__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
+        $parse .= '<?php $'.$alias.'["'.$key.'"]=$'.$key.';?>';
         $parse  .= $content;
         $parse  .= '{/volist}';
         return $parse;
