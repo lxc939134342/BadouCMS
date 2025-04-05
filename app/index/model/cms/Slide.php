@@ -16,6 +16,22 @@ class Slide extends \think\Model
 {
     protected $name = 'cms_slide';
 
+    protected $append = [
+        'src'
+    ];
+    protected function getSrcAttr($value, $data)
+    {
+        if ($data['pic']) {
+            if (! preg_match('/^http/', $data['pic'])) {
+                return full_url($data['pic']);
+            } else {
+                return $data['pic'];
+            }
+        }
+        return $data['pic'];
+    }
+
+
     public static function slideList($gid, $num = 5)
     {
         $selfModel = new self();

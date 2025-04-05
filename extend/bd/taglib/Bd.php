@@ -41,6 +41,7 @@ class Bd extends TagLib
         if (!isset($tag['scode'])) {
             throw new \think\Exception('scode参数不能为空');
         }
+        $this->autoBuildVar($tag['scode']);
         $scode  = $this->isVar($tag['scode']) ? $tag['scode'] : '"'.$tag['scode'].'"';
         $alias  = $tag['alias'] ?? 'sort';
         $empty  = $tag['empty'] ?? '';
@@ -67,6 +68,8 @@ class Bd extends TagLib
         $empty   = $tag['empty'] ?? '';
         $key     = !empty($tag['key']) ? $tag['key'] : 'i';
         $mod     = $tag['mod'] ?? '2';
+        $this->autoBuildVar($parent);
+        $this->autoBuildVar($scode);
         $var     = Random::build('alnum', 10);
         $parse   = '<?php ';
         $parse  .= '$__' . $var . '__ = \app\index\model\cms\ContentSort::navList(' . $parent . ',"' . $num . '","' . $scode . '");';
@@ -477,6 +480,7 @@ class Bd extends TagLib
         if (defined($name)) {
             return $name;
         }
+        $this->tpl->config(['default_filter' => '']);
         $this->tpl->parseVar($name);
         $this->tpl->parseVarFunction($name);
         return $name;

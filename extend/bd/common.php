@@ -473,6 +473,27 @@ function get_month_days($date, $start = 0, $interval = 1, $retamp = false)
     return $return;
 }
 
+/* 截取字符串 */
+function len($string, $length)
+{
+    return substr_both($string, 0, $length);
+}
+
+/* 时间函数 */
+function style($string, $style)
+{
+    // 如果不是时间戳，尝试转换为时间戳
+    if (!is_numeric($string)) {
+        $timestamp = strtotime($string);
+        if ($timestamp === false) {
+            return $string; // 如果转换失败，返回原字符串
+        }
+        $string = $timestamp;
+    }
+
+    return date($style, $string);
+}
+
 /**
  * 字符串截取 清除html标签
  * @param mixed $string 字符串
@@ -488,7 +509,7 @@ function bd_substr($string, $strat, $length)
 }
 
 /*清除html标签与换行*/
-if (!function_exists('bd_drophtml')) {
+if (!function_exists('drophtml')) {
     function drophtml($str)
     {
         $str = strip_tags($str);

@@ -101,7 +101,10 @@ class ContentSort extends Model
             ->order($order)
             ->filter(function ($row) use ($view) {
                 $row['tcode'] = $view->sort['tcode'] ?? 0;
-                $row['gcode'] = $view->sort['gcode'] ?? 0;
+                $row['topname'] = $view->sort['topname'] ?? '';
+                $row['toplink'] = $view->sort['toplink'] ?? '';
+                $row['parentname'] = $view->sort['parentname'] ?? '';
+                $row['parentlink'] = $view->sort['parentlink'] ?? '';
             })
             ->select();
         $data = $data->toArray();
@@ -117,6 +120,7 @@ class ContentSort extends Model
             'b.urlname'
         );
         $order = 'a.pcode,a.sorting,a.id desc';
+        $view = View::instance();
         $result = self::alias('a')
             ->where('a.acode', get_frontend_lang())
             ->where('a.status', 1)
@@ -124,6 +128,13 @@ class ContentSort extends Model
             ->field($fields)
             ->cache('cms_sorts_tree_' . get_frontend_lang(), 3600, 'cms_cache')
             ->order($order)
+            ->filter(function ($row) use ($view) {
+                $row['tcode'] = $view->sort['tcode'] ?? 0;
+                $row['topname'] = $view->sort['topname'] ?? '';
+                $row['toplink'] = $view->sort['toplink'] ?? '';
+                $row['parentname'] = $view->sort['parentname'] ?? '';
+                $row['parentlink'] = $view->sort['parentlink'] ?? '';
+            })
             ->select();
 
         if ($result->isEmpty()) {
