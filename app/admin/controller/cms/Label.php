@@ -82,6 +82,7 @@ class Label extends Base
     {
         if ($this->request->isPost()) {
             $data = $this->getPostData();
+            $data['value'] = $data['value'] ?? '';
             $result = false;
             $this->model->startTrans();
             try {

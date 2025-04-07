@@ -49,7 +49,6 @@ class Link extends Backend
     {
         if ($this->request->isPost()) {
             $post = $this->request->post();
-            //            var_dump($post);die();
             $post['acode'] = get_backend_lang();
             $post['create_user'] = 'admin';
             $post['update_user'] = 'admin';
