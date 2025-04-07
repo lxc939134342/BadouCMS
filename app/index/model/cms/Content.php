@@ -53,6 +53,101 @@ class Content extends Model
         }
         return full_url(bdurl($data['type'], $data['urlname'], 'content', $data['scode'], $data['sortfilename'], $data['id'], $data['filename']), true);
     }
+
+    // 内容详情页图片
+    public function getContentPics($id, $field, $num = 0)
+    {
+        $result = $this->alias('a')
+            ->field($field . ',picstitle')
+            ->join('cms_content_ext b', 'a.id=b.contentid', 'LEFT')
+            ->where('a.id', $id)
+            ->where('a.status', 1)
+            ->where('a.date', '<', date('Y-m-d H:i:s'))
+            ->find();
+        $data = [];
+        if ($result) {
+            $pics = $result['pics'];
+            $picstitle = explode(',', $result->picstitle);
+            if ($num) {
+                // 限制标签数量
+                $pics = array_slice($pics, 0, $num);
+            }
+            foreach ($pics as $key => $pic) {
+                $data[] = [
+                    'n' => $key,
+                    'i' => $key + 1,
+                    'src' => $pic,
+                    'title' => isset($picstitle[$key]) ? $picstitle[$key] : '',
+                ];
+            }
+        }
+        return $data;
+    }
+
+    // 指定内容标签调用
+    public static function getContentTags($id = '', $scode = '', $num = 0)
+    {
+        $data = [];
+        $sortModel = new ContentSort();
+        if ($id) {
+            $result = self::field('scode,tags')
+            ->where('id', $id)
+            ->where('status', 1)
+            ->where('status=1')
+            ->where('date', '<', date('Y-m-d H:i:s'))
+            ->find();
+
+            if ($result && $result->tags) {
+                $tags = explode(',', $result->tags);
+                $scode = $scode ?: $result->scode;
+                $sort =  $sortModel->getSort($scode); // 获取栏目信息
+                if ($num) {
+                    // 限制标签数量
+                    $tags = array_slice($tags, 0, $num);
+                }
+                foreach ($tags as $key => $value) {
+                    $data[] = array(
+                        'sort' => $sort,
+                        'tags' => $value
+                    );
+                }
+            }
+        } elseif ($scode) {
+            $scodes = explode(',', $scode); // 多个栏目是分别获取
+            foreach ($scodes as $key => $value) {
+                $sort = $sortModel->getSort($value); // 获取栏目信息
+                if (!!$result = $sortModel->getSortTags($value)) {
+                    $tags = implode(',', $result); // 把栏目tags串起来
+                    $tags = array_unique(explode(',', $tags)); // 再把所有tags组成数组并去重
+                    foreach ($tags as $key2 => $value2) {
+                        if (! in_array($value2, array_column($data, 'tags'))) { // 避免重复输出
+                            $data[] = array(
+                                'sort' => $sort,
+                                'tags' => $value2
+                            );
+                        }
+                    }
+                }
+            }
+        } else {
+            // 全部栏目时候强制标签页形式
+            $target = 'tag';
+            if (!!$result = $sortModel->getSortTags('')) {
+                $tags = implode(',', $result); // 把栏目tags串起来
+                $tags = array_unique(explode(',', $tags)); // 再把所有tags组成数组并去重
+                foreach ($tags as $key2 => $value2) {
+                    if (! in_array($value2, array_column($data, 'tags'))) { // 避免重复输出
+                        $data[] = array(
+                            'tags' => $value2
+                        );
+                    }
+                }
+            }
+        }
+
+        return $data;
+    }
+
     /**
      * 单篇内容
      * @param mixed $scode

@@ -216,6 +216,8 @@ class Bootstrap extends Paginator
             'count'   => $this->lastPage(),
             'rows'    => $this->total,
             'number' => $this->getLinks(),
+            'numbar' => $this->getLinks(),
+            'selectbar' => $this->gopage()
         ];
     }
 

@@ -279,11 +279,23 @@ class Base extends BaseController
     protected function assignBd(): void
     {
         $bdassign = [
+            'sitepath' => request()->domain(true),
             'scaction' => url('/search'),
             'sitemap' => url('/sitemap', [], 'xml'),
             'msgaction' => url('/message'),
-            'sitetplpath' => full_url(DIRECTORY_SEPARATOR.'template'. DIRECTORY_SEPARATOR. $this->site['theme']. DIRECTORY_SEPARATOR) ,
-            'checkcode' => $this->view->config['captchaUrl']
+            'sitetplpath' => request()->domain(true).DIRECTORY_SEPARATOR.'template'. DIRECTORY_SEPARATOR. $this->site['theme']. DIRECTORY_SEPARATOR ,
+            'checkcode' => $this->view->config['captchaUrl'],
+            'islogin' => $this->auth->isLogin(),
+            'registerstatus' => true,
+            'loginstatus' => true,
+            'register' => url('/user/register'),
+            'login' => url('/user/login'),
+            'lgpath' => '',
+            'httpurl' => request()->domain(true),
+            'pageurl' => request()->url(true),
+            'commentstatus' => 1,
+            'commentaction' => '',
+            'commentcodestatus' => 1
         ];
         $this->view->assign('bd', array_merge($bdassign, $this->site, $this->company, $this->label));
     }

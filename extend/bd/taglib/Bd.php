@@ -32,7 +32,10 @@ class Bd extends TagLib
         'commentsub' => ['attr' => '','close' => 1],
         'message'    => ['attr' => '','close' => 1],
         'form'       => ['attr' => 'fcode','close' => 0],
-        'formlist'   => ['attr' => 'fcode','close' => 1]
+        'formlist'   => ['attr' => 'fcode','close' => 1],
+        'tags'       => ['attr' => '','close' => 1],
+        'pics' => ['attr' => '','close' => 1],
+        'qrcode' => ['attr' => 'string','close' => 0],
     ];
 
     /*当前分类 子分类列表*/
@@ -68,13 +71,18 @@ class Bd extends TagLib
         $empty   = $tag['empty'] ?? '';
         $key     = !empty($tag['key']) ? $tag['key'] : 'i';
         $mod     = $tag['mod'] ?? '2';
-        $this->autoBuildVar($parent);
-        $this->autoBuildVar($scode);
+        if ($parent) {
+            $parent = $this->autoBuildVar($parent);
+        }
+        if ($scode) {
+            $scode = $this->autoBuildVar($scode);
+        }
         $var     = Random::build('alnum', 10);
         $parse   = '<?php ';
         $parse  .= '$__' . $var . '__ = \app\index\model\cms\ContentSort::navList(' . $parent . ',"' . $num . '","' . $scode . '");';
         $parse  .= ' ?>';
         $parse  .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
+        $parse .= '<?php $'.$alias.'["'.$key.'"]=$'.$key.';?>';
         $parse  .= $content;
         $parse  .= '{/volist}';
         $parse  .= '{php}$__LASTLIST__=$__' . $var . '__;{/php}';
@@ -116,7 +124,7 @@ class Bd extends TagLib
             }
         }
 
-        $tags ? $params[] = '"tags"=>'.$tags : '';
+        $tags ? $params[] = '"tags"=>"'.$tags.'"' : '';
         $filter ? $params[] = '"filter"=>'.$filter : '';
         $isico ? $params[] = '"isico"=>'.$isico : '';
         $ispics ? $params[] = '"ispics"=>'.$ispics : '';
@@ -447,6 +455,52 @@ class Bd extends TagLib
         $parse  .= '{volist name="$__' . $var . '__data__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
         $parse  .= $content;
         $parse  .= '{/volist}';
+        return $parse;
+    }
+
+    public function tagTags($tag, $content): string
+    {
+        $id = $tag['id'] ?? '""';
+        $scode = $tag['scode'] ?? '""';
+        $alias    = $tag['alias'] ?? 'tags';
+        $empty = $tag['empty'] ?? '';
+        $key   = !empty($tag['key']) ? $tag['key'] : 'i';
+        $num   = $tag['num'] ?? 0;
+        $mod   = $tag['mod'] ?? '2';
+        $var     = Random::build('alnum', 10);
+        $parse   = '<?php ';
+        $parse  .= '$__' . $var . '__ = \app\index\model\cms\Content::getContentTags('.$id.','.$scode.','.$num.');';
+        $parse  .= '?>';
+        $parse  .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
+        $parse  .= $content;
+        $parse  .= '{/volist}';
+        return $parse;
+    }
+
+    public function tagPics($tag, $content): string
+    {
+        $id = $tag['id'] ?? '""';
+        $field = $tag['field'] ?? '"pics"';
+        $alias    = $tag['alias'] ?? 'pics';
+        $empty = $tag['empty'] ?? '';
+        $key   = !empty($tag['key']) ? $tag['key'] : 'i';
+        $num   = $tag['num'] ?? 0;
+        $mod   = $tag['mod'] ?? '2';
+        $var     = Random::build('alnum', 10);
+        $parse   = '<?php ';
+        $parse  .= '$__' . $var . '__ = (new \app\index\model\cms\Content)->getContentPics('.$id.','.$field.','.$num.');';
+        $parse  .= '?>';
+        $parse  .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
+        $parse  .= $content;
+        $parse  .= '{/volist}';
+        return $parse;
+    }
+
+    public function tagQrcode($tag, $content): string
+    {
+        $string = $tag['string'] ?? '""';
+        $string = $this->autoBuildVar($string);
+        $parse   = '<?php echo \'<img src="'.request()->domain(true). '/api/cms.qrcode/index?string=\'.'.$string.'.\'" class="qrcode" alt="二维码">\'; ?>';
         return $parse;
     }
 

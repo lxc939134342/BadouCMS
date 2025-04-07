@@ -256,6 +256,35 @@ class ContentSort extends Model
         return $this->scodes;
     }
 
+    // 指定分类标签调用
+    public function getSortTags($scode)
+    {
+        $scode_arr = [];
+        if ($scode) {
+            // 获取所有子类分类编码
+            $this->scodes = []; // 先清空
+            $scodes = $this->getSubScodes(trim($scode)); // 获取子类
+
+            // 构建查询条件
+            $scode_arr = function ($query) use ($scodes, $scode) {
+                $query->whereIn('a.scode', $scodes)
+                    ->whereOr('a.subscode', $scode);
+            };
+        }
+
+        $result = \app\index\model\cms\Content::alias('a')
+            ->where('c.type', 2)
+            ->where('a.tags', '<>', '')
+            ->where($scode_arr)
+            ->join('cms_content_sort b', 'a.scode=b.scode', 'LEFT')
+            ->join('cms_model c', 'b.mcode=c.mcode', 'LEFT')
+            ->where('a.status', 1)
+            ->order('a.visits', 'DESC')
+            ->column('a.tags');
+
+        return $result;
+    }
+
     /**
      * 获取导航列表
      * @param mixed $parent

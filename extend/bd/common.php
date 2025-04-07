@@ -479,6 +479,15 @@ function len($string, $length)
     return substr_both($string, 0, $length);
 }
 
+// 截取字符串，中文算两个字符
+function lencn($string, $length)
+{
+    if (strlen_both($string) >  $length) {
+        return substr_both($string, 0, $length);
+    }
+    return $string;
+}
+
 /* 时间函数 */
 function style($string, $style)
 {
@@ -492,6 +501,43 @@ function style($string, $style)
     }
 
     return date($style, $string);
+}
+
+/**
+ *  运算功能
+ * @param mixed $data
+ * @param mixed $value
+ */
+function operate($data, $value)
+{
+    if (preg_match('/^([\+\-\*\/\%])([0-9\.]+)$/', $value, $mathes)) {
+        if (! is_numeric($data)) {
+            $data = 0;
+        }
+        switch ($mathes[1]) {
+            case '+':
+                $data = $data + $mathes[2];
+                break;
+            case '-':
+                $data = $data - $mathes[2];
+                break;
+            case '*':
+                $data = $data * $mathes[2];
+                break;
+            case '/':
+                $data = $data / $mathes[2];
+                break;
+            case '%':
+                $data = $data % $mathes[2];
+                break;
+        }
+    }
+    return $data;
+}
+
+function dropblank($string)
+{
+    return clear_html_blank($string);
 }
 
 /**
