@@ -147,7 +147,7 @@ class ContentSort extends Model
         foreach ($result as $value) {
             $value['soncount'] = 0;
             $data[$value['scode']] = $value;
-            if ($value['pcode']) {
+            if (isset($value['pcode']) && $value['pcode']) {
                 $tree[$value['pcode']]['son'][] = $value; // 记录到关系树
             }
         }
