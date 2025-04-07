@@ -157,7 +157,7 @@ class ContentSort extends Model
             $data[$key]['soncount'] = count($tree[$key]['son']);
         }
         foreach ($data as $key => $value) {
-            if ($value['pcode'] == 0) {
+            if (isset($value['pcode']) && $value['pcode'] == 0) {
                 $top[] = $value;
             }
         }
