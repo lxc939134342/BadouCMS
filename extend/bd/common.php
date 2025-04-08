@@ -301,6 +301,16 @@ function escape_string($string)
     return $string;
 }
 
+function mark($string)
+{
+    if ($reqdata = request()->param('keyword')) {
+        $string = preg_replace('/(' . $reqdata . ')/i', '<span style="color:red">$1</span>', $string);
+    }
+    return $string;
+}
+
+
+
 // 字符反转义html实体及斜杠，支持字符串、数组、对象
 function decode_string($string)
 {

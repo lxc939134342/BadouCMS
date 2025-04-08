@@ -12,6 +12,8 @@
 
 namespace app\index\controller\cms;
 
+use bd\Bootstrap;
+
 class Lists extends Base
 {
     protected array $noNeedLogin = ['*'];
@@ -27,6 +29,9 @@ class Lists extends Base
         $this->site['pagedescription'] = $this->site['sitedescription'];
         $this->site['pagekeywords'] = $this->site['sitekeywords'];
 
+        $bootstrap = new Bootstrap(0, 10);
+        $page = $bootstrap->pageData();
+        $this->view->assign('page', $page);
         $this->assignBd();
         return $this->view->fetch('/'.basename($template, '.html'));
     }

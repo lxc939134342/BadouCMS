@@ -30,6 +30,7 @@ trait Jump
             'msg' => $msg,
             'data' => $data,
             'url' => $url,
+            'tourl' => $url,
             'wait' => $wait,
         ];
 
@@ -68,6 +69,7 @@ trait Jump
             'msg' => $msg,
             'data' => $data,
             'url' => $url,
+            'tourl' => $url,
             'wait' => $wait,
         ];
 

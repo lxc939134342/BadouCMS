@@ -170,7 +170,10 @@ class ContentSort extends Base
                     'description' => '',
                     'sorting'     => 255,
                     'create_user' => '',
-                    'update_user' => ''
+                    'update_user' => '',
+                    'def1' => '',
+                    'def2' => '',
+                    'def3' => '',
                 );
 
                 $result = $this->model->save($data);
@@ -230,7 +233,10 @@ class ContentSort extends Base
                         'description' => '',
                         'sorting' => 255,
                         'create_user' => '',
-                        'update_user' => ''
+                        'update_user' => '',
+                        'def1' => '',
+                        'def2' => '',
+                        'def3' => '',
                     );
                     $scode = get_auto_code($scode);
                 }

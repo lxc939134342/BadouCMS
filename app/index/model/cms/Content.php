@@ -51,7 +51,7 @@ class Content extends Model
         if (!isset($data['type']) || !isset($data['urlname']) || !isset($data['sortfilename'])) {
             return '';
         }
-        return full_url(bdurl($data['type'], $data['urlname'], 'content', $data['scode'], $data['sortfilename'], $data['id'], $data['filename']), true);
+        return bdurl($data['type'], $data['urlname'], 'content', $data['scode'], $data['sortfilename'], $data['id'], $data['filename']);
     }
 
     // 内容详情页图片
@@ -85,7 +85,7 @@ class Content extends Model
     }
 
     // 指定内容标签调用
-    public static function getContentTags($id = '', $scode = '', $num = 0)
+    public static function getContentTags($id = '', $scode = '', $num = 0, $target = 'list')
     {
         $data = [];
         $sortModel = new ContentSort();
@@ -143,6 +143,18 @@ class Content extends Model
                     }
                 }
             }
+        }
+        // $target = 'tag';
+        foreach ($data as $key => &$value) {
+            $value['n'] = $key;
+            $value['i'] = $key + 1;
+
+            if ($target == 'tag') {
+                $value['link'] = url('/tag/'.$value['tags']);
+            } else {
+                $value['link'] = bdurl($value['sort']['type'], $value['sort']['urlname'], 'list', $value['sort']['scode'], $value['sort']['filename'], '', '').'?tag=' . urlencode($value['tags']);
+            }
+            $value['text'] = $value['tags'];
         }
 
         return $data;
@@ -504,7 +516,8 @@ class Content extends Model
         }
 
         $scode_arr = [];
-        if ($scode) {
+
+        if ($scode && $scode != '*') {
             // 获取所有子类分类编码
             $arr = explode(',', $scode); // 传递有多个分类时进行遍历
             $contentSortModel = new ContentSort();
@@ -526,6 +539,16 @@ class Content extends Model
                 'a.acode','=',$lg
             ];
         }
+        if ($page) {
+            $tag = request()->param('tag');
+            if ($tag) {
+                if ($params['fuzzy']) {
+                    $tagWhere[] = ['a.tags','like',"%".escape_string($tag) . "%"];
+                } else {
+                    $tagWhere[] = ['a.tags','=',escape_string($tag) ];
+                }
+            }
+        }
 
         // 筛选条件支持模糊匹配
         $db = self::name('cms_content')
@@ -533,7 +556,9 @@ class Content extends Model
             ->field($fields)
             ->where($where)
             ->whereOr($filterWhere)
-            ->whereOr($tagWhere)
+            ->where(function ($query) use ($tagWhere) {
+                $query->whereOr($tagWhere);
+            })
             ->join('cms_content_sort b', 'a.scode=b.scode', 'LEFT')
             ->join('cms_content_sort c', 'a.subscode=c.scode', 'LEFT')
             ->join('cms_model d', 'b.mcode=d.mcode', 'LEFT')

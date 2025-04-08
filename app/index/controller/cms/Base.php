@@ -200,7 +200,7 @@ class Base extends BaseController
                 'uploadUrl'    => '/upload',
                 'upload'       => keys_to_camel_case(get_upload_config(), ['max_size', 'save_name', 'allowed_suffixes', 'allowed_mime_types']),
             ],
-            'captchaUrl' => '/api/common/captcha',
+            'captchaUrl' => '/api/cms.common/captcha',
         ];
 
         // 设置允许输出字段
@@ -236,11 +236,13 @@ class Base extends BaseController
             }
             $tcode = $contentSortModel->getSortTopScode($this->contentSort['scode']);
             $this->contentSort['tcode'] = $tcode;
+            $this->contentSort['toprows'] = $contentSortModel->getSortRows(0);
             // 获取顶级栏目
             if ($tcode) {
                 $top_sort = $contentSortModel->getSort($tcode);
                 $this->contentSort['topname'] = $top_sort['name'] ?? '';
                 $this->contentSort['toplink'] = $top_sort['link'] ?? '';
+                $this->contentSort['toprows'] = $contentSortModel->getSortRows($tcode);
             }
 
             // 获取父级栏目
@@ -248,6 +250,7 @@ class Base extends BaseController
                 $parent_sort = $contentSortModel->getSort($this->contentSort['pcode']);
                 $this->contentSort['parentname'] = $parent_sort['name'] ?? '';
                 $this->contentSort['parentlink'] = $parent_sort['link'] ?? '';
+                $this->contentSort['parentrows'] = $contentSortModel->getSortRows($this->contentSort['pcode']);
             }
 
             $this->view->assign('sort', $this->contentSort);
@@ -269,6 +272,7 @@ class Base extends BaseController
             }
         } else {
             $this->contentSort = $contentSortModel->getDefaultData();
+            $this->contentSort['toprows'] = $contentSortModel->getSortRows(0);
             $this->view->assign('sort', $this->contentSort);
         }
     }
@@ -293,9 +297,13 @@ class Base extends BaseController
             'lgpath' => '',
             'httpurl' => request()->domain(true),
             'pageurl' => request()->url(true),
-            'commentstatus' => 1,
-            'commentaction' => '',
-            'commentcodestatus' => 1
+            'commentstatus' => get_sys_config('commentstatus'),
+            'commentaction' => url('/comment/add'),
+            'commentcodestatus' => 1,
+            'msgcodestatus' => get_sys_config('msgcodestatus'),
+            'pagetitle' => $this->site['sitetitle'],
+            'pagedescription' => $this->site['sitedescription'],
+            'pagekeywords' => $this->site['sitekeywords'],
         ];
         $this->view->assign('bd', array_merge($bdassign, $this->site, $this->company, $this->label));
     }

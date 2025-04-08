@@ -39,7 +39,12 @@ class ContentSort extends Model
         return [
             'scode' => 0,
             'tcode' => 0,
-            'pcode' => 0
+            'pcode' => 0,
+            'pic' => '',
+            'name' => '',
+            'subname' => '',
+            'toplink' => '',
+            'toprows' => 0,
         ];
     }
 
@@ -55,7 +60,7 @@ class ContentSort extends Model
 
     public function getLinkAttr($value, $data)
     {
-        return full_url(bdurl($data['type'], $data['urlname'], 'list', $data['scode'], $data['filename'], '', ''), true);
+        return bdurl($data['type'], $data['urlname'], 'list', $data['scode'], $data['filename'], '', '');
     }
 
     /**
@@ -144,8 +149,13 @@ class ContentSort extends Model
         $data = [];
         $tree = [];
         $top = [];
+        $self = new self();
         foreach ($result as $value) {
             $value['soncount'] = 0;
+            $value['rows'] = $self->getSortRows($value['scode']);
+            $topcode = $self->getSortTopScode($value['scode']);
+            $value['toprows'] = $self->getSortRows($topcode);
+            $value['parentrows'] = $self->getSortRows($value['pcode']);
             $data[$value['scode']] = $value;
             if (isset($value['pcode']) && $value['pcode']) {
                 $tree[$value['pcode']]['son'][] = $value; // 记录到关系树
@@ -212,6 +222,9 @@ class ContentSort extends Model
     public function getTopParent($scode, $sorts): mixed
     {
         if (! $scode || ! $sorts) {
+            return false;
+        }
+        if (!isset($sorts[$scode])) {
             return false;
         }
         $this->position[] = $sorts[$scode];
@@ -283,6 +296,41 @@ class ContentSort extends Model
             ->column('a.tags');
 
         return $result;
+    }
+
+    public function getSortRows($scode)
+    {
+        if (!$scode) {
+            $count = Content::where([
+                ['acode', '=', get_frontend_lang()],
+                ['status', '=', 1],
+                ['date', '<', date('Y-m-d H:i:s')]
+            ])
+            ->cache('sort_rows_' . $scode, 3600, 'cms_cache')
+            ->count();
+
+            return $count;
+        }
+
+        $this->scodes = [];
+        // 获取多分类子类
+        $arr = explode(',', $scode);
+        foreach ($arr as $value) {
+            $scodes = $this->getSubScodes(trim($value));
+        }
+
+        $count = Content::whereOr([
+               ['scode', 'in', $scodes],
+               ['subscode', '=', $scode]
+           ])
+           ->where([
+               ['acode', '=', get_frontend_lang()],
+               ['status', '=', 1],
+               ['date', '<', date('Y-m-d H:i:s')]
+           ])
+           ->cache('sort_rows_' . $scode, 3600, 'cms_cache')
+           ->count();
+        return $count;
     }
 
     /**

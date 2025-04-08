@@ -30,9 +30,12 @@ class Search extends Base
         }
 
         $keyword = $this->request->param('keyword', $this->request->param('title'));
+        if (empty($keyword)) {
+            $this->error(__('Please enter keywords'));
+        }
         //禁止搜索过滤域名
         if (preg_match("/\.[a-z]{2,}/i", $keyword)) {
-            $this->error("未找到相关记录");
+            $this->error(__('No Data'));
         }
         $keyword = strip_tags($keyword);
         $keyword = str_replace(strrchr($keyword, "."), "", $keyword);  //去掉带有后缀的关键词

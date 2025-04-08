@@ -54,6 +54,9 @@ class Comment extends Base
             // 接受验证码和验证码ID
             $data['captcha']   = $this->request->post('captcha');
             $data['captchaId'] = $this->request->post('captcha_id');
+            if (!$data['captchaId']) {
+                $data['captchaId'] = session('captchaId');
+            }
 
             $captchaObj = new Captcha();
             if (!$captchaObj->check($data['captcha'], $data['captchaId'])) {

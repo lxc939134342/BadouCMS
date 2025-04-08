@@ -36,6 +36,7 @@ class Bd extends TagLib
         'tags'       => ['attr' => '','close' => 1],
         'pics' => ['attr' => '','close' => 1],
         'qrcode' => ['attr' => 'string','close' => 0],
+        'loop' => ['attr' => '','close' => 1],
     ];
 
     /*当前分类 子分类列表*/
@@ -115,7 +116,9 @@ class Bd extends TagLib
             "'start'=>{$start}",
             "'fuzzy'=>{$fuzzy}",
         ];
-        if ($scode) {
+        if ($scode == '*') {
+            $params[] = '"scode"=>"*"';
+        } elseif ($scode) {
             $params[] = '"scode"=>'.$scode;
         } else {
             $params[] = '"scode"=>$sort["scode"]';
@@ -501,6 +504,25 @@ class Bd extends TagLib
         $string = $tag['string'] ?? '""';
         $string = $this->autoBuildVar($string);
         $parse   = '<?php echo \'<img src="'.request()->domain(true). '/api/cms.qrcode/index?string=\'.'.$string.'.\'" class="qrcode" alt="二维码">\'; ?>';
+        return $parse;
+    }
+
+    /**
+     * 循环标签
+     * @return string
+     */
+    public function tagLoop($tag, $content): string
+    {
+        $start = $tag['start'] ?? 0;
+        $end = $tag['end'] ?? 0;
+        $parse = '<?php ';
+        $parse .= '$loop = ["i"=>0, "index"=>1];';
+        $parse .= 'for($i='.$start.'; $i<'.$end.'; $i++) {';
+        $parse .= '$loop["i"] = $i;';
+        $parse .= '$loop["index"] = $i+1;';
+        $parse .= '?>';
+        $parse .= $content;
+        $parse .= '<?php } ?>';
         return $parse;
     }
 

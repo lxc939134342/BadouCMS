@@ -91,6 +91,7 @@ class Content extends Model
             $value['date'] = date('Y-m-d H:i:s');
             $value['create_time'] = date('Y-m-d H:i:s');
             $value['update_time'] = date('Y-m-d H:i:s');
+            $value['pics'] = $value['pics'] ? implode(',', $value['pics']) : '';
             // 插入主内容
             $id = $this->insertGetId($value);
 
