@@ -139,6 +139,8 @@ class ContentSort extends Model
                 $row['toplink'] = $view->sort['toplink'] ?? '';
                 $row['parentname'] = $view->sort['parentname'] ?? '';
                 $row['parentlink'] = $view->sort['parentlink'] ?? '';
+                $row['parentrows'] = 0;
+                $row['toprows'] = 0;
             })
             ->select();
 
@@ -152,10 +154,8 @@ class ContentSort extends Model
         $self = new self();
         foreach ($result as $value) {
             $value['soncount'] = 0;
-            $value['rows'] = $self->getSortRows($value['scode']);
-            $topcode = $self->getSortTopScode($value['scode']);
-            $value['toprows'] = $self->getSortRows($topcode);
-            $value['parentrows'] = $self->getSortRows($value['pcode']);
+            $sortrows = $self->getSortRows($value['scode']);
+            $value['rows'] = $sortrows['rows'] ?? 0;
             $data[$value['scode']] = $value;
             if (isset($value['pcode']) && $value['pcode']) {
                 $tree[$value['pcode']]['son'][] = $value; // 记录到关系树
@@ -171,7 +171,6 @@ class ContentSort extends Model
                 $top[] = $value;
             }
         }
-
         $data['top'] = $top;
         $data['tree'] = $tree;
         return $data;
@@ -196,6 +195,7 @@ class ContentSort extends Model
                 ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
                 ->field($fields)
                 ->order($order)
+                ->cache('__CACHE_CMS_SORTS_'. get_frontend_lang(), 3600, 'cms_cache')
                 ->select();
             if ($sorts->isEmpty()) {
                 return [];
@@ -252,18 +252,21 @@ class ContentSort extends Model
     }
 
     // 分类子类集
-    public function getSubScodes($scode)
+    public function getSubScodes($scode, $sorts = null)
     {
         if (! $scode) {
             return;
         }
+        // 第一次调用时初始化
+        if ($sorts === null) {
+            $this->scodes = [];  // 重置结果数组
+            $sorts = $this->getSortList();
+        }
         $this->scodes[] = $scode;
-        $subs = $this->where("pcode", $scode)
-            ->where('outlink', '')
-            ->column('scode');
-        if ($subs) {
-            foreach ($subs as $value) {
-                $this->getSubScodes($value);
+        // 查找所有直接子分类
+        foreach ($sorts as $sort) {
+            if ($sort['pcode'] == $scode && empty($sort['outlink'])) {
+                $this->getSubScodes($sort['scode'], $sorts);
             }
         }
         return $this->scodes;
@@ -298,39 +301,66 @@ class ContentSort extends Model
         return $result;
     }
 
+
+    /**
+     * 批量获取所有分类的内容数量
+     */
+    protected function getAllSortRows()
+    {
+        // 使用缓存
+        $cacheKey = 'all_sort_rows_' . get_frontend_lang();
+        $result = cache($cacheKey);
+        if ($result) {
+            return $result;
+        }
+
+        // 基础条件
+        $where = [
+            ['acode', '=', get_frontend_lang()],
+            ['status', '=', 1],
+            ['date', '<', date('Y-m-d H:i:s')]
+        ];
+
+        // 获取主分类统计
+        $mainCounts = Content::where($where)
+            ->group('scode')
+            ->column('count(*)', 'scode');
+
+        // 修改副分类统计，排除空值
+        $subCounts = Content::where($where)
+            ->where('subscode', '<>', '')    // 添加这行
+            ->whereNotNull('subscode')       // 保留这行
+            ->group('subscode')
+            ->column('count(*)', 'subscode');
+
+        // 合并统计结果
+        $result = [];
+        foreach ($mainCounts as $scode => $count) {
+            if ($scode !== '' && $scode !== null) {  // 添加空值检查
+                $result[$scode] = ($result[$scode] ?? 0) + $count;
+            }
+        }
+        foreach ($subCounts as $scode => $count) {
+            if ($scode !== '' && $scode !== null) {  // 添加空值检查
+                $result[$scode] = ($result[$scode] ?? 0) + $count;
+            }
+        }
+        // 设置缓存
+        cache($cacheKey, $result, 3600, 'cms_cache');
+
+        return $result;
+    }
+
     public function getSortRows($scode)
     {
+        $allCounts = $this->getAllSortRows();
         if (!$scode) {
-            $count = Content::where([
-                ['acode', '=', get_frontend_lang()],
-                ['status', '=', 1],
-                ['date', '<', date('Y-m-d H:i:s')]
-            ])
-            ->cache('sort_rows_' . $scode, 3600, 'cms_cache')
-            ->count();
-
-            return $count;
+            return array_sum($allCounts);
         }
 
-        $this->scodes = [];
-        // 获取多分类子类
-        $arr = explode(',', $scode);
-        foreach ($arr as $value) {
-            $scodes = $this->getSubScodes(trim($value));
-        }
-
-        $count = Content::whereOr([
-               ['scode', 'in', $scodes],
-               ['subscode', '=', $scode]
-           ])
-           ->where([
-               ['acode', '=', get_frontend_lang()],
-               ['status', '=', 1],
-               ['date', '<', date('Y-m-d H:i:s')]
-           ])
-           ->cache('sort_rows_' . $scode, 3600, 'cms_cache')
-           ->count();
-        return $count;
+        $subscode = $this->getSubScodes($scode);
+        $subRows = array_sum(array_intersect_key($allCounts, array_flip($subscode)));
+        return $subRows;
     }
 
     /**

@@ -215,6 +215,7 @@ class Base extends BaseController
         // 会员验权和登录标签位
         Event::trigger('cmsInit', $this->auth);
         $this->getSort();
+
     }
 
     /*获取分类信息*/
@@ -248,12 +249,16 @@ class Base extends BaseController
             // 获取父级栏目
             if ($this->contentSort['pcode']) {
                 $parent_sort = $contentSortModel->getSort($this->contentSort['pcode']);
-                $this->contentSort['parentname'] = $parent_sort['name'] ?? '';
-                $this->contentSort['parentlink'] = $parent_sort['link'] ?? '';
-                $this->contentSort['parentrows'] = $contentSortModel->getSortRows($this->contentSort['pcode']);
+            } else {
+                $parent_sort = $top_sort;
             }
 
+            $this->contentSort['parentname'] = $parent_sort['name'] ?? '';
+            $this->contentSort['parentlink'] = $parent_sort['link'] ?? '';
+            $this->contentSort['parentrows'] = $contentSortModel->getSortRows($parent_sort['scode']);
+
             $this->view->assign('sort', $this->contentSort);
+            $this->view->assign('listsort', $this->contentSort);
             /*验证权限*/
             if ($this->contentSort['gid']) {
                 $this->checkPageLevel($this->contentSort['gid'], $this->contentSort['gtype']);
@@ -273,7 +278,9 @@ class Base extends BaseController
         } else {
             $this->contentSort = $contentSortModel->getDefaultData();
             $this->contentSort['toprows'] = $contentSortModel->getSortRows(0);
+            $this->contentSort['parentrows'] = $this->contentSort['toprows'];
             $this->view->assign('sort', $this->contentSort);
+            $this->view->assign('listsort', $this->contentSort);
         }
     }
 

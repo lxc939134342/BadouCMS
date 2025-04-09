@@ -47,6 +47,7 @@ class Bd extends TagLib
         }
         $this->autoBuildVar($tag['scode']);
         $scode  = $this->isVar($tag['scode']) ? $tag['scode'] : '"'.$tag['scode'].'"';
+
         $alias  = $tag['alias'] ?? 'sort';
         $empty  = $tag['empty'] ?? '';
         $key    = !empty($tag['key']) ? $tag['key'] : 'i';
@@ -58,7 +59,7 @@ class Bd extends TagLib
         $parse .= '{volist name="$__' . $var . '__" id="' .$alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
         $parse .= $content;
         $parse .= '{/volist}';
-
+        $parse .= '<?php unset($'.$alias.');$sort=$listsort; ?>';
         return $parse;
     }
 

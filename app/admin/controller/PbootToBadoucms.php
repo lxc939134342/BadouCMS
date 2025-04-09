@@ -69,7 +69,11 @@ class PbootToBadoucms extends Backend
             foreach ($this->tableMap as $sourceTable => $targetTable) {
                 $count = 0;
                 try {
-                    $count = Db::connect('pboot')->table($sourceTable)->count();
+                    // 修改查询方式，使用更通用的方法
+                    $exists = Db::connect('pboot')->query("SELECT 1 FROM {$sourceTable} LIMIT 1");
+                    if ($exists !== false) {
+                        $count = Db::connect('pboot')->table($sourceTable)->count();
+                    }
                 } catch (\Exception $e) {
                     continue;
                 }
@@ -80,20 +84,28 @@ class PbootToBadoucms extends Backend
                     'count' => $count
                 ];
             }
-
+            $customTables = [];
             // 获取自定义表
-            if ($dbType == 'sqlite') {
-                $customTables = Db::connect('pboot')->query("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'ay_diy_%'");
-                $customTables = array_map(function ($item) { return ['name' => $item['name']]; }, $customTables);
+            if (stripos($dbType, 'sqlite') !== false) {
+                // 使用 SQLite 特定的查询语法
+                $sql = "SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'ay_diy_%' ORDER BY name";
+                $customTables = Db::connect('pboot')->query($sql);
             } else {
+                // MySQL 语法
                 $customTables = Db::connect('pboot')->query("SHOW TABLES LIKE 'ay_diy_%'");
-                $customTables = array_map(function ($item) { return ['name' => current($item)]; }, $customTables);
+                $customTables = array_map(function ($item) {
+                    return ['name' => current($item)];
+                }, $customTables);
             }
 
             foreach ($customTables as $table) {
                 $sourceName = $table['name'];
                 $targetName = str_replace('ay_diy_', 'bd_cms_diy_', $sourceName);
-                $count = Db::connect('pboot')->table($sourceName)->count();
+                try {
+                    $count = Db::connect('pboot')->table($sourceName)->count();
+                } catch (\Exception $e) {
+                    $count = 0;
+                }
                 $tables[] = [
                     'name' => $sourceName,
                     'target' => $targetName,
@@ -199,7 +211,7 @@ class PbootToBadoucms extends Backend
             $dbType = $this->setupPbootConnection($pbootPath);
 
             // 获取所有自定义表
-            if ($dbType == 'sqlite') {
+            if (stripos($dbType, 'sqlite') !== false) {
                 $tables = Db::connect('pboot')->query("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'ay_diy_%'");
                 $tables = array_map(function ($item) { return ['name' => $item['name']]; }, $tables);
             } else {
@@ -207,7 +219,7 @@ class PbootToBadoucms extends Backend
             }
 
             foreach ($tables as $table) {
-                $customTableName = $dbType == 'sqlite' ? $table['name'] : current($table);
+                $customTableName = stripos($dbType, 'sqlite') !== false ? $table['name'] : current($table);
                 if (strpos($customTableName, 'ay_diy_') === 0) {
                     $targetTable = str_replace('ay_diy_', 'bd_cms_diy_', $customTableName);
                     $this->tableMap[$customTableName] = $targetTable;
@@ -220,7 +232,7 @@ class PbootToBadoucms extends Backend
                     }
 
                     // 创建新表
-                    if ($dbType == 'sqlite') {
+                    if (stripos($dbType, 'sqlite') !== false) {
                         $createTableSql = Db::connect('pboot')->query("SELECT sql FROM sqlite_master WHERE type='table' AND name = ?", [$customTableName])[0]['sql'];
                         // 转换SQLite的建表语句为MySQL格式
                         $createTableSql = preg_replace('/INTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT/i', 'INT AUTO_INCREMENT PRIMARY KEY', $createTableSql);
@@ -274,10 +286,8 @@ class PbootToBadoucms extends Backend
                     }
 
                     // 创建新表
-                    if ($dbType == 'sqlite') {
+                    if (stripos($dbType, 'sqlite') !== false) {
                         $createTableSql = Db::connect('pboot')->query("SELECT sql FROM sqlite_master WHERE type='table' AND name = ?", [$tableName])[0]['sql'];
-                        p($createTableSql);
-                        halt(111);
                         // 转换SQLite的建表语句为MySQL格式
                         $createTableSql = preg_replace('/INTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT/i', 'INT AUTO_INCREMENT PRIMARY KEY', $createTableSql);
                         $createTableSql = preg_replace('/INTEGER(?!\s+PRIMARY\s+KEY)/i', 'INT', $createTableSql);
@@ -410,73 +420,54 @@ class PbootToBadoucms extends Backend
 
         // 获取目标表的字段信息
         $columns = Db::getFields($targetTable);
-
-
-        $validFields = array_keys($columns);
-
         foreach ($data as $row) {
             $newRow = [];
-            foreach ($row as $field => $value) {
-                // 如果有字段映射关系，则进行转换
-                if (isset($this->fieldMap[$sourceTable][$field])) {
-                    $targetField = $this->fieldMap[$sourceTable][$field];
-                } else {
-                    $targetField = $field;
-                }
+            // 遍历目标表的所有字段
+            foreach ($columns as $targetField => $info) {
+                // 获取源字段名
+                $sourceField = isset($this->fieldMap[$sourceTable][$targetField]) ?
+                    $this->fieldMap[$sourceTable][$targetField] : $targetField;
 
-                // 只保留目标表中存在的字段
-                if (in_array($targetField, $validFields)) {
-                    // 检查字段类型和数据长度
-                    if (isset($columns[$targetField])) {
-                        $type = strtoupper($columns[$targetField]['type']);
+                // 设置字段值
+                if (isset($row[$sourceField])) {
+                    $value = $row[$sourceField];
 
-                        // 处理可能超长的字段
-                        if (is_string($value)) {
-                            // 检查各种可能的字段类型
-                            if (preg_match('/(VARCHAR|CHAR|TEXT|TINYTEXT|MEDIUMTEXT)\((\d+)\)?/i', $type, $matches)) {
-                                $fieldType = strtoupper($matches[1]);
-                                $length = isset($matches[2]) ? intval($matches[2]) : 0;
+                    // 处理可能超长的字段
+                    if (is_string($value)) {
+                        $type = strtoupper($info['type']);
+                        if (preg_match('/(VARCHAR|CHAR|TEXT|TINYTEXT|MEDIUMTEXT)\((\d+)\)?/i', $type, $matches)) {
+                            $fieldType = strtoupper($matches[1]);
+                            $length = isset($matches[2]) ? intval($matches[2]) : 0;
 
-                                // 根据不同字段类型判断是否需要转换
-                                $needConvert = false;
-                                if ($fieldType === 'VARCHAR' || $fieldType === 'CHAR') {
-                                    $needConvert = mb_strlen($value) > floor($length / 4);
-                                } elseif ($fieldType === 'TINYTEXT' && mb_strlen($value) > 255) {
-                                    $needConvert = true;
-                                } elseif ($fieldType === 'TEXT' && mb_strlen($value) > 65535) {
-                                    $needConvert = true;
-                                } elseif ($fieldType === 'MEDIUMTEXT' && mb_strlen($value) > 16777215) {
-                                    $needConvert = true;
+                            // 根据字段类型处理值
+                            if (($fieldType === 'VARCHAR' || $fieldType === 'CHAR')) {
+                                // 使用 mb_strwidth 获取字符串实际显示宽度
+                                if (mb_strwidth($value) > $length) {
+                                    $value = mb_strimwidth($value, 0, $length, '', 'UTF-8');
                                 }
-
-                                if ($needConvert) {
-                                    try {
-                                        // 转换为 LONGTEXT 类型
-                                        Db::execute("ALTER TABLE {$targetTable} MODIFY COLUMN `{$targetField}` LONGTEXT");
-                                        $columns[$targetField]['type'] = 'LONGTEXT';
-                                        unset($columns[$targetField]['length']);
-                                    } catch (\Exception $e) {
-                                        // 如果无法修改字段类型，则根据原字段类型截断数据
-                                        if ($fieldType === 'VARCHAR' || $fieldType === 'CHAR') {
-                                            $value = mb_substr($value, 0, floor($length / 4));
-                                        } elseif ($fieldType === 'TINYTEXT') {
-                                            $value = mb_substr($value, 0, 255);
-                                        } elseif ($fieldType === 'TEXT') {
-                                            $value = mb_substr($value, 0, 65535);
-                                        } elseif ($fieldType === 'MEDIUMTEXT') {
-                                            $value = mb_substr($value, 0, 16777215);
-                                        }
-                                    }
-                                }
+                            } elseif ($fieldType === 'TINYTEXT' && mb_strlen($value) > 255) {
+                                $value = mb_substr($value, 0, 255);
                             }
                         }
                     }
                     $newRow[$targetField] = $value;
+                } else {
+                    // 设置默认值
+                    if (isset($info['default'])) {
+                        $newRow[$targetField] = $info['default'];
+                    } else {
+                        // 根据字段类型设置空值
+                        $type = strtoupper($info['type']);
+                        if (preg_match('/INT|DECIMAL|FLOAT|DOUBLE/i', $type)) {
+                            $newRow[$targetField] = 0;
+                        } else {
+                            $newRow[$targetField] = '';
+                        }
+                    }
                 }
             }
-            if (!empty($newRow)) {
-                $transformedData[] = $newRow;
-            }
+
+            $transformedData[] = $newRow;
         }
 
         return $transformedData;
