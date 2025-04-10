@@ -139,7 +139,7 @@ class Base extends BaseController
         $this->view = View::instance();
         $this->view->config([
             'view_path' => $view_path,
-            'taglib_pre_load' => Bd::class
+            'taglib_pre_load' => Bd::class,
         ]);
 
         /**
@@ -294,7 +294,7 @@ class Base extends BaseController
             'scaction' => url('/search'),
             'sitemap' => url('/sitemap', [], 'xml'),
             'msgaction' => url('/message'),
-            'sitetplpath' => request()->domain(true).DIRECTORY_SEPARATOR.'template'. DIRECTORY_SEPARATOR. $this->site['theme']. DIRECTORY_SEPARATOR ,
+            'sitetplpath' => request()->domain(true).'/template/'. $this->site['theme'],
             'checkcode' => $this->view->config['captchaUrl'],
             'islogin' => $this->auth->isLogin(),
             'registerstatus' => true,

@@ -60,6 +60,9 @@ class ContentSort extends Model
 
     public function getLinkAttr($value, $data)
     {
+        if ($data['outlink']) {
+            return $data['outlink'];
+        }
         return bdurl($data['type'], $data['urlname'], 'list', $data['scode'], $data['filename'], '', '');
     }
 

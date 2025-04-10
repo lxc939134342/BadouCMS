@@ -557,9 +557,11 @@ class Bd extends TagLib
         if (defined($name)) {
             return $name;
         }
+        $default_filter = $this->tpl->getConfig('default_filter');
         $this->tpl->config(['default_filter' => '']);
         $this->tpl->parseVar($name);
         $this->tpl->parseVarFunction($name);
+        $this->tpl->config(['default_filter' => $default_filter]);
         return $name;
     }
 }

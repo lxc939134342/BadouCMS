@@ -26,7 +26,8 @@ class Content extends Model
     {
         /* 替换富文本中的图片域名 */
         $value = addEditorDomain($value, request()->domain());
-        return !$value ? '' : htmlspecialchars_decode($value);
+        return !$value ? '' : html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        ;
     }
 
     public function getIcoAttr($value, $data)
@@ -50,6 +51,9 @@ class Content extends Model
     {
         if (!isset($data['type']) || !isset($data['urlname']) || !isset($data['sortfilename'])) {
             return '';
+        }
+        if ($data['outlink']) {
+            return $data['outlink'];
         }
         return bdurl($data['type'], $data['urlname'], 'content', $data['scode'], $data['sortfilename'], $data['id'], $data['filename']);
     }
