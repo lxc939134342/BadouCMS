@@ -159,35 +159,10 @@ class FormField extends Base
                 ],
             ];
             try {
-
-                // 记录日志
-                $crudLogId = Helper::recordCrudStatus([
-                    'table' => $table,
-                    'fields' => $fields,
-                    'status' => 'start',
-                ]);
                 Helper::handleTableDesign($table, $fields);
-                // 记录日志
-                Helper::recordCrudStatus([
-                    'id'     => $crudLogId,
-                    'status' => 'success',
-                ]);
-
-
             } catch (Exception $e) {
-                Helper::recordCrudStatus([
-                    'id'     => $crudLogId ?? 0,
-                    'status' => 'error',
-                ]);
                 $this->error($e->getMessage());
             } catch (Throwable $e) {
-                Helper::recordCrudStatus([
-                    'id'     => $crudLogId ?? 0,
-                    'status' => 'error',
-                ]);
-                if (env('app_debug', false)) {
-                    throw $e;
-                }
                 $this->error($e->getMessage());
             }
             parent::add();
@@ -217,7 +192,6 @@ class FormField extends Base
 
         $count = 0;
         $data  = $this->model->where($where)->select();
-        //        p($data);die;
         $this->model->startTrans();
         try {
             foreach ($data as $v) {
@@ -258,35 +232,10 @@ class FormField extends Base
                 ];
 
                 try {
-
-                    // 记录日志
-                    $crudLogId = Helper::recordCrudStatus([
-                        'table' => $table,
-                        'fields' => $fields,
-                        'status' => 'start',
-                    ]);
                     Helper::handleTableDesign($table, $fields);
-                    // 记录日志
-                    Helper::recordCrudStatus([
-                        'id'     => $crudLogId,
-                        'status' => 'success',
-                    ]);
-
-
                 } catch (Exception $e) {
-                    Helper::recordCrudStatus([
-                        'id'     => $crudLogId ?? 0,
-                        'status' => 'error',
-                    ]);
                     $this->error($e->getMessage());
                 } catch (Throwable $e) {
-                    Helper::recordCrudStatus([
-                        'id'     => $crudLogId ?? 0,
-                        'status' => 'error',
-                    ]);
-                    if (env('app_debug', false)) {
-                        throw $e;
-                    }
                     $this->error($e->getMessage());
                 }
 

@@ -16,7 +16,7 @@
             <template #sorting>
                 <el-table-column :label="t('cms.extfield.sorting')" width="100" align="left">
                     <template #default="scope">
-                        <el-input v-model="scope.row.sorting" @change="sortingChange(scope.row.sorting,scope.row)" />
+                        <el-input v-model="scope.row.sorting" @change="sortingChange(scope.row.sorting, scope.row)" />
                     </template>
                 </el-table-column>
             </template>
@@ -36,8 +36,8 @@ import { defaultOptButtons } from '/@/components/table'
 import TableHeader from '/@/components/table/header/index.vue'
 import Table from '/@/components/table/index.vue'
 import baTableClass from '/@/utils/baTable'
-import {url,models,typeText} from '/@/api/backend/cms/Extfield'
-import {sorting} from '/@/api/backend/cms/Common'
+import { url, models, typeText } from '/@/api/backend/cms/Extfield'
+import { sorting } from '/@/api/backend/cms/Common'
 
 defineOptions({
     name: 'cms/extfield',
@@ -46,8 +46,8 @@ defineOptions({
 const { t } = useI18n()
 const tableRef = ref()
 const optButtons: OptButton[] = defaultOptButtons(['edit', 'delete'])
-const mcodeMap=ref()
-const typeTextMap=ref()
+const mcodeMap = ref()
+const typeTextMap = ref()
 
 /**
  * baTable 内包含了表格的所有数据且数据具备响应性，然后通过 provide 注入给了后代组件
@@ -59,28 +59,67 @@ const baTable = new baTableClass(
         column: [
             { type: 'selection', align: 'center', operator: false },
             { label: t('cms.extfield.id'), prop: 'id', align: 'center', width: 100, operator: 'RANGE', sortable: 'custom' },
-            { label: t('cms.extfield.mcode'), prop: 'mcode', align: 'center',render:'tag', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false,replaceValue: mcodeMap},
-            { label: t('cms.extfield.description'), prop: 'description', align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
-            { label: t('cms.extfield.name'), prop: 'name', align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
-            { label: t('cms.extfield.type'), prop: 'type', align: 'center', render: 'tag', operator: 'eq', sortable: false,replaceValue: typeTextMap},
-            { label: t('cms.extfield.sorting'), prop: 'sorting', render:'slot',slotName:'sorting',  align: 'center', operator: 'RANGE', sortable: false },
+            {
+                label: t('cms.extfield.mcode'),
+                prop: 'mcode',
+                align: 'center',
+                render: 'tag',
+                operatorPlaceholder: t('Fuzzy query'),
+                operator: 'LIKE',
+                sortable: false,
+                replaceValue: mcodeMap,
+            },
+            {
+                label: t('cms.extfield.description'),
+                prop: 'description',
+                align: 'center',
+                operatorPlaceholder: t('Fuzzy query'),
+                operator: 'LIKE',
+                sortable: false,
+            },
+            {
+                label: t('cms.extfield.name'),
+                prop: 'name',
+                align: 'center',
+                operatorPlaceholder: t('Fuzzy query'),
+                operator: 'LIKE',
+                sortable: false,
+            },
+            {
+                label: t('cms.extfield.type'),
+                prop: 'type',
+                align: 'center',
+                render: 'tag',
+                operator: 'eq',
+                sortable: false,
+                replaceValue: typeTextMap,
+            },
+            {
+                label: t('cms.extfield.sorting'),
+                prop: 'sorting',
+                render: 'slot',
+                slotName: 'sorting',
+                align: 'center',
+                operator: 'RANGE',
+                sortable: false,
+            },
             { label: t('Operate'), align: 'center', width: 180, render: 'buttons', buttons: optButtons, operator: false },
         ],
         dblClickNotEditColumn: [undefined],
     },
     {
-        defaultItems: {'type': '',name:'ext_'},
+        defaultItems: { type: '', name: 'ext_', value: '', sorting: 0 },
     }
 )
-models().then(res=>{
-    if(res.code==1){
-        mcodeMap.value=res.data.list
+models().then((res) => {
+    if (res.code == 1) {
+        mcodeMap.value = res.data.list
     }
 })
 
-typeText().then(res=>{
-    if(res.code==1){
-        typeTextMap.value=res.data.list
+typeText().then((res) => {
+    if (res.code == 1) {
+        typeTextMap.value = res.data.list
     }
 })
 provide('baTable', baTable)
@@ -97,8 +136,8 @@ onMounted(() => {
 })
 
 /*列表排序修改*/
-const sortingChange = (value: any,data:any) => {
-    sorting(url+'sorting',data.id, value)
+const sortingChange = (value: any, data: any) => {
+    sorting(url + 'sorting', data.id, value)
         .then(() => {
             data.loading = false
             baTable.table.data = []

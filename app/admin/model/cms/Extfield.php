@@ -104,6 +104,11 @@ class Extfield extends Model
     public static function onBeforeInsert($model)
     {
         $data = $model->getData();
+        $value = $data['value'] ?? '';
+        $sorting = $data['sorting'] ?? 0;
+        $model->set('value', $value);
+        $model->set('sorting', $sorting);
+
         $field = $data['name'];
         if (!preg_match('/^ext_[a-zA-Z0-9_]+$/', $field)) {
             throw new \think\Exception('字段名必须以`ext_`开头,且只能包含字母、数字、下划线');
@@ -128,6 +133,10 @@ class Extfield extends Model
     public static function onBeforeUpdate($model)
     {
         $data = $model->getData();
+        $value = $data['value'] ?? '';
+        $sorting = $data['sorting'] ?? 0;
+        $model->set('value', $value);
+        $model->set('sorting', $sorting);
         $changeData = $model->getChangedData();
         $originData = $model->getOrigin();
         $oldname = $originData['name'];
