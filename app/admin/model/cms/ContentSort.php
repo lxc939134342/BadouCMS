@@ -120,6 +120,7 @@ class ContentSort extends Model
             'date' => date('Y-m-d H:i:s'),
             'ico' => '',
             'pics' => '',
+            'picstitle' => '',
             'content' => '',
             'tags' => '',
             'enclosure' => '',
@@ -137,7 +138,9 @@ class ContentSort extends Model
             'likes' => 0,
             'oppose' => 0,
             'create_user' => $auth['nickname'],
-            'update_user' => $auth['nickname']
+            'update_user' => $auth['nickname'],
+            'create_time' => date('Y-m-d H:i:s'),
+            'update_time' => date('Y-m-d H:i:s'),
         );
         Db::name('cms_content')->insert($data);
     }

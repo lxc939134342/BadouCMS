@@ -29,5 +29,6 @@ return [
         '__PUBLIC__' => '',
         '__ROOT__'   => '',
         '__CDN__'    => '',
-    ]
+    ],
+    'default_filter' => ''
 ];
