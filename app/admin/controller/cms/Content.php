@@ -122,13 +122,46 @@ class Content extends Base
         if ($this->request->isPost()) {
 
             $data = $this->getPostData();
-            $data['filename'] ?? $data['filename'] = '';
-            $data['description'] ?? $data['description'] = '';
-            $data['ico'] ?? $data['ico'] = '';
             $data['content'] ?? $data['content'] = '';
-            $data['acode'] ?? $data['acode'] = get_backend_lang();
             $data['content'] = $this->request->param('content', '', 'clean_xss');
-            $data['author'] = $this->auth->nickname;
+
+            // 构建数据
+            $default = [
+                'acode' => get_backend_lang(),
+                'scode' => '',
+                'subscode' => '',
+                'title' => '',
+                'titlecolor' => '',
+                'subtitle' => '',
+                'filename' => '',
+                'author' => $this->auth->nickname,
+                'source' => '',
+                'outlink' => '',
+                'date' => '',
+                'ico' => '',
+                'pics' => '',
+                'picstitle' => '',
+                'content' => '',
+                'tags' => '',
+                'enclosure' => '',
+                'keywords' => '',
+                'description' => '',
+                'sorting' => 255,
+                'status' => 1,
+                'istop' => 0,
+                'isrecommend' => 0,
+                'isheadline' => 0,
+                'gid' => '',
+                'gtype' => '',
+                'gnote' => '',
+                'visits' => 0,
+                'likes' => 0,
+                'oppose' => 0,
+                'create_user' => $this->auth->username,
+                'update_user' => $this->auth->username
+            ];
+
+            $data = array_merge($default, $data);
 
             $result = false;
             Db::startTrans();
