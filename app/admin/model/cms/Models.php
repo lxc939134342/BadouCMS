@@ -54,7 +54,7 @@ class Models extends Model
 
         /* 菜单名称 */
         $parent_menu_name = "cms/content";
-        $menu_name = $parent_menu_name . '/mcode/' . $data['id'];
+        $menu_name = $parent_menu_name . '/mcode/' . $data['mcode'];
         if ($data['type'] == '1') {
             $views = '/src/views/backend/cms/content/page';
         }
@@ -103,7 +103,7 @@ class Models extends Model
     public static function onAfterDelete($model): void
     {
         $data = $model->getData();
-        $menu_name = 'cms/content/mcode/' . $data['id'];
+        $menu_name = 'cms/content/mcode/' . $data['mcode'];
         Menu::delete($menu_name, true);
     }
 

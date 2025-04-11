@@ -66,6 +66,7 @@
                             v-model="baTable.form.items!.mcode"
                             prop="mcode"
                             :input-attr="{
+                                pk: 'mcode',
                                 field: 'name',
                                 remoteUrl: url + 'models',
                                 placeholder: t('Please select field', { field: t('cms.contentSort.mcode') }),

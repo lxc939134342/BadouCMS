@@ -81,7 +81,7 @@ class Bd extends TagLib
         }
         $var     = Random::build('alnum', 10);
         $parse   = '<?php ';
-        $parse  .= '$__' . $var . '__ = \app\index\model\cms\ContentSort::navList(' . $parent . ',"' . $num . '","' . $scode . '");';
+        $parse  .= '$__' . $var . '__ = \app\index\model\cms\ContentSort::navList(' . $parent . ',"' . $scode . '","' . $num . '");';
         $parse  .= ' ?>';
         $parse  .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
         $parse .= '<?php $'.$alias.'["'.$key.'"]=$'.$key.';?>';

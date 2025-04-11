@@ -30,7 +30,7 @@ class ContentSort extends Model
 
     public function models()
     {
-        return $this->belongsTo(Models::class, 'mcode', 'id');
+        return $this->belongsTo(Models::class, 'mcode', 'mcode');
     }
 
     public static function onAfterInsert($model)

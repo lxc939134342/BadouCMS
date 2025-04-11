@@ -48,7 +48,7 @@ const baTable = new baTableClass(
         pk: 'id',
         column: [
             { type: 'selection', align: 'center', operator: false },
-            { label: t('cms.models.id'), prop: 'id', align: 'center', width: 90, operator: 'RANGE', sortable: 'custom' },
+            { label: t('cms.models.id'), prop: 'mcode', align: 'center', width: 90, operator: 'RANGE', sortable: 'custom' },
             { label: t('cms.models.name'), prop: 'name', align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
             {
                 label: t('cms.models.type'),

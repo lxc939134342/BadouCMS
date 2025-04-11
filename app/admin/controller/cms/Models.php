@@ -55,7 +55,21 @@ class Models extends Base
     {
         if ($this->request->isPost()) {
             $data = $this->getPostData();
+            // 构建数据
+            $default = array(
+                'mcode' => 0,
+                'name' => '',
+                'type' => '',
+                'urlname' => '',
+                'listtpl' => '',
+                'contenttpl' => '',
+                'status' => 1,
+                'issystem' => 0,
+                'create_user' => $this->auth->username,
+                'update_user' => $this->auth->username
+            );
 
+            $data = array_merge($default, $data);
             $result = false;
             $this->model->startTrans();
             try {
