@@ -1,0 +1,1 @@
+const e={id:"编号",acode:"区域编码",contacts:"联系人",mobile:"联系电话",content:"留言内容",user_ip:"IP地址",user_os:"操作系统",user_bs:"浏览器",recontent:"回复内容",status:"是否前台显示",create_user:"创建人员",update_user:"更新人员",create_time:"创建时间",update_time:"更新时间",uid:"用户ID(默认匿名用户ID)",visitor_information:"访客信息",reply:"回复","quick Search Fields":"编号"};export{e as default};

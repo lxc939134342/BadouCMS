@@ -1,0 +1,1 @@
+const e={id:"ID",name:"字段名称",length:"长度",required:"是否必填",description:"字段描述",sorting:"排序",status:"状态","quick Search Fields":"id",create_time:"创建时间",nameHelp:"字段名称只能以字母开头，且只能包含字母、数字、下划线"};export{e as default};

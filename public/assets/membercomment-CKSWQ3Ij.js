@@ -1,0 +1,1 @@
+const e={contentid:"文章",comment:"评论",uid:"评论人",puid:"被评论人",likes:"点赞数",oppose:"反对数",status:"状态",user_ip:"用户IP",user_os:"操作系统",user_bs:"浏览器",create_time:"创建时间",update_time:"修改时间","quick Search Fields":"id",review:"审核",disable:"禁用",selectreview:"请选择要审核的评论",selectdisable:"请选择要禁用的评论",reviewSuccess:"审核成功",info:"详情",close:"关闭"};export{e as default};

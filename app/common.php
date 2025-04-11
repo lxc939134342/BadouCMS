@@ -63,7 +63,10 @@ if (!function_exists('clean_xss')) {
      */
     function clean_xss(string $string): string
     {
-        return (new AntiXSS())->xss_clean($string);
+        $antiXss = new AntiXSS();
+        $antiXss->removeEvilAttributes(['style']); // 允许 style 属性
+        $antiXss->setReplacement('cleanXss'); // 检查到xss代码之后使用cleanXss替换它
+        return $antiXss->xss_clean($string);
     }
 }
 

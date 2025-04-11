@@ -1,0 +1,1 @@
+const e={id:"id",mcode:"mcode",name:"name",type:"type",urlname:"urlname",listtpl:"listtpl",contenttpl:"contenttpl",status:"status",issystem:"issystem",create_user:"create_user",update_user:"update_user",create_time:"create_time",update_time:"update_time","quick Search Fields":"id"};export{e as default};

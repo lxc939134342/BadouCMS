@@ -1,0 +1,1 @@
+const e={id:"编号",mcode:"模型",name:"字段名称",type:"字段类型",value:"选择按钮值",description:"字段描述",sorting:"排序","quick Search Fields":"编号",valueHelp:"多个选项用逗号隔开或者回车",nameHelp:'必须以"ext_"开头,且只能包含字母、数字、下划线'};export{e as default};

@@ -1,0 +1,1 @@
+import{c as t}from"./index-CU1Fw0iA.js";const r="/admin/Backupdb/";function e(a){return t({url:r+"backupTable",method:"post",data:a})}function u(){return t({url:r+"backupDb",method:"post"})}function p(a){return t({url:r+"optimize",method:"post",data:a})}function n(a){return t({url:r+"repair",method:"post",data:a})}export{u as a,e as b,p as o,n as r};

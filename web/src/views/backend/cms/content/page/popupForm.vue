@@ -112,7 +112,7 @@
 
                             <FormItem
                                 :label="t('cms.content.pics')"
-                                type="image"
+                                type="images"
                                 v-model="baTable.form.items!.pic"
                                 prop="pics"
                                 :placeholder="t('Please input field', { field: t('cms.content.pics') })"
