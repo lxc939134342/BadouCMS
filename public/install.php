@@ -17,14 +17,25 @@
 
 namespace think;
 
-require __DIR__ . '/../vendor/autoload.php';
+error_reporting(E_ALL & ~E_WARNING & ~E_NOTICE & ~E_DEPRECATED);
+ini_set('display_errors', '0');
+use Throwable;
 
-// 执行HTTP应用并响应
-$app = new App();
-$http = $app->http;
-$route = $app->route;
-$route->rule('/', '\bd\service\install\Install::index');
-$response = $http->run();
-$response->send();
+try {
+    require __DIR__ . '/../vendor/autoload.php';
+    // 执行HTTP应用并响应
+    $app = new App();
+    $http = $app->http;
+    $route = $app->route;
+    $route->rule('/', '\bd\service\install\Install::index');
+    $response = $http->run();
+    $response->send();
 
-$http->end($response);
+    $http->end($response);
+} catch (Throwable $e) {
+    header('Content-Type:text/html;charset=utf-8');
+    $html = <<<EOF
+依赖加载失败，重新下载完整程序包 或 执行 composer install 重新安装依赖<br> 查看文档<a href="http://www.badoucms.com/install" target="_blank">http://www.badoucms.com/install</a>
+EOF;
+    die($html);
+}

@@ -270,8 +270,6 @@ class Install
         ];
     }
 
-
-
     /**
      * 检测环境
      */
@@ -326,6 +324,7 @@ class Install
         if (!$phpProc) {
             throw new Exception(__("proc_open is not currently installed and cannot be installed"));
         }
+        // proc_open-end
 
         // 检测目录是否存在
         $checkDirs = [
@@ -338,8 +337,6 @@ class Install
                 throw new Exception(__('Please go to the official website to download the full package or resource package and try to install'));
             }
         }
-
-        // proc_open-end
         return true;
     }
 
