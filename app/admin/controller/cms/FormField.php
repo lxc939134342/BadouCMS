@@ -113,8 +113,8 @@ class FormField extends Base
         if ($this->request->isPost()) {
             $post = $this->request->post();
             $post['acode'] = get_backend_lang();
-            $post['create_user'] = 'admin';
-            $post['update_user'] = 'admin';
+            $post['create_user'] = $this->auth->username;
+            $post['update_user'] = $this->auth->username;
 
             if (empty($this->request->post('fcode'))) {
                 $formFieldModel = $this->model;
@@ -126,7 +126,6 @@ class FormField extends Base
 
             $formModel = new \app\admin\model\cms\Form();
             $form = $formModel->where('fcode', $post['fcode'])->find()->toArray();
-
             $table = [
                 "name" => $form['table_name'],
                 "comment" => $form['form_name'],

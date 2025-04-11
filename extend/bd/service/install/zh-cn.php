@@ -34,6 +34,6 @@ return [
     'The system has been installed. If you need to reinstall, please remove %s first'                       => '当前已经安装成功，如果需要重新安装，请手动移除%s文件',
     'Iszhuzidata'                                                                                           => '是否导入测试数据',
     'public directory is not writable'                                                                      => 'public 目录没有写入权限,无法进行安装',
-    'proc_open is not currently installed and cannot be installed'                                          => '当前未开启proc_open，无法进行安装',
+    'proc_open is not currently installed and cannot be installed'                                          => '当前未开启proc_open，请勿禁用此函数',
     'gd2 is not currently installed and cannot be installed'                                                => '当前未开启gd2 或 freeType，无法进行安装',
 ];

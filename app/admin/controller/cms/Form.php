@@ -61,16 +61,24 @@ class Form extends Base
         if ($this->request->isPost()) {
             $post = $this->request->post();
 
-            $post['create_user'] = 'admin';
-            $post['update_user'] = 'admin';
+            $post['create_user'] = $this->auth->username;
+            $post['update_user'] = $this->auth->username;
 
             if (empty($this->request->post('fcode'))) {
                 $fcode = $formModel->order('fcode', 'desc')->value('fcode');
                 $post['fcode'] = $fcode + 1;
             }
+            // 获取数据库配置的表前缀
+            $dbPrefix = config('database.connections.mysql.prefix').'cms_diy_';
+            $table_name = $this->request->post('table_name');
+            if (strpos($table_name, $dbPrefix) !== 0) {
+                $table_name = $dbPrefix . $table_name;
+            }
+            $post['table_name'] = $table_name;
             $this->request->withPost($post);
+
             $table = [
-                "name" => $this->request->post('table_name'),
+                "name" => $table_name,
                 "comment" => $this->request->post('form_name'),
                 "isCommonModel" => 0,
                 "databaseConnection" => 'mysql',
@@ -119,39 +127,10 @@ class Form extends Base
             ];
 
             try {
-                // 记录日志
-                $crudLogId = Helper::recordCrudStatus([
-                    'table' => $table,
-                    'fields' => $fields,
-                    'status' => 'start',
-                ]);
-
-                // 表名称
-                $tableName = TableManager::tableName($table['name'], false, $table['databaseConnection']);
-                // 处理表设计 - 表创建
-                [$tablePk] = Helper::handleTableDesign($table, $fields);
-                // 表注释
-
-                // 记录日志
-                Helper::recordCrudStatus([
-                    'id'     => $crudLogId,
-                    'status' => 'success',
-                ]);
-
+                Helper::handleTableDesign($table, $fields);
             } catch (Exception $e) {
-                Helper::recordCrudStatus([
-                    'id'     => $crudLogId ?? 0,
-                    'status' => 'error',
-                ]);
                 $this->error($e->getMessage());
             } catch (Throwable $e) {
-                Helper::recordCrudStatus([
-                    'id'     => $crudLogId ?? 0,
-                    'status' => 'error',
-                ]);
-                if (env('app_debug', false)) {
-                    throw $e;
-                }
                 $this->error($e->getMessage());
             }
 

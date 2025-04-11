@@ -326,6 +326,19 @@ class Install
         if (!$phpProc) {
             throw new Exception(__("proc_open is not currently installed and cannot be installed"));
         }
+
+        // 检测目录是否存在
+        $checkDirs = [
+            'vendor',
+            'vendor'.DIRECTORY_SEPARATOR.'topthink',
+        ];
+
+        foreach ($checkDirs as $k => $v) {
+            if (!is_dir(root_path() . $v)) {
+                throw new Exception(__('Please go to the official website to download the full package or resource package and try to install'));
+            }
+        }
+
         // proc_open-end
         return true;
     }
