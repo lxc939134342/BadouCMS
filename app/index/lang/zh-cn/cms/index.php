@@ -156,4 +156,5 @@ return [
     'You\'ve logged in, do not login again'                                    => '您已登录，无需再次登录~',
     'Please input correct username'                                            => '用户名必须以字母开头，由3-16位字母、数字或下划线组成',
     'Please input correct password'                                            => '密码必须为6-32位字符，且不能包含特殊字符',
+    'ScanWithYourMobilePhoneToAddWeChat'                                       => '扫码添加微信'
 ];
