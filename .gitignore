@@ -17,6 +17,7 @@ README.md
 .DS_store
 /web/yarn.lock
 /web/pnpm-lock.yaml
+/public/assets
 public/npm-install-test
 modules/*
 backup/*
