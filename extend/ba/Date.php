@@ -118,12 +118,14 @@ class Date
      * 格式化 UNIX 时间戳为人易读的字符串
      *
      * @param int  $remote Unix 时间戳
-     * @param ?int $local  本地时间
+     * @param ?int $local  本地时间戳
      * @return string 格式化的日期字符串
      */
     public static function human(int $remote, ?int $local = null): string
     {
         $timeDiff = (is_null($local) ? time() : $local) - $remote;
+        $tense    = $timeDiff < 0 ? 'after' : 'ago';
+        $timeDiff = abs($timeDiff);
         $chunks   = [
             [60 * 60 * 24 * 365, 'year'],
             [60 * 60 * 24 * 30, 'month'],
@@ -143,7 +145,7 @@ class Date
                 break;
             }
         }
-        return __("%d $name%s ago", [$count, $count > 1 ? 's' : '']);
+        return __("%d $name%s $tense", [$count, $count > 1 ? 's' : '']);
     }
 
     /**
@@ -172,15 +174,22 @@ class Date
             'minute' => $position ? mktime($hour, $minute + $offset, 0, $month, $day, $year) : mktime($hour, $minute + $offset, 59, $month, $day, $year),
             'hour' => $position ? mktime($hour + $offset, 0, 0, $month, $day, $year) : mktime($hour + $offset, 59, 59, $month, $day, $year),
             'day' => $position ? mktime(0, 0, 0, $month, $day + $offset, $year) : mktime(23, 59, 59, $month, $day + $offset, $year),
-            'week' => $position ?
-                mktime(0, 0, 0, $month, $day - date("w", mktime(0, 0, 0, $month, $day, $year)) + 1 - 7 * (-$offset), $year) :
-                mktime(23, 59, 59, $month, $day - date("w", mktime(0, 0, 0, $month, $day, $year)) + 7 - 7 * (-$offset), $year),
-            'month' => $position ? mktime(0, 0, 0, $month + $offset, 1, $year) : mktime(23, 59, 59, $month + $offset, cal_days_in_month(CAL_GREGORIAN, $month + $offset, $year), $year),
+            // 使用固定的 this week monday 而不是 $offset weeks monday 的语法才能确保准确性
+            'week' => $position ? strtotime('this week monday', mktime(0, 0, 0, $month, $day + ($offset * 7), $year)) : strtotime('this week sunday 23:59:59', mktime(0, 0, 0, $month, $day + ($offset * 7), $year)),
+            'month' => $position ? mktime(0, 0, 0, $month + $offset, 1, $year) : mktime(23, 59, 59, $month + $offset, self::daysInMonth($month + $offset, $year), $year),
             'quarter' => $position ?
                 mktime(0, 0, 0, 1 + ((ceil(date('n', mktime(0, 0, 0, $month, $day, $year)) / 3) + $offset) - 1) * 3, 1, $year) :
-                mktime(23, 59, 59, (ceil(date('n', mktime(0, 0, 0, $month, $day, $year)) / 3) + $offset) * 3, cal_days_in_month(CAL_GREGORIAN, (ceil(date('n', mktime(0, 0, 0, $month, $day, $year)) / 3) + $offset) * 3, $year), $year),
+                mktime(23, 59, 59, (ceil(date('n', mktime(0, 0, 0, $month, $day, $year)) / 3) + $offset) * 3, self::daysInMonth((ceil(date('n', mktime(0, 0, 0, $month, $day, $year)) / 3) + $offset) * 3, $year), $year),
             'year' => $position ? mktime(0, 0, 0, 1, 1, $year + $offset) : mktime(23, 59, 59, 12, 31, $year + $offset),
             default => mktime($hour, $minute, 0, $month, $day, $year),
         };
+    }
+
+    /**
+     * 获取给定月份的天数 （28 到 31）
+     */
+    public static function daysInMonth(int $month, ?int $year = null): int
+    {
+        return (int)date('t', mktime(0, 0, 0, $month, 1, $year));
     }
 }

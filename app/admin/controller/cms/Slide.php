@@ -44,10 +44,20 @@ class Slide extends Base
     public function add(): void
     {
         if ($this->request->isPost()) {
-            $post = $this->request->post();
-            $post['acode'] = get_backend_lang();
-            $post['create_user'] = 'admin';
-            $post['update_user'] = 'admin';
+            $post = $this->getPostData();
+            // 构建数据
+            $default = [
+               'acode' => get_backend_lang(),
+               'gid' => 0,
+               'pic' => '',
+               'link' => '',
+               'title' => '',
+               'subtitle' => '',
+               'sorting' => 255,
+               'create_user' => $this->auth->username,
+               'update_user' => $this->auth->username
+            ];
+            $post = array_merge($default, $post);
 
             $slideModel = $this->model;
             if ($this->request->post('gid') == 0) {
@@ -60,7 +70,12 @@ class Slide extends Base
         }
 
         $slideModel = $this->model;
-        $res = $slideModel->where('acode', 'cn')->distinct(true)->field('gid')->order('gid', 'asc')->select();
+        $res = $slideModel
+            ->where('acode', get_backend_lang())
+                ->distinct(true)
+                ->field('gid')
+                ->order('gid', 'asc')
+                ->select();
 
         $addRes['gid_text'] = '自动新增分组';
         $addRes['gid'] = 0;

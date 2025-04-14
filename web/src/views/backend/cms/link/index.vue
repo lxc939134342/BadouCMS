@@ -1,12 +1,13 @@
 <template>
     <div class="default-main ba-table-box">
-        <el-alert class="ba-table-alert" v-if="baTable.table.remark" :title="baTable.table.remark" type="info"
-            show-icon />
+        <el-alert class="ba-table-alert" v-if="baTable.table.remark" :title="baTable.table.remark" type="info" show-icon />
 
         <!-- 表格顶部菜单 -->
         <!-- 自定义按钮请使用插槽，甚至公共搜索也可以使用具名插槽渲染，参见文档 -->
-        <TableHeader :buttons="['refresh', 'add', 'edit', 'delete', 'comSearch', 'quickSearch', 'columnDisplay']"
-            :quick-search-placeholder="t('Quick search placeholder', { fields: t('cms.link.quick Search Fields') })">
+        <TableHeader
+            :buttons="['refresh', 'add', 'edit', 'delete', 'comSearch', 'quickSearch', 'columnDisplay']"
+            :quick-search-placeholder="t('Quick search placeholder', { fields: t('cms.link.quick Search Fields') })"
+        >
         </TableHeader>
 
         <!-- 表格 -->
@@ -51,7 +52,15 @@ const baTable = new baTableClass(
             { label: t('cms.link.gid'), prop: 'gid', align: 'center', operator: 'RANGE', sortable: false },
             { label: t('cms.link.name'), prop: 'name', align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
             { label: t('cms.link.link'), prop: 'link', align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false },
-            { label: t('cms.link.logo'), prop: 'logo', align: 'center', operatorPlaceholder: t('Fuzzy query'), operator: 'LIKE', sortable: false, render: 'image', },
+            {
+                label: t('cms.link.logo'),
+                prop: 'logo',
+                align: 'center',
+                operatorPlaceholder: t('Fuzzy query'),
+                operator: 'LIKE',
+                sortable: false,
+                render: 'image',
+            },
             { label: t('cms.link.sorting'), prop: 'sorting', align: 'center', operator: 'RANGE', sortable: false },
             { label: t('Operate'), align: 'center', width: 100, render: 'buttons', buttons: optButtons, operator: false },
         ],
@@ -67,6 +76,7 @@ provide('baTable', baTable)
 onMounted(() => {
     baTable.table.ref = tableRef.value
     baTable.mount()
+    baTable.table.filter!.order = 'sorting,asc'
     baTable.getIndex()?.then(() => {
         baTable.initSort()
         baTable.dragSort()

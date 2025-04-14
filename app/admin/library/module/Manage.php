@@ -109,7 +109,7 @@ class Manage
         }
         // 下载 - 系统版本号要求、已安装模块的互斥和依赖检测
         $zipFile = Server::download($this->uid, $this->installDir, [
-            'sysVersion'    => Config::get('buildadmin.version'),
+            'sysVersion'    => Config::get('badoucms.version'),
             'nuxtVersion'   => Server::getNuxtVersion(),
             'ba-user-token' => $token,
             'order_id'      => $orderId,
@@ -418,7 +418,9 @@ class Manage
         $delNuxtNpmDepend  = false;
         $delComposerDepend = false;
         foreach ($dependConflictSolution as $env => $depends) {
-            if (!$depends) continue;
+            if (!$depends) {
+                continue;
+            }
             if ($env == 'require' || $env == 'require-dev') {
                 $delComposerDepend = true;
             } elseif ($env == 'dependencies' || $env == 'devDependencies') {
@@ -482,7 +484,9 @@ class Manage
         $webDep       = new Depends(root_path() . 'web' . DIRECTORY_SEPARATOR . 'package.json');
         $webNuxtDep   = new Depends(root_path() . 'web-nuxt' . DIRECTORY_SEPARATOR . 'package.json');
         foreach ($dependConflictSolution as $env => $depends) {
-            if (!$depends) continue;
+            if (!$depends) {
+                continue;
+            }
             $dev = !(stripos($env, 'dev') === false);
             if ($env == 'require' || $env == 'require-dev') {
                 $serverDepend->removeDepends($depends, $dev);
@@ -512,7 +516,9 @@ class Manage
             // 纯净模式下，模块文件将被删除，此处直接检查模块目录中是否有该文件并恢复（不检查是否开启纯净模式，因为开关可能被调整）
             $moduleFilePath = Filesystem::fsFit($this->modulesDir . $file);
             $file           = Filesystem::fsFit(root_path() . $file);
-            if (!file_exists($file)) continue;
+            if (!file_exists($file)) {
+                continue;
+            }
             if (!file_exists($moduleFilePath)) {
                 if (!is_dir(dirname($moduleFilePath))) {
                     mkdir(dirname($moduleFilePath), 0755, true);
@@ -952,7 +958,9 @@ class Manage
         foreach ($arr as $item) {
             if (is_array($item)) {
                 $empty = self::isEmptyArray($item);
-                if (!$empty) return false;
+                if (!$empty) {
+                    return false;
+                }
             } elseif ($item) {
                 return false;
             }

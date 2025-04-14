@@ -17,7 +17,7 @@ use app\common\controller\Backend;
 /**
  * 友情链接
  */
-class Link extends Backend
+class Link extends Base
 {
     /**
      * Link模型对象
@@ -30,16 +30,14 @@ class Link extends Backend
 
     protected string|array $quickSearchField = ['id','name'];
 
+    protected string $weighField = 'sorting';
+
+    protected string|array $defaultSortField = ['sorting' => 'asc'];
     public function initialize(): void
     {
         parent::initialize();
         $this->model = new \app\admin\model\cms\Link();
     }
-
-
-    /**
-     * 若需重写查看、编辑、删除等方法，请复制 @see \app\admin\library\traits\Backend 中对应的方法至此进行重写
-     */
 
     /**
      * 添加
@@ -48,10 +46,20 @@ class Link extends Backend
     public function add(): void
     {
         if ($this->request->isPost()) {
-            $post = $this->request->post();
-            $post['acode'] = get_backend_lang();
-            $post['create_user'] = 'admin';
-            $post['update_user'] = 'admin';
+            $post = $this->getPostData();
+
+            // 构建数据
+            $default = [
+                'acode' => get_backend_lang(),
+                'gid' => 0,
+                'name' => '',
+                'link' => '',
+                'logo' => '',
+                'sorting' => 255,
+                'create_user' =>  $this->auth->username,
+                'update_user' =>  $this->auth->username
+            ];
+            $post = array_merge($default, $post);
 
             $linkModel = $this->model;
             if ($this->request->post('gid') == 0) {
@@ -59,25 +67,23 @@ class Link extends Backend
                 $post['gid'] = $gid + 1;
             }
             $this->request->withPost($post);
-
-            //            var_dump($this->request->post());die();
             parent::add();
         }
 
         $linkModel = $this->model;
-        $res = $linkModel->where('acode', 'cn')->distinct(true)->field('gid')->order('gid', 'asc')->select();
+        $res = $linkModel->where('acode', get_backend_lang())
+            ->distinct(true)
+            ->field('gid')
+            ->order('gid', 'asc')->select();
 
         $addRes['gid_text'] = '自动新增分组';
         $addRes['gid'] = 0;
 
         $res->push($addRes);
-        // var_dump($res);die();
         $data = [
             'list' => $res,
             'remark' => ''
         ];
         $this->success('ok', $data);
     }
-
-
 }

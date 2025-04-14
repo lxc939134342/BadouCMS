@@ -1,5 +1,5 @@
 
-    public function get{%field%}Attr($value): float
+    public function get{%field%}Attr($value): ?float
     {
-        return (float)$value;
+        return is_null($value) ? null : (float)$value;
     }

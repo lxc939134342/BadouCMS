@@ -1,4 +1,5 @@
 <?php
+
 return [
     'Please login first'                                                                  => '请先登录！',
     'You have no permission'                                                              => '没有权限操作！',

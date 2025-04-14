@@ -1,1 +1,0 @@
-import{c as e}from"./index-BRCNTaKG.js";const t="/admin/cms.Extfield/";function s(){return e({url:t+"models",method:"get"})}function m(){return e({url:t+"typeText",method:"get"})}const d=r=>e({url:t+"getModelFields",method:"get",params:{mcode:r}});export{d as g,s as m,m as t,t as u};

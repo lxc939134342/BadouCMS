@@ -7,7 +7,7 @@ use app\admin\model\AdminRule;
 use app\admin\model\UserRule;
 
 /**
- * 后台菜单类
+ * 菜单规则管理类
  */
 class Menu
 {
@@ -34,28 +34,37 @@ class Menu
 
             // 属性
             $item['status'] = '1';
-            if (!isset($item['pid']) && $pid) {
+            if (!isset($item['pid'])) {
                 $item['pid'] = $pid;
             }
 
-            $oldMenu = $model->where('name', $item['name'])->find();
-            if ($oldMenu) {
-                // 存在相关名称的菜单规则
+            $sameOldMenu = $model->where('name', $item['name'])->find();
+            if ($sameOldMenu) {
+                // 存在相同名称的菜单规则
                 if ($mode == 'cover') {
-                    $oldMenu->save($item);
+                    $sameOldMenu->save($item);
                 } elseif ($mode == 'rename') {
                     $count         = $model->where('name', $item['name'])->count();
-                    $item['name']  = $item['name'] . '-conflicting-' . $count;
-                    $item['title'] = $item['title'] . '-conflicting-' . $count;
-                    $oldMenu       = $model->create($item);
+                    $item['name']  = $item['name'] . '-CONFLICT-' . $count;
+                    $item['path']  = $item['path'] . '-CONFLICT-' . $count;
+                    $item['title'] = $item['title'] . '-CONFLICT-' . $count;
+                    $sameOldMenu   = $model->create($item);
                 } elseif ($mode == 'ignore') {
-                    $oldMenu = $menu;
+                    // 忽略同名菜单时，当前 pid 下没有同名菜单，则创建同名新菜单，以保证所有新增菜单的上下级结构
+                    $sameOldMenu = $model
+                        ->where('name', $item['name'])
+                        ->where('pid', $item['pid'])
+                        ->find();
+
+                    if (!$sameOldMenu) {
+                        $sameOldMenu = $model->create($item);
+                    }
                 }
             } else {
-                $oldMenu = $model->create($item);
+                $sameOldMenu = $model->create($item);
             }
-            if (isset($item['children']) && $item['children']) {
-                self::create($item['children'], $oldMenu['name'], $mode, $position);
+            if (!empty($item['children'])) {
+                self::create($item['children'], $sameOldMenu['id'], $mode, $position);
             }
         }
     }

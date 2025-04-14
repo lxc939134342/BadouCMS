@@ -1,6 +1,6 @@
 <?php
+
 return [
-    'Invalid token'                                          => 'Invalid Token!',
     'Login expired, please login again.'                     => 'Login expired, please login again.',
     'Account not exist'                                      => 'Account does not exist',
     'Account disabled'                                       => 'Account is disabled',

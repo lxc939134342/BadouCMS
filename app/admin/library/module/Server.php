@@ -23,7 +23,7 @@ class Server
 {
     private static ?Client $client = null;
 
-    private static string $apiBaseUrl = '/api/v6.store/';
+    private static string $apiBaseUrl = '/api/modules/';
 
     /**
      * 下载
@@ -180,7 +180,9 @@ class Server
                 foreach ($overwriteDir as $item) {
                     $baseDir = $dir . $item;
                     foreach ($moduleFileList as $file) {
-                        if (!str_starts_with($file['path'], $baseDir)) continue;
+                        if (!str_starts_with($file['path'], $baseDir)) {
+                            continue;
+                        }
                         $fileList[] = Filesystem::fsFit(str_replace($dir, '', $file['path']));
                     }
                 }
@@ -194,7 +196,8 @@ class Server
                 continue;
             }
             $files = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($baseDir, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST
+                new RecursiveDirectoryIterator($baseDir, FilesystemIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::CHILD_FIRST
             );
             foreach ($files as $file) {
                 if ($file->isFile()) {
@@ -301,7 +304,9 @@ class Server
         $info     = [];
         if (is_file($infoFile)) {
             $info = parse_ini_file($infoFile, true, INI_SCANNER_TYPED) ?: [];
-            if (!$info) return [];
+            if (!$info) {
+                return [];
+            }
         }
         return $info;
     }
@@ -367,7 +372,9 @@ class Server
     public static function analysisWebBootstrap(string $uid, string $dir): array
     {
         $bootstrapFile = $dir . 'webBootstrap.stub';
-        if (!file_exists($bootstrapFile)) return [];
+        if (!file_exists($bootstrapFile)) {
+            return [];
+        }
         $bootstrapContent = file_get_contents($bootstrapFile);
         $pregArr          = [
             'mainTsImport'    => '/#main.ts import code start#([\s\S]*?)#main.ts import code end#/i',
@@ -523,13 +530,16 @@ class Server
     {
         $runtimeFilePath = $dir . '.runtime';
         $files           = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($dir), RecursiveIteratorIterator::LEAVES_ONLY
+            new RecursiveDirectoryIterator($dir),
+            RecursiveIteratorIterator::LEAVES_ONLY
         );
         $filePaths       = [];
         foreach ($files as $file) {
             if (!$file->isDir()) {
                 $pathName = $file->getPathName();
-                if ($pathName == $runtimeFilePath) continue;
+                if ($pathName == $runtimeFilePath) {
+                    continue;
+                }
                 $filePaths[] = [
                     'path' => Filesystem::fsFit($pathName),
                     'size' => filesize($pathName),
@@ -552,7 +562,9 @@ class Server
         $runtimeFilePath   = $dir . '.runtime';
         $runtimeContent    = @file_get_contents($runtimeFilePath);
         $runtimeContentArr = json_decode($runtimeContent, true);
-        if (!$runtimeContentArr) return [];
+        if (!$runtimeContentArr) {
+            return [];
+        }
 
         if ($key) {
             return $runtimeContentArr[$key] ?? [];
@@ -568,7 +580,7 @@ class Server
     protected static function getClient(): Client
     {
         $options = [
-            'base_uri'        => Config::get('buildadmin.api_url'),
+            'base_uri'        => Config::get('badoucms.api_url'),
             'timeout'         => 30,
             'connect_timeout' => 30,
             'verify'          => false,

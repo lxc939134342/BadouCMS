@@ -233,7 +233,11 @@ trait Backend
         $weigh = $targetRow[$this->weighField];
 
         // 波及行的权重值向上增加还是向下减少
-        $updateMethod = $direction == 'up' ? 'dec' : 'inc';
+        if ($order[$this->weighField] == 'desc') {
+            $updateMethod = $direction == 'up' ? 'dec' : 'inc';
+        } else {
+            $updateMethod = $direction == 'up' ? 'inc' : 'dec';
+        }
 
         // 与目标行权重相同的行
         $weighRowIds    = $this->model
@@ -251,7 +255,7 @@ trait Backend
             ->save();
 
         // 遍历与目标行权重相同的行，每出现一行权重值将额外 +1，保证权重相同行的顺序位置不变
-        if ($updateMethod == 'inc') {
+        if ($direction == 'down') {
             $weighRowIds = array_reverse($weighRowIds);
         }
 
@@ -262,7 +266,9 @@ trait Backend
             ->orderRaw("field($pk,$weighRowIds)")
             ->select();
 
+        // 权重相等行
         foreach ($weighRows as $key => $weighRow) {
+            // 跳过当前拖动行（相等权重数据之间的拖动时，被拖动行会出现在 $weighRows 内）
             if ($moveRow[$pk] == $weighRow[$pk]) {
                 continue;
             }
@@ -273,6 +279,7 @@ trait Backend
                 $rowWeighVal = $weighRow[$this->weighField] + $key;
             }
 
+            // 找到了目标行
             if ($weighRow[$pk] == $targetRow[$pk]) {
                 $moveComplete               = 1;
                 $moveRow[$this->weighField] = $rowWeighVal;
@@ -293,5 +300,6 @@ trait Backend
      */
     public function select(): void
     {
+
     }
 }

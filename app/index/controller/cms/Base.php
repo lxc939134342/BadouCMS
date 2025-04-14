@@ -139,7 +139,7 @@ class Base extends BaseController
         $this->view = View::instance();
         $this->view->config([
             'view_path' => $view_path,
-            'taglib_pre_load' => Bd::class,
+            'taglib_pre_load' => Bd::class
         ]);
 
         /**

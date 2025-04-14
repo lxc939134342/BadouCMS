@@ -1,4 +1,5 @@
 <?php
+
 return [
     'username'                                                                => '用户名',
     'email'                                                                   => '邮箱',

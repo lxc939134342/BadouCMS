@@ -49,10 +49,10 @@ class User extends Validate
     public function __construct()
     {
         $this->field   = [
-            'username'     => __('username'),
-            'email'        => __('email'),
-            'mobile'       => __('mobile'),
-            'password'     => __('password'),
+            'username'     => __('Username'),
+            'email'        => __('Email'),
+            'mobile'       => __('Mobile'),
+            'password'     => __('Password'),
             'captcha'      => __('captcha'),
             'captchaId'    => __('captchaId'),
             'captchaInfo'  => __('captcha'),

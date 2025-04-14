@@ -1,4 +1,5 @@
 <?php
+
 return [
     'username'                                                                 => '用户名',
     'nickname'                                                                 => '昵称',

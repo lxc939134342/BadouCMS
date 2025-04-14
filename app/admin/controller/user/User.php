@@ -39,7 +39,7 @@ class User extends Backend
         }
 
         list($where, $alias, $limit, $order) = $this->queryBuilder();
-        $res = $this->model->with(['member_group'])
+        $res = $this->model
             ->withoutField('password,salt')
             ->withJoin($this->withJoinTable, $this->withJoinType)
             ->alias($alias)
@@ -80,7 +80,9 @@ class User extends Backend
                     $validate = str_replace("\\model\\", "\\validate\\", get_class($this->model));
                     if (class_exists($validate)) {
                         $validate = new $validate();
-                        if ($this->modelSceneValidate) $validate->scene('add');
+                        if ($this->modelSceneValidate) {
+                            $validate->scene('add');
+                        }
                         $validate->check($data);
                     }
                 }

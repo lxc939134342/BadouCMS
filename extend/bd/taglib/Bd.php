@@ -13,6 +13,7 @@
 namespace bd\taglib;
 
 use ba\Random;
+use think\Exception;
 use think\template\TagLib;
 
 class Bd extends TagLib

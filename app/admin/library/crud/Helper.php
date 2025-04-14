@@ -21,74 +21,13 @@ class Helper
      * @var array
      */
     protected static array $reservedKeywords = [
-        'abstract',
-        'and',
-        'array',
-        'as',
-        'break',
-        'callable',
-        'case',
-        'catch',
-        'class',
-        'clone',
-        'const',
-        'continue',
-        'declare',
-        'default',
-        'die',
-        'do',
-        'echo',
-        'else',
-        'elseif',
-        'empty',
-        'enddeclare',
-        'endfor',
-        'endforeach',
-        'endif',
-        'endswitch',
-        'endwhile',
-        'eval',
-        'exit',
-        'extends',
-        'final',
-        'for',
-        'foreach',
-        'function',
-        'global',
-        'goto',
-        'if',
-        'implements',
-        'include',
-        'include_once',
-        'instanceof',
-        'insteadof',
-        'interface',
-        'isset',
-        'list',
-        'namespace',
-        'new',
-        'or',
-        'print',
-        'private',
-        'protected',
-        'public',
-        'require',
-        'require_once',
-        'return',
-        'static',
-        'switch',
-        'throw',
-        'trait',
-        'try',
-        'unset',
-        'use',
-        'var',
-        'while',
-        'xor',
-        'yield',
-        'match',
-        'readonly',
-        'fn',
+        'abstract', 'and', 'array', 'as', 'break', 'callable', 'case', 'catch', 'class', 'clone',
+        'const', 'continue', 'declare', 'default', 'die', 'do', 'echo', 'else', 'elseif', 'empty',
+        'enddeclare', 'endfor', 'endforeach', 'endif', 'endswitch', 'endwhile', 'eval', 'exit', 'extends',
+        'final', 'for', 'foreach', 'function', 'global', 'goto', 'if', 'implements', 'include', 'include_once',
+        'instanceof', 'insteadof', 'interface', 'isset', 'list', 'namespace', 'new', 'or', 'print', 'private',
+        'protected', 'public', 'require', 'require_once', 'return', 'static', 'switch', 'throw', 'trait', 'try',
+        'unset', 'use', 'var', 'while', 'xor', 'yield', 'match', 'readonly', 'fn',
     ];
 
     /**
@@ -345,12 +284,12 @@ class Helper
                 ]);
             return $data['id'];
         }
-//        p($data);die;
+
         $connection = $data['table']['databaseConnection'] ?: config('database.default');
         $log        = CrudLog::create([
             'table_name' => $data['table']['name'],
             'table'      => $data['table'],
-            'fields'     => $data['fields'] ?? 'default',
+            'fields'     => $data['fields'],
             'connection' => $connection,
             'status'     => $data['status'],
         ]);
@@ -471,22 +410,8 @@ class Helper
 
         // 无默认值字段
         $noDefaultValueFields = [
-            'text',
-            'blob',
-            'geometry',
-            'geometrycollection',
-            'json',
-            'linestring',
-            'longblob',
-            'longtext',
-            'mediumblob',
-            'mediumtext',
-            'multilinestring',
-            'multipoint',
-            'multipolygon',
-            'point',
-            'polygon',
-            'tinyblob',
+            'text', 'blob', 'geometry', 'geometrycollection', 'json', 'linestring', 'longblob', 'longtext', 'mediumblob',
+            'mediumtext', 'multilinestring', 'multipoint', 'multipolygon', 'point', 'polygon', 'tinyblob',
         ];
         if ($field['defaultType'] != 'NONE' && !in_array($conciseType, $noDefaultValueFields)) {
             $phinxColumnOptions['default'] = self::analyseFieldDefault($field);
@@ -553,20 +478,15 @@ class Helper
     public static function handleTableDesign(array $table, array $fields): array
     {
         $name         = TableManager::tableName($table['name'], true, $table['databaseConnection']);
-        //评论
         $comment      = $table['comment'] ?? '';
-        //设计更改
         $designChange = $table['designChange'] ?? [];
-        //适配器
         $adapter      = TableManager::phinxAdapter(false, $table['databaseConnection']);
 
-        //主键
         $pk = self::searchArray($fields, function ($item) {
             return $item['primaryKey'];
         });
         $pk = $pk ? $pk['name'] : '';
 
-        //判断 这个表 是否存在
         if ($adapter->hasTable($name)) {
             // 更新表
             if ($designChange) {
@@ -608,7 +528,7 @@ class Helper
                     }
 
                     if ($item['type'] == 'change-field-attr') {
-                        //更改字段attr
+
                         if (!$tableManager->hasColumn($item['oldName'])) {
                             // 字段不存在
                             throw new BaException(__($item['type'] . ' fail not exist', [$item['oldName']]));
@@ -619,7 +539,7 @@ class Helper
                         }));
                         $tableManager->changeColumn($item['oldName'], $phinxFieldData['type'], $phinxFieldData['options']);
                     } elseif ($item['type'] == 'add-field') {
-                        // 添加字段
+
                         if ($tableManager->hasColumn($item['newName'])) {
                             // 字段已经存在
                             throw new BaException(__($item['type'] . ' fail exist', [$item['newName']]));
@@ -1012,43 +932,43 @@ class Helper
     public static function createMenu($webViewsDir, $tableComment): void
     {
         $menuName = self::getMenuName($webViewsDir);
-        if (!AdminRule::where('name', $menuName)->value('id')) {
-            $pid = 0;
-            foreach ($webViewsDir['path'] as $item) {
-                $pMenu = AdminRule::where('name', $item)->value('id');
-                if ($pMenu) {
-                    $pid = $pMenu;
-                    continue;
-                }
-                $menu = [
-                    'pid'   => $pid,
-                    'type'  => 'menu_dir',
-                    'title' => $item,
-                    'name'  => $item,
-                    'path'  => $item,
-                ];
-                $menu = AdminRule::create($menu);
-                $pid  = $menu->id;
-            }
-
-            // 建立菜单
-            foreach (self::$menuChildren as &$item) {
-                $item['name'] = $menuName . $item['name'];
-            }
-            $componentPath = str_replace(['\\', 'web/src'], ['/', '/src'], $webViewsDir['views'] . '/' . 'index.vue');
-            Menu::create([
-                [
-                    'type'      => 'menu',
-                    'title'     => $tableComment ?: $webViewsDir['originalLastName'],
-                    'name'      => $menuName,
-                    'path'      => $menuName,
-                    'menu_type' => 'tab',
-                    'keepalive' => '1',
-                    'component' => $componentPath,
-                    'children'  => self::$menuChildren,
-                ]
-            ], $pid);
+        if (AdminRule::where('name', $menuName)->value('id')) {
+            return;
         }
+
+        // 组装权限节点数据
+        $menuChildren = self::$menuChildren;
+        foreach ($menuChildren as &$item) {
+            $item['name'] = $menuName . $item['name'];
+        }
+
+        // 组件路径
+        $componentPath = str_replace(['\\', 'web/src'], ['/', '/src'], $webViewsDir['views'] . '/' . 'index.vue');
+
+        // 菜单数组
+        $menus = [
+            'type'      => 'menu',
+            'title'     => $tableComment ?: $webViewsDir['originalLastName'],
+            'name'      => $menuName,
+            'path'      => $menuName,
+            'menu_type' => 'tab',
+            'keepalive' => 1,
+            'component' => $componentPath,
+            'children'  => $menuChildren,
+        ];
+        $paths = array_reverse($webViewsDir['path']);
+        foreach ($paths as $path) {
+            $menus = [
+                'type'     => 'menu_dir',
+                'title'    => $path,
+                'name'     => $path,
+                'path'     => $path,
+                'children' => [$menus],
+            ];
+        }
+
+        // 创建菜单
+        Menu::create([$menus], 0, 'ignore');
     }
 
     public static function writeWebLangFile($langData, $webLangDir): void
@@ -1358,4 +1278,5 @@ class Helper
             return $arr;
         }
     }
+
 }

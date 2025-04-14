@@ -44,8 +44,12 @@ class Config extends Model
         if ($model->getData('extend') || $model->getData('inputExtend')) {
             $extend      = str_attr_to_array($model->getData('extend'));
             $inputExtend = str_attr_to_array($model->getData('inputExtend'));
-            if ($inputExtend) $extend['baInputExtend'] = $inputExtend;
-            if ($extend) $model->extend = json_encode($extend);
+            if ($inputExtend) {
+                $extend['baInputExtend'] = $inputExtend;
+            }
+            if ($extend) {
+                $model->extend = json_encode($extend);
+            }
         }
         $model->allow_del = 1;
     }
@@ -61,7 +65,9 @@ class Config extends Model
 
     public function getValueAttr($value, $row)
     {
-        if (!isset($row['type']) || $value == '0') return $value;
+        if (!isset($row['type']) || $value == '0') {
+            return $value;
+        }
         if (in_array($row['type'], $this->jsonDecodeType)) {
             return empty($value) ? [] : json_decode($value, true);
         } elseif ($row['type'] == 'switch') {
@@ -69,8 +75,12 @@ class Config extends Model
         } elseif ($row['type'] == 'editor') {
             return !$value ? '' : htmlspecialchars_decode($value);
         } elseif (in_array($row['type'], ['city', 'remoteSelects'])) {
-            if (!$value) return [];
-            if (!is_array($value)) return explode(',', $value);
+            if (!$value) {
+                return [];
+            }
+            if (!is_array($value)) {
+                return explode(',', $value);
+            }
             return $value;
         } else {
             return $value ?: '';
@@ -99,7 +109,9 @@ class Config extends Model
 
     public function getContentAttr($value, $row)
     {
-        if (!isset($row['type'])) return '';
+        if (!isset($row['type'])) {
+            return '';
+        }
         if (in_array($row['type'], $this->needContent)) {
             $arr = json_decode($value, true);
             return $arr ?: [];

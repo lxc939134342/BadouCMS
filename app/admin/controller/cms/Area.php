@@ -12,6 +12,8 @@
 
 namespace app\admin\controller\cms;
 
+use Throwable;
+
 /**
  * 区域管理
  */
@@ -42,10 +44,41 @@ class Area extends Base
         $this->model = new \app\admin\model\cms\Area();
     }
 
+    public function add(): void
+    {
+        if ($this->request->isPost()) {
+            $data = $this->getPostData();
 
-    /**
-     * 若需重写查看、编辑、删除等方法，请复制 @see \app\admin\library\traits\Backend 中对应的方法至此进行重写
-     */
+            // 构建数据
+            $default = [
+                'acode' => get_backend_lang(),
+                'pcode' => 0,
+                'name' => '',
+                'domain' => '',
+                'is_default' => 0,
+                'create_user' => $this->auth->username,
+                'update_user' => $this->auth->username
+            ];
+            $data = array_merge($default, $data);
+            $result = false;
+            $this->model->startTrans();
+            try {
+                $this->modelValidateFunction($data);
+                $result = $this->model->save($data);
+                $this->model->commit();
+            } catch (Throwable $e) {
+                $this->model->rollback();
+                $this->error($e->getMessage());
+            }
+            if ($result !== false) {
+                $this->success(__('Added successfully'));
+            } else {
+                $this->error(__('No rows were added'));
+            }
+        }
+
+        $this->error(__('Parameter error'));
+    }
 
     /**
      * 获取语言列表

@@ -128,9 +128,9 @@ class Ajax extends Backend
     public function getTableList(): void
     {
         $quickSearch  = $this->request->get("quickSearch/s", '');
-        $connection   = $this->request->request('connection'); // 数据库连接配置标识
-        $samePrefix   = $this->request->request('samePrefix/b', true); // 是否仅返回项目数据表（前缀同项目一致的）
-        $excludeTable = $this->request->request('excludeTable/a', []); // 要排除的数据表数组（表名无需带前缀）
+        $connection   = $this->request->request('connection');// 数据库连接配置标识
+        $samePrefix   = $this->request->request('samePrefix/b', true);// 是否仅返回项目数据表（前缀同项目一致的）
+        $excludeTable = $this->request->request('excludeTable/a', []);// 要排除的数据表数组（表名无需带前缀）
 
         $outTables = [];
         $dbConfig  = TableManager::getConnectionConfig($connection);

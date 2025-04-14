@@ -85,6 +85,13 @@ class Base extends Backend
             $this->error(__('Parameter %s can not be empty', ['']));
         }
 
+        // 将 null 值转换为空字符串
+        array_walk_recursive($data, function (&$value) {
+            if ($value === null) {
+                $value = '';
+            }
+        });
+
         $data = $this->excludeFields($data);
         if ($this->dataLimit && $this->dataLimitFieldAutoFill) {
             $data[$this->dataLimitField] = $this->auth->id;

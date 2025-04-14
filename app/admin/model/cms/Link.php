@@ -25,8 +25,6 @@ class Link extends Model
     // 自动写入时间戳字段
     protected $autoWriteTimestamp = true;
 
-    //默认主键为id，如果你没有使用id作为主键名，需要在模型中设置属性
-    protected $pk = 'id';
 
     //新增模型自定义字段 分组名称
     protected $append = [

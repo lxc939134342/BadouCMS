@@ -149,15 +149,15 @@ class ContentSort extends Base
                 $this->modelValidateFunction($data);
                 $lastcode = $this->model->getLastCode();
                 $scode = get_auto_code($lastcode);
-                $data = array(
+                $default = [
                     'acode'       => get_backend_lang(),
-                    'pcode'       => $data['pcode'] ?? 0,
+                    'pcode'       => 0,
                     'scode'       => $scode,
-                    'name'        => $data['name'],
-                    'mcode'       => $data['mcode'],
-                    'listtpl'     => $data['listtpl'],
-                    'contenttpl'  => $data['contenttpl'],
-                    'status'      => $data['status'],
+                    'name'        => '',
+                    'mcode'       => 0,
+                    'listtpl'     => '',
+                    'contenttpl'  => '',
+                    'status'      => 1,
                     'gid'         => 0,
                     'gtype'       => 4,
                     'subname'     => '',
@@ -169,12 +169,14 @@ class ContentSort extends Base
                     'keywords'    => '',
                     'description' => '',
                     'sorting'     => 255,
-                    'create_user' => '',
-                    'update_user' => '',
+                    'create_user' => $this->auth->username,
+                    'update_user' => $this->auth->username,
                     'def1' => '',
                     'def2' => '',
                     'def3' => '',
-                );
+                ];
+
+                $data = array_merge($default, $data);
 
                 $result = $this->model->save($data);
                 $this->model->commit();

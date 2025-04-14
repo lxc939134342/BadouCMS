@@ -69,10 +69,11 @@ class Index extends Frontend
         $this->success('', [
             'site'             => [
                 'siteName'     => get_sys_config('site_name'),
-                'recordNumber' => get_sys_config('record_number'),
                 'version'      => get_sys_config('version'),
                 'cdnUrl'       => full_url(),
                 'upload'       => keys_to_camel_case(get_upload_config(), ['max_size', 'save_name', 'allowed_suffixes', 'allowed_mime_types']),
+                'recordNumber' => get_sys_config('record_number'),
+                'cdnUrlParams' => Config::get('buildadmin.cdn_url_params'),
             ],
             'openMemberCenter' => Config::get('buildadmin.open_member_center'),
             'userInfo'         => $this->auth->getUserInfo(),

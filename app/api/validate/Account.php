@@ -31,12 +31,12 @@ class Account extends Validate
     public function __construct()
     {
         $this->field   = [
-            'username' => __('username'),
+            'username' => __('Username'),
+            'email'    => __('Email'),
+            'mobile'   => __('Mobile'),
+            'password' => __('Password'),
             'nickname' => __('nickname'),
             'birthday' => __('birthday'),
-            'email'    => __('email'),
-            'mobile'   => __('mobile'),
-            'password' => __('password'),
         ];
         $this->message = array_merge($this->message, [
             'nickname.chsDash' => __('nicknameChsDash'),

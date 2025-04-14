@@ -176,16 +176,34 @@ class Auth extends \ba\Auth
             $this->setError('Account disabled');
             return false;
         }
+
+        // 登录失败重试检查
+        $lastLoginTime   = $this->model->getData('last_login_time');
         $adminLoginRetry = Config::get('buildadmin.admin_login_retry');
-        if ($adminLoginRetry && $this->model->login_failure >= $adminLoginRetry && time() - $this->model->getData('last_login_time') < 86400) {
-            $this->setError('Please try again after 1 day');
-            return false;
+        if ($adminLoginRetry && $lastLoginTime) {
+            // 重置失败次数
+            if ($this->model->login_failure > 0 && time() - $lastLoginTime >= 86400) {
+                $this->model->login_failure = 0;
+                $this->model->save();
+
+                // 重获模型实例，避免单实例多次更新
+                $this->model = Admin::where('username', $username)->find();
+            }
+
+            if ($this->model->login_failure >= $adminLoginRetry) {
+                $this->setError('Please try again after 1 day');
+                return false;
+            }
         }
+
+        // 密码检查
         if ($this->model->password != encrypt_password($password, $this->model->salt)) {
             $this->loginFailed();
             $this->setError('Password is incorrect');
             return false;
         }
+
+        // 清理 token
         if (Config::get('buildadmin.admin_sso')) {
             Token::clear(self::TOKEN_TYPE, $this->model->id);
             Token::clear(self::TOKEN_TYPE . '-refresh', $this->model->id);
@@ -214,7 +232,9 @@ class Auth extends \ba\Auth
      */
     public function loginSuccessful(): bool
     {
-        if (!$this->model) return false;
+        if (!$this->model) {
+            return false;
+        }
         $this->model->startTrans();
         try {
             $this->model->login_failure   = 0;
@@ -242,7 +262,9 @@ class Auth extends \ba\Auth
      */
     public function loginFailed(): bool
     {
-        if (!$this->model) return false;
+        if (!$this->model) {
+            return false;
+        }
         $this->model->startTrans();
         try {
             $this->model->login_failure++;
@@ -313,7 +335,9 @@ class Auth extends \ba\Auth
      */
     public function getInfo(): array
     {
-        if (!$this->model) return [];
+        if (!$this->model) {
+            return [];
+        }
         $info                  = $this->model->toArray();
         $info                  = array_intersect_key($info, array_flip($this->getAllowFields()));
         $info['token']         = $this->getToken();
@@ -432,17 +456,18 @@ class Auth extends \ba\Auth
     }
 
     /**
-     * 获取拥有"所有权限"的分组
-     * @param string $dataLimit 数据权限
+     * 获取拥有 `所有权限` 的分组
+     * @param string $dataLimit       数据权限
+     * @param array  $groupQueryWhere 分组查询条件（默认查询启用的分组：[['status','=',1]]）
      * @return array 分组数组
      * @throws Throwable
      */
-    public function getAllAuthGroups(string $dataLimit): array
+    public function getAllAuthGroups(string $dataLimit, array $groupQueryWhere = [['status', '=', 1]]): array
     {
         // 当前管理员拥有的权限
         $rules         = $this->getRuleIds();
         $allAuthGroups = [];
-        $groups        = AdminGroup::where('status', '1')->select();
+        $groups        = AdminGroup::where($groupQueryWhere)->select();
         foreach ($groups as $group) {
             if ($group['rules'] == '*') {
                 continue;

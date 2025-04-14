@@ -22,7 +22,7 @@ class Module extends Backend
     public function index(): void
     {
         $this->success('', [
-            'sysVersion' => Config::get('buildadmin.version'),
+            'sysVersion' => Config::get('badoucms.version'),
             'installed'  => Server::installedList(root_path() . 'modules' . DIRECTORY_SEPARATOR),
         ]);
     }
@@ -138,8 +138,12 @@ class Module extends Backend
         AdminLog::instance()->setTitle(__('Upload install module'));
         $file  = $this->request->get("file/s", '');
         $token = $this->request->get("token/s", '');
-        if (!$file) $this->error(__('Parameter error'));
-        if (!$token) $this->error(__('Please login to the official website account first'));
+        if (!$file) {
+            $this->error(__('Parameter error'));
+        }
+        if (!$token) {
+            $this->error(__('Please login to the official website account first'));
+        }
 
         $info = [];
         try {

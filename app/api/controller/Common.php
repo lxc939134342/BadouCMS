@@ -55,10 +55,16 @@ class Common extends Api
         $info    = $this->request->post('info/s');
         $unset   = $this->request->post('unset/b', false);
         $captcha = new ClickCaptcha();
-        if ($captcha->check($id, $info, $unset)) $this->success();
+        if ($captcha->check($id, $info, $unset)) {
+            $this->success();
+        }
         $this->error();
     }
 
+    /**
+     * 刷新 token
+     * 无需主动删除原 token，由 token 驱动自行实现过期 token 清理，可避免并发场景下无法获取到过期 token 数据
+     */
     public function refreshToken(): void
     {
         $refreshToken = $this->request->post('refreshToken');
@@ -72,21 +78,11 @@ class Common extends Api
 
         // 管理员token刷新
         if ($refreshToken['type'] == AdminAuth::TOKEN_TYPE . '-refresh') {
-            $baToken = get_auth_token();
-            if (!$baToken) {
-                $this->error(__('Invalid token'));
-            }
-            Token::delete($baToken);
             Token::set($newToken, AdminAuth::TOKEN_TYPE, $refreshToken['user_id'], (int)Config::get('buildadmin.admin_token_keep_time'));
         }
 
         // 会员token刷新
         if ($refreshToken['type'] == UserAuth::TOKEN_TYPE . '-refresh') {
-            $baUserToken = get_auth_token(['ba', 'user', 'token']);
-            if (!$baUserToken) {
-                $this->error(__('Invalid token'));
-            }
-            Token::delete($baUserToken);
             Token::set($newToken, UserAuth::TOKEN_TYPE, $refreshToken['user_id'], (int)Config::get('buildadmin.user_token_keep_time'));
         }
 

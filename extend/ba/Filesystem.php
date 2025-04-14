@@ -18,7 +18,9 @@ class Filesystem
      */
     public static function dirIsEmpty(string $dir): bool
     {
-        if (!file_exists($dir)) return true;
+        if (!file_exists($dir)) {
+            return true;
+        }
         $handle = opendir($dir);
         while (false !== ($entry = readdir($handle))) {
             if ($entry != "." && $entry != "..") {
@@ -209,20 +211,25 @@ class Filesystem
      * @param array  $suffix 要获取的文件列表的后缀
      * @return array
      */
-    public static function getDirFiles(string $dir, array $suffix = ['php']): array
+    public static function getDirFiles(string $dir, array $suffix = []): array
     {
         $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($dir), RecursiveIteratorIterator::LEAVES_ONLY
+            new RecursiveDirectoryIterator($dir),
+            RecursiveIteratorIterator::LEAVES_ONLY
         );
 
         $fileList = [];
         foreach ($files as $file) {
-            if (!$file->isDir() && in_array($file->getExtension(), $suffix)) {
-                $filePath        = $file->getRealPath();
-                $name            = str_replace($dir, '', $filePath);
-                $name            = str_replace(DIRECTORY_SEPARATOR, "/", $name);
-                $fileList[$name] = $name;
+            if ($file->isDir()) {
+                continue;
             }
+            if (!empty($suffix) && !in_array($file->getExtension(), $suffix)) {
+                continue;
+            }
+            $filePath        = $file->getRealPath();
+            $name            = str_replace($dir, '', $filePath);
+            $name            = str_replace(DIRECTORY_SEPARATOR, "/", $name);
+            $fileList[$name] = $name;
         }
         return $fileList;
     }

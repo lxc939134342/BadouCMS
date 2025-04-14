@@ -11,6 +11,11 @@ use app\common\library\token\TokenExpirationException;
 class Backend extends Api
 {
     /**
+     * 引入traits
+     * traits内实现了index、add、edit等方法
+     */
+    use \app\admin\library\traits\Backend;
+    /**
      * 无需登录的方法，访问本控制器的此方法，无需管理员登录
      * @var array
      */
@@ -123,12 +128,6 @@ class Backend extends Api
     protected string|array $indexField = ['*'];
 
     /**
-     * 引入traits
-     * traits内实现了index、add、edit等方法
-     */
-    use \app\admin\library\traits\Backend;
-
-    /**
      * 初始化
      * @throws Throwable
      */
@@ -143,7 +142,9 @@ class Backend extends Api
             // 初始化管理员鉴权实例
             $this->auth = Auth::instance();
             $token      = get_auth_token();
-            if ($token) $this->auth->init($token);
+            if ($token) {
+                $this->auth->init($token);
+            }
         } catch (TokenExpirationException) {
             if ($needLogin) {
                 $this->error(__('Token expiration'), [], 409);
@@ -211,7 +212,22 @@ class Backend extends Api
 
             $field['operator'] = $this->getOperatorByAlias($field['operator']);
 
-            $fieldName = str_contains($field['field'], '.') ? $field['field'] : $mainTableAlias . $field['field'];
+            // 查询关联表字段，转换表别名（驼峰转小写下划线）
+            if (str_contains($field['field'], '.')) {
+                $fieldNameParts        = explode('.', $field['field']);
+                $fieldNamePartsLastKey = array_key_last($fieldNameParts);
+
+                // 忽略最后一个元素（字段名）
+                foreach ($fieldNameParts as $fieldNamePartsKey => $fieldNamePart) {
+                    if ($fieldNamePartsKey !== $fieldNamePartsLastKey) {
+                        $fieldNameParts[$fieldNamePartsKey] = parse_name($fieldNamePart);
+                    }
+                }
+
+                $fieldName = implode('.', $fieldNameParts);
+            } else {
+                $fieldName = $mainTableAlias . $field['field'];
+            }
 
             // 日期时间
             if (isset($field['render']) && $field['render'] == 'datetime') {
