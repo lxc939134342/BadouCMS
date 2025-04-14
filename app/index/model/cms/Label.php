@@ -25,11 +25,6 @@ class Label extends Model
             if (!$value) {
                 continue;
             }
-            // $value = explode(',', $value);
-            // p($value);
-            // if (is_array($value)) {
-            //     return $value;
-            // }
             $value = htmlspecialchars_decode_improve(html_entity_decode($value));
         }
         return $info;

@@ -467,9 +467,9 @@ class Content extends Model
                     break;
                 case 'start':
                     // 起始数校验
-                    if (is_numeric( $value) ) {
+                    if (is_numeric($value)) {
                         $start = $value;
-                    }else{
+                    } else {
                         $start = 0;
                     }
                     break;
@@ -601,6 +601,8 @@ class Content extends Model
                 $data['last_page'] = $res->lastPage();
                 $data['data'] = $res->getCollection()->toArray();
                 $data['page'] = $res->pageData();
+            } else {
+                $data['total'] = $res->total();
             }
         } else {
             $res = $db->limit($start, $num)->select();
