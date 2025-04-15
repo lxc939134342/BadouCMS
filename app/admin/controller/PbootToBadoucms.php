@@ -223,45 +223,11 @@ class PbootToBadoucms extends Backend
                 if (strpos($customTableName, 'ay_diy_') === 0) {
                     $targetTable = str_replace('ay_diy_', 'bd_cms_diy_', $customTableName);
                     $this->tableMap[$customTableName] = $targetTable;
-
-                    // 检查目标表是否存在，如果存在则先删除
-                    try {
-                        Db::execute("DROP TABLE IF EXISTS {$targetTable}");
-                    } catch (\Exception $e) {
-                        throw new \Exception('删除旧表失败：' . $e->getMessage());
-                    }
-
-                    // 创建新表
-                    if (stripos($dbType, 'sqlite') !== false) {
-                        $createTableSql = Db::connect('pboot')->query("SELECT sql FROM sqlite_master WHERE type='table' AND name = ?", [$customTableName])[0]['sql'];
-                        // 转换SQLite的建表语句为MySQL格式
-                        $createTableSql = preg_replace('/INTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT/i', 'INT AUTO_INCREMENT PRIMARY KEY', $createTableSql);
-                        $createTableSql = preg_replace('/INTEGER(?!\s+PRIMARY\s+KEY)/i', 'INT', $createTableSql);
-                        $createTableSql = preg_replace('/DATETIME\s+DEFAULT\s+CURRENT_TIMESTAMP/i', 'DATETIME DEFAULT CURRENT_TIMESTAMP', $createTableSql);
-
-                        $createTableSql = preg_replace_callback('/VARCHAR\((\d+)\)/i', function ($matches) {
-                            $length = intval($matches[1]);
-                            return $length <= 255 ? "VARCHAR($length)" : "TEXT";  // 保留<=255的VARCHAR定义
-                        }, $createTableSql);
-                        $createTableSql = str_replace('"', '`', $createTableSql);
-                        $createTableSql = str_replace($customTableName, $targetTable, $createTableSql);
-                        // 移除SQLite特有的语法
-                        $createTableSql = preg_replace('/\s*AUTOINCREMENT\s*/i', ' AUTO_INCREMENT ', $createTableSql);
-                    } else {
-                        $createTableSql = Db::connect('pboot')->query("SHOW CREATE TABLE {$customTableName}")[0]['Create Table'];
-                        $createTableSql = str_replace($customTableName, $targetTable, $createTableSql);
-                    }
-                    try {
-                        Db::execute($createTableSql);
-                    } catch (\Exception $e) {
-                        throw new \Exception('创建表失败：' . $e->getMessage() . '\nSQL: ' . $createTableSql);
-                    }
                 }
             }
 
             // 关闭外键约束
             Db::execute('SET FOREIGN_KEY_CHECKS = 0');
-
             // 如果指定了表名，则只迁移该表
             if (!empty($tableName)) {
                 // 检查是否是系统表
@@ -277,40 +243,6 @@ class PbootToBadoucms extends Backend
                 if ($isCustomTable && !isset($this->tableMap[$tableName])) {
                     $targetTable = str_replace('ay_diy_', 'bd_cms_diy_', $tableName);
                     $this->tableMap[$tableName] = $targetTable;
-
-                    // 检查目标表是否存在，如果存在则先删除
-                    try {
-                        Db::execute("DROP TABLE IF EXISTS {$targetTable}");
-                    } catch (\Exception $e) {
-                        return json(['code' => 0, 'msg' => '删除旧表失败：' . $e->getMessage()]);
-                    }
-
-                    // 创建新表
-                    if (stripos($dbType, 'sqlite') !== false) {
-                        $createTableSql = Db::connect('pboot')->query("SELECT sql FROM sqlite_master WHERE type='table' AND name = ?", [$tableName])[0]['sql'];
-                        // 转换SQLite的建表语句为MySQL格式
-                        $createTableSql = preg_replace('/INTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT/i', 'INT AUTO_INCREMENT PRIMARY KEY', $createTableSql);
-                        $createTableSql = preg_replace('/INTEGER(?!\s+PRIMARY\s+KEY)/i', 'INT', $createTableSql);
-                        $createTableSql = preg_replace('/DATETIME\s+DEFAULT\s+CURRENT_TIMESTAMP/i', 'DATETIME DEFAULT CURRENT_TIMESTAMP', $createTableSql);
-
-                        // 修改所有可能存储长文本的字段为 LONGTEXT
-                        $createTableSql = preg_replace('/VARCHAR\s*\(\d+\)\s*(?=,|\))/i', 'LONGTEXT', $createTableSql);
-                        $createTableSql = preg_replace('/TEXT\s*\(\d+\)\s*(?=,|\))/i', 'LONGTEXT', $createTableSql);
-                        $createTableSql = preg_replace('/TEXT(?!\()/i', 'LONGTEXT', $createTableSql);
-
-                        $createTableSql = str_replace('"', '`', $createTableSql);
-                        $createTableSql = str_replace($tableName, $targetTable, $createTableSql);
-                        $createTableSql = preg_replace('/\s*AUTOINCREMENT\s*/i', ' AUTO_INCREMENT ', $createTableSql);
-                    } else {
-                        $createTableSql = Db::connect('pboot')->query("SHOW CREATE TABLE {$tableName}")[0]['Create Table'];
-                        $createTableSql = str_replace($tableName, $targetTable, $createTableSql);
-                    }
-
-                    try {
-                        Db::execute($createTableSql);
-                    } catch (\Exception $e) {
-                        return json(['code' => 0, 'msg' => '创建表失败：' . $e->getMessage()]);
-                    }
                 }
 
                 $targetTable = $this->tableMap[$tableName];
@@ -326,19 +258,65 @@ class PbootToBadoucms extends Backend
         }
     }
 
+    protected function createTable($sourceTable, $targetTable, $dbType)
+    {
+        // 检查目标表是否存在，如果存在则先删除
+        try {
+            Db::execute("DROP TABLE IF EXISTS {$targetTable}");
+        } catch (\Exception $e) {
+            throw new \Exception('删除旧表失败：' . $e->getMessage());
+        }
+
+        // 创建新表
+        if (stripos($dbType, 'sqlite') !== false) {
+            $createTableSql = Db::connect('pboot')->query("SELECT sql FROM sqlite_master WHERE type='table' AND name = ?", [$sourceTable])[0]['sql'];
+            // 转换SQLite的建表语句为MySQL格式
+            $createTableSql = preg_replace('/INTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT/i', 'BIGINT AUTO_INCREMENT PRIMARY KEY', $createTableSql);
+            $createTableSql = preg_replace('/INTEGER(?!\s+PRIMARY\s+KEY)/i', 'BIGINT', $createTableSql);
+            $createTableSql = preg_replace('/DATETIME\s+DEFAULT\s+CURRENT_TIMESTAMP/i', 'DATETIME DEFAULT CURRENT_TIMESTAMP', $createTableSql);
+
+            // 处理TEXT字段
+            $createTableSql = preg_replace_callback('/TEXT\((\d+)\)/i', function ($matches) {
+                $length = intval($matches[1]);
+                return $length <= 255 ? "VARCHAR($length)" : "TEXT";
+            }, $createTableSql);
+
+            // 移除TEXT类型的默认值
+            $createTableSql = preg_replace('/TEXT\s+NOT\s+NULL\s+DEFAULT\s+\'[^\']*\'/i', 'TEXT NOT NULL', $createTableSql);
+
+            $createTableSql = str_replace('"', '`', $createTableSql);
+            $createTableSql = str_replace($sourceTable, $targetTable, $createTableSql);
+            // 移除SQLite特有的语法
+            $createTableSql = preg_replace('/\s*AUTOINCREMENT\s*/i', ' AUTO_INCREMENT ', $createTableSql);
+        } else {
+            $createTableSql = Db::connect('pboot')->query("SHOW CREATE TABLE {$sourceTable}")[0]['Create Table'];
+            $createTableSql = str_replace($sourceTable, $targetTable, $createTableSql);
+        }
+        try {
+            Db::execute($createTableSql);
+        } catch (\Exception $e) {
+            throw new \Exception('创建表失败：' . $e->getMessage() . '\nSQL: ' . $createTableSql);
+        }
+    }
+
     /**
      * 迁移单个表的数据
      */
     protected function migrateTable($sourceTable, $targetTable)
     {
-        // 清空目标表
-        Db::execute("TRUNCATE TABLE {$targetTable}");
+        // 获取数据库类型
+        $dbType = config('database.connections.pboot.type');
+        $this->createTable($sourceTable, $targetTable, $dbType);
 
         // 设置每批处理的数量
         $batchSize = 100;
         $offset = 0;
 
-        while (true) {
+        // 获取总记录数
+        $total = Db::connect('pboot')->table($sourceTable)->count();
+
+        // 当 offset 小于总记录数时继续执行
+        while ($offset < $total) {
             try {
                 // 分批获取源表数据
                 $data = Db::connect('pboot')
@@ -346,28 +324,26 @@ class PbootToBadoucms extends Backend
                     ->limit($offset, $batchSize)
                     ->select()
                     ->toArray();
+
+                if (!empty($data)) {
+                    // 转换数据
+                    $transformedData = $this->transformData($data, $sourceTable);
+                    // 批量插入数据
+                    Db::table($targetTable)->insertAll($transformedData);
+                }
+
+                // 无论是否有数据，都增加 offset
+                $offset += $batchSize;
+
+                // 释放内存
+                unset($data, $transformedData);
+                gc_collect_cycles();
+
             } catch (\Exception $e) {
                 throw new \Exception('数据获取失败：' . $e->getMessage());
             }
-
-            if (empty($data)) {
-                break;
-            }
-
-            // 转换数据
-            $transformedData = $this->transformData($data, $sourceTable);
-            // 批量插入数据
-            Db::table($targetTable)->insertAll($transformedData);
-
-            $offset += $batchSize;
-
-            // 释放内存
-            unset($data, $transformedData);
-            gc_collect_cycles();
-
         }
     }
-
     /**
      * 迁移文件
      * @return void
@@ -456,12 +432,46 @@ class PbootToBadoucms extends Backend
                     if (isset($info['default'])) {
                         $newRow[$targetField] = $info['default'];
                     } else {
-                        // 根据字段类型设置空值
+                        // 根据字段类型设置空值或处理超出范围的值
                         $type = strtoupper($info['type']);
-                        if (preg_match('/INT|DECIMAL|FLOAT|DOUBLE/i', $type)) {
-                            $newRow[$targetField] = 0;
+                        if (preg_match('/INT\((\d+)\)/i', $type, $matches) || preg_match('/(TINYINT|SMALLINT|MEDIUMINT|INT|BIGINT)/i', $type)) {
+                            $maxValues = [
+                                'TINYINT' => 127,
+                                'SMALLINT' => 32767,
+                                'MEDIUMINT' => 8388607,
+                                'INT' => 2147483647,
+                                'BIGINT' => PHP_INT_MAX
+                            ];
+
+                            $maxValue = PHP_INT_MAX;
+                            foreach ($maxValues as $intType => $maxVal) {
+                                if (stripos($type, $intType) !== false) {
+                                    $maxValue = $maxVal;
+                                    break;
+                                }
+                            }
+
+                            $value = isset($row[$sourceField]) ? intval($row[$sourceField]) : 0;
+                            // 如果值超出范围，设置为最大值
+                            $newRow[$targetField] = min($value, $maxValue);
+                        } elseif (preg_match('/(TINYINT|SMALLINT|MEDIUMINT|INT|BIGINT)/i', $type)) {
+                            // 处理没有指定长度的整数类型
+                            $maxValues = [
+                                'TINYINT' => 127,
+                                'SMALLINT' => 32767,
+                                'MEDIUMINT' => 8388607,
+                                'INT' => 2147483647,
+                                'BIGINT' => PHP_INT_MAX
+                            ];
+                            foreach ($maxValues as $intType => $maxVal) {
+                                if (stripos($type, $intType) !== false) {
+                                    $value = isset($row[$sourceField]) ? intval($row[$sourceField]) : 0;
+                                    $newRow[$targetField] = min($value, $maxVal);
+                                    break;
+                                }
+                            }
                         } else {
-                            $newRow[$targetField] = '';
+                            $newRow[$targetField] = isset($row[$sourceField]) ? intval($row[$sourceField]) : 0;
                         }
                     }
                 }
