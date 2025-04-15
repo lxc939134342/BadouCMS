@@ -354,6 +354,7 @@ class ContentSort extends Model
         return $result;
     }
 
+    // 获取分类内容数量
     public function getSortRows($scode)
     {
         $allCounts = $this->getAllSortRows();
@@ -364,6 +365,47 @@ class ContentSort extends Model
         $subscode = $this->getSubScodes($scode);
         $subRows = array_sum(array_intersect_key($allCounts, array_flip($subscode)));
         return $subRows;
+    }
+
+    // 获取分类树
+    public function getSorts($acode)
+    {
+        $fields = [
+            'a.*',
+            'b.type'
+        ];
+        $result = $this->alias('a')
+            ->field($fields)
+            ->where('a.acode', $acode)
+            ->where('a.status', 1)
+            ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
+            ->order(['a.pcode' => 'asc', 'a.sorting' => 'asc', 'a.id' => 'asc'])
+            ->select()
+            ->toArray();
+
+        return get_tree($result, 0, 'scode', 'pcode');
+    }
+
+
+    // 获取分类的子类
+    public function getSortsSon($acode, $scode)
+    {
+        $fields = [
+            'a.*',
+            'b.type'
+        ];
+
+        $result = $this->alias('a')
+            ->field($fields)
+            ->where('a.pcode', $scode)
+            ->where('a.acode', $acode)
+            ->where('a.status', 1)
+            ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
+            ->order(['a.sorting' => 'asc', 'a.id' => 'asc'])
+            ->select()
+            ->toArray();
+
+        return $result;
     }
 
     /**

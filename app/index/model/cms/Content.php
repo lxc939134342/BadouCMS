@@ -59,7 +59,7 @@ class Content extends Model
     }
 
     // 内容详情页图片
-    public function getContentPics($id, $field, $num = 0)
+    public function getContentPics($id, $field, $num = 0, $onlypic = false)
     {
         $result = $this->alias('a')
             ->field($field . ',picstitle')
@@ -75,6 +75,9 @@ class Content extends Model
             if ($num) {
                 // 限制标签数量
                 $pics = array_slice($pics, 0, $num);
+            }
+            if ($onlypic) {
+                return $pics;
             }
             foreach ($pics as $key => $pic) {
                 $data[] = [
@@ -656,7 +659,7 @@ class Content extends Model
     {
         $ext_table = false;
         $lg = get_frontend_lang();
-        $lfield = ''; // 查询��段限制
+        $lfield = ''; // 查询字段限制
         $order = 'a.istop DESC,a.isrecommend DESC,a.isheadline DESC,a.sorting ASC,a.date DESC,a.id DESC'; // 默认排序
         $simple = false;//简洁分页
         $num = 16;//每页显示数量
@@ -667,6 +670,15 @@ class Content extends Model
         $scode = request()->param('scode', '');
         $keyword = request()->param('keyword');
         $field = request()->param('field', '');
+        //禁止搜索过滤域名
+        if (preg_match("/\.[a-z]{2,}/i", $keyword)) {
+            $keyword = "";
+        }
+        if ($keyword) {
+            $keyword = strip_tags($keyword);
+            $keyword = str_replace(strrchr($keyword, "."), "", $keyword);  //去掉带有后缀的关键词
+            $keyword = mb_substr($keyword, 0, 15);
+        }
 
         if (!preg_match('/^[\w\|\s]+$/', $field)) {
             $field = '';
@@ -693,7 +705,6 @@ class Content extends Model
                 'number'  => ''
             ]
         ];
-
 
         // 分离参数
         foreach ($params as $key => $value) {
@@ -796,6 +807,8 @@ class Content extends Model
                     break;
             }
         }
+
+
 
         if ($lfield) {
             $lfield .= ',id,outlink,type,scode,sortfilename,filename,urlname'; // 附加必须字段
@@ -901,12 +914,12 @@ class Content extends Model
 
         /* 任意搜索字段 */
         /* 排除字段 */
-        $exclude = ['page','start','lfield','keyword','fuzzy','scode','lg','searchtpl','field'];
+        $exclude = ['page','start','lfield','keyword','fuzzy','scode','lg','searchtpl','field','num'];
         foreach (request()->param() as $key => $value) {
             if (in_array($key, $exclude)) {
                 continue;
             }
-            if (! ! $value = request()->param($key)) {
+            if (!!$value = request()->param($key)) {
                 if ($key == 'title') {
                     $key = 'a.title';
                 }
@@ -915,7 +928,6 @@ class Content extends Model
                 }
             }
         }
-
         // 筛选条件支持模糊匹配
         $db = self::name('cms_content')
             ->alias('a')
@@ -933,7 +945,6 @@ class Content extends Model
             $db->join('cms_content_ext e', 'a.id=e.contentid', 'LEFT');
         }
         $db->order($order);
-
         if ($page) {
             // 扩展字段数据筛选
             $get = request()->get();
