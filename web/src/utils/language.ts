@@ -5,6 +5,9 @@ export class Language {
     private static cache = new Map<string, any>()
 
     static async load(path: string, lang: string = 'zh-cn') {
+        if (!path.includes('cms/content')) {
+            return {}
+        }
         const cacheKey = `${path}_${lang}`
         if (this.cache.has(cacheKey)) {
             return this.cache.get(cacheKey)

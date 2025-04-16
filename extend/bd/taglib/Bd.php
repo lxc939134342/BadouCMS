@@ -44,7 +44,10 @@ class Bd extends TagLib
     public function tagSort($tag, $content)
     {
         if (!isset($tag['scode'])) {
-            throw new \think\Exception('scode参数不能为空');
+            if (get_sys_config('tpl_error')) {
+                throw new \think\Exception('scode参数不能为空');
+            }
+            return $content;
         }
         $this->autoBuildVar($tag['scode']);
         $scode  = $this->isVar($tag['scode']) ? $tag['scode'] : '"'.$tag['scode'].'"';
@@ -564,5 +567,75 @@ class Bd extends TagLib
         $this->tpl->parseVarFunction($name);
         $this->tpl->config(['default_filter' => $default_filter]);
         return $name;
+    }
+
+    /**
+     * 分析标签属性 正则方式
+     * @access public
+     * @param  string $str 标签属性字符串
+     * @param  string $name 标签名
+     * @param  string $alias 别名
+     * @return array
+     */
+    public function parseAttr(string $str, string $name, string $alias = ''): array
+    {
+        $regex  = '/\s+(?>(?P<name>[\w-]+)\s*)=(?>\s*)([\"\'])(?P<value>(?:(?!\\2).)*)\\2/is';
+        $result = [];
+
+        if (preg_match_all($regex, $str, $matches)) {
+            foreach ($matches['name'] as $key => $val) {
+                $result[$val] = $matches['value'][$key];
+            }
+
+            if (!isset($this->tags[$name])) {
+                // 检测是否存在别名定义
+                foreach ($this->tags as $key => $val) {
+                    if (isset($val['alias'])) {
+                        $array = (array) $val['alias'];
+                        if (in_array($name, explode(',', $array[0]))) {
+                            $tag           = $val;
+                            $type          = !empty($array[1]) ? $array[1] : 'type';
+                            $result[$type] = $name;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                $tag = $this->tags[$name];
+                // 设置了标签别名
+                if (!empty($alias) && isset($tag['alias'])) {
+                    $type          = !empty($tag['alias'][1]) ? $tag['alias'][1] : 'type';
+                    $result[$type] = $alias;
+                }
+            }
+
+            if (!empty($tag['must'])) {
+                $must = explode(',', $tag['must']);
+                foreach ($must as $name) {
+                    if (!isset($result[$name])) {
+                        throw new Exception('tag attr must:' . $name);
+                    }
+                }
+            }
+        } else {
+            // 允许直接使用表达式的标签
+            if (!empty($this->tags[$name]['expression'])) {
+                static $_taglibs;
+                if (!isset($_taglibs[$name])) {
+                    $_taglibs[$name][0] = strlen($this->tpl->getConfig('taglib_begin_origin') . $name);
+                    $_taglibs[$name][1] = strlen($this->tpl->getConfig('taglib_end_origin'));
+                }
+                $result['expression'] = substr($str, $_taglibs[$name][0], -$_taglibs[$name][1]);
+                // 清除自闭合标签尾部/
+                $result['expression'] = rtrim($result['expression'], '/');
+                $result['expression'] = trim($result['expression']);
+            } elseif (empty($this->tags[$name]) || !empty($this->tags[$name]['attr'])) {
+                if (get_sys_config('tpl_error')) {
+                    throw new Exception('tag error:'. $name);
+                }
+            }
+        }
+
+        return $result;
     }
 }

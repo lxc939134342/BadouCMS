@@ -1209,7 +1209,7 @@ INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`,
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (28, 'form_check_code', 'message', '表单验证码', '', 'switch', '0', NULL, '', '', 1, 0);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (29, 'form_send_mail', 'message', '表单发送邮件', '', 'switch', '0', NULL, '', '', 1, 0);
 COMMIT;
-
+INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (30, 'tpl_error', 'basics', '模版报错提醒', '', 'radio', '0', '', '', '', 1, 0);
 -- ----------------------------
 -- Table structure for bd_crud_log
 -- ----------------------------

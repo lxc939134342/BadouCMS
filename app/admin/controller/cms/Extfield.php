@@ -45,7 +45,7 @@ class Extfield extends Base
     public function models(): void
     {
         $models = new Models();
-        $list = $models->column('name', 'id');
+        $list = $models->column('name', 'mcode');
         $this->success('', [
             'list'   => $list,
         ]);
