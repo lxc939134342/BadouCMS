@@ -39,6 +39,9 @@ class Content extends Model
     {
         if ($value) {
             $pics = explode(',', $value);
+            if (count($pics) == 1) {
+                return full_url($pics[0]);
+            }
             foreach ($pics as &$pic) {
                 $pic = full_url($pic);
             }
