@@ -56,7 +56,7 @@ class Form extends Model
     }
 
     // 获取表单列表
-    public function getFormList($fcode, $num, $order, $page = false, $start = 1)
+    public function getFormList($fcode, $num, $order = 'id DESC', $page = false, $start = 1)
     {
         $table_name = $this->where('fcode', $fcode)->value('table_name');
         $simple = false;//简洁分页

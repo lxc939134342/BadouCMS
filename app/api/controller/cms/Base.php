@@ -11,6 +11,13 @@ class Base extends Api
     public function initialize(): void
     {
         parent::initialize();
+        // 加载控制器语言包
+        $langSet = $this->app->lang->getLangSet();
+        $app_index_path = root_path().'app'.DIRECTORY_SEPARATOR.'index'.DIRECTORY_SEPARATOR;
+        $this->app->lang->load([
+              $app_index_path.'lang' . DIRECTORY_SEPARATOR . $langSet . DIRECTORY_SEPARATOR . (str_replace('/', DIRECTORY_SEPARATOR, $this->app->request->controllerPath)) . '.php',
+              $app_index_path . 'lang' . DIRECTORY_SEPARATOR . $langSet . DIRECTORY_SEPARATOR.'cms'.DIRECTORY_SEPARATOR.'index.php'
+        ]);
         $this->checkAccess();
     }
 
