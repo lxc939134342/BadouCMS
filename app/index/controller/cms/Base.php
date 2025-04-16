@@ -134,6 +134,9 @@ class Base extends BaseController
         $this->label = (new Label())->getLabelData();
 
         $theme = $this->site['theme'] ? $this->site['theme'] : 'default';
+
+        // 手机端模版
+        // TODO 待完善
         /* 设置模版路径 */
         $view_path = root_path() . 'template' . DIRECTORY_SEPARATOR. $theme. DIRECTORY_SEPARATOR;
         $this->view = View::instance();
@@ -312,7 +315,8 @@ class Base extends BaseController
             'pagedescription' => $this->site['sitedescription'],
             'pagekeywords' => $this->site['sitekeywords'],
         ];
-        $this->view->assign('bd', array_merge($bdassign, $this->site, $this->company, $this->label));
+        $api_data = $this->apiSecret();
+        $this->view->assign('bd', array_merge($bdassign, $api_data, $this->site, $this->company, $this->label));
     }
 
     /**
@@ -437,6 +441,21 @@ class Base extends BaseController
                 'menus'            => $menus,
             ]);
         }
+    }
+
+    /**
+     * api授权
+     * @return array
+     */
+    protected function apiSecret()
+    {
+        $timestamp = time();
+        $signature = md5(md5(get_sys_config('api_appid').get_sys_config('api_secret').$timestamp));
+        return [
+            'appid' => get_sys_config('api_appid'),
+            'timestamp' => $timestamp,
+            'signature' => $signature,
+        ];
     }
 
 }

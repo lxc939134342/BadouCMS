@@ -518,7 +518,7 @@ class Bd extends TagLib
      */
     public function tagLoop($tag, $content): string
     {
-        $start = $tag['start'] ?? 0;
+        $start = $tag['start'] ?? 1;
         $end = $tag['end'] ?? 0;
         $parse = '<?php ';
         $parse .= '$loop = ["i"=>0, "index"=>1];';
