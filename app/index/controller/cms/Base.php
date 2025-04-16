@@ -294,7 +294,7 @@ class Base extends BaseController
             'scaction' => url('/search'),
             'sitemap' => url('/sitemap', [], 'xml'),
             'msgaction' => url('/message'),
-            'sitetplpath' => request()->domain(true).'/template/'. $this->site['theme'],
+            'sitetplpath' => request()->domain().'/template/'. $this->site['theme'],
             'checkcode' => $this->view->config['captchaUrl'],
             'islogin' => $this->auth->isLogin(),
             'registerstatus' => true,
