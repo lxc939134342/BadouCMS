@@ -152,6 +152,11 @@ class Base extends BaseController
         $this->request->filter('filter');
 
         // 加载控制器语言包
+        $lang = get_frontend_lang();
+        if ($lang == 'cn') {
+            $lang = 'zh-cn';
+        }
+        $this->app->lang->setLangSet($lang);
         $langSet = $this->app->lang->getLangSet();
         $this->app->lang->load([
             app_path() . 'lang' . DIRECTORY_SEPARATOR . $langSet . DIRECTORY_SEPARATOR . (str_replace('/', DIRECTORY_SEPARATOR, $this->app->request->controllerPath)) . '.php',
