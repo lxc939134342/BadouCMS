@@ -247,8 +247,8 @@
                                 :label="t('cms.content.insufficientPermissionPrompt')"
                                 type="string"
                                 :style="{ width: '50%' }"
-                                v-model="baTable.form.items!.insufficientPermissionPrompt"
-                                prop="insufficientPermissionPrompt"
+                                v-model="baTable.form.items!.gnote"
+                                prop="gnote"
                                 :placeholder="t('Please input field', { field: t('cms.content.insufficientPermissionPrompt') })"
                             />
 

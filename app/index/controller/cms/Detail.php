@@ -40,7 +40,7 @@ class Detail extends Base
         }
         /*验证内容权限*/
         if ($this->contentInfo['gid']) {
-            $this->checkPageLevel($this->contentInfo['gid'], $this->contentInfo['gtype']);
+            $this->checkPageLevel($this->contentInfo['gid'], $this->contentInfo['gtype'], $this->contentInfo['gnote']);
         }
 
         $this->contentInfo = $this->contentInfo->toArray();
