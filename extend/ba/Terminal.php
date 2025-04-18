@@ -439,8 +439,13 @@ class Terminal
         if (!file_exists($indexHtmlPath) || !file_exists($assetsPath)) {
             return false;
         }
-
-        $toIndexHtmlPath = root_path() . 'public' . DIRECTORY_SEPARATOR . 'index.html';
+        // web 目录不存在，创建
+        if (!file_exists(root_path(). 'public'. DIRECTORY_SEPARATOR. 'web')) {
+            //将根目录的index.html 改名
+            rename(root_path(). 'public'. DIRECTORY_SEPARATOR.'index.html', root_path(). 'public'. DIRECTORY_SEPARATOR.'index.html.backend');
+            Filesystem::mkdir(root_path(). 'public'. DIRECTORY_SEPARATOR. 'web');
+        }
+        $toIndexHtmlPath = root_path() . 'public' . DIRECTORY_SEPARATOR . 'web'.DIRECTORY_SEPARATOR.'index.html';
         $toAssetsPath    = root_path() . 'public' . DIRECTORY_SEPARATOR . 'assets';
         @unlink($toIndexHtmlPath);
         Filesystem::delDir($toAssetsPath);
