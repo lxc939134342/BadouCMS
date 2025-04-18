@@ -22,6 +22,8 @@ return [
     'Page %s of %s'                                                            => '第%s页/共%s页',
     'Previous Page'                                                            => '上一页',
     'Next Page'                                                                => '下一页',
+    'Next Five Pages'                                                          => '后五页',
+    'Previous Five Pages'                                                      => '前五页',
     'Page Number'                                                              => '页码',
     'Jump'                                                                     => '跳转',
     'Search'                                                                   => '搜索',

@@ -11,8 +11,9 @@ class Bootstrap extends Paginator
      * @param string $text
      * @return string
      */
-    protected function getPreviousButton($text = "上一页")
+    protected function getPreviousButton($text = '')
     {
+        $text = $text ?: __('Previous Page');
 
         if ($this->currentPage() <= 1) {
             return $this->getDisabledTextWrapper($text);
@@ -24,8 +25,6 @@ class Bootstrap extends Paginator
 
         return $this->getPageLinkWrapper($url, $text);
     }
-
-
 
     //总数标签
     protected function totalshow()
@@ -39,8 +38,9 @@ class Bootstrap extends Paginator
     }
 
     //尾页标签
-    protected function showlastpage($text = '尾页')
+    protected function showlastpage($text = '')
     {
+        $text = $text ?: __('Last Page');
         if ($this->currentPage() == $this->lastPage()) {
             return $this->getDisabledTextWrapper($text);
 
@@ -51,8 +51,9 @@ class Bootstrap extends Paginator
     }
 
     //首页标签
-    protected function showfirstpage($text = '首页')
+    protected function showfirstpage($text = '')
     {
+
         if ($this->currentPage() == 1) {
             return $this->getDisabledTextWrapper($text);
         }
@@ -61,8 +62,9 @@ class Bootstrap extends Paginator
         return $this->getPageLinkWrapper($url, $text);
     }
     //后五页
-    protected function afivepage($text = '后五页')
+    protected function afivepage($text = '')
     {
+        $text = $text ?: __('Next Five Pages');
         if ($this->lastPage() < $this->currentPage() + 5) {
             return $this->getDisabledTextWrapper($text);
 
@@ -74,8 +76,9 @@ class Bootstrap extends Paginator
     }
 
     //前五页
-    protected function bfivepage($text = '前五页')
+    protected function bfivepage($text = '')
     {
+        $text = $text ?: __('Previous Five Pages');
         if ($this->currentPage() < 5) {
             return $this->getDisabledTextWrapper($text);
         }
@@ -88,8 +91,9 @@ class Bootstrap extends Paginator
      * @param string $text
      * @return string
      */
-    protected function getNextButton($text = '下一页')
+    protected function getNextButton($text = '')
     {
+        $text = $text ?: __('Next Page');
         if (!$this->hasMore) {
             return $this->getDisabledTextWrapper($text);
         }

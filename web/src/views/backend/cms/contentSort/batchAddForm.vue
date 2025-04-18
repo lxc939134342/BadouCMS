@@ -37,7 +37,7 @@
                     prop="pcode"
                     :input-attr="{
                         pk: 'content_sort.scode',
-                        params: { select: true, order: 'sorting,asc' },
+                        params: { select: true, order: 'sorting,asc', acode: baTable.table.filter!.acode },
                         field: 'name',
                         remoteUrl: indexUrl,
                         placeholder: t('cms.contentSort.Please select the column'),

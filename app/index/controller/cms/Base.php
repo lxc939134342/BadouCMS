@@ -133,7 +133,7 @@ class Base extends BaseController
         $this->company = (new Company())->getCompanyData();
         $this->label = (new Label())->getLabelData();
 
-        $theme = $this->site['theme'] ? $this->site['theme'] : 'default';
+        $theme = isset($this->site['theme']) && !empty($this->site['theme']) ? $this->site['theme'] : 'default';
 
         // 手机端模版
         // TODO 待完善

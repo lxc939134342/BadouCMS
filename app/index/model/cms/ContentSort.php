@@ -434,10 +434,12 @@ class ContentSort extends Model
         } else { // 顶级栏目起始
             $out_data = $data['top'];
         }
+        // 确保操作的是数组
+        $out_data = is_array($out_data) ? $out_data : [];
 
         // 读取指定数量
         if ($num) {
-            $out_data = array_slice($out_data, 0, $num);
+            $out_data = array_slice($out_data, 0, (int)$num);
         }
 
         $key = 0;

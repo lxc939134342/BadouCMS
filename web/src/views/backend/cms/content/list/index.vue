@@ -200,10 +200,8 @@ const scodeParams = reactive({
     select: true,
     order: 'sorting,asc',
     istop: 0,
-    search: [
-        { field: 'mcode', operator: '=', val: mcode },
-        { field: 'acode', operator: '=', val: useCmsLang().getDataLang() },
-    ],
+    acode: useCmsLang().getDataLang(),
+    search: [{ field: 'mcode', operator: '=', val: mcode }],
 })
 
 /* 当前时间 */

@@ -33,7 +33,10 @@ const state: {
 state.options = computed(() => cmsLang.getLangs())
 
 onMounted(() => {
-    if (baTable) baTable.table.filter!.acode = state.datalang
+    if (baTable) {
+        baTable.table.filter!.acode = state.datalang
+        baTable.form.defaultItems!.acode = state.datalang
+    }
 })
 
 const changeDataLang = () => {

@@ -45,6 +45,7 @@
                                         select: true,
                                         order: 'sorting,asc',
                                         istop: 0,
+                                        acode: baTable.table.filter!.acode,
                                         search: [{ field: 'mcode', operator: '=', val: mcode }],
                                     },
                                     field: 'name',
