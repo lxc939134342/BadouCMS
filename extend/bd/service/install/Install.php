@@ -117,7 +117,7 @@ class Install
                 'value' => $param['sitename']
             ]);
 
-            return $output(1, __('Install Successed'), null, ['adminName' => 'index.html']);
+            return $output(1, __('Install Successed'), null, ['adminName' => 'web/index.html']);
         }
         $errInfo = '';
         try {
