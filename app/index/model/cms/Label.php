@@ -25,7 +25,7 @@ class Label extends Model
             if (!$value) {
                 continue;
             }
-            $value = htmlspecialchars_decode_improve(html_entity_decode($value));
+            $value = htmlspecialchars_decode_improve($value);
         }
         return $info;
     }

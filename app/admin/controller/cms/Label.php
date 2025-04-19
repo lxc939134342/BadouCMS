@@ -82,6 +82,16 @@ class Label extends Base
     {
         if ($this->request->isPost()) {
             $data = $this->getPostData();
+            // 构建数据
+            $default = array(
+              'name' => '',
+              'description' => '',
+              'value' => '', // 添加时设置为空
+              'type' => '',
+              'create_user' => '',
+              'update_user' => ''
+            );
+            $data = array_merge($default, $data);
             $data['value'] = $data['value'] ?? '';
             $result = false;
             $this->model->startTrans();

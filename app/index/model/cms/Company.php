@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | BADOUCMS [ 八斗网站系统 ]
 // +----------------------------------------------------------------------
@@ -32,6 +33,7 @@ class Company extends Model
         }
         $data = $info->toArray();
         foreach ($data as $key => $value) {
+            $value = htmlspecialchars_decode_improve($value);
             $data['company'.$key] = $value;
         }
         return $data;

@@ -12,12 +12,10 @@
 
 namespace app\admin\controller\cms;
 
-use app\common\controller\Backend;
-
 /**
  * 文章内链
  */
-class Tags extends Backend
+class Tags extends Base
 {
     /**
      * Tags模型对象
@@ -48,14 +46,12 @@ class Tags extends Backend
     public function add(): void
     {
         if ($this->request->isPost()) {
-            $post = $this->request->post();
-            //            var_dump($post);die();
+            $post = $this->getOriginalInputData();
             $post['acode'] = get_backend_lang();
-            $post['create_user'] = 'admin';
-            $post['update_user'] = 'admin';
+            $post['create_user'] = $this->auth->username;
+            $post['update_user'] = $this->auth->username;
 
             $this->request->withPost($post);
-            //            var_dump($this->request->post());die();
             parent::add();
         }
     }

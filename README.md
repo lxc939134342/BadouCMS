@@ -67,6 +67,7 @@ http://demo.badoucms.com/index.html
 - [x] 数据库备份
 - [x] 系统升级
 - [x] PbootCMS 迁移
+- [x] Api 接口
 - [ ] 百度推送
 - [ ] 缩略图水印
 

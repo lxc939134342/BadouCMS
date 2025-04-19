@@ -44,7 +44,7 @@ class Slide extends Base
     public function add(): void
     {
         if ($this->request->isPost()) {
-            $post = $this->getPostData();
+            $post = $this->getPostData(true);
             // 构建数据
             $default = [
                'acode' => get_backend_lang(),

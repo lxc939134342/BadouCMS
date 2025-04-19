@@ -97,7 +97,7 @@ class Company extends Base
         if ($this->request->isPost()) {
             $acode = get_backend_lang();
             $row = $this->model->where('acode', $acode)->find();
-            $post = $this->request->post();
+            $post = $this->getOriginalInputData();
             $post['acode'] = $acode;
             $this->request->withPost($post);
             if (!$row) {

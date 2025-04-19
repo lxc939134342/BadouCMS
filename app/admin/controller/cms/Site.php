@@ -96,9 +96,12 @@ class Site extends Base
         if ($this->request->isPost()) {
             $acode = get_backend_lang();
             $row = $this->model->where('acode', $acode)->find();
-            $post = $this->request->post();
-            $post['acode'] = $acode;
-            $this->request->withPost($post);
+
+            // 获取原始POST数据
+            $rawData = $this->getOriginalInputData();
+            $rawData['acode'] = $acode;
+            $this->request->withPost($rawData);
+            // 直接使用原始数据
             if (!$row) {
                 $this->add();
             } else {

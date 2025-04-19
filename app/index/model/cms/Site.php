@@ -33,6 +33,7 @@ class Site extends Model
         }
         $data = $info->toArray();
         foreach ($data as $key => $value) {
+            $value = htmlspecialchars_decode_improve($value);
             $data['site'.$key] = $value;
         }
         return $data;

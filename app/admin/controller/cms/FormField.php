@@ -111,7 +111,7 @@ class FormField extends Base
     public function add(): void
     {
         if ($this->request->isPost()) {
-            $post = $this->request->post();
+            $post = $this->getOriginalInputData();
             $post['acode'] = get_backend_lang();
             $post['create_user'] = $this->auth->username;
             $post['update_user'] = $this->auth->username;

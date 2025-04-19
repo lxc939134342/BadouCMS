@@ -37,7 +37,7 @@ class Base extends Backend
 
         /* 默认在添加和编辑时写入管理员 */
         if ($this->writeAdmin && $this->request->isPost()) {
-            $post = $this->request->post();
+            $post = $this->getOriginalInputData();
             $action = $this->request->action();
             if ($action == 'add') {
                 $post['create_user'] = $this->auth->nickname;
@@ -75,12 +75,23 @@ class Base extends Backend
     }
 
     /**
-     * 获取post数据
+     * 获取原始输入数据 , 防止被多次过滤转义
      * @return array
      */
-    protected function getPostData(): array
+    protected function getOriginalInputData(): array
     {
-        $data = $this->request->post();
+        $input = $this->request->getInput();
+        return $input ? json_decode($input, true) : [];
+    }
+
+    /**
+     * 获取post数据
+     * @param bool $original 是否获取原始数据
+     * @return array
+     */
+    protected function getPostData($original = false): array
+    {
+        $data = $original ? $this->getOriginalInputData() : $this->request->post();
         if (!$data) {
             $this->error(__('Parameter %s can not be empty', ['']));
         }
