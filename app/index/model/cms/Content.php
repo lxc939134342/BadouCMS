@@ -12,6 +12,7 @@
 
 namespace app\index\model\cms;
 
+use think\facade\Db;
 use think\Model;
 
 class Content extends Model
@@ -368,7 +369,6 @@ class Content extends Model
         if (!$scode) {
             return $data;
         }
-
         // 分离参数
         foreach ($params as $key => $value) {
             switch ($key) {
@@ -401,7 +401,7 @@ class Content extends Model
                             $order = $value . ' DESC,a.istop DESC,a.isrecommend DESC,a.isheadline DESC,a.sorting ASC,a.date DESC,a.id DESC';
                             break;
                         case 'random': // 随机取数
-                            $order = "RAND()";
+                            $order = Db::raw("RAND()");
                             break;
                         default:
                             if ($value) {
@@ -744,7 +744,7 @@ class Content extends Model
                             $order = $value . ' DESC,a.istop DESC,a.isrecommend DESC,a.isheadline DESC,a.sorting ASC,a.date DESC,a.id DESC';
                             break;
                         case 'random': // 随机取数
-                            $order = "RAND()";
+                            $order = Db::raw("RAND()");
                             break;
                         default:
                             if ($value) {
@@ -810,8 +810,6 @@ class Content extends Model
                     break;
             }
         }
-
-
 
         if ($lfield) {
             $lfield .= ',id,outlink,type,scode,sortfilename,filename,urlname'; // 附加必须字段

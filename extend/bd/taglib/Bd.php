@@ -114,6 +114,7 @@ class Bd extends TagLib
         $isrecommend = $tag['isrecommend'] ?? '0';
         $isheadline = $tag['isheadline'] ?? '0';
         $fuzzy = $tag['fuzzy'] ?? true;
+        $order = $tag['order'] ?? null;
 
         $params = [
             "'num'=>{$num}",
@@ -139,6 +140,7 @@ class Bd extends TagLib
         $istop ? $params[] = '"istop"=>'.$istop : '';
         $isrecommend ? $params[] = '"isrecommend"=>'.$isrecommend : '';
         $isheadline ? $params[] = '"isheadline"=>'.$isheadline : '';
+        $order ? $params[] = '"order"=>"'.$order.'"' : '';
 
         $var     = Random::build('alnum', 10);
         $parse   = '<?php ';
@@ -288,6 +290,7 @@ class Bd extends TagLib
         $filter = $tag['filter'] ?? null;
         $tags = $tag['tags'] ?? null;
         $fuzzy = $tag['fuzzy'] ?? true;
+        $order = $tag['order'] ?? null;
 
         $params = [
             "'num'=>{$num}",
@@ -298,6 +301,7 @@ class Bd extends TagLib
 
         $tags ? $params[] = '"tags"=>'.$tags : '';
         $filter ? $params[] = '"filter"=>'.$filter : '';
+        $order ? $params[] = '"order"=>"'.$order.'"' : '';
 
         $var     = Random::build('alnum', 10);
         $parse   = '<?php ';
@@ -522,12 +526,12 @@ class Bd extends TagLib
         $end = $tag['end'] ?? 0;
         $parse = '<?php ';
         $parse .= '$loop = ["i"=>0, "index"=>1];';
-        $parse .= 'for($i='.$start.'; $i<'.$end.'; $i++) {';
+        $parse .= 'for($i='.$start.'; $i<='.$end.'; $i++):';
         $parse .= '$loop["i"] = $i;';
         $parse .= '$loop["index"] = $i+1;';
         $parse .= '?>';
         $parse .= $content;
-        $parse .= '<?php } ?>';
+        $parse .= '<?php endfor; ?>';
         return $parse;
     }
 

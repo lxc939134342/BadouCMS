@@ -102,9 +102,14 @@ class ContentSort extends Model
             'b.urlname'
         );
         $order = 'a.pcode,a.sorting,a.id desc';
+        $scode_arr = [];
+        if ($scodes) {
+            $scode_arr = explode(',', $scodes);
+        }
+
         $view = View::instance();
         $data = self::alias('a')->field($field)
-            ->where('a.scode', 'in', $scodes)
+            ->where('a.scode', 'in', $scode_arr)
             ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
             ->order($order)
             ->filter(function ($row) use ($view) {
@@ -116,6 +121,15 @@ class ContentSort extends Model
             })
             ->select();
         $data = $data->toArray();
+        if (is_array($scode_arr)) {
+            //将数组按照scode_arr的顺序排序
+            usort($data, function ($a, $b) use ($scode_arr) {
+                $aIndex = array_search($a['scode'], $scode_arr);
+                $bIndex = array_search($b['scode'], $scode_arr);
+                return $aIndex - $bIndex;
+            });
+        }
+
         return $data;
     }
 
@@ -421,6 +435,7 @@ class ContentSort extends Model
         if ($scode) {
             $scode_arr = explode(',', $scode);
         }
+
         $data = ContentSort::getSortsTree();
         if ($parent) { // 非顶级栏目起始,调用子栏目
             $parent_arr = explode(',', $parent);
@@ -442,18 +457,30 @@ class ContentSort extends Model
             $out_data = array_slice($out_data, 0, (int)$num);
         }
 
-        $key = 0;
-
-        foreach ($out_data as $index => $value) { // 按查询的数据条数循环
-            if ($scode_arr && ! in_array($value['scode'], $scode_arr)) {
-                continue;
+        // 读取指定分类
+        if ($scode_arr) {
+            foreach ($out_data as $index => $value) {
+                if (!in_array($value['scode'], $scode_arr)) {
+                    unset($out_data[$index]);
+                }
             }
-            $out_data[$index]['n'] = $key;
-            $out_data[$index]['i'] = $key + 1;
+            // 将数组按照scode_arr的顺序排序
+            // 将数组按照scode_arr的顺序排序
+            usort($out_data, function ($a, $b) use ($scode_arr) {
+                $pos_a = array_search($a['scode'], $scode_arr);
+                $pos_b = array_search($b['scode'], $scode_arr);
+                return $pos_a - $pos_b;
+            });
         }
-
-        return $out_data;
-
+        $key = 0;
+        $result = [];
+        foreach ($out_data as $index => $value) { // 按查询的数据条数循环
+            $value['n'] = $key;
+            $value['i'] = $key + 1;
+            $result[$index] = $value;
+            $key++;
+        }
+        return $result;
     }
 
     /* 生成面包屑html */

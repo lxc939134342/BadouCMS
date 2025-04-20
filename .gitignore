@@ -22,3 +22,4 @@ public/npm-install-test
 modules/*
 backup/*
 extend/bd/service/upgrade/Upgrade.php.bak
+/web/addons
