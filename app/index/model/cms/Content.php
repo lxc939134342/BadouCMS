@@ -288,7 +288,7 @@ class Content extends Model
             /* 暂无内容 */
             $data['nextcontent'] = "<a href='javascript:;'>".__('Not have')."</a>";
             $data['nextlink'] = "javascript:;";
-            $data['nexttitle'] = "__('Not have')";
+            $data['nexttitle'] = __('Not have');
             $data['nextico'] = "";
 
         } else {
@@ -297,7 +297,7 @@ class Content extends Model
             /* 暂无内容 */
             $data['precontent'] = "<a href='javascript:;'>".__('Not have')."</a>";
             $data['prelink'] = "javascript:;";
-            $data['pretitle'] = "__('Not have')";
+            $data['pretitle'] = __('Not have');
             $data['preico'] = "";
         }
 
