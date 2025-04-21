@@ -309,8 +309,9 @@ class Base extends BaseController
             'loginstatus' => true,
             'register' => url('/user/register'),
             'login' => url('/user/login'),
-            'lgpath' => '',
-            'httpurl' => request()->domain(true),
+            'lgpath' => url('/do/area'),
+            'sitelanguage' => get_frontend_lang(),
+            'httpurl' => request()->domain(),
             'pageurl' => request()->url(true),
             'commentstatus' => get_sys_config('commentstatus'),
             'commentaction' => url('/comment/add'),
@@ -463,4 +464,29 @@ class Base extends BaseController
         ];
     }
 
+    /**
+     * 跳转到对应的语言区域
+     * @return void
+     */
+    public function area()
+    {
+        $lg = $this->request->param('lg');
+        if (!$lg) {
+            $this->redirect('/');
+        }
+        $cms_area = Db::name('cms_area')
+            ->where('acode', $lg)
+            ->field('domain,acode')->find();
+        if (!$cms_area || empty($cms_area['domain'])) {
+            $this->redirect('/');
+        }
+
+        $domain = $cms_area['domain'];
+        // 使用简化的正则表达式只检查是否包含 http 或 https 前缀
+        if (!preg_match('/^https?:\/\//i', $domain)) {
+            $domain = $this->request->scheme() . '://' . $domain;
+        }
+
+        $this->redirect($domain);
+    }
 }

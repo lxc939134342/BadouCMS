@@ -22,6 +22,7 @@ $route_arr = [
     'sitemap.txt$' => 'cms.sitemap/txt', // sitemap路由
     'tag/:tag$' => 'cms.tag/index',// tag路由
     'ajax/:action$' => 'ajax/:action',
+    'do/:action$' => 'cms.index/:action',
     'upload$' => 'cms.base/upload',
     'captcha$' => 'cms.base/captcha',
     'message$' => 'cms.message/index',
