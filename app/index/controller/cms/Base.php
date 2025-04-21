@@ -139,6 +139,10 @@ class Base extends BaseController
         // TODO 待完善
         /* 设置模版路径 */
         $view_path = root_path() . 'template' . DIRECTORY_SEPARATOR. $theme. DIRECTORY_SEPARATOR;
+        if (!is_dir($view_path)) {  //兼容public目录下的模版
+            $tpl_html_dir = get_sys_config('tpl_html_dir') ?: 'html';
+            $view_path = public_path() . 'template' . DIRECTORY_SEPARATOR. $theme. DIRECTORY_SEPARATOR.$tpl_html_dir. DIRECTORY_SEPARATOR;
+        }
         $this->view = View::instance();
         $this->view->config([
             'view_path' => $view_path,

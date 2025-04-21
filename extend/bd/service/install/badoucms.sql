@@ -1181,7 +1181,7 @@ CREATE TABLE `bd_config` (
 -- Records of bd_config
 -- ----------------------------
 BEGIN;
-INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (1, 'config_group', 'other', 'Config group', '', 'array', '[{\"key\":\"basics\",\"value\":\"Basics\"},{\"key\":\"other\",\"value\":\"\\u5176\\u4ed6\\u914d\\u7f6e\"},{\"key\":\"mail\",\"value\":\"Mail\"},{\"key\":\"user\",\"value\":\"\\u4f1a\\u5458\\u914d\\u7f6e\"},{\"key\":\"message\",\"value\":\"\\u7559\\u8a00\\u914d\\u7f6e\"}]', NULL, 'required', '', 0, -1);
+INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (1, 'config_group', 'other', 'Config group', '', 'array', '[{\"key\":\"basics\",\"value\":\"Basics\"},{\"key\":\"other\",\"value\":\"\\u5176\\u4ed6\\u914d\\u7f6e\"},{\"key\":\"mail\",\"value\":\"Mail\"},{\"key\":\"user\",\"value\":\"\\u4f1a\\u5458\\u914d\\u7f6e\"},{\"key\":\"message\",\"value\":\"\\u7559\\u8a00\\u914d\\u7f6e\"},{\"key\":\"webapi\",\"value\":\"WebApi\"}]', NULL, 'required', '', 0, -1);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (2, 'site_name', 'basics', 'Site Name', '', 'string', 'BADOUCMS', NULL, 'required', '', 0, 99);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (4, 'version', 'basics', 'Version number', '系统版本号', 'string', 'v1.0.0', NULL, 'required', '', 0, 0);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (5, 'time_zone', 'basics', 'time zone', '', 'string', 'Asia/Shanghai', NULL, 'required', '', 0, 0);
@@ -1208,8 +1208,13 @@ INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`,
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (27, 'form_status', 'message', '开启表单', '', 'switch', '1', NULL, '', '', 1, 0);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (28, 'form_check_code', 'message', '表单验证码', '', 'switch', '0', NULL, '', '', 1, 0);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (29, 'form_send_mail', 'message', '表单发送邮件', '', 'switch', '0', NULL, '', '', 1, 0);
-COMMIT;
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (30, 'tpl_error', 'basics', '模版报错提醒', '', 'radio', '0', '', '', '', 1, 0);
+INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (32, 'api_open', 'webapi', 'API状态', '', 'switch', '0', NULL, '', '', 1, 0);
+INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (33, 'api_auth', 'webapi', 'API强制认证', '', 'switch', '0', NULL, '', '', 1, 0);
+INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (35, 'api_appid', 'webapi', 'API认证用户', '', 'string', 'apiadmin', NULL, '', '', 1, 0);
+INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (36, 'api_secret', 'webapi', 'API认证密钥', '', 'string', 'apipass', NULL, '', '', 1, 0);
+INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (37, 'tpl_html_dir', 'basics', '模板子目录', '一定程度上防盗，如填 html，则默认模板情况下路径为 default/html 目录！', 'string', 'html', NULL, '', '', 1, 0);
+COMMIT;
 -- ----------------------------
 -- Table structure for bd_crud_log
 -- ----------------------------
