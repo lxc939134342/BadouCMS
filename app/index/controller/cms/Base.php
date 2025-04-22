@@ -32,6 +32,7 @@ use app\index\model\cms\ContentSort;
 use think\db\exception\PDOException;
 use think\exception\HttpResponseException;
 use app\common\library\token\TokenExpirationException;
+use app\index\model\cms\User;
 
 class Base extends BaseController
 {
@@ -215,15 +216,13 @@ class Base extends BaseController
             'captchaUrl' => '/api/cms.common/captcha',
         ];
 
-        // 设置允许输出字段
-        $this->auth->setAllowFields(['id', 'username', 'nickname', 'email', 'mobile', 'avatar', 'gender', 'birthday', 'money', 'score', 'join_time', 'motto', 'last_login_time', 'last_login_ip','level']);
-
-        $this->view->assign('user', $this->auth->getUserInfo());
+        $user = new User();
+        $userInfo = $user->getUserInfo($this->auth->id);
+        $this->view->assign('user', $userInfo);
         $this->view->assign('config', $config);
         $this->assignBd();
-        $this->assignconfig('user', $this->auth->getUserInfo());
+        $this->assignconfig('user', $userInfo);
         $this->assignconfig('captchaUrl', $config['captchaUrl']);
-
         // 会员验权和登录标签位
         Event::trigger('cmsInit', $this->auth);
         $this->getSort();
@@ -437,7 +436,9 @@ class Base extends BaseController
                 }
             }
             $rules = array_values($rules);
-
+            if (!$this->contentSort['scode']) {
+                $this->view->assign('sort', []);
+            }
             $this->view->assign([
                 'site'             => [
                     'siteName'     => get_sys_config('site_name'),

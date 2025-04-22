@@ -15,7 +15,7 @@ class User extends Backend
      */
     protected object $model;
 
-    protected array $withJoinTable = ['group'];
+    protected array $withJoinTable = ['group','member_group'];
 
     // 排除字段
     protected string|array $preExcludeFields = ['last_login_time', 'login_failure', 'password', 'salt'];

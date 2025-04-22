@@ -16,12 +16,10 @@ use ba\Date;
 use ba\Random;
 use Throwable;
 use ba\Captcha;
-use think\Validate;
 use ba\ClickCaptcha;
 use think\facade\Event;
 use think\facade\Config;
 use think\facade\Cookie;
-use app\common\facade\Token;
 use app\admin\model\UserScoreLog;
 use app\common\model\UserMoneyLog;
 use app\api\validate\User as UserValidate;
@@ -35,8 +33,10 @@ class User extends Base
     public function initialize(): void
     {
         parent::initialize();
+        if (!$this->contentSort['scode']) {
+            $this->view->assign('sort', []);
+        }
         $auth = $this->auth;
-
         $this->view->assign('title', __('User center'));
 
         // 监听用户登录、注册、删除事件
