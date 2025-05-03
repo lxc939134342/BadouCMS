@@ -84,39 +84,36 @@ class Install
         };
 
         if ($this->request->isPost()) {
+            $param = $this->request->only(['type', 'adminname', 'adminpassword', 'adminPasswordConfirmation', 'sitename']);
             try {
+                if ($param['adminpassword'] !== $param['adminPasswordConfirmation']) {
+                    return $output(0, __('The two passwords you entered did not match'));
+                }
 
                 $this->baseConfig();
+                // 管理员配置入库
+                $adminModel             = new AdminModel();
+                $defaultAdmin           = $adminModel->where('username', 'admin')->find();
+                $defaultAdmin->username = $param['adminname'];
+                $defaultAdmin->nickname = ucfirst($param['adminname']);
+                $defaultAdmin->save();
+
+                if (isset($param['adminpassword']) && $param['adminpassword']) {
+                    $adminModel->resetPassword($defaultAdmin->id, $param['adminpassword']);
+                }
+
+                // 默认用户密码修改
+                $user = new UserModel();
+                $user->resetPassword(1, Random::build());
+                // 修改站点名称
+                \app\admin\model\Config::where('name', 'site_name')->update([
+                    'value' => $param['sitename']
+                ]);
+
+
             } catch (\Exception $e) {
                 return $output(0, $e->getMessage());
             }
-
-            $param = $this->request->only(['type', 'adminname', 'adminpassword', 'adminPasswordConfirmation', 'sitename']);
-
-            if ($param['adminpassword'] !== $param['adminPasswordConfirmation']) {
-                return $output(0, __('The two passwords you entered did not match'));
-            }
-
-            // 管理员配置入库
-            $adminModel             = new AdminModel();
-            $defaultAdmin           = $adminModel->where('username', 'admin')->find();
-            $defaultAdmin->username = $param['adminname'];
-            $defaultAdmin->nickname = ucfirst($param['adminname']);
-            $defaultAdmin->save();
-
-            if (isset($param['adminpassword']) && $param['adminpassword']) {
-                $adminModel->resetPassword($defaultAdmin->id, $param['adminpassword']);
-            }
-
-            // 默认用户密码修改
-            $user = new UserModel();
-            $user->resetPassword(1, Random::build());
-
-            // 修改站点名称
-            \app\admin\model\Config::where('name', 'site_name')->update([
-                'value' => $param['sitename']
-            ]);
-
             return $output(1, __('Install Successed'), null, ['adminName' => 'web/index.html']);
         }
         $errInfo = '';
