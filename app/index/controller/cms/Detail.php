@@ -60,6 +60,7 @@ class Detail extends Base
         $this->site['pagetitle'] = $this->site['sitetitle'];
         $this->site['pagedescription'] = $this->site['sitedescription'];
         $this->site['pagekeywords'] = $this->site['sitekeywords'];
+        $this->contentInfo['sortlink'] = $this->contentSort['link'];
         $this->assignBd();
         $this->view->assign('content', $this->contentInfo);
         return $this->view->fetch('/'.basename($template, '.html'));

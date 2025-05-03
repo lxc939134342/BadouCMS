@@ -223,6 +223,7 @@ class Content extends Model
         if (!$result) {
             return [];
         }
+        $result['subsortlink'] = $result['subscode'] ? bdurl($result['type'], $result['urlname'], 'list', $result['subscode'], $result['subfilename'], '', '') : '';
         $result->inc('visits')->save();
         $tagsModel = new Tags();
         if (! ! $tags = $tagsModel->getTags()) {

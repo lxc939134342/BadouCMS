@@ -923,42 +923,40 @@ function replaceEditorDomain(string $content, string $newDomain = ''): string
         $content = html_entity_decode($content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
-    // 匹配所有可能的媒体标签
+    // 匹配所有可能的媒体标签，添加u修饰符支持UTF-8
     $patterns = [
-        // 图片
-        '/<img[\s\S]*?src=[\'"]*([^\'"\s>]+)[\'"]*[\s\S]*?>/i',
-        // 视频
-        '/<video[\s\S]*?src=[\'"]*([^\'"\s>]+)[\'"]*[\s\S]*?>/i',
-        // 音频
-        '/<audio[\s\S]*?src=[\'"]*([^\'"\s>]+)[\'"]*[\s\S]*?>/i',
-        // 链接
-        '/href=[\'"]*([^\'"\s>]+\.(?:jpg|jpeg|png|gif|mp4|mp3|pdf|doc|docx|xls|xlsx))[\'"]*>/i',
-        // source 标签
-        '/<source[\s\S]*?src=[\'"]*([^\'"\s>]+)[\'"]*[\s\S]*?>/i'
+        '/<img[\s\S]*?src=[\'"]*([^\'">]+)[\'"]*[\s\S]*?>/iu',
+        '/<video[\s\S]*?src=[\'"]*([^\'">]+)[\'"]*[\s\S]*?>/iu',
+        '/<audio[\s\S]*?src=[\'"]*([^\'">]+)[\'"]*[\s\S]*?>/iu',
+        '/href=[\'"]*([^\'">]+\.(?:jpg|jpeg|png|gif|mp4|mp3|pdf|doc|docx|xls|xlsx))[\'"]*>/iu',
+        '/<source[\s\S]*?src=[\'"]*([^\'">]+)[\'"]*[\s\S]*?>/iu'
     ];
 
     foreach ($patterns as $pattern) {
-        $content = preg_replace_callback($pattern, function ($matches) {
+        $content = preg_replace_callback($pattern, function ($matches) use ($newDomain) {
             if (empty($matches[1])) {
                 return $matches[0];
             }
 
-            // 解析原始URL
-            $url = parse_url(trim($matches[1]));
-            if (!$url || empty($url['path'])) {
-                return $matches[0];
-            }
+            $originalUrl = trim($matches[1]);
 
-            // 只保留路径部分
-            $path = $url['path'];
-            $query = isset($url['query']) ? '?' . $url['query'] : '';
-            $newUrl = $path . $query;
+            // 如果URL以http://或https://开头，检查域名是否匹配
+            if (preg_match('#^(https?://[^/]+)(/.*)$#i', $originalUrl, $m)) {
+                $domain = $m[1];
+                // 只有当域名匹配时才去除域名部分
+                if ($domain === $newDomain) {
+                    $newUrl = $m[2];  // 只保留路径部分
+                } else {
+                    $newUrl = $originalUrl;  // 域名不匹配，保持原样
+                }
+            } else {
+                $newUrl = $originalUrl;  // 如果没有域名部分，保持原样
+            }
 
             // 替换原始src/href的值
             return str_replace($matches[1], $newUrl, $matches[0]);
         }, $content);
     }
-
     // 仅在需要时重新编码
     return $needEncode ? htmlspecialchars($content, ENT_QUOTES | ENT_HTML5, 'UTF-8') : $content;
 }
@@ -992,16 +990,16 @@ function addEditorDomain(string $content, string $domain): string
 
     // 匹配所有可能的媒体标签
     $patterns = [
-        // 图片
-        '/<img[\s\S]*?src=[\'"]*([^\'"\s>]+)[\'"]*[\s\S]*?>/i',
-        // 视频
-        '/<video[\s\S]*?src=[\'"]*([^\'"\s>]+)[\'"]*[\s\S]*?>/i',
-        // 音频
-        '/<audio[\s\S]*?src=[\'"]*([^\'"\s>]+)[\'"]*[\s\S]*?>/i',
-        // 链接
-        '/href=[\'"]*([^\'"\s>]+\.(?:jpg|jpeg|png|gif|mp4|mp3|pdf|doc|docx|xls|xlsx))[\'"]*>/i',
-        // source 标签
-        '/<source[\s\S]*?src=[\'"]*([^\'"\s>]+)[\'"]*[\s\S]*?>/i'
+        // 图片 - 支持中文路径
+        '/<img[\s\S]*?src=[\'"]*([^\'"\>]+)[\'"]*[\s\S]*?>/iu',
+        // 视频 - 支持中文路径
+        '/<video[\s\S]*?src=[\'"]*([^\'"\>]+)[\'"]*[\s\S]*?>/iu',
+        // 音频 - 支持中文路径
+        '/<audio[\s\S]*?src=[\'"]*([^\'"\>]+)[\'"]*[\s\S]*?>/iu',
+        // 链接 - 支持中文路径
+        '/href=[\'"]*([^\'"\>]+\.(?:jpg|jpeg|png|gif|mp4|mp3|pdf|doc|docx|xls|xlsx))[\'"]*>/iu',
+        // source 标签 - 支持中文路径
+        '/<source[\s\S]*?src=[\'"]*([^\'"\>]+)[\'"]*[\s\S]*?>/iu'
     ];
 
     foreach ($patterns as $pattern) {

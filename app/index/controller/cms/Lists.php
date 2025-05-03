@@ -33,7 +33,6 @@ class Lists extends Base
         $page = $bootstrap->pageData();
         $this->view->assign('page', $page);
         $this->assignBd();
-
         return $this->view->fetch('/'.basename($template, '.html'));
     }
 }
