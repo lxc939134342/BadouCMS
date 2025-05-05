@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<title>登录</title>
+	<link rel="stylesheet" href="__CDN__/assets/libs/pear/css/pear.css" />
+	<link rel="stylesheet" href="__CDN__/assets/css/login.css" />
+	<link rel="stylesheet" href="__CDN__/assets/css/variables.css" />
+	<script type="text/javascript">
+		var Config = {$config|raw|json_encode};
+	</script>
+	<script>if (window.self != window.top) { top.location.reload();}</script>
+	<script src="__CDN__/assets/libs/jquery.min.js"></script>
+	<script src="__CDN__/assets/libs/layui/layui.js"></script>
+	<script src="__CDN__/assets/libs/pear/pear.js"></script>
+	<script src="__CDN__/assets/js/badou.js"></script>
+</head>
+
+<body>
+<div class="login-page" style="background-image: url(__CDN__/assets/images/background.svg)">
+	<div class="layui-row">
+		<div class="layui-col-sm12 layui-col-xs12 login-form">
+			<div class="login-head">
+				<img src="__CDN__/assets/images/login-head.svg" alt="">
+			</div>
+			<div class="layui-form">
+				<div class="form-center">
+					<div class="form-center-box">
+
+						<div class="top-log-title">
+							<span>BadouAdmin 1.0</span>
+						</div>
+						<div class="top-desc">
+							化繁为简，返璞归真，扩展灵活
+						</div>
+						<div style="margin-top: 25px;">
+							<div class="layui-form-item">
+								<div class="layui-input-wrap">
+									<div class="layui-input-prefix">
+										<i class="layui-icon layui-icon-username"></i>
+									</div>
+									<input lay-verify="required" name="username" placeholder="账户" autocomplete="off"
+										   class="layui-input">
+								</div>
+							</div>
+							<div class="layui-form-item">
+								<div class="layui-input-wrap">
+									<div class="layui-input-prefix">
+										<i class="layui-icon layui-icon-password"></i>
+									</div>
+									<input lay-verify="required" type="password" name="password" value=""
+										    placeholder="密码" autocomplete="off"
+										   class="layui-input" lay-affix="eye">
+								</div>
+							</div>
+							<div class="tab-log-verification">
+								<div class="verification-text">
+									<div class="layui-input-wrap">
+										<div class="layui-input-prefix">
+											<i class="layui-icon layui-icon-auz"></i>
+										</div>
+										<input lay-verify="required" name="captcha" value="" placeholder="验证码" autocomplete="off"
+											   class="layui-input">
+									</div>
+								</div>
+								<img src="__CDN__/assets/images/captcha.gif" alt=""
+									 class="verification-img" />
+							</div>
+							<div class="layui-form-item">
+								<div class="remember-passsword">
+									<div class="remember-cehcked">
+										<input type="checkbox" name="keeplogin" lay-skin="primary" title="自动登录">
+									</div>
+								</div>
+							</div>
+							<div class="login-btn">
+								<input type="hidden" name="__token__" id="token" value="{:token()}" />
+								<button type="button" lay-submit lay-filter="login" class="layui-btn login">登 录</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	layui.use(['form', 'button', 'popup','toast'], function () {
+		var form = layui.form;
+		var button = layui.button;
+		var popup = layui.popup;
+
+		// 登 录 提 交
+		form.on('submit(login)', function (data) {
+			/// 验证
+			/// 登录
+			Badou.api.ajax({
+				url:"{:url('index/login')}",
+				data:data.field
+			},function(ret,data){
+				console.log(ret)
+			},function (data){
+				console.log(data)
+				if(data.token){
+					$('#token').val(data.token)
+				}
+			})
+			/// 动画
+			button.load({
+				elem: '.login',
+				time: 1500,
+				done: function () {
+					popup.success("登录成功", function () {
+						// location.href = "./index.html"
+					});
+				}
+			})
+
+			return false;
+		});
+	})
+</script>
+</body>
+
+</html>

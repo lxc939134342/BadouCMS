@@ -58,4 +58,14 @@ trait View
 
         return $this;
     }
+
+    /**
+     * 渲染配置信息
+     * @param mixed $name  键名或数组
+     * @param mixed $value 值
+     */
+    protected function assignconfig($name, $value = '')
+    {
+        $this->view->config = array_merge($this->view->config ? $this->view->config : [], is_array($name) ? $name : [$name => $value]);
+    }
 }

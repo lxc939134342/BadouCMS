@@ -4,6 +4,21 @@ use think\facade\Lang;
 use think\Response;
 use voku\helper\AntiXSS;
 
+function p($vars,$halt=0)
+{
+    if (is_array($vars)) {
+        foreach ($vars as $var) {
+            echo '<pre>';
+            print_r($var);
+            echo '</pre>';
+        }
+    } else {
+        var_dump($vars);
+    }
+    if ($halt)
+    throw new HttpResponseException(Response::create());
+}
+
 if (!function_exists('__')) {
 
     /**

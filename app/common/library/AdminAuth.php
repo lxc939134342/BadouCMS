@@ -3,8 +3,9 @@
 namespace app\common\library;
 
 use app\admin\model\Admin;
-use think\Config;
-use think\Cookie;
+use badou\Date;
+use think\facade\Config;
+use think\facade\Cookie;
 use think\facade\Session;
 use badou\Auth;
 use badou\Random;
@@ -36,7 +37,7 @@ class AdminAuth extends Auth
      */
     public function login($username, $password, $keeptime = 0)
     {
-        $admin = Admin::get(['username' => $username]);
+        $admin = Admin::where('username',$username)->find();
         if (!$admin) {
             $this->setError('Username is incorrect');
             return false;
@@ -47,11 +48,12 @@ class AdminAuth extends Auth
         }
         $admin_failure_retry = Config::get('badouadmin.admin_failure_retry');
         $admin_failure_look_time  = Config::get('badouadmin.admin_failure_lock_time');
-        if ($admin->loginfailure >= $admin_failure_retry && time() - $admin->update_time < $admin_failure_look_time) {
-            $this->setError('Please try again after 1 day');
+        $update_time=$admin->getOrigin('update_time');
+        if ($admin->loginfailure >= $admin_failure_retry && time() - $update_time < $admin_failure_look_time) {
+            $this->setError(__('Please try again after %s',[Date::human($admin_failure_look_time,0)]));
             return false;
         }
-        if ($admin->password != $this->getEncryptPassword($password)) {
+        if (!password_verify($password, $admin->password)) {
             $admin->loginfailure++;
             $admin->save();
             $this->setError('Password is incorrect');
@@ -226,7 +228,7 @@ class AdminAuth extends Auth
         if (!$admin) {
             return false;
         }
-        $my = Admin::get($admin['id']);
+        $my = Admin::find($admin['id']);
         if (!$my) {
             return false;
         }
@@ -244,7 +246,7 @@ class AdminAuth extends Auth
         }
         //判断管理员IP是否变动
         if (Config::get('fastadmin.loginip_check')) {
-            if (!isset($admin['loginip']) || $admin['loginip'] != request()->ip()) {
+            if (!isset($admin['login_ip']) || $admin['login_ip'] != request()->ip()) {
                 $this->logout();
                 return false;
             }

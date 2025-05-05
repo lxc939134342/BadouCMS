@@ -4,7 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>{:__('Warning')}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="__CDN__/assets/img/favicon.ico" />
+    <link rel="shortcut icon" href="__CDN__/favicon.ico" />
     <style type="text/css">
         *{box-sizing:border-box;margin:0;padding:0;font-family:Lantinghei SC,Open Sans,Arial,Hiragino Sans GB,Microsoft YaHei,"微软雅黑",STHeiti,WenQuanYi Micro Hei,SimSun,sans-serif;-webkit-font-smoothing:antialiased}
         body{padding:70px 50px;background:#f4f6f8;font-weight:400;font-size:1pc;-webkit-text-size-adjust:none;color:#333}
@@ -30,7 +30,7 @@
 {php}$codeText=$code == 1 ? 'success' : ($code == 0 ? 'error' : 'info');  {/php}
 <div class="system-message {$codeText}">
     <div class="image">
-        <img src="__CDN__/static/images/{$codeText}.svg" alt="" width="120" />
+        <img src="__CDN__/assets/images/{$codeText}.svg" alt="" width="120" />
     </div>
     <h1>{$msg}</h1>
     {if $url}
