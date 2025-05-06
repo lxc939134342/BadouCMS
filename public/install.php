@@ -35,7 +35,7 @@ try {
 } catch (Throwable $e) {
     header('Content-Type:text/html;charset=utf-8');
     $html = <<<EOF
-依赖加载失败，重新下载完整程序包 或 执行 composer install 重新安装依赖<br> 查看文档<a href="http://www.badoucms.com/install" target="_blank">http://www.badoucms.com/install</a>
+依赖加载失败，重新下载完整程序包 或 执行 composer install 重新安装依赖<br> 查看文档<a href="http://www.badoucms.com/install.html" target="_blank">http://www.badoucms.com/install</a>
 EOF;
     die($html);
 }
