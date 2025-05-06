@@ -104,11 +104,16 @@
 
 		// 注销
 		admin.logout(function(){
-
-			popup.success("注销成功",function(){
-				location.href = "./login.html";
+			Badou.api.ajax({
+				url:"{:url('index/logout')}"
+			},function (ret,res){
+				if(res.code==1){
+					popup.success("注销成功",function(){
+						location.href = res.url;
+					})
+				}
+				return false;
 			})
-
 			// 清空 tabs 缓存
 			return new Promise((resolve) => {
 				resolve(true)

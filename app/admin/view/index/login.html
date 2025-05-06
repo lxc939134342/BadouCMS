@@ -94,29 +94,27 @@
 
 		// 登 录 提 交
 		form.on('submit(login)', function (data) {
-			/// 验证
-			/// 登录
+			/// 动画
+			var btn=button.load({
+				elem: '.login'
+			})
 			Badou.api.ajax({
 				url:"{:url('index/login')}",
 				data:data.field
-			},function(ret,data){
-				console.log(ret)
+			},function(ret,res){
+				if(res.code==1){
+					btn.stop()
+					popup.success(res.msg,function(){
+						location.href = res.url;
+					})
+				}
+				return false;
 			},function (data){
-				console.log(data)
 				if(data.token){
 					$('#token').val(data.token)
 				}
 			})
-			/// 动画
-			button.load({
-				elem: '.login',
-				time: 1500,
-				done: function () {
-					popup.success("登录成功", function () {
-						// location.href = "./index.html"
-					});
-				}
-			})
+
 
 			return false;
 		});

@@ -6,8 +6,6 @@ use app\admin\model\AdminLog;
 use app\common\controller\Backend;
 use think\facade\Config;
 use think\facade\Event;
-use think\Hook;
-use think\Validate;
 
 class Index extends Backend
 {
@@ -15,6 +13,11 @@ class Index extends Backend
     protected $noNeedRight = ['index', 'logout','adminConfig'];
     public function index()
     {
+        if($this->request->isAjax()){
+            $menus=$this->auth->getMenus($this->auth->id);
+            return json($menus);
+        }
+
         return $this->view->fetch();
     }
 
@@ -43,7 +46,7 @@ class Index extends Backend
                 "max" => "30",
                 "index" => [
                     "id" => "1",
-                    "href" => "/admin/dashboard/index?view=1",
+                    "href" => "/admin/dashboard/index",
                     "title" => "首页"
                 ]
             ],
@@ -136,5 +139,14 @@ class Index extends Backend
             }
         }
         return $this->view->fetch();
+    }
+
+    public function logout()
+    {
+        if ($this->request->isPost()) {
+            $this->auth->logout();
+            Event::trigger('admin_logout_after',$this->request);
+            $this->success(__('Logout successful'), 'index/login');
+        }
     }
 }

@@ -85,6 +85,21 @@ trait Jump
     }
 
     /**
+     * URL重定向
+     * @access protected
+     * @param  string $url 跳转的URL表达式
+     * @param  integer $code http code
+     * @param  array $with 隐式传参
+     * @return void
+     */
+    protected function redirect($url, $code = 302, $with = [])
+    {
+        $response = Response::create($url, 'redirect');
+        $response->code($code)->with($with);
+        throw new HttpResponseException($response);
+    }
+
+    /**
      * 获取当前的 response 输出类型
      * @access protected
      * @return string

@@ -7,7 +7,6 @@ use app\common\library\AdminAuth;
 use app\common\traits\Jump;
 use app\common\traits\View as ViewTrait;
 use badou\Auth;
-use think\App;
 use think\facade\Config;
 use think\facade\Event;
 use think\facade\Session;
@@ -118,7 +117,6 @@ class Backend extends BaseController
 
     public function initialize()
     {
-        parent::initialize();
         $this->view     = View::instance();
         $modulename     = app('http')->getName();
         $controllername = strtolower($this->request->controller());
@@ -138,12 +136,10 @@ class Backend extends BaseController
             //检测是否登录
             if (!$this->auth->isLogin()) {
                 Event::trigger('admin_nologin', $this);
-//                Hook::listen('admin_nologin', $this);
                 $url = Session::get('refererd');
                 $url = $url ? $url : $this->request->url();
-                if (in_array($this->request->pathinfo(), ['/', 'index/index'])) {
-                    redirect('index/login', 302);
-                    exit;
+                if (in_array($this->request->pathinfo(), ['','/', 'index/index'])) {
+                    $this->redirect((string)url('index/login', ['referer' => $url]), 302);
                 }
                 $this->error(__('Please login first'), url('index/login', ['url' => $url]));
             }
