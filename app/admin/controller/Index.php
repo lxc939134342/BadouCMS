@@ -17,7 +17,6 @@ class Index extends Backend
             $menus=$this->auth->getMenus($this->auth->id);
             return json($menus);
         }
-
         return $this->view->fetch();
     }
 
@@ -29,7 +28,7 @@ class Index extends Backend
                 "image" => "/static/admin/images/logo.png"
             ],
             "menu" => [
-                "data" => "/admin/index/index",
+                "data" => (string)url('/index/index'),
                 "method" => "GET",
                 "accordion" => true,
                 "collapse" => false,
@@ -46,7 +45,7 @@ class Index extends Backend
                 "max" => "30",
                 "index" => [
                     "id" => "1",
-                    "href" => "/admin/dashboard/index",
+                    "href" => (string)url('/dashboard/index'),
                     "title" => "首页"
                 ]
             ],
@@ -70,7 +69,7 @@ class Index extends Backend
                 ],
                 [
                     "id" => "3",
-                    "color" => "#f6ad55",
+                    "color" => "#FF6C02",
                     "second" => "#fdf6ec"
                 ],
                 [
@@ -102,7 +101,7 @@ class Index extends Backend
         if ($this->auth->isLogin()) {
             $this->success(__("You've logged in, do not login again"), $url);
         }
-        if($this->request->isAjax()){
+        if($this->isAjax()){
             $username = $this->request->post('username');
             $password = $this->request->post('password', '', null);
             $keeplogin = $this->request->post('keeplogin',false);
@@ -143,7 +142,7 @@ class Index extends Backend
 
     public function logout()
     {
-        if ($this->request->isPost()) {
+        if ($this->isAjax()) {
             $this->auth->logout();
             Event::trigger('admin_logout_after',$this->request);
             $this->success(__('Logout successful'), 'index/login');

@@ -38,12 +38,6 @@ class Backend extends BaseController
     protected $noNeedRight = [];
 
     /**
-     * 布局模板
-     * @var string
-     */
-    protected $layout = 'default';
-
-    /**
      * 权限控制类
      * @var Auth
      */
@@ -126,9 +120,7 @@ class Backend extends BaseController
 
         // 检测IP是否允许
         check_ip_allowed();
-
         $this->auth = AdminAuth::instance();
-
         // 设置当前请求的URI
         $this->auth->setRequestUri($path);
         // 检测是否需要验证登录
@@ -141,22 +133,17 @@ class Backend extends BaseController
                 if (in_array($this->request->pathinfo(), ['','/', 'index/index'])) {
                     $this->redirect((string)url('index/login', ['referer' => $url]), 302);
                 }
-                $this->error(__('Please login first'), url('index/login', ['url' => $url]));
+                $this->error(__('Please login first'), (string)url('index/login', ['url' => $url]));
             }
             // 判断是否需要验证权限
             if (!$this->auth->match($this->noNeedRight)) {
                 // 判断控制器和方法是否有对应权限
                 if (!$this->auth->check($path)) {
                     Event::trigger('admin_nopermission', $this);
-                    $this->error(__('You have no permission'), '');
+                    $this->error(__('You have no permission'));
                 }
             }
         }
-
-//        // 如果有使用模板布局
-//        if ($this->layout) {
-//            $this->view->engine->layout('layout/' . $this->layout);
-//        }
 
         // 语言检测
         $lang = $this->app->lang->getLangSet();
@@ -210,5 +197,18 @@ class Backend extends BaseController
             app_path() . 'lang' . DIRECTORY_SEPARATOR . $lang . DIRECTORY_SEPARATOR . (str_replace('.', DIRECTORY_SEPARATOR, $name)) . '.php',
         ]);
         $this->assignconfig('lang', $langArr);
+    }
+
+    /**
+     * 判断是否为ajax请求 一定要用此方法判断
+     * layui加载页面使用的是ajax形式，会导致request->ajax不精准
+     */
+    protected function isAjax()
+    {
+        if ($this->request->param('view', 0) ||
+            (!$this->request->isAjax() && !$this->request->isJson())) {
+            return false;
+        }
+        return true;
     }
 }

@@ -85,6 +85,24 @@ trait Jump
     }
 
     /**
+     * 返回结果
+     * @param string $msg
+     * @param array $data
+     * @param int $code
+     */
+    protected function result($msg='',$data=[],$count=0,$code=0)
+    {
+        $result = [
+            'code' => $code,
+            'msg'  => $msg,
+            'data' => $data,
+            'count'=>$count?:count($data)
+        ];
+        $response = Response::create($result, 'json');
+        throw new HttpResponseException($response);
+    }
+
+    /**
      * URL重定向
      * @access protected
      * @param  string $url 跳转的URL表达式
@@ -106,7 +124,7 @@ trait Jump
      */
     protected function getResponseType()
     {
-        return $this->request->isAjax() || $this->request->isJson()
+        return $this->isAjax()
             ? 'json'
             : 'html';
     }
