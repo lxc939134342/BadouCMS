@@ -27,7 +27,7 @@
 </form>
 <table class="layui-hide" id="ID-treeTable-demo"></table>
 <script>
-	layui.use('bdTable',function(){
+	layui.use('bdTable', function () {
 		var bdtable = layui.bdTable;
 		var treeTable = layui.treeTable;
 		var layer = layui.layer;
@@ -36,18 +36,22 @@
 		bdtable.render({
 			elem: '#ID-treeTable-demo',
 			url: "{:url('auth.rule/index')}", // 此处为静态模拟数据，实际使用时需换成真实接口
+			even:  true,
 			cols: [[
 				{type: 'checkbox'},
 				{field: 'id', title: 'ID', width: 80, sort: true},
-				{field: 'title', title: '标题', },
+				{field: 'title', title: '标题',},
 				{field: 'name', title: '规则', width: 180},
-				{field: 'icon', title: '图标', width: 150, },
+				{field: 'icon', title: '图标', width: 150, templet: bdtable.formatter.icon},
 				{field: 'weigh', title: '权重', width: 100},
-				{field: 'status', title: '状态', width: 100,selectList: { 'normal': '正常', 'hidden': '隐藏' },
-					custom: { 'normal': "green", 'hidden': "orange"},templet:bdtable.formatter.normal},
-				{field: 'ismenu', title: '菜单', width: 100},
-				{ fixed: "right", title: "操作", width: 190, align: "center", toolbar: "#TPL-treeTable-demo-tools"}
+				{
+					field: 'status', title: '状态', width: 100, selectList: {'normal': '正常', 'hidden': '隐藏'},
+					custom: {'normal': "green", 'hidden': "orange"}, templet: bdtable.formatter.status
+				},
+				{field: 'ismenu', title: '菜单', width: 100, templet: bdtable.formatter.switch},
+				{fixed: "right", title: "操作", width: 190, align: "center", templet: bdtable.formatter.operate}
 			]],
+			page: true
 		})
 		// // 渲染
 		// var inst = treeTable.render({
