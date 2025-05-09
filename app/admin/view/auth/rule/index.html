@@ -25,17 +25,32 @@
 		<button type="reset" class="layui-btn layui-btn-primary">Clear</button>
 	</div>
 </form>
-<table class="layui-hide" id="ID-treeTable-demo"></table>
+<table class="layui-hide" id="rule"
+	   data-operate-edit="{:$auth->check('auth.rule/edit')}"
+	   data-operate-del="{:$auth->check('auth.rule/del')}"
+></table>
 <script>
 	layui.use(['badou'], function () {
-		var bdtable = layui.bdTable;
+		var bdTable = layui.bdTable;
 		var treeTable = layui.treeTable;
 		var layer = layui.layer;
 		var dropdown = layui.dropdown;
-		treeTable.render({
-			elem: '#ID-treeTable-demo',
+		bdTable.api.init({
+			table:treeTable,
+			extend: {
+				"index_url": "auth.rule/index",
+				"add_url": "auth.rule/add",
+				"edit_url": "auth.rule/edit",
+				"del_url": "auth.rule/del",
+				"multi_url": "auth.rule/multi",
+				"table": "auth_rule"
+			}
+		})
+		bdTable.render({
+			elem: '#rule',
 			url: "{:url('auth.rule/index')}",
 			pk:'id',
+			even:true,
 			toolbar: '<div>xxx</div>',
 			defaultToolbar:[
 				'filter', 'exports', 'print', // 内置工具
@@ -65,15 +80,35 @@
 				{field: 'id', title: 'ID', width: 80, sort: true},
 				{field: 'title', title: '标题'},
 				{field: 'name', title: '规则', width: 180},
-				{field: 'icon', title: '图标', width: 150, templet: bdtable.formatter.icon},
+				{field: 'icon', title: '图标', width: 150, templet: bdTable.api.formatter.icon},
 				{field: 'weigh', title: '权重', width: 100},
 				{
 					field: 'status', title: '状态', width: 100, selectList: {'normal': '正常', 'hidden': '隐藏'},
-					custom: {'normal': "green", 'hidden': "orange"}, templet: bdtable.formatter.status
+					custom: {'normal': "green", 'hidden': "orange"}, templet: bdTable.api.formatter.status
 				},
-				{field: 'ismenu', title: '菜单', width: 100, templet: bdtable.formatter.switch},
-				{fixed: "right", title: "操作", width: 190, align: "center", templet: bdtable.formatter.operate}
+				{field: 'ismenu', title: '菜单', width: 100, templet: bdTable.api.formatter.switch},
+				{fixed: "right", title: "操作", width: 190, align: "center", templet: bdTable.api.formatter.operate,buttons:[
+					{
+						name: 'edit',
+						title: '编辑',
+						text:'',
+						classname: 'layui-btn layui-bg-green layui-btn-xs',
+						icon: 'fa fa-pencil',
+						hidden: function (d) {
+							return false;
+						}
+					},
+					{
+						name: 'info',
+						title: '详情',
+						text:'详情',
+						classname: 'layui-btn layui-bg-bule layui-btn-xs',
+						icon: 'fa fa-trash',
+						url: '?parentid={id}',
+					}
+				]}
 			]],
 		})
+
 	});
 </script>

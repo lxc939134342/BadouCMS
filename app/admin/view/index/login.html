@@ -4,16 +4,8 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<title>登录</title>
-	<link rel="stylesheet" href="__CDN__/assets/libs/pear/css/pear.css" />
+	{include  file="common/meta" }
 	<link rel="stylesheet" href="__CDN__/assets/css/login.css" />
-	<link rel="stylesheet" href="__CDN__/assets/css/variables.css" />
-	<script type="text/javascript">
-		var Config = {$config|raw|json_encode};
-	</script>
-	<script>if (window.self != window.top) { top.location.reload();}</script>
-	<script src="__CDN__/assets/libs/jquery.min.js"></script>
-	<script src="__CDN__/assets/libs/layui/layui.js"></script>
-	<script src="__CDN__/assets/libs/pear/pear.js"></script>
 </head>
 
 <body>
@@ -91,7 +83,6 @@
 		var button = layui.button;
 		var popup = layui.popup;
 		var Badou = layui.badou;
-		console.log(Config)
 		// 登 录 提 交
 		form.on('submit(login)', function (data) {
 			/// 动画

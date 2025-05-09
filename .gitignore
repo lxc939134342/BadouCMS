@@ -1,7 +1,6 @@
 /nbproject/
 /vendor/
 /runtime/*
-/public/assets/libs/
 /public/uploads/*
 .DS_Store
 .idea
