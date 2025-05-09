@@ -24,7 +24,7 @@ class Tree
      * 生成树型结构所需修饰符号
      * @var array
      */
-    public static array $icon = array('│', '├', '└');
+    public array $icon = array('│', '├', '└');
     public string $pidname = 'pid';
     public string $nbsp = "&nbsp;";
 

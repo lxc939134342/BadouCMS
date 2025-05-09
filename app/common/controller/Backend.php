@@ -109,6 +109,12 @@ class Backend extends BaseController
      */
     protected $importHeadType = 'comment';
 
+    /**
+     * 内容页面布局模板
+     * @var string
+     */
+    protected $layout = 'content';
+
     public function initialize()
     {
         $this->view     = View::instance();
@@ -144,6 +150,10 @@ class Backend extends BaseController
                 }
             }
         }
+        // 如果有使用模板布局
+        if ($this->layout) {
+            $this->view->engine()->layout('common/' . $this->layout);
+        }
 
         // 语言检测
         $lang = $this->app->lang->getLangSet();
@@ -164,7 +174,7 @@ class Backend extends BaseController
             'controllername' => $controllername,
             'actionname'     => $actionname,
             'jsname'         => 'backend/' . str_replace('.', '/', $controllername),
-            'moduleurl'      => rtrim(url("/{$modulename}", [], false), '/'),
+            'moduleurl'      => rtrim(url("/", [], false), '/'),
             'language'       => $lang,
             'referer'        => Session::get("referer"),
             'app_url'        => $this->request->root(true),
@@ -196,7 +206,7 @@ class Backend extends BaseController
         $langArr = $this->app->lang->load([
             app_path() . 'lang' . DIRECTORY_SEPARATOR . $lang . DIRECTORY_SEPARATOR . (str_replace('.', DIRECTORY_SEPARATOR, $name)) . '.php',
         ]);
-        $this->assignconfig('lang', $langArr);
+        return $langArr;
     }
 
     /**

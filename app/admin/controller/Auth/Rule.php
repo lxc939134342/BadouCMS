@@ -4,6 +4,7 @@ namespace app\admin\controller\Auth;
 
 use app\admin\model\AdminRule;
 use app\common\controller\Backend;
+use badou\Tree;
 
 class Rule extends Backend
 {
@@ -24,10 +25,15 @@ class Rule extends Backend
     public function index()
     {
         if ($this->isAjax()) {
-            $list=$this->model->withoutField('type,condition,remark,createtime,updatetime')
+            $res=$this->model->withoutField('type,condition,remark,create_time,update_time')
                     ->order('weigh DESC,id ASC')
-                    ->select();
-            $total = count($list);
+                    ->select()->toArray();
+            $total = count($res);
+            foreach ($res as &$v){
+                $v['title']=__($v['title']);
+            }
+            $treeLib=Tree::instance();
+            $list=$treeLib->init($res)->getTreeArray(0);
             $this->result('ok',$list,$total);
         }
         return $this->view->fetch();

@@ -14,7 +14,6 @@
 	<script src="__CDN__/assets/libs/jquery.min.js"></script>
 	<script src="__CDN__/assets/libs/layui/layui.js"></script>
 	<script src="__CDN__/assets/libs/pear/pear.js"></script>
-	<script src="__CDN__/assets/js/badou.js"></script>
 </head>
 
 <body>
@@ -87,11 +86,12 @@
 </div>
 
 <script>
-	layui.use(['form', 'button', 'popup','toast'], function () {
+	layui.use(['form', 'button', 'popup','toast','badou'], function () {
 		var form = layui.form;
 		var button = layui.button;
 		var popup = layui.popup;
-
+		var Badou = layui.badou;
+		console.log(Config)
 		// 登 录 提 交
 		form.on('submit(login)', function (data) {
 			/// 动画
@@ -104,6 +104,7 @@
 			},function(ret,res){
 				if(res.code==1){
 					btn.stop()
+					console.log(res)
 					popup.success(res.msg,function(){
 						location.href = res.url;
 					})

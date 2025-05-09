@@ -18,7 +18,6 @@
 	<script src="__CDN__/assets/libs/jquery.min.js"></script>
 	<script src="__CDN__/assets/libs/layui/layui.js"></script>
 	<script src="__CDN__/assets/libs/pear/pear.js"></script>
-	<script src="__CDN__/assets/js/badou.js"></script>
 </head>
 <!-- 结 构 代 码 -->
 <body class="layui-layout-body pear-admin">
@@ -94,13 +93,14 @@
 
 <!-- 框 架 初 始 化 -->
 <script>
-	layui.use(['admin','jquery','popup'], function() {
+	layui.use(['admin','jquery','popup','badou'], function() {
 		var admin = layui.admin;
 		var popup = layui.popup;
 		var $ = layui.jquery;
+		var Badou = layui.badou;
 		// yml | json | api
 		admin.setConfigurationPath(Config.app_url+"/index/adminConfig");
-
+		console.log(admin)
 		// 渲染
 		admin.render();
 

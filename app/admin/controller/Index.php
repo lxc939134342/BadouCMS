@@ -11,6 +11,8 @@ class Index extends Backend
 {
     protected $noNeedLogin = ['login'];
     protected $noNeedRight = ['index', 'logout','adminConfig'];
+
+    protected $layout='';
     public function index()
     {
         if($this->request->isAjax()){
@@ -84,7 +86,7 @@ class Index extends Backend
                 ]
             ],
             "other" => [
-                "keepLoad" => "1200",
+                "keepLoad" => "700",
                 "autoHead" => false,
                 "footer" => false
             ],
@@ -97,7 +99,7 @@ class Index extends Backend
 
     public function login(){
         $url = $this->request->get('url', '', 'url_clean');
-        $url = $url ?: 'index/index';
+        $url = $url ?: rtrim(url("/", [], false), '/');
         if ($this->auth->isLogin()) {
             $this->success(__("You've logged in, do not login again"), $url);
         }
