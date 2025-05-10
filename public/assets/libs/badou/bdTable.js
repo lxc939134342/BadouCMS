@@ -26,14 +26,14 @@ layui.define(['jquery', 'http'], function (exports) {
                 name: 'edit',
                 icon: 'fa fa-pencil',
                 title: __('Edit'),
-                extend: 'data-toggle="tooltip" data-container="body"',
-                classname: 'layui-btn layui-bg-green layui-btn-xs'
+                extend: "lay-event='btn-editone'",
+                classname: 'layui-btn layui-bg-green layui-btn-xs',
             },
             del: {
                 name: 'del',
                 icon: 'fa fa-trash',
                 title: __('Del'),
-                extend: 'data-toggle="tooltip" data-container="body"',
+                extend: "lay-event='btn-delone'",
                 classname: 'layui-btn layui-bg-red layui-btn-xs'
             },
         },
@@ -75,6 +75,14 @@ layui.define(['jquery', 'http'], function (exports) {
                     }
                     return false;
                 })
+                // 监听操作事件
+                bdTable.table.on('tool(' + id + ')', function (obj) {
+                    var attrEvent = obj.event;
+                    if (bdTable.api.events.operate.hasOwnProperty(attrEvent)) {
+                        bdTable.api.events.operate[attrEvent] && bdTable.api.events.operate[attrEvent].call(this, id, obj);
+                    }
+                    return false;
+                })
                 // // 监听表格开关切换
                 // bdTable.events.switch(options, tableId);
             },
@@ -89,7 +97,6 @@ layui.define(['jquery', 'http'], function (exports) {
                         names.push(item.name);
                     });
                     if (bdTable.extend.edit_url !== '' && names.indexOf('edit') === -1) {
-                        bdTable.button.edit.url = bdTable.extend.edit_url;
                         buttons.push(bdTable.button.edit);
                     }
                     if (bdTable.extend.del_url !== '' && names.indexOf('del') === -1) {
@@ -210,7 +217,6 @@ layui.define(['jquery', 'http'], function (exports) {
                 var url = typeof data.url !== "undefined" ? data.url : (action == "del" ? bdTable.extend.del_url : bdTable.extend.multi_url);
                 var params = typeof data.params !== "undefined" ? (typeof data.params == 'object' ? $.param(data.params) : data.params) : '';
 
-
                 options = { url: http.api.fixurl(url), data: { action: action, ids: ids, params: params } };
                 http.api.ajax(options, function (data, ret) {
                     table.trigger("uncheckbox");
@@ -264,7 +270,7 @@ layui.define(['jquery', 'http'], function (exports) {
                             return false;
                         }
 
-                        var title = $(this).data('title') || $(this).attr("title") || '编辑';
+                        var title = $(this).data('title') || $(this).attr("title") || __('Edit');
                         var data = $(this).data() || {};
                         delete data.title;
 
@@ -297,6 +303,26 @@ layui.define(['jquery', 'http'], function (exports) {
                                 Layer.close(index);
                             }
                         );
+                    }
+                },
+                operate: {
+                    // 编辑
+                    'btn-editone': function (id, obj) {
+                        var title = $(this).data('title') || $(this).attr("title") || __('Edit');
+                        var data = $(this).data() || {};
+                        var row = obj.data;
+                        var table = bdTable.initTable;
+                        delete data.title;
+
+                        var url = bdTable.extend.edit_url;
+                        row = $.extend({}, row ? row : {}, { id: row[obj.pk] });
+                        url = bdTable.api.replaceurl(url, row, table);
+                        http.api.open(url, typeof title === 'function' ? title.call(table, row) : title, data);
+                        return false;
+                    },
+                    // 删除
+                    'btn-delone': function (id, obj) {
+                        console.log(obj);
                     }
                 },
 
@@ -333,6 +359,7 @@ layui.define(['jquery', 'http'], function (exports) {
                 var table = bdTable.initTable
                 var row = data
                 $.each(buttons, function (i, j) {
+
                     if (type === 'operate') {
                         if (['add', 'edit', 'del', 'multi'].indexOf(j.name) > -1 && !bdTable.extend[j.name + "_url"]) {
                             return true;
