@@ -285,11 +285,15 @@ layui.define(['jquery', 'http'], function (exports) {
                             layer.msg(__('Please select at least one item'));
                             return false;
                         }
+                        var idarr = [];
+                        $.each(ids, function (i, v) {
+                            idarr.push(v[table.config.pk]);
+                        });
                         Layer.confirm(
                             __('Are you sure you want to delete the %s selected item?', ids.length),
                             { icon: 3, title: __('Warning'), offset: 0, shadeClose: true, btn: [__('OK'), __('Cancel')] },
                             function (index) {
-                                bdTable.api.multi("del", ids, table, that);
+                                bdTable.api.multi("del", idarr, table, that);
                                 Layer.close(index);
                             }
                         );
@@ -388,7 +392,7 @@ layui.define(['jquery', 'http'], function (exports) {
                     data = checkStatus.data;
                 var arr = [];
                 $.each(data, function (i, v) {
-                    arr.push(v['id']);
+                    arr.push(v);
                 });
                 return arr;
             },
