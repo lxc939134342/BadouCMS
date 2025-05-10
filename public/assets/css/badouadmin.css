@@ -1,5 +1,45 @@
-.layui-tab-item{
+.layui-tab-item {
     margin: 15px;
     background: #fff;
     padding: 15px;
+}
+.layui-btn + .layui-btn {
+    margin-left: 0;
+}
+.layui-table-tool {
+    background-color: #f8f8f8;
+}
+.layui-table-cell {
+    padding: 10px 15px;
+    height: 48px;
+}
+.layui-table-header {
+    border-bottom: 1px solid #ddd;
+}
+.layui-table > thead > tr > th > .layui-table-cell {
+    color: #333;
+}
+.layui-table td {
+    border-color: #f4f4f4;
+}
+.layui-btn {
+    border-radius: 3px !important;
+}
+.layui-btn:active,
+.layui-btn:hover {
+    opacity: 0.75;
+}
+.layui-btn.disabled,
+.layui-btn[disabled] {
+    opacity: 0.65;
+    cursor: not-allowed !important;
+}
+.hide {
+    display: none !important;
+}
+.show {
+    display: block !important;
+}
+.invisible {
+    visibility: hidden;
 }

@@ -1,14 +1,17 @@
 layui.define(['jquery', 'http'], function (exports) {
     "use strict";
     var MOD_NAME = 'bdTable',
-        table = layui.table,
         $ = layui.jquery,
         http = layui.http,
+        Layer = layui.layer,
         laytpl = layui.laytpl;
 
     var bdTable = {
+        // 导入layui的table 或者 treeTable
         table: null,
+        // 初始化layui的table 或者 treeTable
         initTable: null,
+        // 表格的dom
         table_elem: null,
         extend: {
             index_url: '',
@@ -39,6 +42,7 @@ layui.define(['jquery', 'http'], function (exports) {
             options.pk = options.pk || 'id';
             options.cols = options.cols || [];
             options.url = options.url || '';
+
             bdTable.initTable = bdTable.table.render(options);
             bdTable.table_elem = options.elem;
             bdTable.api.bindevent();
@@ -56,10 +60,21 @@ layui.define(['jquery', 'http'], function (exports) {
             },
             //事件绑定
             bindevent: function () {
+                var id = bdTable.initTable.config.id;
+                // 监听选中
+                bdTable.api.events.toolbarCheckbox(id);
+                // 监听工具栏事件
+                bdTable.table.on('toolbar(' + id + ')', function (obj) {
+                    var attrEvent = obj.event;
+                    if ($(this).hasClass('disabled')) {
+                        return false;
+                    }
 
-
-                // var tableId = tableId || bdTable.init.table_render_id;
-                // var options = layui.table.getOptions(tableId);
+                    if (bdTable.api.events.toolbar.hasOwnProperty(attrEvent)) {
+                        bdTable.api.events.toolbar[attrEvent] && bdTable.api.events.toolbar[attrEvent].call(this, id, obj);
+                    }
+                    return false;
+                })
                 // // 监听表格开关切换
                 // bdTable.events.switch(options, tableId);
             },
@@ -187,7 +202,100 @@ layui.define(['jquery', 'http'], function (exports) {
                     }
                 }
             },
+            // 批量操作请求
+            multi: function (action, ids, table, elem) {
+                var options = table.config;
+                var data = elem ? $(elem).data() : {};
+                ids = ($.isArray(ids) ? ids.join(",") : ids);
+                var url = typeof data.url !== "undefined" ? data.url : (action == "del" ? bdTable.extend.del_url : bdTable.extend.multi_url);
+                var params = typeof data.params !== "undefined" ? (typeof data.params == 'object' ? $.param(data.params) : data.params) : '';
+
+
+                options = { url: http.api.fixurl(url), data: { action: action, ids: ids, params: params } };
+                http.api.ajax(options, function (data, ret) {
+                    table.trigger("uncheckbox");
+                    var success = $(elem).data("success") || $.noop;
+                    if (typeof success === 'function') {
+                        if (false === success.call(elem, data, ret)) {
+                            return false;
+                        }
+                    }
+                    bdTable.api.events.toolbar.refresh(table.config.id);
+                }, function (data, ret) {
+                    var error = $(elem).data("error") || $.noop;
+                    if (typeof error === 'function') {
+                        if (false === error.call(elem, data, ret)) {
+                            return false;
+                        }
+                    }
+                });
+            },
             events: {
+                // 选择数据时触发disabled
+                toolbarCheckbox: function (id) {
+                    var table = bdTable.table;
+                    table.on('checkbox(' + id + ')', function (obj) {
+                        var checkStatus = table.checkStatus(obj.config.id);
+
+                        $('.layui-table-tool .btn-disabled')
+                            .toggleClass('disabled', !checkStatus.data.length);
+                        return false;
+                    })
+                },
+                // 左侧工具栏
+                toolbar: {
+                    // 刷新表格
+                    refresh: function (id) {
+                        var table = bdTable.table;
+                        table.reload(id);
+                    },
+                    // 添加
+                    add: function (id) {
+                        var url = bdTable.extend.add_url;
+                        http.api.open(url, $(this).data("original-title") || $(this).attr("title") || __('Add'), $(this).data() || {});
+                    },
+                    // 修改
+                    edit: function (id, obj) {
+                        var table = bdTable.initTable;
+
+                        var ids = bdTable.api.selectedids();
+                        if (ids.length === 0) {
+                            layer.msg(__('Please select at least one item'));
+                            return false;
+                        }
+
+                        var title = $(this).data('title') || $(this).attr("title") || '编辑';
+                        var data = $(this).data() || {};
+                        delete data.title;
+
+                        //循环弹出多个编辑框
+                        $.each(ids, function (index, row) {
+                            var url = bdTable.extend.edit_url;
+                            row = $.extend({}, row ? row : {}, { id: row[obj.pk] });
+                            url = bdTable.api.replaceurl(url, row, table);
+                            http.api.open(url, typeof title === 'function' ? title.call(table, row) : title, data);
+                        });
+                    },
+                    // 删除
+                    del: function (id, obj) {
+                        var that = this;
+                        var table = bdTable.initTable;
+                        var ids = bdTable.api.selectedids();
+                        if (ids.length === 0) {
+                            layer.msg(__('Please select at least one item'));
+                            return false;
+                        }
+                        Layer.confirm(
+                            __('Are you sure you want to delete the %s selected item?', ids.length),
+                            { icon: 3, title: __('Warning'), offset: 0, shadeClose: true, btn: [__('OK'), __('Cancel')] },
+                            function (index) {
+                                bdTable.api.multi("del", ids, table, that);
+                                Layer.close(index);
+                            }
+                        );
+                    }
+                },
+
                 switch: function (option, id) {
                     console.log(option)
                     var modifyReload = option.modifyReload || false;
@@ -272,6 +380,18 @@ layui.define(['jquery', 'http'], function (exports) {
                 // }
                 return html.join(' ');
             },
+            // 获取选中的条目ID集合
+            selectedids: function () {
+                var table = bdTable.initTable;
+                var id = table.config.id;
+                var checkStatus = bdTable.table.checkStatus(id),
+                    data = checkStatus.data;
+                var arr = [];
+                $.each(data, function (i, v) {
+                    arr.push(v['id']);
+                });
+                return arr;
+            },
             //替换URL中的数据
             replaceurl: function (url, row, table) {
                 var options = table ? table.config : null;
@@ -293,55 +413,7 @@ layui.define(['jquery', 'http'], function (exports) {
                 return url;
             },
         },
-        //生成工具栏
-        renderToolbar: function (options) {
-            var d = options.toolbar,
-                tableId = options.id,
-                searchInput = options.searchInput,
-                elem = options.elem,
-                init = options.init;
-            d = d || [];
-            var toolbarHtml = '';
-            $.each(d, function (i, v) {
-                if (v === 'refresh') {
-                    toolbarHtml += '<a lay-event="btn-refresh" href="javascript:;" class="layui-btn layui-btn-sm yzn-btn-primary btn-refresh" data-table-refresh="' + tableId + '"><i class="iconfont icon-loop-left-line"></i> </a>\n';
-                } else if (v === 'add') {
-                    if (bdTable.auth('add', elem)) {
-                        toolbarHtml += '<a lay-event="btn-add" href="javascript:;" class="layui-btn layui-btn-normal layui-btn-sm"><i class="iconfont icon-add-fill"></i> 添加</a>\n';
-                    }
-                } else if (v === 'edit') {
-                    if (bdTable.auth('edit', elem)) {
-                        toolbarHtml += '<a lay-event="btn-edit" href="javascript:;" class="layui-btn layui-btn-normal layui-btn-sm layui-btn-disabled btn-disabled" data-table="' + tableId + '"><i class="iconfont icon-edit-2-line"></i> 编辑</a>\n';
-                    }
-                } else if (v === 'delete') {
-                    if (bdTable.auth('delete', elem)) {
-                        toolbarHtml += '<a lay-event="btn-delete" href="javascript:;" class="layui-btn layui-btn-sm layui-btn-danger layui-btn-disabled btn-disabled" data-href="' + init.delete_url + '" data-table="' + tableId + '"><i class="iconfont icon-delete-bin-line"></i> 删除</a>\n';
-                    }
-                } else if (v === 'recyclebin') {
-                    if (bdTable.auth('recyclebin', elem)) {
-                        toolbarHtml += '<a class="layui-btn layui-btn-warm layui-btn-sm btn-dialog" href="' + init.recyclebin_url + '" data-title="回收站"><i class="iconfont icon-recycle-line"></i> 回收站</a>\n';
-                    }
-                } else if (v === 'restore') {
-                    if (bdTable.auth('restore', elem)) {
-                        toolbarHtml += '<a lay-event="btn-multi" class="layui-btn layui-btn-sm confirm layui-btn-disabled btn-disabled" href="javascript:;" data-url="' + init.restore_url + '" data-action="restore" data-table="' + tableId + '"><i class="iconfont icon-arrow-go-back-line"></i> 还原</a>\n';
-                    }
-                } else if (v === 'destroy') {
-                    if (bdTable.auth('destroy', elem)) {
-                        toolbarHtml += '<a lay-event="btn-multi" class="layui-btn layui-btn-sm confirm layui-btn-danger layui-btn-disabled btn-disabled" href="javascript:;" data-url="' + init.destroy_url + '" data-action="destroy" data-table="' + tableId + '"><i class="iconfont icon-close-fill"></i> 销毁</a>\n';
-                    }
-                } else if (typeof v === "object") {
-                    $.each(v, function (ii, vv) {
-                        if (bdTable.auth(vv.auth, elem)) {
-                            toolbarHtml += bdTable.buildToolbarHtml(vv);
-                        }
-                    });
-                }
-            });
-            if (searchInput) {
-                toolbarHtml += '<input id="layui-input-search" value="" placeholder="搜索" class="layui-input layui-hide-xs" style="display:inline-block;width:auto;float: right;\n' + 'margin:2px 25px 0 0;height:28px;">\n'
-            }
-            return '<div>' + toolbarHtml + '</div>';
-        },
+
         auth: function (operate, elem) {
             var attr = $(elem).data("operate-" + operate);
             if (typeof attr === 'undefined' || attr) {
@@ -354,31 +426,6 @@ layui.define(['jquery', 'http'], function (exports) {
                 return false;
             }
         },
-        buildToolbarHtml: function (j) {
-            j.html = j.html || '';
-            if (j.html !== '') {
-                return j.html;
-            }
-
-            var hidden, html, url, classname, refresh, extend, text, title, icon;
-            hidden = typeof j.hidden === 'function' ? j.hidden.call(Table, j) : (typeof j.hidden !== 'undefined' ? j.hidden : false);
-            if (hidden) {
-                return '';
-            }
-            text = j.text ? j.text : '';
-            title = j.title ? j.title : text;
-            icon = j.icon ? j.icon : '';
-
-            classname = j.class ? j.class : '';
-            refresh = j.refresh ? 'data-refresh="' + j.refresh + '"' : '';
-            url = j.url ? j.url : '';
-            url = url ? Yzn.api.fixurl(j.url) : 'javascript:;';
-            extend = typeof j.extend !== 'undefined' ? j.extend : '';
-
-            html = '<a href="' + url + '" class="' + classname + '" ' + (refresh ? refresh + ' ' : '') + extend + ' title="' + title + '" data-table="' + Table.init.table_render_id + '"><i class="' + icon + '"></i>' + (text ? ' ' + text : '') + '</a>\n';
-            return html;
-        },
-
 
     }
 

@@ -25,10 +25,22 @@
 		<button type="reset" class="layui-btn layui-btn-primary">Clear</button>
 	</div>
 </form>
+<!-- 表格 -->
 <table class="layui-hide" id="rule"
 	   data-operate-edit="{:$auth->check('auth.rule/edit')}"
 	   data-operate-del="{:$auth->check('auth.rule/del')}"
 ></table>
+<!-- 表格左侧按钮 toolbar  -->
+<script type="text/html" id="toolbar">
+	<div class="layui-btn-container">
+		<a href="javascript:;" lay-event="refresh" class="layui-btn layui-btn-sm layui-bg-black	"><i class="fa fa-refresh"></i></a>
+		<button class="layui-btn layui-btn-sm layui-bg-green" lay-event="add"><i class="fa fa-plus"></i> {:__('Add')}</button>
+		<button class="layui-btn layui-btn-sm layui-bg-blue btn-disabled disabled {:$auth->check('auth.rule/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
+		<button class="layui-btn layui-btn-sm layui-bg-red btn-disabled disabled" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
+		<button class="layui-btn layui-btn-sm" id="expandAll"><i class="fa fa-plus"></i> {:__('Expendall')}</button>
+	</div>
+</script>
+
 <script>
 	layui.use(['badou'], function () {
 		var bdTable = layui.bdTable;
@@ -51,7 +63,7 @@
 			url: "{:url('auth.rule/index')}",
 			pk:'id',
 			even:true,
-			toolbar: '<div>xxx</div>',
+			toolbar: '#toolbar',
 			defaultToolbar:[
 				'filter', 'exports', 'print', // 内置工具
 				{
@@ -73,6 +85,10 @@
 				},
 				view:{
 					showIcon:false
+				},
+				// 取消联动
+				data:{
+					cascade:'none'
 				}
 			},
 			cols: [[
@@ -87,28 +103,22 @@
 					custom: {'normal': "green", 'hidden': "orange"}, templet: bdTable.api.formatter.status
 				},
 				{field: 'ismenu', title: '菜单', width: 100, templet: bdTable.api.formatter.switch},
-				{fixed: "right", title: "操作", width: 190, align: "center", templet: bdTable.api.formatter.operate,buttons:[
-					{
-						name: 'edit',
-						title: '编辑',
-						text:'',
-						classname: 'layui-btn layui-bg-green layui-btn-xs',
-						icon: 'fa fa-pencil',
-						hidden: function (d) {
-							return false;
-						}
-					},
-					{
-						name: 'info',
-						title: '详情',
-						text:'详情',
-						classname: 'layui-btn layui-bg-bule layui-btn-xs',
-						icon: 'fa fa-trash',
-						url: '?parentid={id}',
-					}
-				]}
+				{fixed: "right", title: "操作", width: 190, align: "center", templet: bdTable.api.formatter.operate}
 			]],
 		})
-
+		// 展开全部
+		$(document).on('click', '#expandAll', function () {
+			var btn = $(this);
+			var isExpanded = btn.hasClass('expanded');
+			if(isExpanded) {
+				treeTable.expandAll('rule', false);
+				btn.removeClass('expanded');
+				btn.html('<i class="fa fa-plus"></i> {:__("Expendall")}');
+			} else {
+				treeTable.expandAll('rule', true);
+				btn.addClass('expanded');
+				btn.html('<i class="fa fa-minus"></i> {:__("Collapseall")}');
+			}
+		});
 	});
 </script>
