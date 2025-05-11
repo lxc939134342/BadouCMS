@@ -233,13 +233,13 @@ layui.define(['jquery', 'http'], function (exports) {
 
                 options = { url: http.api.fixurl(url), data: { action: action, ids: ids, params: params } };
                 http.api.ajax(options, function (data, ret) {
-                    table.trigger("uncheckbox");
                     var success = $(elem).data("success") || $.noop;
                     if (typeof success === 'function') {
                         if (false === success.call(elem, data, ret)) {
                             return false;
                         }
                     }
+
                     bdTable.api.events.toolbar.refresh(table.config.id);
                 }, function (data, ret) {
                     var error = $(elem).data("error") || $.noop;
@@ -336,7 +336,22 @@ layui.define(['jquery', 'http'], function (exports) {
                     },
                     // 删除
                     'btn-delone': function (id, obj) {
-                        console.log(obj);
+                        var table = bdTable.initTable;
+                        var data = obj.data;
+                        var top = $(this).offset().top - $(window).scrollTop();
+                        var left = $(this).offset().left - $(window).scrollLeft() - 260;
+                        if (top + 154 > $(window).height()) {
+                            top = top - 154;
+                        }
+                        if ($(window).width() < 480) {
+                            top = left = undefined;
+                        }
+                        Layer.confirm(__('Are you sure you want to delete this item?'), { icon: 3, title: __('Warning'), offset: [top, left], shadeClose: true, btn: [__('OK'), __('Cancel')] },
+                            function (index) {
+                                bdTable.api.multi("del", data[table.config.pk], table, this);
+                                Layer.close(index);
+                            }
+                        );
                     }
                 },
 

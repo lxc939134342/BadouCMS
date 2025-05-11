@@ -18,14 +18,14 @@ class Rule extends Backend
         $this->model = new AdminRule();
     }
 
-
     /**
      * 查看
      */
     public function index()
     {
         if ($this->isAjax()) {
-            $res = $this->model->withoutField('type,condition,remark,create_time,update_time')
+            $res = $this->model
+                    ->withoutField('type,condition,remark,create_time,update_time')
                     ->order('weigh DESC,id ASC')
                     ->select()->toArray();
             $total = count($res);
@@ -44,18 +44,9 @@ class Rule extends Backend
      */
     public function add()
     {
+        if ($this->isAjax()) {
+            parent::add();
+        }
         return $this->view->fetch();
-    }
-
-    public function edit()
-    {
-        p($this->request->param());
-        return $this->view->fetch();
-    }
-
-    public function del()
-    {
-        $id = $this->request->param('ids');
-        p($id);
     }
 }

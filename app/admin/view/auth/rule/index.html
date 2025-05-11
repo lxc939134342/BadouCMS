@@ -34,7 +34,7 @@
 <!-- 表格左侧按钮 toolbar  -->
 <script type="text/html" id="toolbar">
 	<div class="layui-btn-container">
-		<a href="javascript:;" lay-event="refresh" class="layui-btn layui-btn-sm layui-bg-black	"><i class="fa fa-refresh"></i></a>
+		<a href="javascript:;" lay-event="refresh" class="layui-btn layui-btn-sm btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
 		<button class="layui-btn layui-btn-sm layui-bg-green" lay-event="add"><i class="fa fa-plus"></i> {:__('Add')}</button>
 		<button class="layui-btn layui-btn-sm layui-bg-blue btn-disabled disabled {:$auth->check('auth.rule/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
 		<button class="layui-btn layui-btn-sm layui-bg-red btn-disabled disabled" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>

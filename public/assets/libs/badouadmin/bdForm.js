@@ -13,11 +13,9 @@ layui.define(['jquery', 'http', 'form'], function (exports) {
                     filter = submitBtn.attr('lay-filter');
 
                 $(".layer-footer [lay-submit],.fixed-footer [lay-submit],.normal-footer [lay-submit]", layform).removeClass("disabled");
-                console.log(form);
                 //验证通过提交表单
                 form.on('submit(' + filter + ')', function (data) {
                     submitBtn.addClass("disabled");
-                    console.log(submitBtn);
 
                     var submitResult = bdForm.api.submit(layform, function (data, ret) {
                         submitBtn.removeClass("disabled");
@@ -30,12 +28,14 @@ layui.define(['jquery', 'http', 'form'], function (exports) {
                             }
                         }
                         //提示及关闭当前窗口
-                        var msg = ret.hasOwnProperty("msg") && ret.msg !== "" ? ret.msg : '操作成功!';
-                        parent.Toastr.success(msg);
+                        var msg = ret.hasOwnProperty("msg") && ret.msg !== "" ? ret.msg : __('Operation completed');
+
+                        parent.layui.toast.success({ message: msg })
                         parent.$(".btn-refresh").trigger("click");
+
                         if (window.name) {
-                            var index = parent.Layer.getFrameIndex(window.name);
-                            parent.Layer.close(index);
+                            var index = parent.layer.getFrameIndex(window.name);
+                            parent.layer.close(index);
                         }
                         return false;
                     }, function (data, ret) {

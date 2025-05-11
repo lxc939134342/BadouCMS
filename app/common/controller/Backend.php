@@ -6,7 +6,6 @@ use app\BaseController;
 use app\common\library\AdminAuth;
 use app\common\traits\Jump;
 use app\common\traits\View as ViewTrait;
-use badou\Auth;
 use think\facade\Config;
 use think\facade\Event;
 use think\facade\Session;
@@ -16,9 +15,10 @@ class Backend extends BaseController
 {
     //引入视图方法
     use ViewTrait;
-
     //跳转
     use Jump;
+    // 引入后台控制器的通用方法
+    use \app\common\traits\Backend;
 
     /**
      * @var \think\View 视图类实例
@@ -210,5 +210,25 @@ class Backend extends BaseController
             return false;
         }
         return true;
+    }
+
+    /**
+     * 获取数据限制的管理员ID
+     * 禁用数据限制时返回的是null
+     * @return mixed
+     */
+    protected function getDataLimitAdminIds()
+    {
+        if (!$this->dataLimit) {
+            return null;
+        }
+        if ($this->auth->isSuperAdmin()) {
+            return null;
+        }
+        $adminIds = [];
+        if (in_array($this->dataLimit, ['auth', 'personal'])) {
+            $adminIds = $this->dataLimit == 'auth' ? $this->auth->getChildrenAdminIds(true) : [$this->auth->id];
+        }
+        return $adminIds;
     }
 }

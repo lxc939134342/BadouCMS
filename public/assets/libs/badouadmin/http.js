@@ -117,7 +117,7 @@ layui.define(function (exports) {
             open: function (url, title, options) {
                 title = options && options.title ? options.title : (title ? title : "");
                 url = Http.api.fixurl(url);
-                url = url + (url.indexOf("?") > -1 ? "&" : "?") + "view=1";
+                // url = url + (url.indexOf("?") > -1 ? "&" : "?") + "";
                 var area = Http.config.openArea != undefined ? Http.config.openArea : [$(window).width() > 800 ? '800px' : '95%', $(window).height() > 600 ? '600px' : '95%'];
                 var success = options && typeof options.success === 'function' ? options.success : $.noop;
                 if (options && typeof options.success === 'function') {

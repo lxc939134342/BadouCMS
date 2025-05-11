@@ -80,11 +80,13 @@
 
 <!-- 框 架 初 始 化 -->
 <script>
-	layui.use(['admin','jquery','popup','badou'], function() {
+	layui.use(['admin','jquery','popup','badou','toast'], function() {
 		var admin = layui.admin;
 		var popup = layui.popup;
 		var $ = layui.jquery;
 		var Badou = layui.badou;
+		var toast= layui.toast;
+
 		// yml | json | api
 		admin.setConfigurationPath(Config.app_url+"/index/adminConfig");
 		console.log(Badou)

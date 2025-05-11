@@ -1,22 +1,23 @@
 <?php
-// 应用公共文件
-use think\facade\Lang;
-use think\Response;
-use voku\helper\AntiXSS;
 
-function p($vars,$halt=0)
+// 应用公共文件
+use think\Response;
+use think\facade\Lang;
+use voku\helper\AntiXSS;
+use think\exception\HttpResponseException;
+
+function p($vars, $halt = 0)
 {
     if (is_array($vars)) {
-        foreach ($vars as $var) {
-            echo '<pre>';
-            print_r($var);
-            echo '</pre>';
-        }
+        echo '<pre>';
+        print_r($vars);
+        echo '</pre>';
     } else {
         var_dump($vars);
     }
-    if ($halt)
-    throw new HttpResponseException(Response::create());
+    if ($halt) {
+        throw new HttpResponseException(Response::create());
+    }
 }
 
 if (!function_exists('__')) {
