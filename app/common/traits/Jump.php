@@ -90,13 +90,13 @@ trait Jump
      * @param array $data
      * @param int $code
      */
-    protected function result($msg='',$data=[],$count=0,$code=0)
+    protected function result($msg = '', $data = [], $count = 0, $code = 1)
     {
         $result = [
             'code' => $code,
             'msg'  => $msg,
             'data' => $data,
-            'count'=>$count?:count($data)
+            'count' => $count ?: count($data)
         ];
         $response = Response::create($result, 'json');
         throw new HttpResponseException($response);

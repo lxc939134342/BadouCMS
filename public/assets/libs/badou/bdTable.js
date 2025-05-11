@@ -42,6 +42,20 @@ layui.define(['jquery', 'http'], function (exports) {
             options.pk = options.pk || 'id';
             options.cols = options.cols || [];
             options.url = options.url || '';
+            // 后端返回数据格式
+            if (typeof options.parseData !== 'function') {
+                options.parseData = function (res) {
+                    var code = res.code;
+                    //兼容后端返回数据格式 1 成功 0 失败
+                    code == 1 ? code = 0 : code = -1;
+                    return {
+                        "code": code, // 解析接口状态
+                        "msg": res.msg, // 解析提示文本
+                        "count": res.count, // 解析数据长度
+                        "data": res.data // 解析数据列表
+                    };
+                }
+            }
 
             bdTable.initTable = bdTable.table.render(options);
             bdTable.table_elem = options.elem;
