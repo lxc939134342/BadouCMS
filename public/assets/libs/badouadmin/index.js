@@ -6,10 +6,11 @@ window.rootPath = (function (src) {
 })();
 
 layui.config({
-    base: rootPath ,
+    base: rootPath,
     version: "1.0.0"
 }).extend({
-    lang:"lang",
+    lang: "lang",
     http: "http",
     bdTable: "bdTable",
+    bdForm: "bdForm",
 }).use([], function () { });

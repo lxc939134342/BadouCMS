@@ -154,7 +154,7 @@ layui.define(function (exports) {
                                     var target = layerfooter[0];
                                     // 创建观察者对象
                                     var observer = new MutationObserver(function (mutations) {
-                                        Fast.api.layerfooter(layero, index, that);
+                                        Http.api.layerfooter(layero, index, that);
                                         mutations.forEach(function (mutation) {
                                         });
                                     });
@@ -193,21 +193,19 @@ layui.define(function (exports) {
             layerfooter: function (layero, index, that) {
                 var frame = Layer.getChildFrame('html', index);
                 var layerfooter = frame.find(".layer-footer");
+
                 if (layerfooter.length > 0) {
                     $(".layui-layer-footer", layero).remove();
                     var footer = $("<div />").addClass('layui-layer-btn layui-layer-footer');
                     footer.html(layerfooter.html());
-                    if ($(".row", footer).length === 0) {
-                        $(">", footer).wrapAll("<div class='row'></div>");
-                    }
                     footer.insertAfter(layero.find('.layui-layer-content'));
                     //绑定事件
-                    footer.on("click", ".btn", function () {
+                    footer.on("click", ".layui-btn", function () {
                         if ($(this).hasClass("disabled") || $(this).parent().hasClass("disabled")) {
                             return;
                         }
-                        var index = footer.find('.btn').index(this);
-                        $(".btn:eq(" + index + ")", layerfooter).trigger("click");
+                        var index = footer.find('.layui-btn').index(this);
+                        $(".layui-btn:eq(" + index + ")", layerfooter).trigger("click");
                     });
 
                     var titHeight = layero.find('.layui-layer-title').outerHeight() || 0;
@@ -263,7 +261,39 @@ layui.define(function (exports) {
                 }
                 return text;
             }
+        },
+        init: function () {
+            // jQuery兼容处理
+            $.fn.extend({
+                size: function () {
+                    return $(this).length;
+                }
+            });
+            // 对相对地址进行处理
+            $.ajaxSetup({
+                beforeSend: function (xhr, setting) {
+                    setting.url = Http.api.fixurl(setting.url);
+                }
+            });
+            Layer.config({
+                skin: 'layui-layer-badouadmin'
+            });
+            // 绑定ESC关闭窗口事件
+            $(window).keyup(function (e) {
+                if (e.keyCode == 27) {
+                    if ($(".layui-layer").length > 0) {
+                        var index = 0;
+                        $(".layui-layer").each(function () {
+                            index = Math.max(index, parseInt($(this).attr("times")));
+                        });
+                        if (index) {
+                            Layer.close(index);
+                        }
+                    }
+                }
+            });
         }
     };
+    Http.init();
     exports('http', Http);
 });

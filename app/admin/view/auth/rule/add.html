@@ -79,10 +79,17 @@
             <input type="radio" name="row[status]" value="0" title="隐藏">
         </div>
     </div>
-    <div class="layui-form-item layer-footer">
+    <div class="layui-form-item layer-footer hide">
         <div class="layui-input-block">
             <button class="layui-btn disabled" lay-submit>立即提交</button>
             <button type="reset" class="layui-btn layui-btn-primary">重置</button>
         </div>
     </div>
 </form>
+
+<script>
+    layui.use(['badou'],function () {
+        var bdForm = layui.bdForm;
+        bdForm.api.bindevent($("form.layui-form"));
+    })
+</script>

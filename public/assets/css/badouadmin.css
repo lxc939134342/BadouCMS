@@ -43,3 +43,45 @@
 .invisible {
     visibility: hidden;
 }
+.layui-layer-footer {
+    text-align: left !important;
+}
+.badouadmin-form-body {
+    padding: 15px;
+}
+.badouadmin-form-body .layui-form {
+    padding-bottom: 15px;
+}
+
+/* 弹窗样式 s */
+.layui-layer-badouadmin .layui-layer-title {
+    background-color: var(--global-primary-color) !important;
+    color: #fff !important;
+}
+.layui-layer-badouadmin .layui-layer-footer {
+    padding: 8px 20px;
+    background-color: #fafaf9;
+    height: auto;
+    text-align: inherit !important;
+}
+.layui-layer-badouadmin .layui-layer-footer .layui-btn {
+    height: 36px;
+    line-height: 36px;
+    padding: 0 12px;
+    font-size: 13px;
+}
+.layui-layer-badouadmin .layui-layer-setwin span {
+    color: #fff;
+}
+.layui-layer-badouadmin .layui-layer-setwin .layui-layer-min::before {
+    border-bottom: 1px solid #fff;
+}
+.layui-layer-badouadmin .layui-layer-setwin .layui-layer-max::before,
+.layui-layer-badouadmin .layui-layer-setwin .layui-layer-max::after {
+    border: 1px solid #fff;
+    color: #fff;
+}
+.layui-layer-badouadmin .layui-layer-setwin .layui-layer-max::after {
+    background: none !important;
+}
+/* 弹窗样式 e */

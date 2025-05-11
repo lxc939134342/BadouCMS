@@ -1,13 +1,14 @@
 <?php
 
 namespace app\admin\controller;
+
 use app\common\controller\Backend;
+
 class Dashboard extends Backend
 {
     public function index()
     {
-        if($this->request->isAjax()){
-            dump(111);
+        if ($this->isAjax()) {
         }
         return $this->view->fetch();
     }
