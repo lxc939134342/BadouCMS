@@ -39,7 +39,7 @@ class Backend extends BaseController
 
     /**
      * 权限控制类
-     * @var Auth
+     * @var AdminAuth
      */
     protected $auth = null;
 
@@ -109,12 +109,6 @@ class Backend extends BaseController
      */
     protected $importHeadType = 'comment';
 
-    /**
-     * 内容页面布局模板
-     * @var string
-     */
-    protected $layout = 'content';
-
     public function initialize()
     {
         $this->view     = View::instance();
@@ -149,10 +143,6 @@ class Backend extends BaseController
                     $this->error(__('You have no permission'));
                 }
             }
-        }
-        // 如果有使用模板布局
-        if ($this->layout) {
-            $this->view->engine()->layout('common/' . $this->layout);
         }
 
         // 语言检测

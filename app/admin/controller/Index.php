@@ -12,11 +12,10 @@ class Index extends Backend
     protected $noNeedLogin = ['login'];
     protected $noNeedRight = ['index', 'logout','adminConfig'];
 
-    protected $layout='';
     public function index()
     {
-        if($this->request->isAjax()){
-            $menus=$this->auth->getMenus($this->auth->id);
+        if ($this->request->isAjax()) {
+            $menus = $this->auth->getMenus($this->auth->id);
             return json($menus);
         }
         return $this->view->fetch();
@@ -97,16 +96,17 @@ class Index extends Backend
         return response($adminConfig, 200, [], 'json');
     }
 
-    public function login(){
+    public function login()
+    {
         $url = $this->request->get('url', '', 'url_clean');
         $url = $url ?: rtrim(url("/", [], false), '/');
         if ($this->auth->isLogin()) {
             $this->success(__("You've logged in, do not login again"), $url);
         }
-        if($this->isAjax()){
+        if ($this->isAjax()) {
             $username = $this->request->post('username');
             $password = $this->request->post('password', '', null);
-            $keeplogin = $this->request->post('keeplogin',false);
+            $keeplogin = $this->request->post('keeplogin', false);
             //验证token
             if (!$this->request->checkToken('__token__')) {
                 $this->error(__('Token verification error'), $url, ['token' => $this->request->buildToken()]);
@@ -119,19 +119,19 @@ class Index extends Backend
                 'username.require' => '请输入用户名',
                 'password.require' => '请输入密码',
             ];
-            $data=[
-                'username'=>$username,
-                'password'=>$password,
+            $data = [
+                'username' => $username,
+                'password' => $password,
             ];
-            $validate = validate($rule,$msg);
-            if(!$validate->check($data)){
-                $this->error($validate->getError(),$url,['token'=>$this->request->buildToken()]);
+            $validate = validate($rule, $msg);
+            if (!$validate->check($data)) {
+                $this->error($validate->getError(), $url, ['token' => $this->request->buildToken()]);
             }
             AdminLog::instance()->setTitle(__('Login'));
-            $admin_keep_time= Config::get('badouadmin.admin_keep_time');
+            $admin_keep_time = Config::get('badouadmin.admin_keep_time');
             $result = $this->auth->login($username, $password, $keeplogin ? $admin_keep_time : 0);
             if ($result === true) {
-                Event::trigger('admin_login_arter',$this->request);
+                Event::trigger('admin_login_arter', $this->request);
                 $this->success(__('Login successful'), $url, ['url' => $url, 'id' => $this->auth->id, 'username' => $username, 'avatar' => $this->auth->avatar]);
             } else {
                 $msg = $this->auth->getError();
@@ -146,7 +146,7 @@ class Index extends Backend
     {
         if ($this->isAjax()) {
             $this->auth->logout();
-            Event::trigger('admin_logout_after',$this->request);
+            Event::trigger('admin_logout_after', $this->request);
             $this->success(__('Logout successful'), 'index/login');
         }
     }
