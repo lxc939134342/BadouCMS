@@ -90,11 +90,12 @@
 
 		<!-- 框 架 初 始 化 -->
 		<script>
-			layui.use(['admin','jquery','popup','drawer','badou'], function() {
+			layui.use(['admin','jquery','popup','drawer','badou','toast'], function() {
 				var $ = layui.jquery;
 				var admin = layui.admin;
 				var popup = layui.popup;
 				var Badou = layui.badou;
+				var toast = layui.toast;
 
 				admin.setConfigPath(Config.app_url+"/index/adminConfig");
 
@@ -105,14 +106,22 @@
                     Badou.api.ajax({
                         url:"{:url('index/logout')}"
                     },function (ret,res){
-                        popup.success(res.msg,function(){
-                            location.href = res.url;
-                        })
+						toast.success({
+							message:res.msg,
+							timeout:500,
+							onClosing:function (){
+								location.href = res.url;
+							}
+						})
                         return false;
                     },function (ret,res){
-                        popup.error(res.msg,function(){
-                            location.href = res.url;
-                        })
+						toast.error({
+							message:res.msg,
+							timeout:500,
+							onClosing:function (){
+								location.href = res.url;
+							}
+						})
                         return false;
                     })
 					// 注销逻辑 返回 true / false

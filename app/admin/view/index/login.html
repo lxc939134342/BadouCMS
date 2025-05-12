@@ -70,19 +70,19 @@
         </div>
 
         <script>
-            layui.use(["form", "button", "popup", "toast", "badou"], function () {
+            layui.use(["form", "button", "toast", "badou"], function () {
                 var form = layui.form;
                 var button = layui.button;
-                var popup = layui.popup;
+                var toast = layui.toast;
                 var Badou = layui.badou;
 
                 // 刷新验证码函数
                 function refreshCaptcha() {
-                    $('.verification-img').attr('src', '{:captcha_src()}?r=' + Math.random());
+                    $(".verification-img").attr("src", "{:captcha_src()}?r=" + Math.random());
                 }
 
                 // 点击验证码刷新
-                $('.verification-img').click(function() {
+                $(".verification-img").click(function () {
                     refreshCaptcha();
                 });
 
@@ -101,8 +101,12 @@
                         function (ret, res) {
                             if (res.code == 1) {
                                 btn.stop();
-                                popup.success(res.msg, function () {
-                                    window.location.href = res.url;
+                                toast.success({
+                                    message: res.msg,
+                                    timeout: 500,
+                                    onClosing: function () {
+                                        window.location.href = res.url;
+                                    },
                                 });
                             } else {
                                 // 登录失败时刷新验证码
@@ -112,9 +116,9 @@
                             return false;
                         },
                         function (data) {
-							btn.stop();
-							// 登录失败时刷新验证码
-							refreshCaptcha();
+                            btn.stop();
+                            // 登录失败时刷新验证码
+                            refreshCaptcha();
                             if (data.token) {
                                 $("#token").val(data.token);
                             }

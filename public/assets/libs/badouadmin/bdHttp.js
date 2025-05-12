@@ -1,5 +1,6 @@
 layui.define(function (exports) {
     var Layer = layui.layer;
+    var toast = layui.toast;
     var bdHttp = {
         config: {
 
@@ -15,7 +16,7 @@ layui.define(function (exports) {
                     if (result === false)
                         return;
                 }
-                layer.msg(msg);
+                toast.success({ message: ret.msg });
             },
             //请求错误的回调
             onAjaxError: function (ret, onAjaxError) {
@@ -26,7 +27,7 @@ layui.define(function (exports) {
                         return;
                     }
                 }
-                layer.msg(ret.msg);
+                toast.error({ message: ret.msg });
             },
             //服务器响应数据后
             onAjaxResponse: function (response) {
