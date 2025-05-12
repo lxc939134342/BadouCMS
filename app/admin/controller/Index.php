@@ -106,30 +106,31 @@ class Index extends Backend
         if ($this->isAjax()) {
             $username = $this->request->post('username');
             $password = $this->request->post('password', '', null);
+            $captcha = $this->request->post('captcha');
             $keeplogin = $this->request->post('keeplogin', false);
             //验证token
             if (!$this->request->checkToken('__token__')) {
                 $this->error(__('Token verification error'), $url, ['token' => $this->request->buildToken()]);
             }
             $rule = [
-                'username'  => 'require',
-                'password'  => 'require',
-            ];
-            $msg = [
-                'username.require' => '请输入用户名',
-                'password.require' => '请输入密码',
+                'username|用户名'  => 'require',
+                'password|密码'  => 'require',
+                'captcha|验证码'   => 'require|captcha',
             ];
             $data = [
                 'username' => $username,
                 'password' => $password,
+                'captcha'  => $captcha,
             ];
-            $validate = validate($rule, $msg);
+            $validate = validate($rule, [], false, false);
             if (!$validate->check($data)) {
                 $this->error($validate->getError(), $url, ['token' => $this->request->buildToken()]);
             }
+
             AdminLog::instance()->setTitle(__('Login'));
             $admin_keep_time = Config::get('badouadmin.admin_keep_time');
             $result = $this->auth->login($username, $password, $keeplogin ? $admin_keep_time : 0);
+
             if ($result === true) {
                 Event::trigger('admin_login_arter', $this->request);
                 $this->success(__('Login successful'), $url, ['url' => $url, 'id' => $this->auth->id, 'username' => $username, 'avatar' => $this->auth->avatar]);

@@ -30,7 +30,8 @@
         "ext-iconv": "*",
         "ext-json": "*",
         "ext-gd": "*",
-        "topthink/think-view": "^2.0"
+        "topthink/think-view": "^2.0",
+        "topthink/think-captcha": "^3.0"
     },
     "require-dev": {
         "symfony/var-dumper": "^5.4",
