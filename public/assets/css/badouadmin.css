@@ -1,7 +1,7 @@
 .layui-tab-item {
-    margin: 15px;
+    /* margin: 15px; */
     background: #fff;
-    padding: 15px;
+    /* padding: 15px; */
 }
 .layui-btn + .layui-btn {
     margin-left: 0;
@@ -11,7 +11,15 @@
 }
 .layui-table-cell {
     padding: 10px 15px;
-    height: 48px;
+    margin-right: -1px;
+}
+.layui-table th:last-child,
+.layui-table td:last-child {
+    border-right: 0;
+}
+
+.layui-table-view::after {
+    width: 0;
 }
 .layui-table-header {
     border-bottom: 1px solid #ddd;

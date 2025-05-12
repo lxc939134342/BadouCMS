@@ -34,7 +34,6 @@ use think\facade\Request;
  */
 class Auth
 {
-
     /**
      * @var object 对象实例
      */
@@ -273,7 +272,9 @@ class Auth
     public function getOriginAuthRules(int $uid): array
     {
         $ids = $this->getRuleIds($uid);
-        if (empty($ids)) return [];
+        if (empty($ids)) {
+            return [];
+        }
 
         $where   = [];
         $where[] = ['status', '=', 'normal'];
@@ -294,7 +295,7 @@ class Auth
             app_path() . 'lang' . DIRECTORY_SEPARATOR . $lang . DIRECTORY_SEPARATOR . 'auth' . DIRECTORY_SEPARATOR . 'rule.php',
         ]);
         foreach ($rules as $key => &$rule) {
-            $rule['href'] ='';
+            $rule['href'] = '';
             if (!$rule['url']) {
                 $rule['href'] = (string)url('/'.$rule['name']);
             }
@@ -334,7 +335,9 @@ class Auth
         }
 
         // 没有根菜单规则
-        if (!isset($this->children[0])) return [];
+        if (!isset($this->children[0])) {
+            return [];
+        }
 
         return $this->getChildren($this->children[0]);
     }

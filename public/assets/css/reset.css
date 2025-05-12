@@ -14,24 +14,24 @@
     border-color: var(--global-primary-color);
 }
 
-.layui-form-radio:hover>*,
-.layui-form-radioed>i,
+.layui-form-radio:hover > *,
+.layui-form-radioed > i,
 .layui-form-radioed {
     color: var(--global-primary-color) !important;
 }
 
-.layui-form-checked[lay-skin=primary]>i {
+.layui-form-checked[lay-skin="primary"] > i {
     border-color: var(--global-primary-color) !important;
     background-color: var(--global-primary-color);
     color: #fff;
 }
 
-.layui-form-checkbox[lay-skin=primary]>.layui-icon-indeterminate,
-.layui-form-checkbox[lay-skin=primary]>.layui-icon-indeterminate:hover {
+.layui-form-checkbox[lay-skin="primary"] > .layui-icon-indeterminate,
+.layui-form-checkbox[lay-skin="primary"] > .layui-icon-indeterminate:hover {
     border-color: var(--global-primary-color);
 }
 
-.layui-form-checkbox[lay-skin=primary]>.layui-icon-indeterminate:before {
+.layui-form-checkbox[lay-skin="primary"] > .layui-icon-indeterminate:before {
     background-color: var(--global-primary-color);
 }
 
@@ -72,7 +72,8 @@
     background-color: #f8f8f8;
 }
 
-.layui-input:focus, .layui-textarea:focus {
+.layui-input:focus,
+.layui-textarea:focus {
     border-color: var(--global-primary-color) !important;
     box-shadow: 0 0 0 3px rgb(from var(--global-primary-color) r g b / 8%);
 }
@@ -81,15 +82,17 @@
     color: var(--global-primary-color);
 }
 
-.layui-input-wrap .layui-input:focus+.layui-input-split {
-    border-color: var(--global-primary-color)
+.layui-input-wrap .layui-input:focus + .layui-input-split {
+    border-color: var(--global-primary-color);
 }
 
-.layui-form-checked:hover>div, .layui-form-checked>div {
+.layui-form-checked:hover > div,
+.layui-form-checked > div {
     background-color: var(--global-primary-color);
 }
 
-.layui-form-checked:hover>i, .layui-form-checked>i {
+.layui-form-checked:hover > i,
+.layui-form-checked > i {
     color: var(--global-primary-color);
 }
 
@@ -105,15 +108,18 @@
     color: var(--global-primary-color);
 }
 
-.layui-laypage input:focus, .layui-laypage select:focus {
+.layui-laypage input:focus,
+.layui-laypage select:focus {
     border-color: var(--global-primary-color) !important;
 }
 
-.layui-laydate .layui-this, .layui-laydate .layui-this>div {
+.layui-laydate .layui-this,
+.layui-laydate .layui-this > div {
     background-color: var(--global-primary-color) !important;
 }
 
-.layui-laydate-header i:hover, .layui-laydate-header span:hover {
+.layui-laydate-header i:hover,
+.layui-laydate-header span:hover {
     color: var(--global-primary-color);
 }
 
@@ -121,11 +127,12 @@
     color: var(--global-primary-color);
 }
 
-.layui-tab-brief>.layui-tab-title .layui-this {
+.layui-tab-brief > .layui-tab-title .layui-this {
     color: var(--global-primary-color);
 }
 
-.layui-tab-brief>.layui-tab-more li.layui-this:after, .layui-tab-brief>.layui-tab-title .layui-this:after {
+.layui-tab-brief > .layui-tab-more li.layui-this:after,
+.layui-tab-brief > .layui-tab-title .layui-this:after {
     border-bottom: 2px solid var(--global-primary-color);
 }
 
@@ -133,6 +140,6 @@
     background-color: var(--global-primary-color);
 }
 
-.layui-form-checkbox[lay-skin=primary]:hover>i {
+.layui-form-checkbox[lay-skin="primary"]:hover > i {
     border-color: var(--global-primary-color);
 }

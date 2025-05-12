@@ -1,8 +1,8 @@
-layui.define(['jquery', 'http'], function (exports) {
+layui.define(['jquery', 'bdHttp'], function (exports) {
     "use strict";
     var MOD_NAME = 'bdTable',
         $ = layui.jquery,
-        http = layui.http,
+        http = layui.bdHttp,
         Layer = layui.layer,
         laytpl = layui.laytpl;
 

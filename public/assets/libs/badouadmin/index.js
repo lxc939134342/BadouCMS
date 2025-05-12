@@ -10,7 +10,8 @@ layui.config({
     version: "1.0.0"
 }).extend({
     lang: "lang",
-    http: "http",
+    bdhttp: "bdHttp",
     bdTable: "bdTable",
     bdForm: "bdForm",
+    badou: "badou",
 }).use([], function () { });
