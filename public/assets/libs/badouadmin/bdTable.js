@@ -44,6 +44,30 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
             options.pk = options.pk || 'id';
             options.cols = options.cols || [];
             options.url = options.url || '';
+            options.searchFormVisible = options.searchFormVisible || false;
+            options.commonSearch = options.commonSearch || true;
+            options.defaultToolbar = options.defaultToolbar || [
+                "filter",
+                "exports",
+                "print", // 内置工具
+            ];
+
+            // 高级搜索按钮
+            if (options.commonSearch) {
+                options.defaultToolbar.push({
+                    title: __('Common Search'),
+                    layEvent: 'LAYTABLE_SEARCH',
+                    icon: 'layui-icon-search',
+                    onClick: function (obj) {
+                        tableSearch.toggle()
+                    }
+                });
+            }
+            //是否始终显示高级搜索表单
+            if (options.searchFormVisible) {
+                tableSearch.set({ visible: options.searchFormVisible })
+            }
+
             // 后端返回数据格式
             if (typeof options.parseData !== 'function') {
                 options.parseData = function (res) {
@@ -63,7 +87,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
             bdTable.table_elem = options.elem;
 
             // 渲染搜索表单
-            tableSearch(
+            tableSearch.render(
                 {
                     elem: bdTable.table_elem,
                     columns: options.cols[0]

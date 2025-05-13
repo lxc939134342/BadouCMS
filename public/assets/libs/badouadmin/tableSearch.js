@@ -10,7 +10,7 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
             elem: null,
             action: "",
             template: "",
-            visible: true,
+            visible: false,
             renderDefault: true
         },
 
@@ -30,7 +30,7 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
             }
 
             var html = that._createForm(that.config.columns);
-            var modal = '<div class="layui-card layui-form layui-commonsearch ' + (that.config.visible ? '' : 'layui-hide') + '">' + html + '</div>';
+            var modal = '<div class="layui-card layui-form badouadmin-commonsearch ' + (that.config.visible ? '' : 'layui-hide') + '">' + html + '</div>';
             $(that.config.elem).before(modal);
 
             that._bindEvents();
@@ -246,11 +246,9 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
         },
 
         toggle: function () {
-            $('.layui-commonsearch').toggleClass('layui-hide');
+            $('.badouadmin-commonsearch').toggleClass('layui-hide');
         }
     };
 
-    exports('tableSearch', function (options) {
-        return CommonSearch.render(options);
-    });
+    exports('tableSearch', CommonSearch);
 });

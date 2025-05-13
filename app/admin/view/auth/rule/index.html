@@ -39,22 +39,6 @@
             pk: "id",
             even: true,
             toolbar: "#toolbar",
-            defaultToolbar: [
-                "filter",
-                "exports",
-                "print", // 内置工具
-                {
-                    // 扩展工具
-                    title: "高级搜索", // 标题
-                    name: "tips", // name
-                    layEvent: "LAYTABLE_TIPS", // 事件标识
-                    icon: "layui-icon-search", // 图标 className
-                    onClick: function (obj) {
-                        // 点击事件 - 2.9.12+
-                        console.log(obj); // 查看返回的对象成员
-                    },
-                },
-            ],
             tree: {
                 customName: {
                     children: "childlist",
