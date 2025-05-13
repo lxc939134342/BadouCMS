@@ -132,8 +132,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     }
                     return false;
                 })
-                // // 监听表格开关切换
-                // bdTable.events.switch(options, tableId);
+
 
             },
             // 表格格式化
@@ -180,7 +179,11 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         var value = undefined;
                     }
                     var checked = value === that.checked ? 'checked' : '';
-                    return laytpl('<input type="checkbox" name="' + that.field + '" value="' + data.id + '" lay-skin="switch" data-field="' + that.field + '" lay-text="' + that.tips + '" lay-filter="' + that.filter + '" ' + checked + ' >').render(data);
+                    var html = laytpl('<input type="checkbox" name="' + that.field + '" value="' + data.id + '" lay-skin="switch" data-field="' + that.field + '" lay-text="' + that.tips + '" lay-filter="' + that.filter + '" ' + checked + ' >').render(data);
+
+                    // 监听表格开关切换
+                    bdTable.api.events.switch(that.filter);
+                    return html
                 },
                 status: function (data) {
                     var custom = { normal: 'success', hidden: 'gray', deleted: 'danger', locked: 'info' };
@@ -391,29 +394,27 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     }
                 },
 
-                switch: function (option, id) {
-                    console.log(option)
-                    var modifyReload = option.modifyReload || false;
-                    // layui.form.on('switch(switchStatus)', function(obj) {
-                    //     var that = $(this);
-                    //     var url = $(this).attr('data-url') || option.init.multi_url;
-                    //     var field = $(this).attr('data-field') || 'status';
-                    //     var data = {
-                    //         id: obj.value,
-                    //         param: field + '=' + (obj.elem.checked ? 1 : 0),
-                    //     };
-                    //     Yzn.api.ajax({
-                    //         url: url,
-                    //         data: data,
-                    //     }, function(data, ret) {
-                    //         if (modifyReload) {
-                    //             layui.table.reload(tableId);
-                    //         }
-                    //     }, function(data, ret) {
-                    //         that.trigger('click');
-                    //         layui.form.render('checkbox');
-                    //     });
-                    // });
+                switch: function (filter) {
+                    var table = bdTable.initTable;
+                    var id = table.config.id;
+                    layui.form.on('switch(' + filter + ')', function (obj) {
+                        var that = $(this);
+                        var url = $(this).attr('data-url') || bdTable.extend.multi_url;
+                        var field = $(this).attr('data-field') || 'status';
+                        var data = {
+                            ids: obj.value,
+                            params: field + '=' + (obj.elem.checked ? 1 : 0),
+                        };
+                        http.api.ajax({
+                            url: url,
+                            data: data,
+                        }, function (data, ret) {
+                            bdTable.api.events.toolbar.refresh(id);
+                        }, function (data, ret) {
+                            that.trigger('click');
+                            layui.form.render('checkbox');
+                        });
+                    });
                 }
             },
             buttonlink: function (data, buttons, type) {
