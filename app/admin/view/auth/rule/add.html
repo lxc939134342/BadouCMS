@@ -12,14 +12,16 @@
         <label class="layui-form-label">上级菜单</label>
         <div class="layui-input-block">
             <select name="row[pid]" lay-verify="required">
-                <option value="0">作为一级菜单</option>
+                {foreach name="$ruledata"  item="vo"}
+                <option value="{$key}">{$vo |raw}</option>
+                {/foreach}
             </select>
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">规则</label>
         <div class="layui-input-block">
-            <input type="text" name="row[name]" lay-verify="required" autocomplete="off"  data-placeholder-node="控制器/方法名,如果有目录请使用 目录名.控制器名/方法名" data-placeholder-menu="父级菜单无需匹配控制器和方法,子级菜单请使用控制器名" class="layui-input">
+            <input type="text" name="row[name]" lay-verify="required" autocomplete="off"  placeholder="控制器/方法名,如果有目录请使用 目录名.控制器名/方法名" class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
@@ -49,10 +51,10 @@
     </div>
     <div class="layui-form-item" data-type="menu">
         <label class="layui-form-label">菜单类型</label>
-        <!-- <div class="layui-input-block">
+        <div class="layui-input-block">
             <input type="radio" name="row[menutype]" value="_iframe" title="选项卡(默认)" checked>
             <input type="radio" name="row[menutype]" value="_blank" title="链接">
-        </div> -->
+        </div>
     </div>
     <div class="layui-form-item" data-type="menu">
         <label class="layui-form-label">扩展属性</label>
@@ -75,8 +77,8 @@
     <div class="layui-form-item">
         <label class="layui-form-label">是否显示</label>
         <div class="layui-input-block">
-            <input type="radio" name="row[status]" value="1" title="显示" checked>
-            <input type="radio" name="row[status]" value="0" title="隐藏">
+            <input type="radio" name="row[status]" value="normal" title="显示" checked>
+            <input type="radio" name="row[status]" value="hidden" title="隐藏">
         </div>
     </div>
     <div class="layui-form-item layer-footer hide">

@@ -1,40 +1,4 @@
 {layout name="layout/default" /}
-<div class="layui-card">
-    <div class="layui-card-body">
-        <form class="layui-form" action="">
-            <div class="layui-form-item">
-                <div class="layui-form-item layui-inline">
-                    <label class="layui-form-label">用户名</label>
-                    <div class="layui-input-inline">
-                        <input type="text" name="realName" placeholder="" class="layui-input" />
-                    </div>
-                </div>
-                <div class="layui-form-item layui-inline">
-                    <label class="layui-form-label">性别</label>
-                    <div class="layui-input-inline">
-                        <input type="text" name="realName" placeholder="" class="layui-input" />
-                    </div>
-                </div>
-                <div class="layui-form-item layui-inline">
-                    <label class="layui-form-label">邮箱</label>
-                    <div class="layui-input-inline">
-                        <input type="text" name="realName" placeholder="" class="layui-input" />
-                    </div>
-                </div>
-                <div class="layui-form-item layui-inline">
-                    <button class="pear-btn pear-btn-md pear-btn-primary" lay-submit lay-filter="role-query">
-                        <i class="layui-icon layui-icon-search"></i>
-                        查询
-                    </button>
-                    <button type="reset" class="pear-btn pear-btn-md">
-                        <i class="layui-icon layui-icon-refresh"></i>
-                        重置
-                    </button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
 
 <!-- 表格 -->
 <div class="layui-card">
@@ -75,7 +39,6 @@
             pk: "id",
             even: true,
             toolbar: "#toolbar",
-			skin:'grid',
             defaultToolbar: [
                 "filter",
                 "exports",
@@ -110,15 +73,15 @@
                 [
                     { type: "checkbox" },
                     { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "title", title: "标题" },
-                    { field: "name", title: "规则", width: 100 },
-                    { field: "icon", title: "图标", width: 150, templet: bdTable.api.formatter.icon },
-                    { field: "weigh", title: "权重", width: 100 },
+                    { field: "title", title: "标题",searchType:'remoteSelect' },
+                    { field: "name", title: "规则", width: 300, searchType:'remoteSelect',extend:'data-source="auth.rule/selectpage" data-field="title" data-multiple="false" data-is-tree="1"' },
+                    { field: "icon", title: "图标", width: 150, templet: bdTable.api.formatter.icon,operate:false },
+                    { field: "weigh", title: "权重", width: 100,operate:'BETWEEN' },
                     {
                         field: "status",
                         title: "状态",
                         width: 100,
-                        selectList: { normal: "正常", hidden: "隐藏" },
+                        searchList: { normal: "正常", hidden: "隐藏" },
                         custom: { normal: "green", hidden: "orange" },
                         templet: bdTable.api.formatter.status,
                     },

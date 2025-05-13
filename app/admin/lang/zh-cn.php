@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'View'                                                  => '查看',
     'Add'                                                   => '添加',
     'Edit'                                                  => '编辑',
     'Del'                                                   => '删除',
@@ -42,6 +43,10 @@ return [
     'Operation failed'                                      => '操作失败!',
     'Add successful'                                        => '添加成功!',
     'Add failed'                                            => '添加失败!',
-    'Edit successful'                                       => '编辑成功!',
-    'Edit failed'                                           => '编辑失败!',
+    'Update successful'                                     => '更新成功!',
+    'Update failed'                                         => '更新失败!',
+    'Delete successful'                                     => '删除成功!',
+    'Delete failed'                                         => '删除失败!',
+    'None'                                                  => '无',
+
 ];

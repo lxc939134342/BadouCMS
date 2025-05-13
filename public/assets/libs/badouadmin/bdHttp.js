@@ -1,4 +1,4 @@
-layui.define(function (exports) {
+layui.define(['toast'], function (exports) {
     var Layer = layui.layer;
     var toast = layui.toast;
     var bdHttp = {
@@ -16,7 +16,7 @@ layui.define(function (exports) {
                     if (result === false)
                         return;
                 }
-                toast.success({ message: ret.msg });
+                toast.success({ message: msg });
             },
             //请求错误的回调
             onAjaxError: function (ret, onAjaxError) {
@@ -27,6 +27,8 @@ layui.define(function (exports) {
                         return;
                     }
                 }
+
+
                 toast.error({ message: ret.msg });
             },
             //服务器响应数据后

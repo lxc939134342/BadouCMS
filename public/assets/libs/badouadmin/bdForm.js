@@ -1,5 +1,5 @@
-layui.define(['jquery', 'http', 'form'], function (exports) {
-    var http = layui.http;
+layui.define(['jquery', 'bdHttp', 'form'], function (exports) {
+    var http = layui.bdHttp;
     var form = layui.form;
     var bdForm = {
         events: {

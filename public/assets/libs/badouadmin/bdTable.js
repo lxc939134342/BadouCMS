@@ -1,10 +1,12 @@
-layui.define(['jquery', 'bdHttp'], function (exports) {
+layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
     "use strict";
     var MOD_NAME = 'bdTable',
         $ = layui.jquery,
         http = layui.bdHttp,
         Layer = layui.layer,
+        tableSearch = layui.tableSearch,
         laytpl = layui.laytpl;
+
 
     var bdTable = {
         // 导入layui的table 或者 treeTable
@@ -59,6 +61,15 @@ layui.define(['jquery', 'bdHttp'], function (exports) {
 
             bdTable.initTable = bdTable.table.render(options);
             bdTable.table_elem = options.elem;
+
+            // 渲染搜索表单
+            tableSearch(
+                {
+                    elem: bdTable.table_elem,
+                    columns: options.cols[0]
+                }
+            )
+
             bdTable.api.bindevent();
             return bdTable.initTable;
         },
@@ -99,6 +110,7 @@ layui.define(['jquery', 'bdHttp'], function (exports) {
                 })
                 // // 监听表格开关切换
                 // bdTable.events.switch(options, tableId);
+
             },
             // 表格格式化
             formatter: {
@@ -170,10 +182,10 @@ layui.define(['jquery', 'bdHttp'], function (exports) {
                         var value = undefined;
                     }
                     value = value == null || value.length === 0 ? '' : value.toString();
-                    var keys = typeof that.selectList === 'object' ? Object.keys(that.selectList) : [];
+                    var keys = typeof that.searchList === 'object' ? Object.keys(that.searchList) : [];
                     var index = keys.indexOf(value);
                     var color = value && typeof custom[value] !== 'undefined' ? custom[value] : null;
-                    var display = index > -1 ? that.selectList[value] : null;
+                    var display = index > -1 ? that.searchList[value] : null;
                     var icon = typeof that.icon !== 'undefined' ? that.icon : null;
                     if (!color) {
                         color = index > -1 && typeof colorArr[index] !== 'undefined' ? colorArr[index] : 'primary';

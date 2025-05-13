@@ -13,5 +13,6 @@ layui.config({
     bdhttp: "bdHttp",
     bdTable: "bdTable",
     bdForm: "bdForm",
+    tableSearch: "tableSearch", // 通用搜索
     badou: "badou",
 }).use([], function () { });

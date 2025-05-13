@@ -117,7 +117,7 @@ trait Backend
         }
 
         if ($this->request->isPost()) {
-            $data = $this->request->post();
+            $data = $this->request->post('row/a');
             if (!$data) {
                 $this->error(__('Parameter %s can not be empty', ['']));
             }
