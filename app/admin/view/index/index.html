@@ -30,7 +30,17 @@
                 <ul class="layui-nav layui-layout-right">
                     <li class="layui-nav-item layui-hide-xs"><a href="#" class="menuSearch layui-icon layui-icon-search"></a></li>
                     <li class="layui-nav-item layui-hide-xs"><a href="#" class="fullScreen layui-icon layui-icon-screen-full"></a></li>
-                    <li class="layui-nav-item layui-hide-xs"><a href="http://www.pearadmin.com" class="layui-icon layui-icon-website"></a></li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;" class="layui-icon layui-icon-delete" style="font-size: 19px"></a>
+                        <!-- 功 能 菜 单 -->
+                        <dl class="layui-nav-child">
+                            <dd><a href="javascript:void(0);" class="wipecache" data-type="all">一键清理缓存</a></dd>
+                            <dd><a href="javascript:void(0);" class="wipecache" data-type="data">清除内容缓存</a></dd>
+                            <dd><a href="javascript:void(0);" class="wipecache" data-type="template">清除模板缓存</a></dd>
+                            <!--							<dd><a href="javascript:void(0);" class="wipecache" data-type="addons">清除插件缓存</a></dd>-->
+                            <dd><a href="javascript:void(0);" class="wipecache" data-type="browser">清除浏览器缓存</a></dd>
+                        </dl>
+                    </li>
                     <li class="layui-nav-item layui-hide-xs message"></li>
                     <li class="layui-nav-item user">
                         <!-- 头 像 -->
@@ -95,6 +105,17 @@
                 admin.setConfigPath(Config.app_url + "/index/adminConfig");
 
                 admin.render();
+
+                //清除缓存
+				$(".wipecache").on('click',function(){
+					var type = $(this).data('type')
+					Badou.api.ajax({
+						url:"{:url('ajax/wipecache')}",
+						data:{
+							type:type
+						}
+					})
+				});
 
                 // 登出逻辑
                 admin.logout(function () {

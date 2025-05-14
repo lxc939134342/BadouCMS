@@ -1,6 +1,6 @@
 <?php
 
-namespace baodu;
+namespace badou;
 
 use Throwable;
 use PhpZip\ZipFile;
