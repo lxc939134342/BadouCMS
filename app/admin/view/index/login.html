@@ -85,6 +85,13 @@
                 $(".verification-img").click(function () {
                     refreshCaptcha();
                 });
+                // 添加回车键事件监听
+                $(document).keydown(function (event) {
+                    if (event.keyCode === 13) {
+                        $("button[lay-filter='login']").click();
+                        return false;
+                    }
+                });
 
                 // 登 录 提 交
                 form.on("submit(login)", function (data) {
