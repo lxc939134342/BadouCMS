@@ -78,7 +78,7 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
                     } else if (col.searchType == 'remoteSelect') {
                         if (!col.extend) col.extend = '';
                         // 远程下拉选择框
-                        html.push('<div class="remoteSelect" ' + col.extend + '></div>');
+                        html.push('<div id="remoteSelect-' + col.field + '" class="remoteSelect" ' + col.extend + '></div>');
                     } else {
                         // 普通输入框
                         var placeholder = col.placeholder || col.title;
@@ -137,8 +137,10 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
             });
 
             // 重置搜索
-            $('.layui-commonsearch button[type="reset"]').on('click', function () {
+            $('.badouadmin-commonsearch button[type="reset"]').on('click', function () {
+
                 setTimeout(function () {
+                    that._resetRemoteSelect();
                     that._triggerSearch();
                 }, 1);
             });
@@ -146,6 +148,7 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
         // 远程下拉选择框
         _remoteSelect: function (params) {
             $('.remoteSelect').each(function (i) {
+                var id = $(this).attr('id');
                 var url = $(this).data('source');
                 var field = $(this).data('field');
                 var searchField = $(this).data('search-field');
@@ -160,7 +163,7 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
                 var params = $(this).data('params');
 
                 var options = {
-                    el: this,
+                    el: '#' + id,
                     toolbar: { show: true },
                     data: [],
                     paging: pagination,
@@ -216,6 +219,17 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
                 }
             });
         },
+        // 重置远程下拉选择框
+        _resetRemoteSelect: function () {
+            $('.remoteSelect').each(function (i) {
+                var id = $(this).attr('id');
+                var remoteSelect = xmSelect.get('#' + id, true);
+
+                if (remoteSelect) {
+                    remoteSelect.setValue([]);
+                }
+            });
+        },
         _triggerSearch: function () {
             var that = this;
             if (typeof that.config.onSearch === 'function') {
@@ -224,16 +238,31 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
         },
 
         _getSearchParams: function () {
-            var formElem = $('.layui-commonsearch form');
+            var formElem = $('.badouadmin-commonsearch form');
             var params = {};
             var filters = {};
 
             formElem.find('input[name$="-operate"]').each(function () {
                 var name = $(this).attr('name').replace('-operate', '');
                 var operate = $(this).val();
-                var value = formElem.find('[name="' + name + '"]').val();
+                var value;
 
-                if (value !== '') {
+                // 处理xm-select组件
+                var remoteSelect = $(this).next('.remoteSelect');
+
+                if (remoteSelect.length > 0) {
+                    var id = remoteSelect.attr('id');
+                    var select = xmSelect.get('#' + id, true);
+
+                    if (select) {
+                        value = select.getValue('valueStr');
+                    }
+                } else {
+                    // 普通表单字段
+                    value = formElem.find('[name="' + name + '"]').val();
+                }
+
+                if (value !== undefined && value !== '') {
                     params[name] = operate;
                     filters[name] = value;
                 }

@@ -39,6 +39,7 @@
             pk: "id",
             even: true,
             toolbar: "#toolbar",
+            searchFormVisible: true,
             tree: {
                 customName: {
                     children: "childlist",
@@ -57,7 +58,7 @@
                 [
                     { type: "checkbox" },
                     { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "title", title: "标题",searchType:'remoteSelect' },
+                    { field: "title", title: "标题" ,operate:'like' },
                     { field: "name", title: "规则", width: 300, searchType:'remoteSelect',extend:'data-source="auth.rule/selectpage" data-field="title" data-multiple="false" data-is-tree="1"' },
                     { field: "icon", title: "图标", width: 150, templet: bdTable.api.formatter.icon,operate:false },
                     { field: "weigh", title: "权重", width: 100,operate:'BETWEEN' },

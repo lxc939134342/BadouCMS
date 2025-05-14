@@ -93,7 +93,17 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     columns: options.cols[0]
                 }
             )
-
+            // 监听搜索表单提交
+            tableSearch.set({
+                onSearch: function (value, item) {
+                    bdTable.table.reloadData(
+                        bdTable.initTable.config.id,
+                        {
+                            where: value,
+                        }
+                    )
+                }
+            })
             bdTable.api.bindevent();
             return bdTable.initTable;
         },
