@@ -1,60 +1,59 @@
 {layout name="layout/default" /}
+
+<!-- 头部 -->
+<div class="layui-card">
+    <div class="layui-card-body">
+        <a href="javascript:;" lay-event="refresh" class="layui-btn layui-btn-sm btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
+        <button class="layui-btn layui-btn-sm layui-bg-green" lay-event="add"><i class="fa fa-plus"></i> {:__('All')}</button>
+        <button class="layui-btn layui-btn-sm layui-bg-red"><i class="fa fa-user"></i> {:__('BADOU 会员登录')}</button>
+    </div>
+</div>
 <!-- 表格 -->
 <div class="layui-card">
     <div class="layui-card-body">
-        <table class="layui-hide" id="rule" data-operate-edit="{:$auth->check('auth.rule/edit')}" data-operate-del="{:$auth->check('auth.rule/del')}"></table>
+        <div id="modules-wrapper"></div>
     </div>
 </div>
-<!-- 表格左侧按钮 toolbar  -->
-<script type="text/html" id="toolbar">
-	<a href="javascript:;" lay-event="refresh" class="layui-btn layui-btn-sm btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
-	<button class="layui-btn layui-btn-sm layui-bg-green" lay-event="add"><i class="fa fa-plus"></i> {:__('Add')}</button>
-	<button class="layui-btn layui-btn-sm layui-bg-blue btn-disabled disabled {:$auth->check('auth.rule/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
-	<button class="layui-btn layui-btn-sm layui-bg-red btn-disabled disabled" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
-</script>
+
 <script>
-    layui.use(["badou"], function () {
+    layui.use(["badou", "card","form"], function () {
         var bdTable = layui.bdTable;
-        var table = layui.table;
-        var layer = layui.layer;
-        var dropdown = layui.dropdown;
-        bdTable.api.init({
-            table: table,
-            extend: {
-                index_url: "auth.rule/index",
-                add_url: "auth.rule/add",
-                edit_url: "auth.rule/edit",
-                del_url: "auth.rule/del",
-                multi_url: "auth.rule/multi",
-                table: "auth_rule",
+        var card = layui.card;
+        var form = layui.form;
+
+        card.render({
+            elem: "#modules-wrapper",
+            url: "{:url('module/index')}", // 接口数据
+            data: [], // 静态数据
+            page: true, // 是否分页
+            limit: 8, // 每页数量
+            linenum: 4, // 每行数量
+            response: {
+                statusCode:1,
+            },
+            clickItem: function (data) {
+                // 单击事件
+                console.log(data);
             },
         });
-        bdTable.render({
-            elem: "#rule",
-            url: "{:url('auth.rule/index')}",
-            pk: "id",
-            even: true,
-            toolbar:'#toolbar',
-            cols: [
-                [
-                    { type: "checkbox" },
-                    { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "title", title: "标题" ,operate:'like' },
-                    { field: "name", title: "规则", width: 300, searchType:'remoteSelect',extend:'data-source="auth.rule/selectpage" data-field="title" data-multiple="false" data-is-tree="1"' },
-                    { field: "icon", title: "图标", width: 150, templet: bdTable.api.formatter.icon,operate:false },
-                    { field: "weigh", title: "权重", width: 100,operate:'BETWEEN' },
-                    {
-                        field: "status",
-                        title: "状态",
-                        width: 100,
-                        searchList: { normal: "正常", hidden: "隐藏" },
-                        custom: { normal: "green", hidden: "orange" },
-                        templet: bdTable.api.formatter.status,
-                    },
-                    { field: "ismenu", title: "菜单", width: 100, templet: bdTable.api.formatter.switch },
-                    { title: "操作", width: 190, align: "center", templet: bdTable.api.formatter.operate},
-                ],
-            ],
+
+        // 监听搜索操作
+        form.on("submit(data-search-btn)", function (data) {
+            queryJson = data.field;
+            card.reload("currentTableId", {
+                where: queryJson,
+            });
+            return false;
+        });
+        form.on("submit(data-checked-btn)", function () {
+            var data = card.getChecked("currentTableId");
+            layer.msg(JSON.stringify(data));
+            return false;
+        });
+        form.on("submit(data-btn)", function () {
+            var data = card.getAllData("currentTableId");
+            layer.msg(JSON.stringify(data));
+            return false;
         });
     });
 </script>
