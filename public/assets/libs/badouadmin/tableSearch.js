@@ -30,7 +30,7 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
             }
 
             var html = that._createForm(that.config.columns);
-            var modal = '<div class="layui-card layui-form badouadmin-commonsearch ' + (that.config.visible ? '' : 'layui-hide') + '">' + html + '</div>';
+            var modal = '<div class="badouadmin-commonsearch ' + (that.config.visible ? '' : 'layui-hide') + '">' + html + '</div>';
             $(that.config.elem).before(modal);
 
             that._bindEvents();
@@ -44,7 +44,6 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
                 return layui.laytpl(that.config.template).render({ columns: columns });
             }
 
-            html.push('<div class="layui-card-body">');
             html.push('<form class="layui-form" action="' + that.config.action + '" method="post">');
             html.push('<div class="layui-row layui-col-space10">');
 
@@ -114,15 +113,14 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
             html.push('<div class="layui-col-xs12 layui-col-sm6 layui-col-md4 layui-col-lg3">');
             html.push('<div class="layui-form-item">');
             html.push('<div class="layui-input-block">');
-            html.push('<button class="layui-btn layui-btn-normal" lay-submit lay-filter="commonsearch">搜索</button>');
-            html.push('<button type="reset" class="layui-btn layui-btn-primary">重置</button>');
+            html.push('<button class="pear-btn pear-btn-md pear-btn-primary commonsearch-submit" lay-submit lay-filter="commonsearch"> <i class="layui-icon layui-icon-search"></i> 搜索</button>');
+            html.push('<button type="reset" class="pear-btn pear-btn-md commonsearch-rest"> <i class="layui-icon layui-icon-refresh"></i> 重置</button>');
             html.push('</div>');
             html.push('</div>');
             html.push('</div>');
 
             html.push('</div>');
             html.push('</form>');
-            html.push('</div>');
 
             return html.join('');
         },

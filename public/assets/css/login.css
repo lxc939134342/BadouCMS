@@ -83,7 +83,7 @@ body {
 .top-log-title span {
     font-size: 32px;
     font-weight: 700;
-    color: var(--global-primary-color);
+    color: var(--primary-color);
 }
 
 .top-desc {
@@ -193,7 +193,7 @@ body {
 
 .layui-btn {
     border-radius: 4px;
-    background-color: var(--global-primary-color);
+    background-color: var(--primary-color);
 }
 
 @media (min-width: 992px) and (max-width: 1200px) {
