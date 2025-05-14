@@ -1,10 +1,26 @@
-layui.define(['jquery', 'bdHttp', 'form'], function (exports) {
+layui.define(['jquery', 'bdHttp', 'form', 'iconPicker'], function (exports) {
     var http = layui.bdHttp;
     var form = layui.form;
+    var iconPicker = layui.iconPicker;
     var bdForm = {
         events: {
             bindevent: function (layform) {
-
+                //选择图标水电费
+                if ($('.icon-select').length > 0) {
+                    $(".icon-select").each(function (i, j) {
+                        var that = this;
+                        iconPicker.render({
+                            elem: this,
+                            type: 'fontClass',
+                            search: true,
+                            page: true,
+                            limit: 16,
+                            click: function (data) {
+                                $(that).val(data.class);
+                            },
+                        });
+                    });
+                }
             },
             validator: function (layform, success, error, submit) {
                 if (!layform.is("form"))

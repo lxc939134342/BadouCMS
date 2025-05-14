@@ -48,5 +48,5 @@ return [
     'Delete successful'                                     => '删除成功!',
     'Delete failed'                                         => '删除失败!',
     'None'                                                  => '无',
-
+    'Dashboard'                                             => '控制台',
 ];

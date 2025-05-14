@@ -39,7 +39,7 @@
     <div class="layui-form-item">
         <label class="layui-form-label">图标</label>
         <div class="layui-input-block">
-            <input type="text" id="iconPicker" lay-filter="iconPicker" class="layui-hide" name="row[icon]" class="layui-input">
+            <input type="text" class="icon-select" lay-filter="iconPicker" class="layui-hide" name="row[icon]" class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
@@ -92,6 +92,7 @@
 <script>
     layui.use(['badou'],function () {
         var bdForm = layui.bdForm;
+
         bdForm.api.bindevent($("form.layui-form"));
     })
 </script>
