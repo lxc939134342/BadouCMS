@@ -45,7 +45,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
             options.cols = options.cols || [];
             options.url = options.url || '';
             options.searchFormVisible = options.searchFormVisible || false;
-            options.commonSearch = options.commonSearch || true;
+            options.commonSearch === undefined || options.commonSearch === true ? options.commonSearch = true : options.commonSearch = false;
             options.defaultToolbar = options.defaultToolbar || [
                 "filter",
                 "exports",
