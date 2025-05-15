@@ -3,6 +3,7 @@
 namespace app\admin\controller;
 
 use app\common\controller\Backend;
+use badou\Service;
 
 class Module extends Backend
 {
@@ -41,6 +42,12 @@ class Module extends Backend
             ];
             $this->success('ok', null, $list);
         }
+
+        $modules = Service::getModuleList();
+        foreach ($modules as $k => &$v) {
+            $v['url'] = str_replace($this->request->server('SCRIPT_NAME'), '', $v['url']);
+        }
+        $this->assignconfig(['modules' => $modules, 'api_url' => config('badouadmin.api_url'), 'faversion' => config('badouadmin.version'), 'domain' => request()->host(true)]);
         return $this->view->fetch();
     }
 }

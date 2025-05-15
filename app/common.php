@@ -9,6 +9,7 @@ use think\exception\HttpResponseException;
 // 简化写法
 !defined('DS') && define('DS', DIRECTORY_SEPARATOR);
 
+
 function p($vars, $halt = 0)
 {
     if (is_array($vars)) {

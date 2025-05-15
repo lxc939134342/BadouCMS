@@ -1,0 +1,58 @@
+{layout name="layout/default" /}
+
+<!-- 表格 -->
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table class="layui-hide" id="models" data-operate-edit="{:$auth->check('cms.models/edit')}" data-operate-del="{:$auth->check('cms.models/del')}"></table>
+    </div>
+</div>
+
+<script>
+    layui.use(["badou"], function () {
+        var bdTable = layui.bdTable;
+        var table = layui.table;
+        var layer = layui.layer;
+        var dropdown = layui.dropdown;
+        bdTable.api.init({
+            table: table,
+            extend: {
+                index_url: "cms.models/index",
+                add_url: "cms.models/add",
+                edit_url: "cms.models/edit",
+                del_url: "cms.models/del",
+                multi_url: "cms.models/multi",
+                table: "auth_rule",
+            },
+        });
+        bdTable.render({
+            elem: "#models",
+            url: "{:url('cms.models/index')}",
+            pk: "id",
+            even: true,
+            toolbar: "#toolbar",
+            searchFormVisible: true,
+
+            cols: [
+                [
+                    { type: "checkbox" },
+                    { field: "id", title: "ID", width: 80, sort: true },
+                    { field: "name", title: __('Name'), width: 300, searchType:'remoteSelect',extend:'data-source="cms.models/selectpage" data-field="title" data-multiple="false" data-is-tree="1"' },
+                    { field: "type", title: __('Type'), width: 150},
+                    { field: "urlname", title:__('UrlName'), width: 100 },
+                    { field: "listtpl", title:__('Listtpl'), width: 100 },
+                    { field: "contenttpl", title:__('Contenttpl'), width: 100 },
+                    {
+                        field: "status",
+                        title: __('Status'),
+                        width: 100,
+                        searchList: { normal: "正常", hidden: "隐藏" },
+                        custom: { normal: "green", hidden: "orange" },
+                        templet: bdTable.api.formatter.status,
+                    },
+                    { field: "create_time", title: __('Create_time') ,width: 100, templet: bdTable.api.formatter.switch },
+                    { title: "操作", width: 190, align: "center", templet: bdTable.api.formatter.operate},
+                ],
+            ],
+        });
+    });
+</script>

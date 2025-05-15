@@ -4,8 +4,12 @@
 <div class="layui-card">
     <div class="layui-card-body">
         <a href="javascript:;" lay-event="refresh" class="layui-btn layui-btn-sm btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
-        <button class="layui-btn layui-btn-sm layui-bg-green" lay-event="add"><i class="fa fa-plus"></i> {:__('All')}</button>
-        <button class="layui-btn layui-btn-sm layui-bg-red"><i class="fa fa-user"></i> {:__('BADOU 会员登录')}</button>
+        <div class="layui-btn-group">
+            <button class="layui-btn layui-btn-sm layui-bg-blue" lay-event="add"><i class="fa fa-list"></i> {:__('All')}</button>
+            <button type="button" class="layui-btn layui-btn-sm layui-bg-blue"><i class="fa fa-laptop"></i> 已安装</button>
+        </div>
+
+        <button class="layui-btn layui-btn-sm layui-bg-red"><i class="fa fa-user"></i> {:__('BADOU 会员信息')}</button>
     </div>
 </div>
 <!-- 表格 -->

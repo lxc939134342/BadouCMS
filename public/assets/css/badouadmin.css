@@ -35,7 +35,7 @@
     border-color: #f4f4f4;
 }
 .layui-btn {
-    border-radius: 3px !important;
+    border-radius: 3px;
 }
 .layui-btn:active,
 .layui-btn:hover {
@@ -63,6 +63,10 @@
 }
 .badouadmin-form-body .layui-form {
     padding-bottom: 15px;
+}
+
+.pear-nav-tree .layui-nav-item a span {
+    letter-spacing: 0.5px;
 }
 
 /* 表格高级搜索 s */
