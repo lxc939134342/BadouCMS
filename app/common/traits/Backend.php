@@ -42,11 +42,9 @@ trait Backend
             $this->select();
         }
 
-        list($where, $alias, $limit, $order) = $this->queryBuilder();
+        [$where, $sort, $order, $offset, $limit] = $this->buildparams();
+        p($limit);
         $res = $this->model
-            ->field($this->indexField)
-            ->withJoin($this->withJoinTable, $this->withJoinType)
-            ->alias($alias)
             ->where($where)
             ->order($order)
             ->paginate($limit);

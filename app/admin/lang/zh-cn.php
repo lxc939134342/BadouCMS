@@ -49,4 +49,11 @@ return [
     'Delete failed'                                         => '删除失败!',
     'None'                                                  => '无',
     'Dashboard'                                             => '控制台',
+    'Operate'                                               => '操作',
+    'ID'                                                    => 'ID',
+    'Create time'                                           => '创建时间',
+    'Update time'                                           => '更新时间',
+    'Status'                                                => '状态',
+    'Name'                                                  => '名称',
+
 ];
