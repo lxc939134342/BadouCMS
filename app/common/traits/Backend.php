@@ -43,16 +43,12 @@ trait Backend
         }
 
         [$where, $sort, $order, $offset, $limit] = $this->buildparams();
-        p($limit);
         $res = $this->model
             ->where($where)
-            ->order($order)
+            ->order($sort, $order)
             ->paginate($limit);
 
-        $this->success('', '', [
-            'list'   => $res->items(),
-            'total'  => $res->total(),
-        ]);
+        $this->result('', $res->items());
     }
 
     /**

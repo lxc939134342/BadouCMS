@@ -8,12 +8,7 @@ class Models extends Base
     {
         parent::initialize();
         $this->model = new \app\admin\model\cms\Models();
+        $this->assignconfig("type_list", $this->model->getTypeList());
     }
-    // public function index()
-    // {
-    //     if ($this->isAjax()) {
-    //         $this->success('ok');
-    //     }
-    //     return $this->view->fetch();
-    // }
+
 }

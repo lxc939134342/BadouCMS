@@ -77,8 +77,17 @@ class Base extends Backend
      */
     protected function getOriginalInputData(): array
     {
+        $contentType = $this->request->contentType();
         $input = $this->request->getInput();
-        return $input ? json_decode($input, true) : [];
+        if ('application/x-www-form-urlencoded' == $contentType) {
+            parse_str($input, $data);
+            return $data;
+        }
+
+        if (str_contains($contentType, 'json')) {
+            return (array) json_decode($input, true);
+        }
+        return [];
     }
 
     /**
