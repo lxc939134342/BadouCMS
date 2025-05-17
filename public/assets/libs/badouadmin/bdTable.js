@@ -133,7 +133,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         bdTable.api.events.toolbar[attrEvent] && bdTable.api.events.toolbar[attrEvent].call(this, id, obj);
                     }
                     return false;
-                })
+                });
                 // 监听操作事件
                 bdTable.table.on('tool(' + id + ')', function (obj) {
                     var attrEvent = obj.event;
@@ -141,9 +141,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         bdTable.api.events.operate[attrEvent] && bdTable.api.events.operate[attrEvent].call(this, id, obj);
                     }
                     return false;
-                })
-
-
+                });
             },
             // 表格格式化
             formatter: {
@@ -284,7 +282,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         display = http.api.escape(display);
                         label = '<span class="layui-badge layui-bg-' + color + '">' + display + '</span>';
                         if (that.operate) {
-                            html.push('<a href="javascript:;" class="searchit" data-toggle="tooltip" title="' + __('Click to search %s', display) + '" data-field="' + field + '" data-value="' + value + '">' + label + '</a>');
+                            html.push('<a href="javascript:;" class="searchit" title="' + __('Click to search %s', display) + '" data-field="' + field + '" data-value="' + value + '">' + label + '</a>');
                         } else {
                             html.push(label);
                         }

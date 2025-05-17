@@ -246,8 +246,8 @@ class Backend extends BaseController
         $searchfields = is_null($searchfields) ? $this->searchFields : $searchfields;
         $relationSearch = is_null($relationSearch) ? $this->relationSearch : $relationSearch;
         $search = $this->request->get("search", '');
-        $filter = $this->request->get("filter", '');
-        $op = $this->request->get("op", '', 'trim');
+        $filter = $this->request->get("filter", '', 'trim,strip_tags');
+        $op = $this->request->get("op", '', 'trim,strip_tags');
         $sort = $this->request->get("sort", !empty($this->model) && $this->model->getPk() ? $this->model->getPk() : 'id');
         $order = $this->request->get("order", "DESC");
         $offset = max(0, $this->request->get("offset/d", 0));

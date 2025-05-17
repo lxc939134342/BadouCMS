@@ -55,5 +55,8 @@ return [
     'Update time'                                           => '更新时间',
     'Status'                                                => '状态',
     'Name'                                                  => '名称',
-
+    'Normal'                                                => '正常',
+    'Hidden'                                                => '隐藏',
+    'Off'                                                   => '关闭',
+    'On'                                                    => '开启',
 ];

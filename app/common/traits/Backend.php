@@ -178,7 +178,7 @@ trait Backend
             $this->error($e->getMessage());
         }
         if ($count) {
-            $this->success(__('Deleted successfully'));
+            $this->success(__('Delete successful'));
         } else {
             $this->error(__('No rows were deleted'));
         }
