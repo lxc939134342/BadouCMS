@@ -17,7 +17,7 @@ use Symfony\Component\VarExporter\VarExporter;
 /**
  * 模块服务
  */
-class Service
+class Server
 {
     protected static $infoTag = 'moduleinfo';
 
@@ -59,7 +59,7 @@ class Service
                 continue;
             }
 
-            $info = Config::parse($info_file, $name);
+            $info = Config::load($info_file, $name);
             if (!isset($info['name'])) {
                 continue;
             }
@@ -320,19 +320,19 @@ class Service
         $extend['domain'] = request()->host(true);
 
         // 远程下载模块
-        $tmpFile = $tmpFile ?: Service::download($name, $extend);
+        $tmpFile = $tmpFile ?: Server::download($name, $extend);
 
         $moduleDir = self::getModuleDir($name);
 
         try {
             // 解压模块压缩包到模块目录
-            Service::unzip($name, $tmpFile);
+            Server::unzip($name, $tmpFile);
 
             // 检查模块是否完整
-            Service::check($name);
+            Server::check($name);
 
             if (!$force) {
-                Service::noconflict($name);
+                Server::noconflict($name);
             }
         } catch (ModuleException $e) {
             Filesystem::delDir($moduleDir);
@@ -369,14 +369,14 @@ class Service
         }
 
         // 导入
-        Service::importsql($name);
+        Server::importsql($name);
 
         // 启用模块
-        Service::enable($name, true);
+        Server::enable($name, true);
 
         $info['config'] = get_module_config($name) ? 1 : 0;
-        $info['bootstrap'] = is_file(Service::getBootstrapFile($name));
-        $info['testdata'] = is_file(Service::getTestdataFile($name));
+        $info['bootstrap'] = is_file(Server::getBootstrapFile($name));
+        $info['testdata'] = is_file(Server::getTestdataFile($name));
         return $info;
     }
 
@@ -395,12 +395,12 @@ class Service
         }
 
         if (!$force) {
-            Service::noconflict($name);
+            Server::noconflict($name);
         }
 
         // 移除模块全局资源文件
         if ($force) {
-            $list = Service::getGlobalFiles($name);
+            $list = Server::getGlobalFiles($name);
             foreach ($list as $k => $v) {
                 @unlink(root_path() . $v);
             }
@@ -436,7 +436,7 @@ class Service
         }
 
         if (!$force) {
-            Service::noconflict($name);
+            Server::noconflict($name);
         }
 
         //备份冲突文件
@@ -465,7 +465,7 @@ class Service
         $files = self::getGlobalFiles($name);
         if ($files) {
             //刷新模块配置缓存
-            Service::config($name, ['files' => $files]);
+            Server::config($name, ['files' => $files]);
         }
 
         // 复制文件
@@ -531,12 +531,12 @@ class Service
         }
 
         if (!$force) {
-            Service::noconflict($name);
+            Server::noconflict($name);
         }
 
         if (config('fastadmin.backup_global_files')) {
             //仅备份修改过的文件
-            $conflictFiles = Service::getGlobalFiles($name, true);
+            $conflictFiles = Server::getGlobalFiles($name, true);
             if ($conflictFiles) {
                 $zip = new ZipFile();
                 try {
@@ -553,14 +553,14 @@ class Service
             }
         }
 
-        $config = Service::config($name);
+        $config = Server::config($name);
 
         $moduleDir = self::getModuleDir($name);
         //模块资源目录
         $destAssetsDir = self::getDestAssetsDir($name);
 
         // 移除模块全局文件
-        $list = Service::getGlobalFiles($name);
+        $list = Server::getGlobalFiles($name);
 
         //模块纯净模式时将原有的文件复制回模块目录
         //当无法获取全局文件列表时也将列表复制回模块目录
@@ -624,7 +624,7 @@ class Service
         }
 
         // 刷新
-        Service::refresh();
+        Server::refresh();
         return true;
     }
 
@@ -646,10 +646,10 @@ class Service
         }
 
         // 远程下载模块(如果为本地文件则使用本地文件)
-        $tmpFile = $tmpFile ? $tmpFile : Service::download($name, $extend);
+        $tmpFile = $tmpFile ? $tmpFile : Server::download($name, $extend);
 
         // 备份模块文件
-        Service::backup($name);
+        Server::backup($name);
 
         $moduleDir = self::getModuleDir($name);
 
@@ -661,7 +661,7 @@ class Service
 
         try {
             // 解压模块
-            Service::unzip($name, $tmpFile);
+            Server::unzip($name, $tmpFile);
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         } finally {
@@ -685,7 +685,7 @@ class Service
         }
 
         // 导入
-        Service::importsql($name);
+        Server::importsql($name);
 
         // 执行升级脚本
         try {
@@ -717,7 +717,7 @@ class Service
         $info['version'] = $extend['version'] ?? $info['version'];
 
         $info['config'] = get_module_config($name) ? 1 : 0;
-        $info['bootstrap'] = is_file(Service::getBootstrapFile($name));
+        $info['bootstrap'] = is_file(Server::getBootstrapFile($name));
         return $info;
     }
 
