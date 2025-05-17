@@ -18,9 +18,8 @@ class Models extends Base
 
     /**
      * 添加
-     * @return void
      */
-    public function add(): void
+    public function add()
     {
         if ($this->request->isPost()) {
             $data = $this->getPostData();
@@ -57,6 +56,8 @@ class Models extends Base
                 $this->error(__('No rows were added'));
             }
         }
+
+        return $this->fetch();
     }
 
     public function del($ids = null): void
