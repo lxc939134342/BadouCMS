@@ -15,4 +15,5 @@ layui.config({
     bdForm: "bdForm",
     tableSearch: "tableSearch", // 通用搜索
     badou: "badou",
+    cardList: "cardList",
 }).use([], function () { });

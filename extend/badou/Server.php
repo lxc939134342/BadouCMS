@@ -63,7 +63,6 @@ class Server
             if (!isset($info['name'])) {
                 continue;
             }
-            // $info['url'] = module_url($name);
             $list[$name] = $info;
         }
         return $list;
@@ -109,6 +108,7 @@ class Server
     {
         $modulesTempDir = self::getModulesBackupDir();
         $tmpFile = $modulesTempDir . $name . ".zip";
+
         try {
             $client = self::getClient();
             $response = $client->get('/module/download', ['query' => array_merge(['name' => $name], $extend)]);
@@ -117,7 +117,7 @@ class Server
             if (substr($content, 0, 1) === '{') {
                 $json = (array)json_decode($content, true);
                 //如果传回的是一个下载链接,则再次下载
-                if ($json['data'] && isset($json['data']['url'])) {
+                if ($json['data'] && isset($json['data']['url']) && $json['data']['url']) {
                     $response = $client->get($json['data']['url']);
                     $body = $response->getBody();
                     $content = $body->getContents();
@@ -240,8 +240,10 @@ class Server
         if (!$moduleClass) {
             throw new Exception("The module file does not exist");
         }
-        $module = new $moduleClass();
-        if (!$module->checkInfo()) {
+
+        $info = self::getModuleInfo($name);
+
+        if (!$info) {
             throw new Exception("The configuration file content is incorrect");
         }
         return true;
@@ -374,8 +376,8 @@ class Server
         // 启用模块
         Server::enable($name, true);
 
-        $info['config'] = get_module_config($name) ? 1 : 0;
-        $info['bootstrap'] = is_file(Server::getBootstrapFile($name));
+        // $info['config'] = get_module_config($name) ? 1 : 0;
+        // $info['bootstrap'] = is_file(Server::getBootstrapFile($name));
         $info['testdata'] = is_file(Server::getTestdataFile($name));
         return $info;
     }
@@ -939,7 +941,7 @@ class Server
      */
     public static function getModulesBackupDir()
     {
-        $dir = runtime_path() . 'modules' . DIRECTORY_SEPARATOR;
+        $dir = root_path().'runtime'.DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR;
         if (!is_dir($dir)) {
             @mkdir($dir, 0755, true);
         }
@@ -1059,7 +1061,7 @@ class Server
     public static function getModuleInfo($name, $force = false)
     {
         if (!$force) {
-            $info = Config::tag(self::$infoTag)->get($name);
+            $info = Config::get($name);
             if ($info) {
                 return $info;
             }
@@ -1068,9 +1070,9 @@ class Server
         $modulePath = self::getModuleDir($name);
         $infoFile = $modulePath . 'info.ini';
         if (is_file($infoFile)) {
-            $info = Config::parse($infoFile, $name);
+            $info = Config::load($infoFile, $name);
         }
-        Config::tag(self::$infoTag)->set($name, $info);
+        Config::set($info, $name);
 
         return $info ? $info : [];
     }

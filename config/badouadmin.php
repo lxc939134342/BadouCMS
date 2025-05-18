@@ -17,5 +17,5 @@ return [
         'dispatch_error_tmpl'   => app()->getBasePath() . '/common/view/tpl/dispatch_jump.tpl',
     ],
     'version' => 'v1.0.0',
-    'api_url' => 'http://sq.badoucms.test',
+    'api_url' => 'http://ldshouquan.test/',
 ];
