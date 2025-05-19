@@ -82,9 +82,8 @@ layui.define(['toast'], function (exports) {
                     if (!r.test(url)) {
                         url = Config.moduleurl + "/" + url;
                     }
-                } else if (url.substr(0, 8) === "/addons/") {
-                    url = Config.__PUBLIC__.replace(/(\/*$)/g, "") + url;
                 }
+
                 return url;
             },
             //获取修复后可访问的cdn链接

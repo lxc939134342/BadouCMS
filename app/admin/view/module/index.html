@@ -8,7 +8,6 @@
             <button class="layui-btn layui-btn-sm layui-bg-blue" lay-event="add"><i class="fa fa-list"></i> {:__('All')}</button>
             <button type="button" class="layui-btn layui-btn-sm layui-bg-blue"><i class="fa fa-laptop"></i> 已安装</button>
         </div>
-
         <button type="button" class="layui-btn layui-btn-sm layui-bg-red btn-userinfo"><i class="fa fa-user"></i> {:__('BADOU 会员信息')}</button>
     </div>
 </div>
@@ -20,7 +19,7 @@
 </div>
 
 <script type="text/html" id="cardTpl">
-    <div id='{{=d.item.id}}' class="layui-col-md{{=d.line }} ew-datagrid-item" data-number="1">
+    <div id='{{=d.item.name}}' data-name="{{=d.item.name}}" class="layui-col-md{{=d.line }} ew-datagrid-item btn-item" data-number="1">
         <div class="project-list-item">
             <img class="project-list-item-cover" src="{{=d.item.image }}">
             <div class="project-list-item-body">
@@ -30,11 +29,30 @@
                     <span class="layui-badge layui-bg-black">{{=d.item.author}}</span>
                     <span class="layui-badge layui-bg-green">{{=d.item.version}}</span>
                 </div>
-                {{ if(d.item.state==1) { }}
-                <button class="layui-btn layui-btn-sm layui-bg-gray"> 已安装</button>
-                {{ } else { }}
-                <button type="button" data-version="{{=d.item.version}}" data-name="{{=d.item.name}}" class="layui-btn layui-btn-sm layui-bg-red btn-install"> <i class="fa fa-cloud-download"></i> 安装</button>
-                {{ } }}
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>
+                        <i class="fa fa-download"></i> 0
+                    </span>
+                    {{ if(d.item.state==1) { }}
+                    <button class="layui-btn layui-btn-sm layui-bg-green"> 已安装</button>
+                    {{ } else { }}
+                    <span>
+                       ￥{{=d.item.price}}
+                    </span>
+                    {{ } }}
+                </div>
+
+
+                <!-- <button class="layui-btn layui-btn-sm layui-bg-blue btn-upgrade" lay-options="{
+                    data: [{{d.item.releaselist.forEach(function(value) { }}{title: '{{=value.version}}', id: '{{=value.id}}'} {{ }); }}]
+                }">
+                    <i class="fa fa-cloud"></i> 升级
+                    <i class="layui-icon layui-icon-down layui-font-12"></i>
+                </button>
+                <button class="layui-btn layui-btn-sm layui-bg-green"><i class="fa fa-cloud"></i> 禁用</button>
+                <button class="layui-btn layui-btn-sm layui-bg-red"> <i class="fa fa-times"></i> 卸载</button> -->
+                <!-- <button type="button" data-version="{{=d.item.version}}" data-name="{{=d.item.name}}" class="layui-btn layui-btn-sm layui-bg-red btn-install"> <i class="fa fa-cloud-download"></i> 安装</button> -->
+
             </div>
         </div >
     </div >
@@ -48,6 +66,7 @@
         var laytpl = layui.laytpl;
         var badou = layui.badou;
         var layer = layui.layer;
+        var dropdown = layui.dropdown;
         var template = document.getElementById('cardTpl').innerHTML; // 获取模板字符
         var badouStorage = {
             // 统一的命名空间
@@ -104,9 +123,10 @@
             response: {
                 statusCode:1,
             },
-            clickItem: function (data) {
-                // 单击事件
-                console.log(data);
+            done: function () {
+                dropdown.render({
+                    elem: '.btn-upgrade',
+                })
             },
         });
 
@@ -130,6 +150,7 @@
             return false;
         });
 
+
         // 点击安装
         $(document).on("click", ".btn-install", function () {
             var that = this;
@@ -143,6 +164,15 @@
             }
 
             install(name, version, false);
+        });
+
+        $(document).on("click", ".btn-item", function () {
+            var name=$(this).data("name");
+            var userinfo = badouStorage.get('userinfo');
+            var url = "{:url('module/info')}?name="+name+'&uid='+userinfo.id+'&token='+userinfo.token+'&bdversion='+Config.bdversion;
+            console.log(url);
+            badou.api.open(url,__('Module info'));
+
         });
 
         // 会员信息

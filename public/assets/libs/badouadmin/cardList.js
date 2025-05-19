@@ -118,6 +118,7 @@ layui.define(['table', 'laypage', 'jquery', 'element', 'laytpl'], function (expo
 						}
 					});
 				}
+				option.done();
 			});
 		}
 		else {

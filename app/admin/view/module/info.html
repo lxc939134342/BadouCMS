@@ -1,0 +1,29 @@
+{layout name="layout/default" /}
+<div class="layui-row">
+    <div class="layui-col-md4 layui-col-xs4">
+        <div class="layui-carousel" id="ID-carousel-demo-1">
+            <div carousel-item>
+                <div>条目1</div>
+                <div>条目2</div>
+                <div>条目3</div>
+                <div>条目4</div>
+                <div>条目5</div>
+            </div>
+        </div>
+    </div>
+    <div class="layui-col-md8 layui-col-xs8">
+        <h3>{$info.title}</h3>
+        价格：{$info|p}
+    </div>
+</div>
+
+<script type="text/javascript">
+    layui.use("carousel", function () {
+        var carousel = layui.carousel;
+        // 渲染 - 常规轮播
+        carousel.render({
+            elem: "#ID-carousel-demo-1",
+            width: "auto",
+        });
+    });
+</script>

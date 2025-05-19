@@ -58,6 +58,9 @@
 .layui-layer-footer {
     text-align: left !important;
 }
+.project-list-item-body {
+    padding: 10px;
+}
 .badouadmin-form-body {
     padding: 15px;
 }

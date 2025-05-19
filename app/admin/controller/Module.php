@@ -43,6 +43,44 @@ class Module extends Backend
     }
 
     /**
+     * 插件详情
+     * @return void
+     */
+    public function info()
+    {
+        $name = $this->request->get("name");
+
+        if (!$name) {
+            $this->error(__('Parameter %s can not be empty', ['name']));
+        }
+        if (!preg_match("/^[a-zA-Z0-9]+$/", $name)) {
+            $this->error(__('Module name incorrect'));
+        }
+
+        $info = [];
+        try {
+            $uid = $this->request->get("uid");
+            $token = $this->request->get("token");
+            $version = $this->request->get("version");
+            $bdversion = $this->request->get("bdversion");
+            $extend = [
+                'uid'       => $uid,
+                'token'     => $token,
+                'version'   => $version,
+                'bdversion' => $bdversion
+            ];
+            $res = Server::moduleInfo($name, $extend);
+            $info = $res['data'];
+        } catch (ModuleException $e) {
+            $this->result(__($e->getMessage()), $e->getData(), 0, $e->getCode(), );
+        } catch (Exception $e) {
+            $this->error(__($e->getMessage()));
+        }
+        $this->assign('info', $info);
+        return $this->view->fetch();
+    }
+
+    /**
      * 安装
      */
     public function install()
@@ -220,9 +258,9 @@ class Module extends Backend
         $filter = $this->request->get("filter");
         $search = $this->request->get("search");
         $search = htmlspecialchars(strip_tags($search));
-        $onlinemodules = $this->getInstalldModuleList();
+        $onlinemodules = Server::modules();
         $filter = (array)json_decode($filter, true);
-        $modules = get_module_list();
+        $modules = Server::getInstalldModuleList();
         $list = [];
         foreach ($modules as $k => $v) {
             if ($search && stripos($v['name'], $search) === false && stripos($v['title'], $search) === false && stripos($v['intro'], $search) === false) {
@@ -321,31 +359,5 @@ class Module extends Backend
         }
         $tables = array_values($tables);
         $this->success('', null, ['tables' => $tables]);
-    }
-
-    protected function getInstalldModuleList()
-    {
-        $onlinemodules = Cache::get("onlinemodules");
-        if (!is_array($onlinemodules) && config('fastadmin.api_url')) {
-            $onlinemodules = [];
-            $params = [
-                'uid'       => $this->request->post('uid'),
-                'token'     => $this->request->post('token'),
-                'version'   => config('fastadmin.version'),
-                'bdversion' => config('fastadmin.version'),
-            ];
-            $json = [];
-            try {
-                $json = Server::Modules($params);
-            } catch (\Exception $e) {
-
-            }
-            $rows = isset($json['rows']) ? $json['rows'] : [];
-            foreach ($rows as $index => $row) {
-                $onlinemodules[$row['name']] = $row;
-            }
-            Cache::set("onlinemodules", $onlinemodules, 600);
-        }
-        return $onlinemodules;
     }
 }

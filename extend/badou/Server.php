@@ -94,6 +94,22 @@ class Server
     }
 
     /**
+     * 插件详情
+     * @param mixed $name
+     * @param mixed $extend
+     * @return array
+     */
+    public static function moduleInfo($name, $extend = [])
+    {
+        $params = array_merge(['name' => $name, 'domain' => request()->host(true)], $extend);
+        $info = self::sendRequest('/module/info', $params, 'GET');
+        if ($info['code'] != 1) {
+            throw new Exception($info['msg']);
+        }
+        return $info;
+    }
+
+    /**
      * 远程下载模块
      *
      * @param string $name   模块名称
