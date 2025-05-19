@@ -194,3 +194,51 @@ if (!function_exists('check_url_allowed')) {
         return false;
     }
 }
+
+if (!function_exists('encrypt_password')) {
+    /**
+     * 对用户的密码进行加密
+     * @param string $password 明文密码
+     * @param string $encrypt 传入加密串，在修改密码时做认证
+     * @param string $fun 加密函数
+     * @return array|mixed
+     */
+    function encrypt_password(string $password, string $encrypt = '', string $fun = 'md5'): mixed
+    {
+        $pwd             = [];
+        $pwd['encrypt']  = $encrypt ?: genRandomString();
+        $pwd['password'] = $fun($fun($password) . $pwd['encrypt']);
+        return $encrypt ? $pwd['password'] : $pwd;
+    }
+}
+
+if (!function_exists('genRandomString')) {
+    /**
+     * 产生一个指定长度的随机字符串,并返回给用户
+     * @param int $len 产生字符串的长度
+     * @return string 随机字符串
+     */
+    function genRandomString(int $len = 6): string
+    {
+        $chars = [
+            "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k",
+            "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v",
+            "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G",
+            "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R",
+            "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2",
+            "3", "4", "5", "6", "7", "8", "9",
+        ];
+        $charsLen = count($chars) - 1;
+        // 将数组打乱
+        shuffle($chars);
+        $output = "";
+        for ($i = 0; $i < $len; $i++) {
+            $output .= $chars[mt_rand(0, $charsLen)];
+        }
+        return $output;
+    }
+}
+
+
+
+

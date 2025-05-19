@@ -372,4 +372,26 @@ class Backend extends BaseController
         //这里一定要返回有list这个字段,total是可选的,如果total<=list的数量,则会隐藏分页按钮
         $this->success('ok', '', ['list' => $list, 'total' => $total]);
     }
+
+
+    /**
+     * 通用的添加方法
+     *
+     * @param array $data 提交的数据
+     * @return array
+     */
+    protected function token()
+    {
+        $check = $this->request->checkToken('__token__');
+        // 刷新token
+        $token = $this->request->buildToken();
+        if ($this->request->isAjax()) {
+            header('__token__: ' . $token);
+        }
+        if (false === $check) {
+            $this->error('令牌错误！', '', ['__token__' => $token]);
+        }
+    }
+
+
 }
