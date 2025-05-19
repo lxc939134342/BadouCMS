@@ -304,6 +304,10 @@ class AdminAuth extends Auth
         return parent::getRuleIds($uid);
     }
 
+     /**
+     * 检查当前用户是否超级管理员
+     * @return bool
+     */
     public function isSuperAdmin()
     {
         return in_array('*', $this->getRuleIds()) ? true : false;
@@ -332,7 +336,15 @@ class AdminAuth extends Auth
     public function getChildrenGroupIds($withself = false)
     {
         //取出当前管理员所有的分组
+        // 调用 getGroups 方法获取分组信息
         $groups = $this->getGroups();
+        // 打印分组信息，方便调试
+        // p($groups);
+        // 检查 $groups 是否为 think\Collection 实例，如果是则转换为数组
+        if ($groups instanceof \think\Collection) {
+            $groups = $groups->toArray();
+        }
+        // 从数组中提取所有分组的 id
         $groupIds = array_column($groups, 'id');
         $originGroupIds = $groupIds;
         foreach ($groups as $k => $v) {
