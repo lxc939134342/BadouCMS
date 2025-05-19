@@ -15,6 +15,33 @@ use RecursiveDirectoryIterator;
 class Filesystem
 {
     /**
+     * 复制文件夹
+     * @param string $source 源文件夹
+     * @param string $dest   目标文件夹
+     */
+    public static function copyDirs($source, $dest)
+    {
+        if (!is_dir($dest)) {
+            @mkdir($dest, 0755, true);
+        }
+        foreach (
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::SELF_FIRST
+            ) as $item
+        ) {
+            if ($item->isDir()) {
+                $sontDir = $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathname();
+                if (!is_dir($sontDir)) {
+                    @mkdir($sontDir, 0755, true);
+                }
+            } else {
+                @copy($item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
+            }
+        }
+    }
+
+    /**
      * 是否是空目录
      */
     public static function dirIsEmpty(string $dir): bool
@@ -62,26 +89,22 @@ class Filesystem
     }
 
     /**
-     * 删除一个路径下的所有相对空文件夹（删除此路径中的所有空文件夹）
-     * @param string $path 相对于根目录的文件夹路径 如`c:BuildAdmin/a/b/`
+     * 移除空目录
+     * @param string $dir 目录
      * @return void
      */
-    public static function delEmptyDir(string $path): void
+    public static function delEmptyDir(string $dir): void
     {
-        $path = str_replace(root_path(), '', rtrim(self::fsFit($path), DIRECTORY_SEPARATOR));
-        $path = array_filter(explode(DIRECTORY_SEPARATOR, $path));
-        for ($i = count($path) - 1; $i >= 0; $i--) {
-            $dirPath = root_path() . implode(DIRECTORY_SEPARATOR, $path);
-            if (!is_dir($dirPath)) {
-                unset($path[$i]);
-                continue;
+        try {
+            $isDirEmpty = !(new \FilesystemIterator($dir))->valid();
+            if ($isDirEmpty) {
+                @rmdir($dir);
+                self::delEmptyDir(dirname($dir));
             }
-            if (self::dirIsEmpty($dirPath)) {
-                self::delDir($dirPath);
-                unset($path[$i]);
-            } else {
-                break;
-            }
+        } catch (\UnexpectedValueException $e) {
+
+        } catch (\Exception $e) {
+
         }
     }
 

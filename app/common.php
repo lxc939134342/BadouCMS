@@ -9,6 +9,7 @@ use think\exception\HttpResponseException;
 // 简化写法
 !defined('DS') && define('DS', DIRECTORY_SEPARATOR);
 
+
 function p($vars, $halt = 0)
 {
     if (is_array($vars)) {
@@ -195,50 +196,100 @@ if (!function_exists('check_url_allowed')) {
     }
 }
 
-if (!function_exists('encrypt_password')) {
-    /**
-     * 对用户的密码进行加密
-     * @param string $password 明文密码
-     * @param string $encrypt 传入加密串，在修改密码时做认证
-     * @param string $fun 加密函数
-     * @return array|mixed
-     */
-    function encrypt_password(string $password, string $encrypt = '', string $fun = 'md5'): mixed
-    {
-        $pwd             = [];
-        $pwd['encrypt']  = $encrypt ?: genRandomString();
-        $pwd['password'] = $fun($fun($password) . $pwd['encrypt']);
-        return $encrypt ? $pwd['password'] : $pwd;
-    }
-}
 
-if (!function_exists('genRandomString')) {
+if (!function_exists('cdnurl')) {
+
     /**
-     * 产生一个指定长度的随机字符串,并返回给用户
-     * @param int $len 产生字符串的长度
-     * @return string 随机字符串
+     * 获取上传资源的CDN的地址
+     * @param string  $url    资源相对地址
+     * @param boolean $domain 是否显示域名 或者直接传入域名
+     * @return string
      */
-    function genRandomString(int $len = 6): string
+    function cdnurl($url, $domain = false)
     {
-        $chars = [
-            "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k",
-            "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v",
-            "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G",
-            "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R",
-            "S", "T", "U", "V", "W", "X", "Y", "Z", "0", "1", "2",
-            "3", "4", "5", "6", "7", "8", "9",
-        ];
-        $charsLen = count($chars) - 1;
-        // 将数组打乱
-        shuffle($chars);
-        $output = "";
-        for ($i = 0; $i < $len; $i++) {
-            $output .= $chars[mt_rand(0, $charsLen)];
+        $regex = "/^((?:[a-z]+:)?\/\/|data:image\/)(.*)/i";
+        $cdnurl = \think\Config::get('upload.cdnurl');
+        if (is_bool($domain) || stripos($cdnurl, '/') === 0) {
+            $url = preg_match($regex, $url) || ($cdnurl && stripos($url, $cdnurl) === 0) ? $url : $cdnurl . $url;
         }
-        return $output;
+        if ($domain && !preg_match($regex, $url)) {
+            $domain = is_bool($domain) ? request()->domain() : $domain;
+            $url = $domain . $url;
+        }
+        return $url;
     }
 }
 
+if (!function_exists('letter_avatar')) {
+    /**
+     * 首字母头像
+     * @param $text
+     * @return string
+     */
+    function letter_avatar($text)
+    {
+        $total = unpack('L', hash('adler32', $text, true))[1];
+        $hue = $total % 360;
+        list($r, $g, $b) = hsv2rgb($hue / 360, 0.3, 0.9);
 
+        $bg = "rgb({$r},{$g},{$b})";
+        $color = "#ffffff";
+        $first = mb_strtoupper(mb_substr($text, 0, 1));
+        $src = base64_encode('<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="100" width="100"><rect fill="' . $bg . '" x="0" y="0" width="100" height="100"></rect><text x="50" y="50" font-size="50" text-copy="fast" fill="' . $color . '" text-anchor="middle" text-rights="admin" dominant-baseline="central">' . $first . '</text></svg>');
+        $value = 'data:image/svg+xml;base64,' . $src;
+        return $value;
+    }
+}
 
+if (!function_exists('hsv2rgb')) {
+    function hsv2rgb($h, $s, $v)
+    {
+        $r = $g = $b = 0;
+
+        $i = floor($h * 6);
+        $f = $h * 6 - $i;
+        $p = $v * (1 - $s);
+        $q = $v * (1 - $f * $s);
+        $t = $v * (1 - (1 - $f) * $s);
+
+        switch ($i % 6) {
+            case 0:
+                $r = $v;
+                $g = $t;
+                $b = $p;
+                break;
+            case 1:
+                $r = $q;
+                $g = $v;
+                $b = $p;
+                break;
+            case 2:
+                $r = $p;
+                $g = $v;
+                $b = $t;
+                break;
+            case 3:
+                $r = $p;
+                $g = $q;
+                $b = $v;
+                break;
+            case 4:
+                $r = $t;
+                $g = $p;
+                $b = $v;
+                break;
+            case 5:
+                $r = $v;
+                $g = $p;
+                $b = $q;
+                break;
+        }
+
+        return [
+            floor($r * 255),
+            floor($g * 255),
+            floor($b * 255)
+        ];
+    }
+}
 

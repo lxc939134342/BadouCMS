@@ -1,33 +1,11 @@
 {layout name="layout/form" /}
 <form class="layui-form" method="post">
     {:token_field()}
+
+
+
     <div class="layui-form-item">
-        <label class="layui-form-label">类型</label>
-        <div class="layui-input-block">
-            <input type="radio" name="row[type]" value="0" title="菜单目录" checked lay-filter="type">
-            <input type="radio" name="row[type]" value="1" title="子菜单"  lay-filter="type">
-            <input type="radio" name="row[type]" value="2" title="页面按钮" lay-filter="type">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">菜单</label>
-        <div class="layui-input-block">
-            <input type="radio" name="row[ismenu]" value="1" title="是" checked lay-filter="ismenu">
-            <input type="radio" name="row[ismenu]" value="0" title="否" lay-filter="ismenu">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">上级菜单</label>
-        <div class="layui-input-block">
-            <select name="row[pid]" lay-verify="required">
-                {foreach name="$ruledata"  item="vo"}
-                <option value="{$key}">{$vo |raw}</option>
-                {/foreach}
-            </select>
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">规则</label>
+        <label class="layui-form-label">组名</label>
         <div class="layui-input-block">
             <input type="text" name="row[name]" lay-verify="required" autocomplete="off"  placeholder="控制器/方法名,如果有目录请使用 目录名.控制器名/方法名" class="layui-input">
         </div>

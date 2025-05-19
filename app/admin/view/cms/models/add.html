@@ -1,0 +1,56 @@
+{layout name="layout/form" /}
+<form class="layui-form" method="post">
+    {:token_field()}
+    <div class="layui-form-item">
+        <label class="layui-form-label">名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[name]" value="" required  lay-verify="required" placeholder="请输入输入框内容" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">类型</label>
+        <div class="layui-input-block">
+            <input type="radio" name="row[type]" value="1" title="单页" lay-filter="type">
+            <input type="radio" name="row[type]" value="2" title="列表" checked lay-filter="type">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">URL名称</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[urlname]" value="" placeholder="请输入输入框内容" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">列表页模板</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[listtpl]" value="" placeholder="请输入输入框内容" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">内容页模板</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[contenttpl]" value="" placeholder="请输入输入框内容" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态 </label>
+        <div class="layui-input-block">
+            <input type="radio" name="row[status]" value="1" title="正常" checked>
+            <input type="radio" name="row[status]" value="0" title="隐藏" >
+        </div>
+    </div>
+    <div class="layui-form-item layer-footer hide">
+        <div class="layui-input-block">
+            <button class="layui-btn pear-btn-primary layui-btn-sm disabled" lay-submit>立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(['badou'],function () {
+        var bdForm = layui.bdForm;
+        bdForm.api.bindevent($("form.layui-form"));
+    })
+</script>

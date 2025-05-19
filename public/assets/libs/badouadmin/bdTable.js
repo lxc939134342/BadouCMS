@@ -133,7 +133,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         bdTable.api.events.toolbar[attrEvent] && bdTable.api.events.toolbar[attrEvent].call(this, id, obj);
                     }
                     return false;
-                })
+                });
                 // 监听操作事件
                 bdTable.table.on('tool(' + id + ')', function (obj) {
                     var attrEvent = obj.event;
@@ -141,9 +141,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         bdTable.api.events.operate[attrEvent] && bdTable.api.events.operate[attrEvent].call(this, id, obj);
                     }
                     return false;
-                })
-
-
+                });
             },
             // 表格格式化
             formatter: {
@@ -169,27 +167,16 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     return bdTable.api.buttonlink(data, buttons, 'buttons');
                 },
                 icon: function (data) {
-                    var field = this.field;
-                    try {
-                        var value = getItemField(data, field);
-                    } catch (e) {
-                        var value = undefined;
-                    }
+                    var value = bdTable.api.formatter.value.call(this, data);
                     return '<i class="' + value + '"></i>';
                 },
                 switch: function (data) {
                     var that = this;
-                    var field = that.field;
                     that.filter = that.filter || that.field || null;
                     that.checked = that.checked || 1;
-                    that.tips = that.tips || '开|关';
-                    try {
-                        var value = getItemField(data, field);
-                    } catch (e) {
-                        var value = undefined;
-                    }
+                    var value = parseInt(bdTable.api.formatter.value.call(this, data));
                     var checked = value === that.checked ? 'checked' : '';
-                    var html = laytpl('<input type="checkbox" name="' + that.field + '" value="' + data.id + '" lay-skin="switch" data-field="' + that.field + '" lay-text="' + that.tips + '" lay-filter="' + that.filter + '" ' + checked + ' >').render(data);
+                    var html = laytpl('<input type="checkbox" name="' + that.field + '" value="' + data.id + '" lay-skin="switch" data-field="' + that.field + '" lay-filter="' + that.filter + '" ' + checked + ' >').render(data);
 
                     // 监听表格开关切换
                     bdTable.api.events.switch(that.filter);
@@ -201,7 +188,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         custom = $.extend(custom, this.custom);
                     }
                     this.custom = custom;
-                    this.icon = 'iconfont icon-circle-fill';
+                    this.icon = 'layui-icon layui-icon-circle-dot';
                     return bdTable.api.formatter.normal.call(this, data);
                 },
                 normal: function (data) {
@@ -211,13 +198,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     if (typeof that.custom !== 'undefined') {
                         custom = $.extend(custom, that.custom);
                     }
-                    var field = that.field;
-                    try {
-                        var value = getItemField(data, field);
-                        value = value == null || value.length === 0 ? '' : value.toString();
-                    } catch (e) {
-                        var value = undefined;
-                    }
+                    var value = bdTable.api.formatter.value.call(this, data);
                     value = value == null || value.length === 0 ? '' : value.toString();
                     var keys = typeof that.searchList === 'object' ? Object.keys(that.searchList) : [];
                     var index = keys.indexOf(value);
@@ -230,19 +211,14 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     if (!display) {
                         display = value.charAt(0).toUpperCase() + value.slice(1);
                     }
-                    var html = '<span class="layui-font-' + color + '">' + (icon ? '<i class="' + icon + '"></i>' : '') + display + '</span>';
+                    var html = '<span class="layui-font-' + color + '">' + (icon ? '<i class="' + icon + '"></i> ' : '') + display + '</span>';
                     if (that.search != false) {
                         html = '<a href="javascript:;" class="searchit" lay-tips="点击搜索 ' + display + '" data-field="' + this.field + '" data-value="' + value + '">' + html + '</a>';
                     }
                     return html;
                 },
                 text: function (data) {
-                    var field = this.field;
-                    try {
-                        var value = getItemField(data, field);
-                    } catch (e) {
-                        var value = undefined;
-                    }
+                    var value = bdTable.api.formatter.value.call(this, data);
                     return '<span class="line-limit-length">' + value + '</span>';
                 },
                 value: function (data) {
@@ -252,7 +228,69 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     } catch (e) {
                         var value = undefined;
                     }
-                    return '<span>' + value + '</span>';
+                    return value;
+                },
+                flag: function (data) {
+                    var that = this;
+                    var value = bdTable.api.formatter.value.call(this, data);
+                    value = value == null || value.length === 0 ? '' : value.toString();
+                    var colorArr = { 1: 'red', 2: 'orange', 3: 'green', 4: 'blue', 5: 'purple', 6: 'black' };
+                    //如果字段列有定义custom
+                    if (typeof this.custom !== 'undefined') {
+                        colorArr = $.extend(colorArr, this.custom);
+                    }
+                    var field = this.field;
+                    if (typeof this.customField !== 'undefined') {
+                        var customValue = this.customField.split('.').reduce(function (obj, key) {
+                            return obj === null || obj === undefined ? '' : obj[key];
+                        }, row);
+                        value = http.api.escape(customValue);
+                        field = this.customField;
+                    }
+                    if (typeof that.searchList === 'object' && typeof that.searchList.then === 'function') {
+                        $.when(that.searchList).done(function (ret) {
+                            if (ret.data && ret.data.searchlist && $.isArray(ret.data.searchlist)) {
+                                that.searchList = ret.data.searchlist;
+                            } else if (ret.constructor === Array || ret.constructor === Object) {
+                                that.searchList = ret;
+                            }
+                        })
+                    }
+                    if (typeof that.searchList === 'object' && typeof that.custom === 'undefined') {
+                        var i = 0;
+                        var searchValues = Object.values(colorArr);
+                        $.each(that.searchList, function (key, val) {
+                            if (typeof colorArr[key] == 'undefined') {
+                                colorArr[key] = searchValues[i];
+                                i = typeof searchValues[i + 1] === 'undefined' ? 0 : i + 1;
+                            }
+                        });
+                    }
+
+                    //渲染Flag
+                    var html = [];
+                    var arr = $.isArray(value) ? value : value != '' ? value.split(',') : [];
+                    var color, display, label;
+                    $.each(arr, function (i, value) {
+                        value = value == null || value.length === 0 ? '' : value.toString();
+                        if (value === '')
+                            return true;
+
+                        color = value && typeof colorArr[value] !== 'undefined' ? colorArr[value] : 'primary';
+                        display = typeof that.searchList !== 'undefined' && typeof that.searchList[value] !== 'undefined' ? that.searchList[value] : __(value.charAt(0).toUpperCase() + value.slice(1));
+                        value = http.api.escape(value);
+                        display = http.api.escape(display);
+                        label = '<span class="layui-badge layui-bg-' + color + '">' + display + '</span>';
+                        if (that.operate) {
+                            html.push('<a href="javascript:;" class="searchit" title="' + __('Click to search %s', display) + '" data-field="' + field + '" data-value="' + value + '">' + label + '</a>');
+                        } else {
+                            html.push(label);
+                        }
+                    });
+                    return html.join(' ');
+                },
+                label: function (data) {
+                    return bdTable.api.formatter.flag.call(this, data);
                 },
                 datetime: function (data) {
                     var that = this;

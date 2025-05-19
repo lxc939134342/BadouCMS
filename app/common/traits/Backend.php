@@ -42,19 +42,13 @@ trait Backend
             $this->select();
         }
 
-        list($where, $alias, $limit, $order) = $this->queryBuilder();
+        [$where, $sort, $order, $offset, $limit] = $this->buildparams();
         $res = $this->model
-            ->field($this->indexField)
-            ->withJoin($this->withJoinTable, $this->withJoinType)
-            ->alias($alias)
             ->where($where)
-            ->order($order)
+            ->order($sort, $order)
             ->paginate($limit);
 
-        $this->success('', '', [
-            'list'   => $res->items(),
-            'total'  => $res->total(),
-        ]);
+        $this->result('', $res->items());
     }
 
     /**
@@ -184,7 +178,7 @@ trait Backend
             $this->error($e->getMessage());
         }
         if ($count) {
-            $this->success(__('Deleted successfully'));
+            $this->success(__('Delete successful'));
         } else {
             $this->error(__('No rows were deleted'));
         }
