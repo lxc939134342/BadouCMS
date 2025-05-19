@@ -196,6 +196,7 @@ if (!function_exists('check_url_allowed')) {
     }
 }
 
+
 if (!function_exists('cdnurl')) {
 
     /**
@@ -291,3 +292,4 @@ if (!function_exists('hsv2rgb')) {
         ];
     }
 }
+

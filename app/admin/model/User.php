@@ -26,6 +26,6 @@ class User extends Model
 
     public function userGroup(): BelongsTo
     {
-        return $this->belongsTo('UserGroup', 'group_id', 'id', [], 'LEFT')->setEagerlyType(0);
+        return $this->belongsTo('UserGroup', 'group_id', 'id');
     }
 }

@@ -6,6 +6,15 @@ use app\common\controller\Backend;
 
 class User extends Backend
 {
+
+    protected $model = null;
+
+    public function initialize()
+    {
+        parent::initialize();
+        $this->model = new \app\admin\model\User();
+//        $this->view->assign("statusList", $this->model->getStatusList());
+    }
     public function index()
     {
         //设置过滤方法
@@ -18,9 +27,9 @@ class User extends Backend
 
             $where = [];
             $list = $this->model
-                ->with('user_group')
+                ->with(['user_group'])
                 ->where($where)
-                ->order('weigh DESC,id ASC')
+                ->order('id ASC')
                 ->paginate(15);
 
             $result = array("total" => $list->total(), "rows" => $list->items());
@@ -29,4 +38,14 @@ class User extends Backend
         }
         return $this->view->fetch();
     }
+
+
+    public function add()
+    {
+        if ($this->request->isPost()) {
+            $this->token();
+        }
+        return parent::add();
+    }
+
 }
