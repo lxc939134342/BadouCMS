@@ -17,7 +17,7 @@ class ModuleService extends Service
 
     public function moduleAppInit(): void
     {
-        $installed = Server::getModuleList();
+        $installed = Server::getInstalldModuleList();
         foreach ($installed as $item) {
             if ($item['state'] != 1) {
                 continue;

@@ -32,6 +32,8 @@ return [
     'You have no permission'                                => '你没有权限访问',
     'Go back'                                               => '返回首页',
     'Jump now'                                              => '立即跳转',
+    'Logout'                                                => '退出',
+    'Close'                                                 => '关闭',
     'Please login first'                                    => '请先登录',
     'This page will be re-directed in %s seconds'           => '页面将在%s秒后跳转',
     'Access is allowed only to the super management group'  => '仅超级管理组能访问',

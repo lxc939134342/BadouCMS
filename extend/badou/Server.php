@@ -7,20 +7,16 @@ use think\Exception;
 use think\facade\Db;
 use GuzzleHttp\Client;
 use think\facade\Config;
-use GuzzleHttp\TransferStats;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 use PhpZip\Exception\ZipException;
 use GuzzleHttp\Exception\TransferException;
-use Symfony\Component\VarExporter\VarExporter;
 
 /**
  * 模块服务
  */
 class Server
 {
-    protected static $infoTag = 'moduleinfo';
-
     /**
      * 模块列表
      */
@@ -31,10 +27,10 @@ class Server
     }
 
     /**
-     * 获得插件列表
+     * 获得已安装的模块列表
      * @return array
      */
-    public static function getModuleList()
+    public static function getInstalldModuleList()
     {
         $results = scandir(MODULE_PATH);
         $list = [];
@@ -242,7 +238,6 @@ class Server
         }
 
         $info = self::getModuleInfo($name);
-
         if (!$info) {
             throw new Exception("The configuration file content is incorrect");
         }
@@ -376,8 +371,6 @@ class Server
         // 启用模块
         Server::enable($name, true);
 
-        // $info['config'] = get_module_config($name) ? 1 : 0;
-        // $info['bootstrap'] = is_file(Server::getBootstrapFile($name));
         $info['testdata'] = is_file(Server::getTestdataFile($name));
         return $info;
     }
@@ -442,7 +435,7 @@ class Server
         }
 
         //备份冲突文件
-        if (config('fastadmin.backup_global_files')) {
+        if (config('badouadmin.backup_global_files')) {
             $conflictFiles = self::getGlobalFiles($name, true);
             if ($conflictFiles) {
                 $zip = new ZipFile();
@@ -475,15 +468,15 @@ class Server
             Filesystem::copydirs($sourceAssetsDir, $destAssetsDir);
         }
 
-        // 复制application和public到全局
+        // 复制app和public到全局
         foreach (self::getCheckDirs() as $k => $dir) {
             if (is_dir($moduleDir . $dir)) {
                 Filesystem::copydirs($moduleDir . $dir, root_path() . $dir);
             }
         }
 
-        //模块纯净模式时将模块目录下的application、public和assets删除
-        if (config('fastadmin.module_pure_mode')) {
+        //模块纯净模式时将模块目录下的app、public和assets删除
+        if (config('badouadmin.module_pure_mode')) {
             // 删除模块目录已复制到全局的文件
             Filesystem::delDir($sourceAssetsDir);
             foreach (self::getCheckDirs() as $k => $dir) {
@@ -507,7 +500,6 @@ class Server
         $info = self::getModuleInfo($name);
         $info['state'] = 1;
         unset($info['url']);
-
         self::setModuleInfo($name, $info);
 
         return true;
@@ -536,7 +528,7 @@ class Server
             Server::noconflict($name);
         }
 
-        if (config('fastadmin.backup_global_files')) {
+        if (config('badouadmin.backup_global_files')) {
             //仅备份修改过的文件
             $conflictFiles = Server::getGlobalFiles($name, true);
             if ($conflictFiles) {
@@ -566,7 +558,7 @@ class Server
 
         //模块纯净模式时将原有的文件复制回模块目录
         //当无法获取全局文件列表时也将列表复制回模块目录
-        if (config('fastadmin.module_pure_mode') || !$list) {
+        if (config('badouadmin.module_pure_mode') || !$list) {
             if ($config && isset($config['files']) && is_array($config['files'])) {
                 foreach ($config['files'] as $index => $item) {
                     //避免切换不同服务器后导致路径不一致
@@ -625,8 +617,6 @@ class Server
             throw new Exception($e->getMessage());
         }
 
-        // 刷新
-        Server::refresh();
         return true;
     }
 
@@ -642,7 +632,7 @@ class Server
         if ($info['state']) {
             throw new Exception(__('Please disable module first'));
         }
-        $config = get_module_config($name);
+        $config = self::getModuleInfo($name);
         if ($config) {
             //备份配置
         }
@@ -655,7 +645,7 @@ class Server
 
         $moduleDir = self::getModuleDir($name);
 
-        // 删除模块目录下的application和public
+        // 删除模块目录下的app和public
         $files = self::getCheckDirs();
         foreach ($files as $index => $file) {
             Filesystem::delDir($moduleDir . $file);
@@ -669,21 +659,6 @@ class Server
         } finally {
             // 移除临时文件
             @unlink($tmpFile);
-        }
-
-        if ($config) {
-            $configFile = MODULE_PATH . $name . DIRECTORY_SEPARATOR . 'config.php';
-            $bakFile = MODULE_PATH . $name . DIRECTORY_SEPARATOR . 'config_tmp.php';
-            @copy($configFile, $bakFile);
-            $fullConfig = include($bakFile);
-            @unlink($bakFile);
-            foreach ($fullConfig as $index => &$item) {
-                if (isset($config[$item['name']])) {
-                    $item['value'] = $config[$item['name']];
-                }
-            }
-            // 更新配置
-            set_module_fullconfig($name, $fullConfig);
         }
 
         // 导入
@@ -717,9 +692,6 @@ class Server
 
         //必须变更版本号
         $info['version'] = $extend['version'] ?? $info['version'];
-
-        $info['config'] = get_module_config($name) ? 1 : 0;
-        $info['bootstrap'] = is_file(Server::getBootstrapFile($name));
         return $info;
     }
 
@@ -803,7 +775,7 @@ class Server
      */
     public static function authorization($params = [])
     {
-        $moduleList = get_module_list();
+        $moduleList = self::getInstalldModuleList();
         $result = [];
         $domain = request()->host(true);
         $modules = [];
@@ -812,7 +784,7 @@ class Server
             $modules[] = ['name' => $name, 'domains' => $config['domains'] ?? [], 'licensecodes' => $config['licensecodes'] ?? [], 'validations' => $config['validations'] ?? []];
         }
         $params = array_merge($params, [
-            'faversion' => config('fastadmin.version'),
+            'faversion' => config('badouadmin.version'),
             'domain'    => $domain,
             'modules'    => $modules
         ]);
@@ -877,7 +849,7 @@ class Server
     }
 
     /**
-     * 获取插件类的类名
+     * 获取模块类的类名
      * @param string $uid
      * @param string $type
      * @param mixed $class
@@ -985,7 +957,7 @@ class Server
     protected static function getCheckDirs()
     {
         return [
-            'application',
+            'app',
             'public'
         ];
     }
@@ -1083,8 +1055,9 @@ class Server
      * @param array  $arr 新的ini数据
      * @return bool
      */
-    public static function setModuleInfo(string $dir, array $arr): bool
+    public static function setModuleInfo($name, $arr)
     {
+        $dir      = self::getModuleDir($name);
         $infoFile = $dir . 'info.ini';
         $ini      = [];
         foreach ($arr as $key => $val) {
@@ -1097,6 +1070,7 @@ class Server
                 $ini[] = "$key = $val";
             }
         }
+
         if (!file_put_contents($infoFile, implode("\n", $ini) . "\n", LOCK_EX)) {
             throw new Exception("Configuration file has no write permission");
         }

@@ -5,6 +5,7 @@ namespace app\admin\controller;
 use badou\Server;
 use think\Exception;
 use think\facade\Db;
+use think\facade\Cache;
 use badou\ModuleException;
 use app\common\controller\Backend;
 
@@ -13,7 +14,7 @@ class Module extends Backend
     public function index()
     {
         if ($this->isAjax()) {
-            $modules = Server::getModuleList();
+            $modules = Server::getInstalldModuleList();
             $list = [];
             $res = Server::modules();
             if ($res && $res['code'] == 1) {
@@ -26,6 +27,7 @@ class Module extends Backend
                     $item['version'] = $module['version'];
                     $item['name'] = $module['name'];
                     $item['title'] = $module['title'];
+                    $item['state'] = $module['state'];
                     $item['module'] = $module;
                 }
             }
@@ -86,20 +88,21 @@ class Module extends Backend
         $force = (int)$this->request->post("force");
         $droptables = (int)$this->request->post("droptables");
         if (!$name) {
-            $this->error(__('Parameter %s can not be empty', 'name'));
+            $this->error(__('Parameter %s can not be empty', ['name']));
         }
         if (!preg_match("/^[a-zA-Z0-9]+$/", $name)) {
-            $this->error(__('Addon name incorrect'));
+            $this->error(__('Module name incorrect'));
         }
         //只有开启调试且为超级管理员才允许删除相关数据库
         $tables = [];
-        if ($droptables && Config::get("app_debug") && $this->auth->isSuperAdmin()) {
+
+        if ($droptables && env('app_debug') && $this->auth->isSuperAdmin()) {
             $tables = get_module_tables($name);
         }
         try {
             Server::uninstall($name, $force);
             if ($tables) {
-                $prefix = Config::get('database.prefix');
+                $prefix = env('database.prefix');
                 //删除插件关联表
                 foreach ($tables as $index => $table) {
                     //忽略非插件标识的表名
@@ -129,7 +132,7 @@ class Module extends Backend
             $this->error(__('Parameter %s can not be empty', ['name']));
         }
         if (!preg_match("/^[a-zA-Z0-9]+$/", $name)) {
-            $this->error(__('Addon name incorrect'));
+            $this->error(__('Module name incorrect'));
         }
         try {
             $action = $action == 'enable' ? $action : 'disable';
@@ -154,7 +157,7 @@ class Module extends Backend
             $this->error(__('Parameter %s can not be empty', ['name']));
         }
         if (!preg_match("/^[a-zA-Z0-9]+$/", $name)) {
-            $this->error(__('Addon name incorrect'));
+            $this->error(__('Module name incorrect'));
         }
         if (!is_dir($moduleTmpDir)) {
             @mkdir($moduleTmpDir, 0755, true);
@@ -162,7 +165,7 @@ class Module extends Backend
 
         $info = [];
         try {
-            $info = get_module_info($name);
+            $info =  Server::getModuleInfo($name);
             $uid = $this->request->post("uid");
             $token = $this->request->post("token");
             $version = $this->request->post("version");
@@ -194,7 +197,7 @@ class Module extends Backend
             $this->error(__('Parameter %s can not be empty', ['name']));
         }
         if (!preg_match("/^[a-zA-Z0-9]+$/", $name)) {
-            $this->error(__('Addon name incorrect'));
+            $this->error(__('Module name incorrect'));
         }
 
         try {
@@ -217,7 +220,7 @@ class Module extends Backend
         $filter = $this->request->get("filter");
         $search = $this->request->get("search");
         $search = htmlspecialchars(strip_tags($search));
-        $onlinemodules = $this->getModuleList();
+        $onlinemodules = $this->getInstalldModuleList();
         $filter = (array)json_decode($filter, true);
         $modules = get_module_list();
         $list = [];
@@ -306,7 +309,7 @@ class Module extends Backend
     {
         $name = $this->request->post("name");
         if (!preg_match("/^[a-zA-Z0-9]+$/", $name)) {
-            $this->error(__('Addon name incorrect'));
+            $this->error(__('Module name incorrect'));
         }
         $tables = get_module_tables($name);
         $prefix = Config::get('database.prefix');
@@ -320,7 +323,7 @@ class Module extends Backend
         $this->success('', null, ['tables' => $tables]);
     }
 
-    protected function getModuleList()
+    protected function getInstalldModuleList()
     {
         $onlinemodules = Cache::get("onlinemodules");
         if (!is_array($onlinemodules) && config('fastadmin.api_url')) {
