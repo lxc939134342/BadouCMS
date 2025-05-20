@@ -26,7 +26,6 @@ class Module extends Backend
                 if ($module) {
                     $item['version'] = $module['version'];
                     $item['name'] = $module['name'];
-                    $item['title'] = $module['title'];
                     $item['state'] = $module['state'];
                     $item['module'] = $module;
                 }
@@ -57,7 +56,10 @@ class Module extends Backend
             $this->error(__('Module name incorrect'));
         }
 
-        $info = [];
+        $info = [
+            'module' => null,
+            'state'  => 0,
+        ];
         try {
             $uid = $this->request->get("uid");
             $token = $this->request->get("token");
@@ -70,13 +72,20 @@ class Module extends Backend
                 'bdversion' => $bdversion
             ];
             $res = Server::moduleInfo($name, $extend);
-            $info = $res['data'];
+            $info = array_merge($info, $res['data']);
+            $ini = Server::getModuleInfo($name);
+            if ($ini) {
+                $info['state'] = $ini['state'];
+                $info['module'] = $ini;
+            }
         } catch (ModuleException $e) {
             $this->result(__($e->getMessage()), $e->getData(), 0, $e->getCode(), );
         } catch (Exception $e) {
             $this->error(__($e->getMessage()));
         }
+
         $this->assign('info', $info);
+        $this->assignconfig('info', $info);
         return $this->view->fetch();
     }
 
@@ -181,7 +190,7 @@ class Module extends Backend
         } catch (Exception $e) {
             $this->error(__($e->getMessage()));
         }
-        $this->success(__('Operate successful'));
+        $this->success(__('Operation completed'));
     }
 
     /**

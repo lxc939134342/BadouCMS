@@ -28,7 +28,6 @@ layui.define(['toast'], function (exports) {
                     }
                 }
 
-
                 toast.error({ message: ret.msg });
             },
             //服务器响应数据后
@@ -228,18 +227,22 @@ layui.define(['toast'], function (exports) {
                 if (type) {
                     callback = options;
                 }
-                return Layer.msg(__('Operation completed'), $.extend({
-                    offset: 0, icon: 1
-                }, type ? {} : options), callback);
+                return toast.success({
+                    message: __('Operation completed'),
+                    offset: 0,
+                    onClosing: callback
+                });
             },
             error: function (options, callback) {
                 var type = typeof options === 'function';
                 if (type) {
                     callback = options;
                 }
-                return Layer.msg(__('Operation failed'), $.extend({
-                    offset: 0, icon: 2
-                }, type ? {} : options), callback);
+                return toast.error({
+                    message: __('Operation failed'),
+                    offset: 0,
+                    onClosing: callback
+                })
             },
             msg: function (message, url) {
                 var callback = typeof url === 'function' ? url : function () {

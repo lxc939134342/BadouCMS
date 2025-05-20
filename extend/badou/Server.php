@@ -535,11 +535,6 @@ class Server
             throw new Exception('Module not exists');
         }
 
-        $file = self::getExtraModulesFile();
-        if (!Filesystem::pathIsWritable($file)) {
-            throw new Exception(__("Unable to open file '%s' for writing", ["modules.php"]));
-        }
-
         if (!$force) {
             Server::noconflict($name);
         }
@@ -886,15 +881,6 @@ class Server
             default => '\\modules\\' . $name . '\\' . $class,
         };
         return class_exists($namespace) ? $namespace : '';
-    }
-
-    /**
-     * 获取模块行为、路由配置文件
-     * @return string
-     */
-    public static function getExtraModulesFile()
-    {
-        return config_path() . 'extra' . DIRECTORY_SEPARATOR . 'modules.php';
     }
 
     /**

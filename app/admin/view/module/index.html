@@ -43,15 +43,7 @@
                 </div>
 
 
-                <!-- <button class="layui-btn layui-btn-sm layui-bg-blue btn-upgrade" lay-options="{
-                    data: [{{d.item.releaselist.forEach(function(value) { }}{title: '{{=value.version}}', id: '{{=value.id}}'} {{ }); }}]
-                }">
-                    <i class="fa fa-cloud"></i> 升级
-                    <i class="layui-icon layui-icon-down layui-font-12"></i>
-                </button>
-                <button class="layui-btn layui-btn-sm layui-bg-green"><i class="fa fa-cloud"></i> 禁用</button>
-                <button class="layui-btn layui-btn-sm layui-bg-red"> <i class="fa fa-times"></i> 卸载</button> -->
-                <!-- <button type="button" data-version="{{=d.item.version}}" data-name="{{=d.item.name}}" class="layui-btn layui-btn-sm layui-bg-red btn-install"> <i class="fa fa-cloud-download"></i> 安装</button> -->
+
 
             </div>
         </div >
@@ -150,29 +142,15 @@
             return false;
         });
 
-
-        // 点击安装
-        $(document).on("click", ".btn-install", function () {
-            var that = this;
-            var version = $(this).data("version");
-            var name = $(this).data("name");
-            var userinfo = badouStorage.get('userinfo');
-            var uid = userinfo ? userinfo.id : 0;
-            if (parseInt(uid) === 0) {
-                $(".btn-userinfo").trigger("click", name, version);
-                return false;
-            }
-
-            install(name, version, false);
-        });
-
         $(document).on("click", ".btn-item", function () {
             var name=$(this).data("name");
             var userinfo = badouStorage.get('userinfo');
+            if (!userinfo) {
+                $(".btn-userinfo").trigger("click");
+                return false;
+            }
             var url = "{:url('module/info')}?name="+name+'&uid='+userinfo.id+'&token='+userinfo.token+'&bdversion='+Config.bdversion;
-            console.log(url);
             badou.api.open(url,__('Module info'));
-
         });
 
         // 会员信息
@@ -274,109 +252,6 @@
             }
         });
 
-        var install = function (name, version, force) {
-            var userinfo = badouStorage.get('userinfo');
-            var uid = userinfo ? userinfo.id : 0;
-            var token = userinfo ? userinfo.token : '';
-            badou.api.ajax({
-                url: 'module/install',
-                data: {
-                    name: name,
-                    force: force ? 1 : 0,
-                    uid: uid,
-                    token: token,
-                    version: version,
-                    bdversion: Config.bdversion
-                }
-            }, function (data, ret) {
-                layer.closeAll();
-                Config['modules'][data.addon.name] = ret.data.addon;
-                operate(data.addon.name, 'enable', false, function () {
-                    layer.alert(__('Online installed tips') + (data.addon.testdata ? __('Testdata tips') : ""), {
-                        btn: data.addon.testdata ? [__('Import testdata'), __('Skip testdata')] : [__('OK')],
-                        title: __('Warning'),
-                        yes: function (index) {
-                            if (data.addon.testdata) {
-                                badou.api.ajax({
-                                    url: 'module/testdata',
-                                    data: {
-                                        name: name,
-                                        uid: uid,
-                                        token: token,
-                                        version: version,
-                                        bdversion: Config.bdversion
-                                    }
-                                }, function (data, ret) {
-                                    layer.close(index);
-                                });
-                            } else {
-                                layer.close(index);
-                            }
-                        },
-                        icon: 1
-                    });
-                    Controller.api.refresh(table, name);
-                });
-            }, function (data, ret) {
-                var area = [$(window).width() > 650 ? '650px' : '95%', $(window).height() > 710 ? '710px' : '95%'];
-                if (ret && ret.code === -2) {
-                    //如果登录已经超时,重新提醒登录
-                    if (uid && uid != ret.data.uid) {
-                        badouStorage.remove('userinfo');
-                        $(".operate[data-name='" + name + "'] .btn-install").trigger("click");
-                        return;
-                    }
-                    badou.api.open(ret.data.payurl, __('Pay now'), {
-                        area: area,
-                        end: function () {
-                            badou.api.ajax({
-                                url: 'module/isbuy',
-                                data: {
-                                    name: name,
-                                    force: force ? 1 : 0,
-                                    uid: uid,
-                                    token: token,
-                                    version: version,
-                                    bdversion: Config.bdversion
-                                }
-                            }, function () {
-                                top.layer.alert(__('Pay successful tips'), {
-                                    btn: [__('Continue installation')],
-                                    title: __('Warning'),
-                                    icon: 1,
-                                    yes: function (index) {
-                                        top.layer.close(index);
-                                        install(name, version);
-                                    }
-                                });
-                                return false;
-                            }, function () {
-                                console.log(__('Canceled'));
-                                return false;
-                            });
-                        }
-                    });
-                } else if (ret && ret.code === -3) {
-                    //插件目录发现影响全局的文件
-                    layer.open({
-                        content: Template("conflicttpl", ret.data),
-                        shade: 0.8,
-                        area: area,
-                        title: __('Warning'),
-                        btn: [__('Continue install'), __('Cancel')],
-                        end: function () {
 
-                        },
-                        yes: function () {
-                            install(name, version, true);
-                        }
-                    });
-
-                } else {
-                    layer.alert(ret.msg, {title: __('Warning'), icon: 0});
-                }
-                return false;
-            });
-        };
     });
 </script>
