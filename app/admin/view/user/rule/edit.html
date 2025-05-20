@@ -1,0 +1,66 @@
+{layout name="layout/form" /}
+<form class="layui-form" method="post">
+    {:token_field()}
+    <div class="layui-form-item">
+        <label class="layui-form-label">菜单</label>
+        <div class="layui-input-block">
+            <input type="radio" name="row[ismenu]" value="1" title="是" {if $row.ismenu==1}checked{/if} lay-filter="ismenu">
+            <input type="radio" name="row[ismenu]" value="0" title="否"  {if $row.ismenu==0}checked{/if} lay-filter="ismenu">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">上级菜单</label>
+        <div class="layui-input-block">
+            <select name="row[pid]" lay-verify="required">
+                {foreach name="$ruledata"  item="vo"}
+                <option value="{$key}" {if $row.pid==$key} selected {/if}>{$vo |raw}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">规则</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[name]"  value="{$row.name}" lay-verify="required" autocomplete="off"  placeholder="控制器/方法名,如果有目录请使用 目录名.控制器名/方法名" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">标题</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[title]" value="{:__($row.title)}" lay-verify="required" autocomplete="off" placeholder="标题" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注</label>
+        <div class="layui-input-block">
+            <textarea name="row[remark]" placeholder="备注" class="layui-textarea">{$row.remark}</textarea>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">权重</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[weigh]" autocomplete="off" placeholder="权重" class="layui-input" value="{$row.weigh}" >
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态 </label>
+        <div class="layui-input-block">
+            <input type="radio" name="row[status]" value="normal" title="正常" {if $row.status=='normal'}checked{/if}>
+            <input type="radio" name="row[status]" value="hidden" title="隐藏" {if $row.status=='hidden'}checked{/if}>
+        </div>
+    </div>
+    <div class="layui-form-item layer-footer hide">
+        <div class="layui-input-block">
+            <button class="layui-btn pear-btn-primary layui-btn-sm disabled" lay-submit>立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(['badou'],function () {
+        var bdForm = layui.bdForm;
+        bdForm.api.bindevent($("form.layui-form"));
+    })
+</script>

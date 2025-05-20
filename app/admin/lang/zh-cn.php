@@ -61,4 +61,13 @@ return [
     'Hidden'                                                => '隐藏',
     'Off'                                                   => '关闭',
     'On'                                                    => '开启',
+
+
+    'Profile'                                               => '个人资料',
+    // 前台菜单
+    'Frontend'                                              => '前台',
+    'API Interface'                                         => 'API接口',
+    'User Module'                                           => '会员模块',
+    'Register'                                              => '注册',
+    'User Center'                                           => '会员中心',
 ];
