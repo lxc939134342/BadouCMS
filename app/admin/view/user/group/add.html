@@ -1,82 +1,172 @@
 {layout name="layout/form" /}
 <form class="layui-form" method="post">
     {:token_field()}
+    <div class="layui-form-item">
+        <label class="layui-form-label">父级</label>
+        <div class="layui-input-block">
+        <!-- 由于 Class "thinkfacadeForm" 未找到，我们可以使用原生 HTML 实现下拉选择框 -->
+        <select name="row[parentid]" lay-verify="required" lay-filter="parentid">
+            <?php foreach ($groupdata as $key => $value): ?>
+                <option value="<?php echo $key; ?>" <?php if ($key === 0) echo 'selected'; ?>>
+                    <?php echo $value; ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">权限组</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[title]" lay-verify="required" autocomplete="off" placeholder="权限组" class="layui-input" value="">
+        </div>
+    </div>
+
 
     <div class="layui-form-item">
-        <label class="layui-form-label">组名</label>
+        <label class="layui-form-label">状态</label>
         <div class="layui-input-block">
-            <input type="text" name="row[name]" lay-verify="required" autocomplete="off"  placeholder="控制器/方法名,如果有目录请使用 目录名.控制器名/方法名" class="layui-input">
+            <input type="radio" name="row[status]" value="1" title="正常" checked>
+            <input type="radio" name="row[status]" value="0" title="禁用">
         </div>
     </div>
+
     <div class="layui-form-item">
-        <label class="layui-form-label">标题</label>
+        <label class="layui-form-label">权限</label>
         <div class="layui-input-block">
-            <input type="text" name="row[title]" lay-verify="required" autocomplete="off" placeholder="标题" class="layui-input">
+            <input type="checkbox" name="" title="选中全部" lay-filter="checkall">
+            <input type="checkbox" name="" title="展开全部" lay-filter="expandall">
+            <div id="treeview"></div>
         </div>
     </div>
-    <div class="layui-form-item" data-type="menu">
-        <label class="layui-form-label">URL</label>
-        <div class="layui-input-block">
-            <input type="text" name="row[url]" autocomplete="off" placeholder="一般情况下留空即可,如果是外部链接或相对链接请输入" class="layui-input">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">图标</label>
-        <div class="layui-input-block">
-            <input type="text" class="icon-select" lay-filter="iconPicker" class="layui-hide" name="row[icon]" class="layui-input">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">规则条件</label>
-        <div class="layui-input-block">
-            <textarea name="row[condition]" placeholder="规则条件" class="layui-textarea"></textarea>
-        </div>
-    </div>
-    </div>
-    <div class="layui-form-item" data-type="menu">
-        <label class="layui-form-label">菜单类型</label>
-        <div class="layui-input-block">
-            <input type="radio" name="row[menutype]" value="_iframe" title="选项卡(默认)" checked>
-            <input type="radio" name="row[menutype]" value="_blank" title="链接">
-        </div>
-    </div>
-    <div class="layui-form-item" data-type="menu">
-        <label class="layui-form-label">扩展属性</label>
-        <div class="layui-input-block">
-            <textarea name="row[extend]" placeholder="扩展属性" class="layui-textarea"></textarea>
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">备注</label>
-        <div class="layui-input-block">
-            <textarea name="row[remark]" placeholder="备注" class="layui-textarea"></textarea>
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">显示排序</label>
-        <div class="layui-input-block">
-            <input type="text" name="row[listorder]" autocomplete="off" placeholder="显示排序" class="layui-input" value="0">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">是否显示</label>
-        <div class="layui-input-block">
-            <input type="radio" name="row[status]" value="normal" title="显示" checked>
-            <input type="radio" name="row[status]" value="hidden" title="隐藏">
-        </div>
-    </div>
+
+
+
+
     <div class="layui-form-item layer-footer hide">
         <div class="layui-input-block">
-            <button class="layui-btn pear-btn-primary layui-btn-sm disabled" lay-submit>立即提交</button>
-            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
+            <button class="pear-btn pear-btn-primary pear-btn-md disabled" lay-submit>立即提交</button>
+            <button type="reset" class="pear-btn pear-btn-md">重置</button>
         </div>
     </div>
 </form>
 
 <script>
-    layui.use(['badou'],function () {
+layui.use(['badou','jstree'],function () {
         var bdForm = layui.bdForm;
 
         bdForm.api.bindevent($("form.layui-form"));
-    })
+
+
+         //读取选中的条目
+        //  $.jstree.core.prototype.get_all_checked = function(full) {
+        //     var obj = this.get_selected(),
+        //         i, j;
+        //     for (i = 0, j = obj.length; i < j; i++) {
+        //         obj = obj.concat(this.get_node(obj[i]).parents);
+        //     }
+        //     obj = $.grep(obj, function(v, i, a) {
+        //         return v != '#';
+        //     });
+        //     obj = obj.filter(function(itm, i, a) {
+        //         return i == a.indexOf(itm);
+        //     });
+        //     return full ? $.map(obj, $.proxy(function(i) {
+        //         return this.get_node(i);
+        //     }, this)) : obj;
+        // };
+
+    //     var Controller = {
+           
+    //        add: function() {
+    //            Controller.api.bindevent();
+    //        },
+    //        edit: function() {
+    //            Controller.api.bindevent();
+    //        },
+    //        api: {
+    //            bindevent: function() {
+    //                Form.api.bindevent($("form.layui-form"), null, null, function() {
+    //                    if ($("#treeview").length > 0) {
+    //                        var r = $("#treeview").jstree("get_all_checked");
+    //                        $("input[name='row[rules]']").val(r.join(','));
+    //                    }
+    //                    return true;
+    //                });
+    //                //渲染权限节点树
+    //                //变更级别后需要重建节点树
+    //                layui.form.on('select(parentid)', function(data){
+    //                    var parentid = $(data.elem).data("parentid");
+    //                    var id = $(data.elem).data("id");
+    //                    var val = data.value;
+
+    //                    if (val == id) {
+    //                        $("option[value='" + parentid + "']", this).prop("selected", true).change();
+    //                        Backend.api.toastr.error('父级不能是它自己');
+    //                        return false;
+    //                    }
+    //                    $.ajax({
+    //                        url: "auth.group/roletree",
+    //                        type: 'post',
+    //                        dataType: 'json',
+    //                        data: { id: id, parentid: val },
+    //                        success: function(ret) {
+    //                            if (ret.hasOwnProperty("code")) {
+    //                                var data = ret.hasOwnProperty("data") && ret.data != "" ? ret.data : "";
+    //                                if (ret.code === 1) {
+    //                                    //销毁已有的节点树
+    //                                    $("#treeview").jstree("destroy");
+    //                                    Controller.api.rendertree(data);
+    //                                } else {
+    //                                    Backend.api.toastr.error(ret.msg);
+    //                                }
+    //                            }
+    //                        },
+    //                        error: function(e) {
+    //                            Backend.api.toastr.error(e.message);
+    //                        }
+    //                    });
+    //                });
+
+    //                //全选和展开
+    //                layui.form.on('checkbox(checkall)', function(data){
+    //                    $("#treeview").jstree($(this).prop("checked") ? "check_all" : "uncheck_all");
+    //                });
+    //                layui.form.on('checkbox(expandall)', function(data){
+    //                    $("#treeview").jstree($(this).prop("checked") ? "open_all" : "close_all");
+    //                });
+    //                $("select[name='row[parentid]']").siblings("div.layui-form-select").find("dd.layui-this").click();
+    //            },
+    //            rendertree: function(content) {
+    //                $("#treeview")
+    //                    .on('redraw.jstree', function(e) {
+    //                        $(".layer-footer").attr("domrefresh", Math.random());
+    //                    })
+    //                    .jstree({
+    //                        "themes": { "stripes": true },
+    //                        "checkbox": {
+    //                            "keep_selected_style": false,
+    //                        },
+    //                        "types": {
+    //                            "root": {
+    //                                "icon": "fa fa-folder-open",
+    //                            },
+    //                            "menu": {
+    //                                "icon": "fa fa-folder-open",
+    //                            },
+    //                            "file": {
+    //                                "icon": "fa fa-file-o",
+    //                            }
+    //                        },
+    //                        "plugins": ["checkbox", "types"],
+    //                        "core": {
+    //                            'check_callback': true,
+    //                            "data": content
+    //                        }
+    //                    });
+    //            }
+    //        }
+    //    };
+    //    return Controller;
+
+
+})
 </script>

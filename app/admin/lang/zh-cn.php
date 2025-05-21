@@ -62,7 +62,7 @@ return [
     'Off'                                                   => '关闭',
     'On'                                                    => '开启',
 
-
+    'Group'                                                 => '角色组',
     'Profile'                                               => '个人资料',
     // 前台菜单
     'Frontend'                                              => '前台',
