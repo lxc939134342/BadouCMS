@@ -265,6 +265,49 @@ layui.define(['toast'], function (exports) {
                         .replace(/`/g, '&#x60;');
                 }
                 return text;
+            },
+            badouStorage: {
+                // 统一的命名空间
+                namespace: 'badouadmin',
+
+                // 获取存储数据
+                get: function (key) {
+                    var data = layui.data(this.namespace);
+                    return key ? data[key] : data;
+                },
+
+                // 设置存储数据
+                set: function (namespace, data) {
+                    if (!data) {
+                        data = namespace;
+                    } else {
+                        this.namespace = namespace;
+                    }
+                    layui.data(this.namespace, data);
+                },
+
+                // 删除存储数据
+                remove: function (key) {
+                    layui.data(this.namespace, {
+                        key: key,
+                        remove: true
+                    });
+                },
+
+                // 清空所有数据
+                clear: function () {
+                    layui.data(this.namespace, null);
+                },
+
+                // 获取或生成会话ID
+                getSid: function () {
+                    var sid = this.get('sid');
+                    if (!sid) {
+                        sid = Math.random().toString(20).substr(2, 12);
+                        this.set({ key: 'sid', value: sid });
+                    }
+                    return sid;
+                }
             }
         },
         init: function () {

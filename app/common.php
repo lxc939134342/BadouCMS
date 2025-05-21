@@ -3,6 +3,7 @@
 // 应用公共文件
 use think\Response;
 use think\facade\Lang;
+use think\facade\Config;
 use voku\helper\AntiXSS;
 use think\exception\HttpResponseException;
 
@@ -208,7 +209,7 @@ if (!function_exists('cdnurl')) {
     function cdnurl($url, $domain = false)
     {
         $regex = "/^((?:[a-z]+:)?\/\/|data:image\/)(.*)/i";
-        $cdnurl = \think\Config::get('upload.cdnurl');
+        $cdnurl = Config::get('upload.cdnurl');
         if (is_bool($domain) || stripos($cdnurl, '/') === 0) {
             $url = preg_match($regex, $url) || ($cdnurl && stripos($url, $cdnurl) === 0) ? $url : $cdnurl . $url;
         }
@@ -292,4 +293,3 @@ if (!function_exists('hsv2rgb')) {
         ];
     }
 }
-

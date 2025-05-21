@@ -9,7 +9,7 @@
 </style>
 <div class="layui-row">
     <div class="layui-col-md4 layui-col-xs6">
-        <div class="layui-carousel" id="ID-carousel-demo-1">
+        <div class="layui-carousel" id="carousel">
             <div carousel-item>
                 <div>条目1</div>
             </div>
@@ -58,26 +58,56 @@
     <div class="">
         <div class="">{{-__("Are you sure you want to unstall %s?", d.title)}}
             <p class="text-danger">{:__('Delete all the module file and cannot be recovered!')} </p>
-            {if config('app_debug')}
-            <p class="text-danger"><input type="checkbox" name="droptables" id="droptables" data-name="{{d.name}}"/> {:__('Delete all the module database and cannot be recovered!')} </p>
+            {if env('app_debug')}
+            <p class="text-danger"><input type="checkbox" name="droptables" id="droptables" data-name="{{=d.name}}"/> {:__('Delete all the module database and cannot be recovered!')} </p>
             {/if}
             <p class="text-danger">{:__('Please backup important data manually before uninstall!')}</p>
         </div>
     </div>
 </script>
+
+<script id="conflicttpl" type="text/html">
+    <div class="alert alert-dismissable alert-danger">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <strong>{:__('Warning')}</strong> {:__('Conflict tips')}
+    </div>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>{:__('File')}</th>
+        </tr>
+        </thead>
+        <tbody>
+            {{ for(var i=0;i < d.conflictlist.length;i++) { }}
+            <tr>
+                <th scope="row">{{=i+1 }}</th>
+                <td>{{=d.conflictlist[i] }}</td>
+            </tr>
+            {{ } }}
+        </tbody>
+    </table>
+</script>
 <script type="text/javascript">
     layui.use(["badou","carousel", "dropdown", "layer", "form","laytpl"], function () {
-        var carousel = layui.carousel;
-        var dropdown = layui.dropdown;
-        var $ = layui.$;
-        var form = layui.form;
-        var badou = layui.badou;
-        var laytpl = layui.laytpl;
-        var Layer = layui.layer;
-
+        var carousel     = layui.carousel;
+        var dropdown     = layui.dropdown;
+        var $            = layui.$;
+        var form         = layui.form;
+        var badou        = layui.badou;
+        var laytpl       = layui.laytpl;
+        var Layer        = layui.layer;
+        var conflicttpl  = document.getElementById('conflicttpl').innerHTML;
+        var uninstalltpl = document.getElementById('uninstalltpl').innerHTML;
+        var iframeRefresh = function () {
+             // 获取当前iframe层的索引
+             var index = parent.layer.getFrameIndex(window.name);
+             // 重新加载
+             parent.layer.iframeSrc(index, window.location.href);
+        };
         // 渲染 - 常规轮播
         carousel.render({
-            elem: "#ID-carousel-demo-1",
+            elem: "#carousel",
             width: "auto",
         });
 
@@ -106,6 +136,8 @@
                     name: '{$info.name}',
                     action: action,
                 },
+            }, function (data, ret) {
+                iframeRefresh();
             })
         })
 
@@ -114,7 +146,7 @@
             var that = this;
             var version = $(this).data("version");
             var name = $(this).data("name");
-            var userinfo = badouStorage.get('userinfo');
+            var userinfo = badou.api.badouStorage.get('userinfo');
             var uid = userinfo ? userinfo.id : 0;
             if (parseInt(uid) === 0) {
                 $(".btn-userinfo").trigger("click", name, version);
@@ -127,58 +159,77 @@
         // 点击卸载
         $(document).on("click", ".btn-uninstall", function () {
             var name = $(this).data('name');
-            var template = document.getElementById('uninstalltpl').innerHTML;
+
             if (Config.info.state == 1) {
                 Layer.alert(__('Please disable the add before trying to uninstall'), {icon: 7});
                 return false;
             }
-            console.log(Config.info);
+
             laytpl.extendVars({
                 __:__,
             })
-            Layer.confirm(laytpl(template, {tagStyle: 'modern'}).render(Config.info), {focusBtn: false, title: __("Warning")}, function (index, layero) {
+            Layer.confirm(laytpl(uninstalltpl, {tagStyle: 'modern'}).render(Config.info), {focusBtn: false, title: __("Warning")}, function (index, layero) {
                 uninstall(name, false, $("input[name='droptables']", layero).prop("checked"));
             });
         });
 
-        var operate = function (name, action, force, success) {
+        $(document).on("click", "#droptables", function () {
+            if ($(this).prop("checked")) {
                 badou.api.ajax({
-                    url: 'module/state',
-                    data: {name: name, action: action, force: force ? 1 : 0}
-                }, function (data, ret) {
-                    var module = Config['modules'][name];
-                    module.state = action === 'enable' ? 1 : 0;
-                    Layer.closeAll();
-                    if (typeof success === 'function') {
-                        success(data, ret);
-                    }
-                    Controller.api.refresh(table, name);
-                }, function (data, ret) {
-                    if (ret && ret.code === -3) {
-                        //插件目录发现影响全局的文件
-                        Layer.open({
-                            content: Template("conflicttpl", ret.data),
-                            shade: 0.8,
-                            area: area,
-                            title: __('Warning'),
-                            btn: [__('Continue operate'), __('Cancel')],
-                            end: function () {
-
-                            },
-                            yes: function () {
-                                operate(name, action, true, success);
-                            }
-                        });
-
-                    } else {
-                        Layer.alert(ret.msg, {title: __('Warning'), icon: 0});
-                    }
+                    url: "module/get_table_list",
+                    async: false,
+                    data: {name: $(this).data("name")}
+                }, function (data) {
+                    tables = data.tables;
                     return false;
                 });
-            };
+                var html;
+                html = tables.length > 0 ? '<div class="alert alert-warning-light droptablestips" style="max-width:480px;max-height:300px;overflow-y: auto;">' + __('The following data tables will be deleted') + '：<br>' + tables.join("<br>") + '</div>'
+                    : '<div class="alert alert-warning-light droptablestips">' + __('The Addon did not create a data table') + '</div>';
+                $(html).insertAfter($(this).closest("p"));
+            } else {
+                $(".droptablestips").remove();
+            }
+            $(window).resize();
+        });
+
+        var operate = function (name, action, force, success) {
+            badou.api.ajax({
+                url: 'module/state',
+                data: {name: name, action: action, force: force ? 1 : 0}
+            }, function (data, ret) {
+                var module = Config.info;
+                module.state = action === 'enable' ? 1 : 0;
+                Layer.closeAll();
+                if (typeof success === 'function') {
+                    success(data, ret);
+                }
+            }, function (data, ret) {
+                if (ret && ret.code === -3) {
+                    //插件目录发现影响全局的文件
+                    Layer.open({
+                        content:laytpl(conflicttpl, {tagStyle: 'modern'}).render(ret.data),
+                        shade: 0.8,
+                        area: area,
+                        title: __('Warning'),
+                        btn: [__('Continue operate'), __('Cancel')],
+                        end: function () {
+
+                        },
+                        yes: function () {
+                            operate(name, action, true, success);
+                        }
+                    });
+
+                } else {
+                    Layer.alert(ret.msg, {title: __('Warning'), icon: 0});
+                }
+                return false;
+            });
+        };
 
         var install = function (name, version, force) {
-            var userinfo = badouStorage.get('userinfo');
+            var userinfo = badou.api.badouStorage.get('userinfo');
             var uid = userinfo ? userinfo.id : 0;
             var token = userinfo ? userinfo.token : '';
             badou.api.ajax({
@@ -193,7 +244,6 @@
                 }
             }, function (data, ret) {
                 layer.closeAll();
-                Config['modules'][data.module.name] = ret.data.module;
                 operate(data.module.name, 'enable', false, function () {
                     layer.alert(__('Online installed tips') + (data.module.testdata ? __('Testdata tips') : ""), {
                         btn: data.module.testdata ? [__('Import testdata'), __('Skip testdata')] : [__('OK')],
@@ -218,15 +268,16 @@
                         },
                         icon: 1
                     });
-                    Controller.api.refresh(table, name);
+
                 });
+                return false;
             }, function (data, ret) {
                 var area = [$(window).width() > 650 ? '650px' : '95%', $(window).height() > 710 ? '710px' : '95%'];
                 if (ret && ret.code === -2) {
                     //如果登录已经超时,重新提醒登录
                     if (uid && uid != ret.data.uid) {
-                        badouStorage.remove('userinfo');
-                        $(".operate[data-name='" + name + "'] .btn-install").trigger("click");
+                        badou.api.badouStorage.remove('userinfo');
+                        $(".btn-install").trigger("click");
                         return;
                     }
                     badou.api.open(ret.data.payurl, __('Pay now'), {
@@ -262,7 +313,7 @@
                 } else if (ret && ret.code === -3) {
                     //插件目录发现影响全局的文件
                     layer.open({
-                        content: Template("conflicttpl", ret.data),
+                        content: laytpl(conflicttpl, {tagStyle: 'modern'}).render(ret.data),
                         shade: 0.8,
                         area: area,
                         title: __('Warning'),
@@ -283,33 +334,36 @@
         };
 
         var uninstall = function (name, force, droptables) {
-                badou.api.ajax({
-                    url: 'module/uninstall',
-                    data: {name: name, force: force ? 1 : 0, droptables: droptables ? 1 : 0}
-                }, function (data, ret) {
-                    Layer.closeAll();
-                }, function (data, ret) {
-                    if (ret && ret.code === -3) {
-                        //插件目录发现影响全局的文件
-                        Layer.open({
-                            content: Template("conflicttpl", ret.data),
-                            shade: 0.8,
-                            area: area,
-                            title: __('Warning'),
-                            btn: [__('Continue uninstall'), __('Cancel')],
-                            end: function () {
+            console.log(droptables);
+            badou.api.ajax({
+                url: 'module/uninstall',
+                data: {name: name, force: force ? 1 : 0, droptables: droptables ? 1 : 0}
+            }, function (data, ret) {
+                Layer.closeAll();
+                iframeRefresh();
+                return false;
+            }, function (data, ret) {
+                if (ret && ret.code === -3) {
+                    //插件目录发现影响全局的文件
+                    Layer.open({
+                        content: laytpl(conflicttpl, {tagStyle: 'modern'}).render(ret.data),
+                        shade: 0.8,
+                        area: area,
+                        title: __('Warning'),
+                        btn: [__('Continue uninstall'), __('Cancel')],
+                        end: function () {
 
-                            },
-                            yes: function () {
-                                uninstall(name, true, droptables);
-                            }
-                        });
+                        },
+                        yes: function () {
+                            uninstall(name, true, droptables);
+                        }
+                    });
 
-                    } else {
-                        Layer.alert(ret.msg, {title: __('Warning'), icon: 0});
-                    }
-                    return false;
-                });
-            };
+                } else {
+                    Layer.alert(ret.msg, {title: __('Warning'), icon: 0});
+                }
+                return false;
+            });
+        };
     });
 </script>

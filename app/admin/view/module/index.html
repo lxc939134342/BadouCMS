@@ -33,7 +33,7 @@
                     <span>
                         <i class="fa fa-download"></i> 0
                     </span>
-                    {{ if(d.item.state==1) { }}
+                    {{ if(d.item.module) { }}
                     <button class="layui-btn layui-btn-sm layui-bg-green"> 已安装</button>
                     {{ } else { }}
                     <span>
@@ -41,10 +41,6 @@
                     </span>
                     {{ } }}
                 </div>
-
-
-
-
             </div>
         </div >
     </div >
@@ -60,51 +56,7 @@
         var layer = layui.layer;
         var dropdown = layui.dropdown;
         var template = document.getElementById('cardTpl').innerHTML; // 获取模板字符
-        var badouStorage = {
-            // 统一的命名空间
-            namespace: 'badouadmin',
-
-            // 获取存储数据
-            get: function(key) {
-                var data = layui.data(this.namespace);
-                return key ? data[key] : data;
-            },
-
-            // 设置存储数据
-            set: function(namespace,data) {
-                if(!data){
-                    data=namespace;
-                }else{
-                    this.namespace=namespace;
-                }
-                layui.data(this.namespace, data);
-            },
-
-            // 删除存储数据
-            remove: function(key) {
-                layui.data(this.namespace, {
-                    key: key,
-                    remove: true
-                });
-            },
-
-            // 清空所有数据
-            clear: function() {
-                layui.data(this.namespace, null);
-            },
-
-            // 获取或生成会话ID
-            getSid: function() {
-                var sid = this.get('sid');
-                if (!sid) {
-                    sid = Math.random().toString(20).substr(2, 12);
-                    this.set({key:'sid',value:sid});
-                }
-                return sid;
-            }
-        };
-
-        card.render({
+        var cardOptions = {
             elem: "#modules-wrapper",
             url: "{:url('module/index')}", // 接口数据
             data: [], // 静态数据
@@ -120,6 +72,11 @@
                     elem: '.btn-upgrade',
                 })
             },
+        }
+        card.render(cardOptions);
+
+        $(document).on("click", ".btn-refresh", function () {
+            card.reload('modules-wrapper');
         });
 
         // 监听搜索操作
@@ -144,20 +101,24 @@
 
         $(document).on("click", ".btn-item", function () {
             var name=$(this).data("name");
-            var userinfo = badouStorage.get('userinfo');
+            var userinfo = badou.api.badouStorage.get('userinfo');
             if (!userinfo) {
                 $(".btn-userinfo").trigger("click");
                 return false;
             }
             var url = "{:url('module/info')}?name="+name+'&uid='+userinfo.id+'&token='+userinfo.token+'&bdversion='+Config.bdversion;
-            badou.api.open(url,__('Module info'));
+            badou.api.open(url,__('Module info'),{
+                end:function(){
+                    card.reload('modules-wrapper');
+                }
+            });
         });
 
         // 会员信息
         $(document).on("click", ".btn-userinfo", function (e, name, version) {
             var that = this;
             var area = [$(window).width() > 800 ? '500px' : '95%', $(window).height() > 600 ? '400px' : '95%'];
-            var userinfo = badouStorage.get('userinfo');
+            var userinfo = badou.api.badouStorage.get('userinfo');
             if (!userinfo) {
                 badou.api.ajax({
                     url: Config.api_url + '/member/logintpl',
@@ -165,7 +126,7 @@
                     loading: false,
                     data: {
                         version: Config.bdversion,
-                        sid: badouStorage.getSid()
+                        sid: badou.api.badouStorage.getSid()
                     }
                 }, function (tpldata, ret) {
                     layer.open({
@@ -178,13 +139,13 @@
                         yes: function (index, layero) {
                             var data = $("form", layero).serializeArray();
                             data.push({name: "bdversion", value: Config.bdversion});
-                            data.push({name: "sid", value: badouStorage.getSid()});
+                            data.push({name: "sid", value: badou.api.badouStorage.getSid()});
                             badou.api.ajax({
                                 url: Config.api_url + '/member/login',
                                 type: 'post',
                                 data: data
                             }, function (data, ret) {
-                                badouStorage.set({key:'userinfo', value:data});
+                                badou.api.badouStorage.set({key:'userinfo', value:data});
                                 layer.closeAll();
                                 layer.alert(ret.msg, {title: __('Warning'), icon: 1});
                                 return false;
@@ -214,7 +175,7 @@
                         uid: userinfo.id,
                         token: userinfo.token,
                         version: Config.bdversion,
-                        sid: badouStorage.getSid()
+                        sid: badou.api.badouStorage.getSid()
                     }
                 }, function (tpldata, ret) {
                     layer.open({
@@ -230,14 +191,14 @@
                                     uid: userinfo.id,
                                     token: userinfo.token,
                                     version: Config.bdversion,
-                                    sid: badouStorage.getSid()
+                                    sid: badou.api.badouStorage.getSid()
                                 }
                             }, function (data, ret) {
-                                badouStorage.remove('userinfo');
+                                badou.api.badouStorage.remove('userinfo');
                                 layer.closeAll();
                                 layer.alert(ret.msg, {title: __('Warning'), icon: 0});
                             }, function (data, ret) {
-                                badouStorage.remove('userinfo');
+                                badou.api.badouStorage.remove('userinfo');
                                 layer.closeAll();
                                 layer.alert(ret.msg, {title: __('Warning'), icon: 0});
                             });
@@ -245,13 +206,11 @@
                     });
                     return false;
                 }, function (data) {
-                    badouStorage.remove('userinfo');
+                    badou.api.badouStorage.remove('userinfo');
                     $(that).trigger('click');
                     return false;
                 });
             }
         });
-
-
     });
 </script>

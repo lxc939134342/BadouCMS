@@ -6,6 +6,7 @@ use badou\Server;
 use think\Exception;
 use think\facade\Db;
 use think\facade\Cache;
+use think\facade\Config;
 use badou\ModuleException;
 use app\common\controller\Backend;
 
@@ -144,7 +145,7 @@ class Module extends Backend
         $tables = [];
 
         if ($droptables && env('app_debug') && $this->auth->isSuperAdmin()) {
-            $tables = get_module_tables($name);
+            $tables = Server::getModuleTables($name);
         }
         try {
             Server::uninstall($name, $force);
@@ -358,7 +359,7 @@ class Module extends Backend
         if (!preg_match("/^[a-zA-Z0-9]+$/", $name)) {
             $this->error(__('Module name incorrect'));
         }
-        $tables = get_module_tables($name);
+        $tables = Server::getModuleTables($name);
         $prefix = Config::get('database.prefix');
         foreach ($tables as $index => $table) {
             //忽略非插件标识的表名

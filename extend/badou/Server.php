@@ -883,6 +883,33 @@ class Server
         return class_exists($namespace) ? $namespace : '';
     }
 
+
+    /**
+     * 获取插件创建的表
+     * @param string $name 插件名
+     * @return array
+     */
+    public static function getModuleTables($name)
+    {
+        $moduleInfo = self::getModuleInfo($name);
+        if (!$moduleInfo) {
+            return [];
+        }
+        $regex = "/^CREATE\s+TABLE\s+(IF\s+NOT\s+EXISTS\s+)?`?([a-zA-Z_]+)`?/mi";
+        $sqlFile = MODULE_PATH . $name . DS . 'install.sql';
+        $tables = [];
+        if (is_file($sqlFile)) {
+            preg_match_all($regex, file_get_contents($sqlFile), $matches);
+            if ($matches && isset($matches[2]) && $matches[2]) {
+                $prefix = config('database.prefix');
+                $tables = array_map(function ($item) use ($prefix) {
+                    return str_replace("__PREFIX__", $prefix, $item);
+                }, $matches[2]);
+            }
+        }
+        return $tables;
+    }
+
     /**
      * 获取bootstrap.js路径
      * @return string
