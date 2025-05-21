@@ -3,17 +3,29 @@
 namespace app\admin\controller\User;
 
 use app\common\controller\Backend;
+use badou\Tree;
+use think\facade\Db;
 
 class User extends Backend
 {
 
     protected $model = null;
+    protected $groupList = [];
 
     public function initialize()
     {
         parent::initialize();
         $this->model = new \app\admin\model\User();
-//        $this->view->assign("statusList", $this->model->getStatusList());
+
+        // 必须将结果集转换为数组
+        $groupList = Db::name("user_group")
+            ->order('id ASC')
+            ->column('name','id');
+
+        //数组合并
+        $groupList = array_merge([0 => __('None')],$groupList);
+
+        $this->view->assign('groupdata', $groupList);
     }
     public function index()
     {
@@ -32,9 +44,10 @@ class User extends Backend
                 ->order('id ASC')
                 ->paginate(15);
 
-            $result = array("total" => $list->total(), "rows" => $list->items());
+//            $result = array("total" => $list->total(), "rows" => $list->items());
 
-            $this->success('ok', null, $result);
+            $this->result('ok', $list->items(), $list->total());
+//            $this->success('ok', null, $result);
         }
         return $this->view->fetch();
     }
