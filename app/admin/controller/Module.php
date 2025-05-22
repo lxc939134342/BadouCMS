@@ -218,6 +218,11 @@ class Module extends Backend
             $token = $this->request->post("token");
             $version = $this->request->post("version");
             $bdversion = $this->request->post("bdversion");
+
+            if ($version === $info['version']) {
+                throw new Exception(__('The version is the same, no need to update'));
+            }
+
             $extend = [
                 'uid'        => $uid,
                 'token'      => $token,

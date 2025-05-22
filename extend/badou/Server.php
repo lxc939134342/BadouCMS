@@ -687,7 +687,7 @@ class Server
             //创建临时的类文件
             file_put_contents($destFile, $classContent);
 
-            $className = "\\modules\\" . $name . "\\" . $moduleName . "Upgrade";
+            $className = "\\modules\\" . $name . "\\" . $moduleName ;
             $module = new $className($name);
 
             //调用升级的方法

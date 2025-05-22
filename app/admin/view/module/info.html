@@ -33,13 +33,21 @@
                         <label>更新时间：</label>
                         <span class="layui-text">{$info.update_time|default='2025-04-14 15:32:16'}</span>
                     </div>
+                    <div class="module-info-item">
+                        <label>当前版本：</label>
+                        <span class="layui-font-blue">{$info.version}</span>
+                    </div>
+                    <div class="module-info-item">
+                        <label>开发者：</label>
+                        <span class="layui-font-blue">{$info.author}</span>
+                    </div>
                     <div class="module-info-item d-flex align-items-center">
                         <label>模块状态：</label>
                         <input type="checkbox" name="state" value="{$info.state}" {if $info.state==1} checked {/if} lay-skin="switch" lay-filter="state" />
                     </div>
                     <div class="module-info-item mt-1">
                         {if $info.module}
-                        <button class="layui-btn layui-btn-sm layui-bg-blue btn-upgrade" data-name="{$info.name}">
+                        <button class="layui-btn layui-btn-sm layui-bg-blue" data-name="{$info.name}" id="upgrade-dropdown">
                             <i class="fa fa-cloud"></i> 升级
                             <i class="layui-icon layui-icon-down layui-font-12"></i>
                         </button>
@@ -88,6 +96,15 @@
         </tbody>
     </table>
 </script>
+
+<script id="upgradetpl" type="text/html">
+    <div class="">
+        <div class="">{{-__("Are you sure you want to upgrade %s?", d.title)}}
+            <p class="text-danger">{:__('Please backup important data manually before upgrading!')}</p>
+        </div>
+    </div>
+</script>
+
 <script type="text/javascript">
     layui.use(["badou","carousel", "dropdown", "layer", "form","laytpl"], function () {
         var carousel     = layui.carousel;
@@ -123,6 +140,28 @@
                     id: 2,
                 },
             ],
+        });
+
+        dropdown.render({
+            elem: "#upgrade-dropdown",
+            data: Config.info.releaselist,
+            customName:{
+                id:'id',
+                title:'version'
+            },
+            click:function (data) {
+                var name = Config.info.name;
+                if (Config.info.state == 1) {
+                    Layer.alert(__('Please disable the add before trying to upgrade'), {icon: 7});
+                    return false;
+                }
+                var version =  Config.info.version;
+
+                Layer.confirm(__('Upgrade tips', Config.info.title), function (index, layero) {
+                    upgrade(name, version);
+                });
+
+            }
         });
 
         form.on("switch(state)", function (data) {
@@ -206,7 +245,7 @@
                 }
             }, function (data, ret) {
                 if (ret && ret.code === -3) {
-                    //插件目录发现影响全局的文件
+                    //模块目录发现影响全局的文件
                     Layer.open({
                         content:laytpl(conflicttpl, {tagStyle: 'modern'}).render(ret.data),
                         shade: 0.8,
@@ -311,7 +350,7 @@
                         }
                     });
                 } else if (ret && ret.code === -3) {
-                    //插件目录发现影响全局的文件
+                    //模块目录发现影响全局的文件
                     layer.open({
                         content: laytpl(conflicttpl, {tagStyle: 'modern'}).render(ret.data),
                         shade: 0.8,
@@ -334,7 +373,6 @@
         };
 
         var uninstall = function (name, force, droptables) {
-            console.log(droptables);
             badou.api.ajax({
                 url: 'module/uninstall',
                 data: {name: name, force: force ? 1 : 0, droptables: droptables ? 1 : 0}
@@ -344,7 +382,7 @@
                 return false;
             }, function (data, ret) {
                 if (ret && ret.code === -3) {
-                    //插件目录发现影响全局的文件
+                    //模块目录发现影响全局的文件
                     Layer.open({
                         content: laytpl(conflicttpl, {tagStyle: 'modern'}).render(ret.data),
                         shade: 0.8,
@@ -362,6 +400,23 @@
                 } else {
                     Layer.alert(ret.msg, {title: __('Warning'), icon: 0});
                 }
+                return false;
+            });
+        };
+
+        var upgrade = function (name, version) {
+            var userinfo = badou.api.badouStorage.get('userinfo');
+            var uid = userinfo ? userinfo.id : 0;
+            var token = userinfo ? userinfo.token : '';
+            badou.api.ajax({
+                url: 'module/upgrade',
+                data: {name: name, uid: uid, token: token, version: version, faversion: Config.faversion}
+            }, function (data, ret) {
+                Config.info = data.module;
+                Layer.closeAll();
+
+            }, function (data, ret) {
+                Layer.alert(ret.msg, {title: __('Warning')});
                 return false;
             });
         };
