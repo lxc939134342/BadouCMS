@@ -55,7 +55,8 @@ class Index extends Backend
                 "defaultMenu" => "dark-theme",
                 "defaultHeader" => "light-theme",
                 "allowCustom" => true,
-                "banner" => false
+                "banner" => false,
+                "dark" => true
             ],
             "colors" => [
                 [
@@ -82,7 +83,7 @@ class Index extends Backend
                     "id" => "5",
                     "color" => "#3963bc",
                     "second" => "#ecf5ff"
-                ]
+                ],
             ],
             "other" => [
                 "keepLoad" => "700",

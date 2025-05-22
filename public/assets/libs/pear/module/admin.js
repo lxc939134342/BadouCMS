@@ -252,6 +252,15 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 					}
 				}
 
+				var dark = localStorage.getItem("dark");
+				if (dark === null) {
+					dark = option.theme.dark;
+				} else {
+					if (option.theme.allowCustom === false) {
+						dark = option.theme.dark;
+					}
+				}
+
 				localStorage.setItem("muilt-tab", muiltTab);
 				localStorage.setItem("theme-banner", banner);
 				localStorage.setItem("theme-menu", menu);
@@ -259,10 +268,14 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 				localStorage.setItem("auto-head", autoHead);
 				localStorage.setItem("control", control);
 				localStorage.setItem("footer", footer);
+				localStorage.setItem("dark", dark);
+
 				this.menuSkin(menu);
 				this.headerSkin(header);
 				this.bannerSkin(banner);
 				this.footer(footer);
+				console.log(dark);
+				this.switchTheme(dark);
 			}
 
 			this.footer = function (footer) {
@@ -298,6 +311,14 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 				pearAdmin.removeClass("light-theme");
 				pearAdmin.removeClass("dark-theme");
 				pearAdmin.addClass(theme);
+			}
+
+			this.switchTheme = function (checked) {
+				var $pearAdmin = $(".pear-admin");
+				$pearAdmin.removeClass("pear-admin-dark");
+				if (checked === true || checked === "true") {
+					$pearAdmin.addClass("pear-admin-dark");
+				}
 			}
 
 			this.headerSkin = function (theme) {
@@ -724,6 +745,9 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 				'</div>';
 
 			let moreItem =
+				'<div class="layui-form-item"><div class="layui-input-inline"><input type="checkbox" name="dark" lay-filter="dark" lay-skin="switch" lay-text="开|关"></div><span class="set-text">暗夜模式</span></div>';
+
+			moreItem +=
 				'<div class="layui-form-item"><div class="layui-input-inline"><input type="checkbox" name="control" lay-filter="control" lay-skin="switch" lay-text="开|关"></div><span class="set-text">菜单</span></div>';
 
 			moreItem +=
@@ -789,6 +813,11 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 						});
 					})
 
+					form.on('switch(dark)', function (data) {
+						localStorage.setItem("dark", this.checked);
+						pearAdmin.switchTheme(this.checked);
+					})
+
 					form.on('switch(control)', function (data) {
 						localStorage.setItem("control", this.checked);
 						window.location.reload();
@@ -842,6 +871,12 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 						$('input[name="footer"]').attr('checked', 'checked')
 					} else {
 						$('input[name="footer"]').removeAttr('checked')
+					}
+
+					if (localStorage.getItem('dark') === 'true') {
+						$('input[name="dark"]').attr('checked', 'checked')
+					} else {
+						$('input[name="dark"]').removeAttr('checked')
 					}
 
 					form.render('checkbox');
