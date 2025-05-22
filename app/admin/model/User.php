@@ -21,6 +21,17 @@ class User extends Model
         'token',
     ];
 
+    public static function onBeforeUpdate($row){
+        //如果有密码修改
+        if (isset($row->password)) {
+            if ($row->password) {
+                $row->password = password_hash($row->password, PASSWORD_DEFAULT);
+            }else{
+                unset($row->password);
+            }
+        }
+    }
+
     public function getGenderList()
     {
         return ['1' => __('Male'), '0' => __('Female')];

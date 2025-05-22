@@ -26,39 +26,40 @@
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Password')}</label>
         <div class="layui-input-block">
-            <input type="password" name="row[password]" value="" lay-verify="required" autocomplete="off" placeholder="{:__('Leave password blank if dont want to change')}" class="layui-input">
+            <input type="password" name="row[password]" value="" autocomplete="off" placeholder="{:__('Leave password blank if dont want to change')}" class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Email')}</label>
         <div class="layui-input-block">
-            <input type="text" name="row[email]" value="{$row.email}" lay-verify="required" autocomplete="off" placeholder="{:__('Email')}" class="layui-input">
+            <input type="text" name="row[email]" value="{$row.email}" lay-verify="" autocomplete="off" placeholder="{:__('Email')}" class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Mobile')}</label>
         <div class="layui-input-block">
-            <input type="text" name="row[mobile]" value="{$row.mobile}" lay-verify="required" autocomplete="off" placeholder="{:__('Mobile')}" class="layui-input">
+            <input type="text" name="row[mobile]" value="{$row.mobile}" lay-verify="" autocomplete="off" placeholder="{:__('Mobile')}" class="layui-input">
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Avatar')}</label>
         <div class="layui-input-block">
-            <input type="text" name="row[avatar]" value="{$row.avatar}" lay-verify="required" autocomplete="off" placeholder="{:__('Avatar')}" class="layui-input">
+            <input type="text" name="row[avatar]" value="{$row.avatar}" lay-verify="" autocomplete="off" placeholder="{:__('Avatar')}" class="layui-input">
         </div>
     </div>
 
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Level')}</label>
         <div class="layui-input-block">
-            <input type="number" name="row[level]" value="{$row.level}" lay-verify="required" autocomplete="off" class="layui-input">
+            <input type="number" name="row[level]" value="{$row.level}" lay-verify="" autocomplete="off" class="layui-input">
         </div>
     </div>
 
     <div class="layui-form-item">
-        <label class="layui-form-label">{:__('Gender')}</label>
+        <label class="layui-form-label">{:__('Gender')} </label>
         <div class="layui-input-block">
-
+            <input type="radio" name="row[gender]" value="1" title="{:__('Male')}" {if $row.gender=='1'}checked{/if}>
+            <input type="radio" name="row[gender]" value="0" title="{:__('FeMale')}" {if $row.gender=='0'}checked{/if}>
         </div>
     </div>
 
