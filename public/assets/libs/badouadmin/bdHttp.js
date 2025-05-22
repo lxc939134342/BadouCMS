@@ -119,7 +119,7 @@ layui.define(['toast'], function (exports) {
                 title = options && options.title ? options.title : (title ? title : "");
                 url = bdHttp.api.fixurl(url);
                 // url = url + (url.indexOf("?") > -1 ? "&" : "?") + "";
-                var area = bdHttp.config.openArea != undefined ? bdHttp.config.openArea : [$(window).width() > 800 ? '800px' : '95%', $(window).height() > 600 ? '600px' : '95%'];
+                var area = [$(window).width() > 800 ? '800px' : '95%', $(window).height() > 600 ? '600px' : '95%'];
                 var success = options && typeof options.success === 'function' ? options.success : $.noop;
                 if (options && typeof options.success === 'function') {
                     delete options.success;

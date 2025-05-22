@@ -21,4 +21,5 @@ return [
     'Operate successful'                                      => '升级成功',
     'Please disable module first'                             => '请先禁用模块',
     'The version is the same, no need to update'              => '版本号相同，无需更新',
+    'Pay now'                                                 => '立即支付',
 ];

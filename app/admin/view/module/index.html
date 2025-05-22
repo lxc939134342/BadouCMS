@@ -112,6 +112,7 @@
             }
             var url = "{:url('module/info')}?name="+name+'&uid='+userinfo.id+'&token='+userinfo.token+'&bdversion='+Config.bdversion;
             badou.api.open(url,__('Module info'),{
+                area: ['80%','95%'],
                 end:function(){
                     card.reload('modules-wrapper');
                 }
