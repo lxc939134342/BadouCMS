@@ -9,12 +9,15 @@ layui.define(["jquery", "layer"], function (exports) {
 		this.autoHead = autoHead;
 		var color = localStorage.getItem("theme-color-color");
 		var second = localStorage.getItem("theme-color-second");
+
 		this.colorSet(color, second);
 		if (target.frames.length == 0) return;
 		for (var i = 0; i < target.frames.length; i++) {
 			try {
 				if (target.frames[i].layui == undefined) continue;
 				target.frames[i].layui.theme.changeTheme(target.frames[i], autoHead);
+
+
 			}
 			catch (error) {
 				console.log(error);
@@ -96,6 +99,10 @@ layui.define(["jquery", "layer"], function (exports) {
 			colorPane.html(style);
 		} else {
 			$("head").append("<style id='pear-admin-color'>" + style + "</style>")
+		}
+		var dark = localStorage.getItem("dark");
+		if (dark == "true") {
+			$('body.badouadmin-theme').addClass('pear-admin-dark');
 		}
 	}
 

@@ -274,7 +274,6 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 				this.headerSkin(header);
 				this.bannerSkin(banner);
 				this.footer(footer);
-				console.log(dark);
 				this.switchTheme(dark);
 			}
 
@@ -424,6 +423,10 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 						$(".fullScreen").eq(0).addClass("layui-icon-screen-restore");
 					});
 				}
+			}
+			// 设置iframe 暗夜模式
+			this.iframeDark = function (checked) {
+
 			}
 		};
 
