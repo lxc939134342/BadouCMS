@@ -173,6 +173,7 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
                 var orderBy = $(this).data('order-by');
                 var params = $(this).data('params');
 
+
                 var options = {
                     el: '#' + id,
                     toolbar: { show: true },
@@ -182,7 +183,14 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
                     prop: {
                         name: field,
                         value: key
-                    }
+                    },
+                }
+                // 暗色模式
+                var dark = localStorage.getItem("dark");
+                if (dark) {
+                    options.theme = {
+                        hover: '#000'
+                    };
                 }
                 // 单选
                 if (!multiple) {
