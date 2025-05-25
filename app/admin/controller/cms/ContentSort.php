@@ -123,6 +123,9 @@ class ContentSort extends Base
         $acode = get_backend_lang();
         $template = Db::name('cms_site')->where('acode', $acode)->value('theme');
         $path = root_path().'template'.DIRECTORY_SEPARATOR.$template.DIRECTORY_SEPARATOR;
+        if (!is_dir($path)) {
+            $this->error('template/'.$template.'模版目录不存在');
+        }
 
         $files = Filesystem::getDirFiles($path, ['html']);
         $list = [];

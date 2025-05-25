@@ -44,6 +44,7 @@ const changeDataLang = () => {
     if (baTable) {
         /* 重新加载数据 */
         baTable.table.filter!.acode = state.datalang
+        baTable.form.defaultItems!.acode = state.datalang
         baTable.getIndex()
 
         baTable.initComSearch()
