@@ -11,6 +11,11 @@
 ::before {
     box-sizing: content-box;
 }
+
+.layui-nav .layui-nav-item a {
+    padding: 0 15px;
+}
+
 .layui-tab-item {
     /* margin: 15px; */
     background: #fff;

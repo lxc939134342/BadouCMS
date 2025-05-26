@@ -3,12 +3,12 @@
 <!-- 头部 -->
 <div class="layui-card">
     <div class="layui-card-body">
-        <a href="javascript:;" lay-event="refresh" class="layui-btn layui-btn-sm btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
+        <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
         <div class="layui-btn-group">
-            <button class="layui-btn layui-btn-sm layui-bg-blue" lay-event="add"><i class="fa fa-list"></i> {:__('All')}</button>
-            <button type="button" class="layui-btn layui-btn-sm layui-bg-blue"><i class="fa fa-laptop"></i> {:__('Installed')}</button>
+            <button class="layui-btn layui-bg-blue" lay-event="add"><i class="fa fa-list"></i> {:__('All')}</button>
+            <button type="button" class="layui-btn layui-bg-blue"><i class="fa fa-laptop"></i> {:__('Installed')}</button>
         </div>
-        <button type="button" class="layui-btn layui-btn-sm layui-bg-red btn-userinfo"><i class="fa fa-user"></i> {:__('BADOU Userinfo')}</button>
+        <button type="button" class="layui-btn layui-bg-red btn-userinfo"><i class="fa fa-user"></i> {:__('BADOU Userinfo')}</button>
     </div>
 </div>
 <!-- 表格 -->
@@ -35,9 +35,9 @@
                     </span>
                     {{ if(d.item.module) { }}
                         {{ if(d.item.state==1) { }}
-                         <button class="layui-btn layui-btn-sm layui-bg-green"> 已安装</button>
+                         <button class="layui-btn layui-bg-green"> 已安装</button>
                         {{ } else { }}
-                         <button class="layui-btn layui-btn-sm layui-bg-orange"> 已禁用</button>
+                         <button class="layui-btn layui-bg-orange"> 已禁用</button>
                         {{ } }}
                     {{ } else { }}
                     <span>
