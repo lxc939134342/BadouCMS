@@ -66,12 +66,12 @@ class Index extends Backend
                 ],
                 [
                     "id" => "2",
-                    "color" => "#36b368",
+                    "color" => "#67c23a",
                     "second" => "#f0f9eb"
                 ],
                 [
                     "id" => "3",
-                    "color" => "#FF6C02",
+                    "color" => "#ff6c02",
                     "second" => "#fdf6ec"
                 ],
                 [
@@ -81,7 +81,7 @@ class Index extends Backend
                 ],
                 [
                     "id" => "5",
-                    "color" => "#3963bc",
+                    "color" => "#4e73df",
                     "second" => "#ecf5ff"
                 ],
             ],

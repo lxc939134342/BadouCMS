@@ -103,6 +103,8 @@ layui.define(["jquery", "layer"], function (exports) {
 		var dark = localStorage.getItem("dark");
 		if (dark == "true") {
 			$('body.badouadmin-theme').addClass('pear-admin-dark');
+		} else {
+			$('body.badouadmin-theme').removeClass('pear-admin-dark');
 		}
 	}
 

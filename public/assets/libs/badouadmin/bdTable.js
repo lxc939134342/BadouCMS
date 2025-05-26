@@ -29,14 +29,14 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                 icon: 'fa fa-pencil',
                 title: __('Edit'),
                 extend: "lay-event='btn-editone'",
-                classname: 'layui-btn layui-bg-green layui-btn-xs',
+                classname: 'layui-btn layui-btn-sm',
             },
             del: {
                 name: 'del',
                 icon: 'fa fa-trash',
                 title: __('Del'),
                 extend: "lay-event='btn-delone'",
-                classname: 'layui-btn layui-bg-red layui-btn-xs'
+                classname: 'layui-btn layui-bg-red layui-btn-sm'
             },
         },
         // 表格渲染

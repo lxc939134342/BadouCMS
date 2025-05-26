@@ -125,8 +125,8 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
             html.push('<div class="layui-col-xs12 layui-col-sm6 layui-col-md4 layui-col-lg3">');
             html.push('<div class="layui-form-item">');
             html.push('<div class="layui-input-block">');
-            html.push('<button class="pear-btn pear-btn-md pear-btn-primary commonsearch-submit" lay-submit lay-filter="commonsearch"> <i class="layui-icon layui-icon-search"></i> 搜索</button>');
-            html.push('<button type="reset" class="pear-btn pear-btn-md commonsearch-rest"> <i class="layui-icon layui-icon-refresh"></i> 重置</button>');
+            html.push('<button class="layui-btn btn-theme-color commonsearch-submit" lay-submit lay-filter="commonsearch">  搜索</button>');
+            html.push('<button type="reset" class="layui-btn layui-btn-primary layui-border commonsearch-rest"> 重置</button>');
             html.push('</div>');
             html.push('</div>');
             html.push('</div>');
@@ -158,6 +158,8 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
         },
         // 远程下拉选择框
         _remoteSelect: function (params) {
+            var themeColor = localStorage.getItem("theme-color-color");
+            var dark = localStorage.getItem("dark");
             $('.remoteSelect').each(function (i) {
                 var id = $(this).attr('id');
                 var url = $(this).data('source');
@@ -173,7 +175,6 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
                 var orderBy = $(this).data('order-by');
                 var params = $(this).data('params');
 
-
                 var options = {
                     el: '#' + id,
                     toolbar: { show: true },
@@ -184,14 +185,15 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
                         name: field,
                         value: key
                     },
+                    theme: {
+                        color: themeColor
+                    }
                 }
-                // 暗色模式
-                var dark = localStorage.getItem("dark");
-                if (dark) {
-                    options.theme = {
-                        hover: '#000'
-                    };
+
+                if (dark == 'true') {
+                    options.theme.hover = '#000';
                 }
+
                 // 单选
                 if (!multiple) {
                     options.radio = true;
@@ -236,6 +238,32 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
                         return false;
                     });
                 }
+
+                window.addEventListener('storage', (e) => {
+                    // 暗色模式
+                    if (e.key === 'dark') {
+                        if (e.newValue == 'true') {
+                            xmSelect.batch('', 'update', {
+                                theme: {
+                                    hover: '#000'
+                                }
+                            });
+                        } else {
+                            xmSelect.batch('', 'update', {
+                                theme: {
+                                    hover: '#f2f2f2'
+                                }
+                            });
+                        }
+                    }
+                    if (e.key === 'theme-color-color') {
+                        xmSelect.batch('', 'update', {
+                            theme: {
+                                color: e.newValue
+                            }
+                        });
+                    }
+                });
             });
         },
         // 时间组件

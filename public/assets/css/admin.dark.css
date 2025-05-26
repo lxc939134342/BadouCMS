@@ -235,6 +235,10 @@
     border-color: #484849;
     background-color: rgba(255, 255, 255, 0.08);
 }
+.pear-admin-dark .layui-form-onswitch {
+    border-color: #484849;
+    background-color: var(--theme-color);
+}
 
 /** table */
 .pear-admin-dark .layui-table {
@@ -425,8 +429,8 @@
 }
 
 .pear-admin-dark .layui-input,
-.layui-select,
-.layui-textarea {
+.pear-admin-dark .layui-select,
+.pear-admin-dark .layui-textarea {
     background-color: #141414;
     border-color: rgba(255, 255, 255, 0.3) !important;
 }

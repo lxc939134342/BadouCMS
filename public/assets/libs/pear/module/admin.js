@@ -318,6 +318,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 				if (checked === true || checked === "true") {
 					$pearAdmin.addClass("pear-admin-dark");
 				}
+				pearTheme.changeTheme(window, isAutoHead(config));
 			}
 
 			this.headerSkin = function (theme) {
@@ -423,10 +424,6 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 						$(".fullScreen").eq(0).addClass("layui-icon-screen-restore");
 					});
 				}
-			}
-			// 设置iframe 暗夜模式
-			this.iframeDark = function (checked) {
-
 			}
 		};
 
