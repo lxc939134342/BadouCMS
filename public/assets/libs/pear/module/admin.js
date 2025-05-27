@@ -313,12 +313,17 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 			}
 
 			this.switchTheme = function (checked) {
+				var theme = 'light-theme'
 				var $pearAdmin = $(".pear-admin");
 				$pearAdmin.removeClass("pear-admin-dark");
 				if (checked === true || checked === "true") {
 					$pearAdmin.addClass("pear-admin-dark");
+					theme = 'dark-theme'
+					// 触发菜单主题点击事件
+					$(`[data-select-bgcolor="${theme}"]`).trigger('click');
 				}
 				pearTheme.changeTheme(window, isAutoHead(config));
+
 			}
 
 			this.headerSkin = function (theme) {

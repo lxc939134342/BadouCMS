@@ -26,7 +26,7 @@ class Index extends Backend
         $adminConfig = [
             "logo" => [
                 "title" => "BADOUADMIN",
-                "image" => "/static/admin/images/logo.png"
+                "image" => "/assets/images/logo.png"
             ],
             "menu" => [
                 "data" => (string)url('/index/index'),
@@ -47,7 +47,7 @@ class Index extends Backend
                 "index" => [
                     "id" => "1",
                     "href" => (string)url('/dashboard/index'),
-                    "title" => "首页"
+                    "title" => __('Home')
                 ]
             ],
             "theme" => [
@@ -91,7 +91,7 @@ class Index extends Backend
                 "footer" => false
             ],
             "header" => [
-                "message" => "admin/data/message.json"
+                "message" => false
             ]
         ];
         return response($adminConfig, 200, [], 'json');

@@ -16,8 +16,6 @@ layui.define(["jquery", "layer"], function (exports) {
 			try {
 				if (target.frames[i].layui == undefined) continue;
 				target.frames[i].layui.theme.changeTheme(target.frames[i], autoHead);
-
-
 			}
 			catch (error) {
 				console.log(error);
@@ -30,7 +28,7 @@ layui.define(["jquery", "layer"], function (exports) {
 		var style = '';
 		style += ':root {--theme-color: ' + color + '; --theme-second-color: ' + second + ';}';
 		style += '.light-theme .pear-nav-tree .layui-this a:hover,.light-theme .pear-nav-tree .layui-this,.light-theme .pear-nav-tree .layui-this a,.pear-nav-tree .layui-this a,.pear-nav-tree .layui-this{background-color: ' + color + '!important;}';
-		style += '.pear-admin .layui-logo .title{color:' + color + '!important;}';
+		style += '.pear-admin .layui-logo .title{color:' + color + ';}';
 		style += '.pear-frame-title .dot,.pear-tab .layui-this .pear-tab-active{background-color: ' + color + '!important;}';
 		style += '.bottom-nav li a:hover{background-color:' + color + '!important;}';
 		style += '.pear-btn-primary {border: 1px solid ' + color + '!important;}';
