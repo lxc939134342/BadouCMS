@@ -1,16 +1,15 @@
 {layout name="layout/default" /}
 
-<!-- 表格 -->
 <div class="layui-card">
     <div class="layui-card-body">
-        <table class="layui-hide" id="models" data-operate-edit="{:$auth->check('cms.models/edit')}" data-operate-del="{:$auth->check('cms.models/del')}"></table>
+        <table class="layui-hide" id="content" data-operate-edit="{:$auth->check('cms.content/edit')}" data-operate-del="{:$auth->check('cms.content/del')}"></table>
     </div>
 </div>
 <!-- 表格左侧按钮 toolbar  -->
 <script type="text/html" id="toolbar">
 	<a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
 	<button class="layui-btn layui-bg-green" lay-event="add"><i class="fa fa-plus"></i> {:__('Add')}</button>
-	<button class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('cms.models/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
+	<button class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('cms.content/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
 	<button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
 </script>
 <script>
@@ -22,17 +21,17 @@
         bdTable.api.init({
             table: table,
             extend: {
-                index_url: "cms.models/index",
-                add_url: "cms.models/add",
-                edit_url: "cms.models/edit",
-                del_url: "cms.models/del",
-                multi_url: "cms.models/multi",
+                index_url: "cms.content/index",
+                add_url: "cms.content/add",
+                edit_url: "cms.content/edit",
+                del_url: "cms.content/del",
+                multi_url: "cms.content/multi",
                 table: "auth_rule",
             },
         });
         bdTable.render({
-            elem: "#models",
-            url: "{:url('cms.models/index')}",
+            elem: "#content",
+            url: "{:url('cms.content/index')}",
             pk: "id",
             even: true,
             toolbar: "#toolbar",

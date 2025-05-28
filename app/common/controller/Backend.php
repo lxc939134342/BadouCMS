@@ -402,20 +402,20 @@ class Backend extends BaseController
         if (!empty($this->model)) {
             $this->model->alias($alias);
         }
-        $model = $this->model;
-        $where = function ($query) use ($where, $alias, $bind, &$model) {
-            if (!empty($model)) {
-                $model->alias($alias);
-                $model->bind($bind);
-            }
-            foreach ($where as $k => $v) {
-                if (is_array($v)) {
-                    call_user_func_array([$query, 'where'], $v);
-                } else {
-                    $query->where($v);
-                }
-            }
-        };
+        // $model = $this->model;
+        // $where = function ($query) use ($where, $alias, $bind, &$model) {
+        //     if (!empty($model)) {
+        //         $model->alias($alias);
+        //         $model->bind($bind);
+        //     }
+        //     foreach ($where as $k => $v) {
+        //         if (is_array($v)) {
+        //             call_user_func_array([$query, 'where'], $v);
+        //         } else {
+        //             $query->where($v);
+        //         }
+        //     }
+        // };
         return [$where, $sort, $order, $offset, $limit, $page, $alias, $bind];
     }
 

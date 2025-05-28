@@ -81,7 +81,7 @@ class Models extends Base
         try {
             foreach ($data as $v) {
                 if ($v['issystem'] == 1) {
-                    throw new Exception('系统模型不允许删除');
+                    throw new Exception(__('System model cannot be deleted'));
                 }
                 $count += $v->delete();
             }
