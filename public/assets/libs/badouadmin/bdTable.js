@@ -43,6 +43,10 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
         render: function (options) {
             options.pk = options.pk || 'id';
             options.cols = options.cols || [];
+            // 过滤表格列
+            if (options.cols.length > 0) {
+                options.cols = bdTable.api.filterCols(options.cols);
+            }
             options.url = options.url || '';
             options.searchFormVisible = options.searchFormVisible || false;
             options.commonSearch === undefined || options.commonSearch === true ? options.commonSearch = true : options.commonSearch = false;
@@ -63,6 +67,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     }
                 });
             }
+
             //是否始终显示高级搜索表单
             if (options.searchFormVisible) {
                 tableSearch.set({ visible: options.searchFormVisible })
@@ -142,6 +147,22 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     }
                     return false;
                 });
+            },
+            // 过滤表格列
+            filterCols: function (cols) {
+                $.each(cols, function (rowIndex, row) {
+                    $.each(row, function (colIndex, col) {
+                        if (col.field && col.field.indexOf('.') > -1) {
+                            // 如果没有 templet，则自动创建一个取多级字段的函数
+                            if (!col.templet) {
+                                col.templet = function (d) {
+                                    return getItemField(d, col.field);
+                                };
+                            }
+                        }
+                    });
+                });
+                return cols;
             },
             // 表格格式化
             formatter: {

@@ -40,11 +40,10 @@
                 [
                     { type: "checkbox" },
                     { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "name", title: __('Name'), width: 300,operate:'LIKE'  },
-                    { field: "type", title: __('Type'), width: 150,templet: bdTable.api.formatter.label,searchList:Config.type_list,custom:{1:'blue',2:'green'} },
-                    { field: "urlname", title:__('UrlName'), width: 180 },
-                    { field: "listtpl", title:__('Listtpl'), width: 180 },
-                    { field: "contenttpl", title:__('Contenttpl'), width: 180 },
+                    { field: "scode", hide:true, title: __('Scode'), width: 90,operate:false  },
+                    { field: "contentsort.name", title: __('Scode name'), width: 150 },
+                    { field: "title", title:__('Title') },
+                    { field: "date", title:__('Release time'), width: 180 },
                     {
                         field: "status",
                         title: __('Status'),
@@ -52,8 +51,8 @@
                         searchList: {0:__('Off'),1:__('On')},
                         templet: bdTable.api.formatter.switch,
                     },
-                    { field: "create_time", title: __('Create time') ,width: 200, templet: bdTable.api.formatter.datetime,searchType:'time' },
-                    { title: __('Operate'), align: "center", templet: bdTable.api.formatter.operate},
+                    { field: "visits", title: __('Visits') ,width: 80 },
+                    { title: __('Operate'), align: "center",width: 200, templet: bdTable.api.formatter.operate},
                 ],
             ],
         });

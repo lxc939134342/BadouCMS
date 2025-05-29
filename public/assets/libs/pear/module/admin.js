@@ -125,6 +125,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 							id: param.tab.index.id,
 							url: param.tab.index.href,
 							title: param.tab.index.title,
+							hash: param.tab.index.hash,
 							close: false
 						}],
 						success: function (id) {
@@ -132,7 +133,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 								setTimeout(function () {
 									sideMenu.selectItem(id);
 									bodyTab.positionTab();
-								}, 500)
+								}, 300)
 							}
 						}
 					});
@@ -149,7 +150,8 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 						bodyTab.addTabOnly({
 							id: data.menuId,
 							title: data.menuTitle,
-							url: data.menuUrl,
+							url: Config.app_url + '/' + data.menuUrl,
+							hash: data.menuUrl || '',
 							icon: data.menuIcon,
 							close: true
 						}, 300);
@@ -361,7 +363,8 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 					bodyTab.addTabOnly({
 						id: id,
 						title: title,
-						url: url,
+						url: Config.app_url + '/' + url,
+						hash: url || '',
 						icon: null,
 						close: true
 					}, 400);
@@ -690,7 +693,8 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 				bodyTab.addTabOnly({
 					id: $(this).attr("user-menu-id"),
 					title: $(this).attr("user-menu-title"),
-					url: $(this).attr("user-menu-url"),
+					url: Config.app_url + '/' + $(this).attr("user-menu-url"),
+					hash: $(this).attr("user-menu-url") || '',
 					icon: "",
 					close: true
 				}, 300);

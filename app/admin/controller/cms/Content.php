@@ -101,11 +101,7 @@ class Content extends Base
             ->where($where)
             ->order($sort, $order)
             ->paginate($limit);
-
-        $this->success('', '', [
-            'list'   => $res->items(),
-            'total'  => $res->total(),
-        ]);
+        $this->result('', $res->items(), $res->total());
     }
 
     /**
@@ -291,7 +287,7 @@ class Content extends Base
             }
         }
 
-        $this->success('', [
+        $this->success('', '', [
             'row' => $row
         ]);
     }

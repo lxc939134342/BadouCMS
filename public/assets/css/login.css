@@ -167,6 +167,11 @@ body {
     width: 100%;
     box-sizing: border-box;
 }
+button.login {
+    height: 38px;
+    line-height: 38px;
+    font-size: 15px;
+}
 
 .login-btn > .layui-btn {
     width: 100%;

@@ -4,7 +4,6 @@
     <div class="layui-form-item">
         <label class="layui-form-label">父级</label>
         <div class="layui-input-block">
-        <!-- 由于 Class "thinkfacadeForm" 未找到，我们可以使用原生 HTML 实现下拉选择框 -->
         <select name="row[parentid]" lay-verify="required" lay-filter="parentid">
             <?php foreach ($groupdata as $key => $value): ?>
                 <option value="<?php echo $key; ?>" <?php if ($key === 0) echo 'selected'; ?>>
@@ -48,7 +47,7 @@
         </div>
     </div>
 </form>
-
+<script src="__CDN__/assets/libs/jstree/jstree.min.js"></script>
 <script>
 // 后续使用 jstree 模块
 // layui.use(['jstree'], function() {
@@ -89,7 +88,7 @@ layui.use(['badou','jquery'],function () {
         bdForm.api.authGroupBindevent($("form.layui-form"));
 })
 </script>
-<script src="__CDN__/assets/libs/jstree/jstree.min.js"></script>
+
 
 
 <!-- <script>

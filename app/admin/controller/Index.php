@@ -47,7 +47,8 @@ class Index extends Backend
                 "index" => [
                     "id" => "1",
                     "href" => (string)url('/dashboard/index'),
-                    "title" => __('Home')
+                    "title" => __('Dashboard'),
+                    "hash" => 'dashboard'
                 ]
             ],
             "theme" => [

@@ -63,10 +63,10 @@ return [
     'On'                                                    => '开启',
     'Group'                                                 => '角色组',
     'Profile'                                               => '个人资料',
-    // 前台菜单
     'Frontend'                                              => '前台',
     'API Interface'                                         => 'API接口',
     'User Module'                                           => '会员模块',
     'Register'                                              => '注册',
     'User Center'                                           => '会员中心',
+    'Title'                                                 => '标题',
 ];

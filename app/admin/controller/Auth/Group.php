@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | BadouAdmin [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -14,6 +15,7 @@
 // +----------------------------------------------------------------------
 // |  权限管理控制器
 // +----------------------------------------------------------------------
+
 namespace app\admin\controller\Auth;
 
 use app\admin\model\AdminGroupAccess as AuthGroupAccess;
@@ -24,7 +26,6 @@ use think\exception\ValidateException;
 use badou\Tree;
 use Exception;
 use think\facade\Db;
-use think\facade\View;
 
 class Group extends Backend
 {
@@ -42,7 +43,7 @@ class Group extends Backend
     public function initialize()
     {
         parent::initialize();
-        $this->model = new AuthGroupModel;
+        $this->model = new AuthGroupModel();
 
         $this->childrenGroupIds = $this->auth->getChildrenGroupIds(true);
 
@@ -261,7 +262,7 @@ class Group extends Backend
     public function roletree()
     {
 
-        $model             = new AuthGroupModel;
+        $model             = new AuthGroupModel();
         $id                = $this->request->post("id");
         $pid               = $this->request->post("parentid");
         $parentGroupModel  = $model->find($pid);
@@ -815,7 +816,7 @@ class Group extends Backend
                 "parent" => 63,
                 "text" => "编辑",
                 "type" => "menu",
-                "state" => [    
+                "state" => [
                     "selected" => false
                 ]
             ],
@@ -874,7 +875,7 @@ class Group extends Backend
                 ]
             ]
         ];
-       $this->success('', null, $nodeList);
+        $this->success('', null, $nodeList);
 
     }
 

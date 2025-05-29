@@ -297,7 +297,7 @@ class Auth
         foreach ($rules as $key => &$rule) {
             $rule['href'] = '';
             if (!$rule['url']) {
-                $rule['href'] = (string)url('/'.$rule['name']);
+                $rule['href'] = $rule['name'];
             }
             $rule['title'] = __($rule['title']);
         }

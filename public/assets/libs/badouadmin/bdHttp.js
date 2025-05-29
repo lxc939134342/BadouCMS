@@ -180,14 +180,9 @@ layui.define(['toast'], function (exports) {
                         success.call(this, layero, index);
                     }
                 }, options ? options : {});
-                if ($(window).width() < 480 || (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream && top.$(".tab-pane.active").length > 0)) {
-                    if (top.$(".tab-pane.active").length > 0) {
-                        options.area = [top.$(".tab-pane.active").width() + "px", top.$(".tab-pane.active").height() + "px"];
-                        options.offset = [top.$(".tab-pane.active").scrollTop() + "px", "0px"];
-                    } else {
-                        options.area = [$(window).width() + "px", $(window).height() + "px"];
-                        options.offset = ["0px", "0px"];
-                    }
+                if ($(window).width() < 480 || (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)) {
+                    options.area = [$(window).width() + "px", $(window).height() + "px"];
+                    options.offset = ["0px", "0px"];
                 }
                 return Layer.open(options);
             },
