@@ -457,6 +457,7 @@ body,
     border: #5fb878 2px solid;
     opacity: 1;
     border-radius: 4px;
+    box-sizing: content-box;
 }
 
 .pearone-color .color-content li:after {

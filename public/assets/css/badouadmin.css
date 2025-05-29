@@ -1,5 +1,51 @@
 :root {
     --primary-color: #ff6c02;
+    --success-color: #61c032;
+    --warning-color: #e6a23c;
+    --danger-color: #f56c6c;
+    --info-color: #909399;
+    --blue-color: #4e73df;
+    --black-color: #2c2d34;
+}
+*,
+::after,
+::before {
+    box-sizing: content-box;
+}
+.pear-admin .layui-logo {
+    background-color: #2c2d34;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+}
+.pear-admin .layui-logo .logo {
+    display: block;
+    width: 30px;
+    height: 30px;
+}
+.pear-admin .light-theme .layui-logo .title {
+    color: var(--primary-color) !important;
+}
+.pear-admin .layui-logo .title {
+    top: 0;
+    color: #fff !important;
+    font-weight: 500;
+    font-size: 20px;
+}
+.layui-side .layui-nav .layui-nav-item a {
+    padding: 0 20px;
+}
+.layui-side .layui-nav .layui-nav-item a i {
+    font-size: 14px;
+}
+
+.layui-nav .layui-nav-item a {
+    padding: 0 15px;
+}
+
+.layui-nav .layui-nav-item .user a span {
+    font-size: 15px !important;
 }
 
 .layui-tab-item {
@@ -21,7 +67,12 @@
 .layui-table td:last-child {
     border-right: 0;
 }
-
+.layui-table-box * {
+    font-size: 14px !important;
+}
+.layui-icon {
+    font-size: 16px !important;
+}
 .layui-table-view::after {
     width: 0;
 }
@@ -35,8 +86,34 @@
     border-color: #f4f4f4;
 }
 .layui-btn {
-    border-radius: 3px !important;
+    border-radius: 3px;
+    background-color: #4e73df;
+    height: 32px;
+    line-height: 32px;
+    font-size: 13px;
+    padding: 0 12px;
 }
+.layui-btn.layui-btn-lg {
+    height: 44px;
+    line-height: 44px;
+    padding: 0 25px;
+    font-size: 16px;
+}
+
+.layui-btn.layui-btn-sm {
+    height: 26px;
+    line-height: 26px;
+    padding: 0 6px;
+    font-size: 12px;
+}
+
+.layui-btn.layui-btn-xs {
+    height: 22px;
+    line-height: 22px;
+    padding: 0 5px;
+    font-size: 12px;
+}
+
 .layui-btn:active,
 .layui-btn:hover {
     opacity: 0.75;
@@ -58,11 +135,18 @@
 .layui-layer-footer {
     text-align: left !important;
 }
+.project-list-item-body {
+    padding: 10px;
+}
 .badouadmin-form-body {
     padding: 15px;
 }
 .badouadmin-form-body .layui-form {
     padding-bottom: 15px;
+}
+
+.pear-nav-tree .layui-nav-item a span {
+    letter-spacing: 0.5px;
 }
 
 /* 表格高级搜索 s */
@@ -75,46 +159,129 @@
 /* 表格高级搜索 e */
 
 /* 弹窗样式 s */
+.layui-layer-badouadmin {
+    border-radius: 5px;
+    overflow: hidden;
+}
 .layui-layer-badouadmin .layui-layer-title {
-    background-color: var(--theme-color) !important;
-    color: #fff !important;
+    background-color: #f6f6f6 !important;
 }
 .layui-layer-badouadmin .layui-layer-footer {
-    padding: 8px 20px;
+    padding: 10px 20px;
     background-color: #fafaf9;
     height: auto;
     text-align: inherit !important;
 }
 .layui-layer-badouadmin .layui-layer-footer .layui-btn {
-    height: 36px;
-    line-height: 36px;
+    height: 32px;
+    line-height: 32px;
     padding: 0 12px;
     font-size: 13px;
 }
-.layui-layer-badouadmin .layui-layer-setwin span {
-    color: #fff;
-}
-.layui-layer-badouadmin .layui-layer-setwin .layui-layer-min::before {
-    border-bottom: 1px solid #fff;
-}
-.layui-layer-badouadmin .layui-layer-setwin .layui-layer-max::before,
-.layui-layer-badouadmin .layui-layer-setwin .layui-layer-max::after {
-    border: 1px solid #fff;
-    color: #fff;
-}
-.layui-layer-badouadmin .layui-layer-setwin .layui-layer-max::after {
-    background: none !important;
+.layui-input-block {
+    min-height: 32px;
 }
 /* 弹窗样式 e */
 
-
 /* jsTree树形样式 s */
-#treeview .jstree-container-ul .jstree-node {display: block; clear: both; }
-#treeview .jstree-leaf:not(:first-child) {float: left; background: none; margin-left: 0; min-width: 80px; clear: none; }
-#treeview .jstree-leaf {float: left; margin-left: 0; padding-left: 24px; min-width: 80px; clear: none; color: #777; }
-#treeview .jstree-leaf > .jstree-icon, #treeview .jstree-leaf .jstree-themeicon {display: none; }
-#treeview .jstree-last {background-image: url("../images/32px.png"); background-position: -292px -4px; background-repeat: repeat-y; }
-#treeview .jstree-children:before, #treeview .jstree-children:after {content: " "; display: table; }
-#treeview .jstree-children:after {clear: both; }
-#treeview .jstree-themeicon {display: none; }
+#treeview .jstree-container-ul .jstree-node {
+    display: block;
+    clear: both;
+}
+#treeview .jstree-leaf:not(:first-child) {
+    float: left;
+    background: none;
+    margin-left: 0;
+    min-width: 80px;
+    clear: none;
+}
+#treeview .jstree-leaf {
+    float: left;
+    margin-left: 0;
+    padding-left: 24px;
+    min-width: 80px;
+    clear: none;
+    color: #777;
+}
+#treeview .jstree-leaf > .jstree-icon,
+#treeview .jstree-leaf .jstree-themeicon {
+    display: none;
+}
+#treeview .jstree-last {
+    background-image: url("../images/32px.png");
+    background-position: -292px -4px;
+    background-repeat: repeat-y;
+}
+#treeview .jstree-children:before,
+#treeview .jstree-children:after {
+    content: " ";
+    display: table;
+}
+#treeview .jstree-children:after {
+    clear: both;
+}
+#treeview .jstree-themeicon {
+    display: none;
+}
 /* jsTree树形样式 e */
+.pear-admin .layui-side-scroll {
+    background-color: #2c2d34;
+}
+
+.dark-theme.layui-header {
+    background-color: #2c2d34 !important;
+}
+.dark-theme .layui-nav-tree {
+    background-color: #2c2d34 !important;
+}
+.light-theme .pear-nav-tree,
+.light-theme .pear-nav-tree .layui-nav-hover:before,
+.light-theme .pear-nav-tree .layui-nav-child {
+    background-color: white !important;
+}
+
+.pear-nav-tree .layui-nav-hover:before {
+    background-color: #2c2d34 !important;
+}
+.btn-theme-color {
+    background-color: var(--theme-color) !important;
+}
+.layui-btn-primary {
+    background: none !important;
+}
+.layui-btn-primary:hover {
+    border-color: var(--blue-color);
+}
+.layui-bg-green {
+    background-color: var(--success-color) !important;
+}
+.layui-bg-blue {
+    background-color: var(--blue-color) !important;
+}
+.layui-bg-black {
+    background-color: var(--black-color) !important;
+}
+.layui-font-green {
+    color: #1db369 !important;
+}
+
+.layui-badge {
+    font-size: 12px !important;
+    height: 20px;
+    line-height: 20px;
+}
+
+.layui-form-switch {
+    height: 20px;
+    line-height: 18px;
+    min-width: 40px;
+}
+.layui-form-switch > i {
+    top: 1px;
+    left: 2px;
+}
+
+.layui-form-onswitch > i {
+    margin-left: -18px;
+    left: 100%;
+}

@@ -1,0 +1,73 @@
+{layout name="layout/default" /}
+
+<!-- 表格 -->
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table class="layui-hide" id="rule" data-operate-edit="{:$auth->check('user.user/edit')}" data-operate-del="{:$auth->check('user.user/del')}"></table>
+    </div>
+</div>
+
+<!-- 表格左侧按钮 toolbar  -->
+<script type="text/html" id="toolbar">
+	<a href="javascript:;" lay-event="refresh" class="layui-btn layui-btn-sm btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
+	<button class="layui-btn layui-btn-sm layui-bg-blue btn-disabled disabled {:$auth->check('user.user/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
+	<button class="layui-btn layui-btn-sm layui-bg-red btn-disabled disabled" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
+</script>
+
+<script>
+    layui.use(["badou"], function () {
+        var bdTable = layui.bdTable;
+        var treeTable = layui.treeTable;
+        var layer = layui.layer;
+        var dropdown = layui.dropdown;
+        bdTable.api.init({
+            table: treeTable,
+            extend: {
+                index_url: "user.user/index",
+                add_url: "user.user/add",
+                edit_url: "user.user/edit",
+                del_url: "user.user/del",
+                multi_url: "user.user/multi",
+                table: "user",
+            },
+        });
+        bdTable.render({
+            elem: "#rule",
+            url: "{:url('user.user/index')}",
+            pk: "id",
+            even: true,
+            toolbar: "#toolbar",
+            searchFormVisible: true,
+            cols: [
+                [
+                    { type: "checkbox" },
+                    { field: "id", title: "ID", width: 80, sort: true },
+					{field: 'group.name', title: __('Group')},
+                    { field: "username", title: "用户名" ,operate:'like' },
+
+					{field: 'nickname', title: __('Nickname'), operate: 'LIKE'},
+					{field: 'email', title: __('Email'), operate: 'LIKE'},
+					{field: 'mobile', title: __('Mobile'), operate: 'LIKE'},
+					{field: 'avatar', title: __('Avatar'), events: bdTable.api.events.image, formatter: bdTable.api.formatter.image, operate: false},
+					{field: 'level', title: __('Level'), operate: 'BETWEEN', sortable: true},
+					{field: 'gender', title: __('Gender'), visible: false, searchList: {1: __('Male'), 0: __('Female')}},
+					{field: 'score', title: __('Score'), operate: 'BETWEEN', sortable: true},
+					{field: 'logintime', title: __('Logintime'), formatter: bdTable.api.formatter.datetime, operate: 'RANGE', addclass: 'datetimerange', sortable: true},
+					{field: 'loginip', title: __('Loginip'), formatter: bdTable.api.formatter.search},
+					{field: 'jointime', title: __('Jointime'), formatter: bdTable.api.formatter.datetime, operate: 'RANGE', addclass: 'datetimerange', sortable: true},
+					{field: 'joinip', title: __('Joinip'), formatter: bdTable.api.formatter.search},
+
+                    {
+                        field: "status",
+                        title: "状态",
+                        width: 100,
+                        searchList: { normal: "正常", hidden: "隐藏" },
+                        custom: { normal: "green", hidden: "orange" },
+                        templet: bdTable.api.formatter.status,
+                    },
+                    { title: "操作", width: 190, align: "center", templet: bdTable.api.formatter.operate},
+                ],
+            ],
+        });
+    });
+</script>

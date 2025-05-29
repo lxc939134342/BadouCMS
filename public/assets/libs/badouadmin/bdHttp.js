@@ -28,7 +28,6 @@ layui.define(['toast'], function (exports) {
                     }
                 }
 
-
                 toast.error({ message: ret.msg });
             },
             //服务器响应数据后
@@ -82,9 +81,8 @@ layui.define(['toast'], function (exports) {
                     if (!r.test(url)) {
                         url = Config.moduleurl + "/" + url;
                     }
-                } else if (url.substr(0, 8) === "/addons/") {
-                    url = Config.__PUBLIC__.replace(/(\/*$)/g, "") + url;
                 }
+
                 return url;
             },
             //获取修复后可访问的cdn链接
@@ -121,7 +119,7 @@ layui.define(['toast'], function (exports) {
                 title = options && options.title ? options.title : (title ? title : "");
                 url = bdHttp.api.fixurl(url);
                 // url = url + (url.indexOf("?") > -1 ? "&" : "?") + "";
-                var area = bdHttp.config.openArea != undefined ? bdHttp.config.openArea : [$(window).width() > 800 ? '800px' : '95%', $(window).height() > 600 ? '600px' : '95%'];
+                var area = [$(window).width() > 800 ? '800px' : '95%', $(window).height() > 600 ? '600px' : '95%'];
                 var success = options && typeof options.success === 'function' ? options.success : $.noop;
                 if (options && typeof options.success === 'function') {
                     delete options.success;
@@ -229,18 +227,22 @@ layui.define(['toast'], function (exports) {
                 if (type) {
                     callback = options;
                 }
-                return Layer.msg(__('Operation completed'), $.extend({
-                    offset: 0, icon: 1
-                }, type ? {} : options), callback);
+                return toast.success({
+                    message: __('Operation completed'),
+                    offset: 0,
+                    onClosing: callback
+                });
             },
             error: function (options, callback) {
                 var type = typeof options === 'function';
                 if (type) {
                     callback = options;
                 }
-                return Layer.msg(__('Operation failed'), $.extend({
-                    offset: 0, icon: 2
-                }, type ? {} : options), callback);
+                return toast.error({
+                    message: __('Operation failed'),
+                    offset: 0,
+                    onClosing: callback
+                })
             },
             msg: function (message, url) {
                 var callback = typeof url === 'function' ? url : function () {
@@ -263,6 +265,49 @@ layui.define(['toast'], function (exports) {
                         .replace(/`/g, '&#x60;');
                 }
                 return text;
+            },
+            badouStorage: {
+                // 统一的命名空间
+                namespace: 'badouadmin',
+
+                // 获取存储数据
+                get: function (key) {
+                    var data = layui.data(this.namespace);
+                    return key ? data[key] : data;
+                },
+
+                // 设置存储数据
+                set: function (namespace, data) {
+                    if (!data) {
+                        data = namespace;
+                    } else {
+                        this.namespace = namespace;
+                    }
+                    layui.data(this.namespace, data);
+                },
+
+                // 删除存储数据
+                remove: function (key) {
+                    layui.data(this.namespace, {
+                        key: key,
+                        remove: true
+                    });
+                },
+
+                // 清空所有数据
+                clear: function () {
+                    layui.data(this.namespace, null);
+                },
+
+                // 获取或生成会话ID
+                getSid: function () {
+                    var sid = this.get('sid');
+                    if (!sid) {
+                        sid = Math.random().toString(20).substr(2, 12);
+                        this.set({ key: 'sid', value: sid });
+                    }
+                    return sid;
+                }
             }
         },
         init: function () {

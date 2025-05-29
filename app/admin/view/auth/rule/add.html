@@ -2,6 +2,14 @@
 <form class="layui-form" method="post">
     {:token_field()}
     <div class="layui-form-item">
+        <label class="layui-form-label">类型</label>
+        <div class="layui-input-block">
+            <input type="radio" name="row[type]" value="0" title="菜单目录" checked lay-filter="type">
+            <input type="radio" name="row[type]" value="1" title="子菜单"  lay-filter="type">
+            <input type="radio" name="row[type]" value="2" title="页面按钮" lay-filter="type">
+        </div>
+    </div>
+    <div class="layui-form-item">
         <label class="layui-form-label">菜单</label>
         <div class="layui-input-block">
             <input type="radio" name="row[ismenu]" value="1" title="是" checked lay-filter="ismenu">
@@ -83,8 +91,8 @@
     </div>
     <div class="layui-form-item layer-footer hide">
         <div class="layui-input-block">
-            <button class="pear-btn pear-btn-primary pear-btn-md disabled" lay-submit>立即提交</button>
-            <button type="reset" class="pear-btn pear-btn-md">重置</button>
+            <button class="layui-btn pear-btn-primary layui-btn-sm disabled" lay-submit>立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
         </div>
     </div>
 </form>

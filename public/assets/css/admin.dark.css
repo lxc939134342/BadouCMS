@@ -1,4 +1,8 @@
 /** loader */
+.pear-admin-dark.badouadmin-theme {
+    background: #141414;
+    color: #cfd3dc;
+}
 .pear-admin-dark .loader-wrapper,
 .pear-admin-dark .loader-wrapper .loader {
     background-color: #141414;
@@ -6,6 +10,10 @@
 
 /** layout */
 .pear-admin-dark .layui-layout {
+    background-color: #141414;
+}
+/** pear-container */
+.pear-admin-dark.pear-container {
     background-color: #141414;
 }
 
@@ -26,7 +34,7 @@
 }
 
 .pear-admin-dark .layui-header {
-    border: 1px solid rgba(0, 0, 0, .40) !important;
+    border: 1px solid #000 !important;
 }
 
 .pear-admin-dark .layui-header .layui-nav * {
@@ -34,7 +42,7 @@
 }
 
 .pear-admin-dark .layui-header .layui-nav .layui-nav-child {
-    box-shadow: 0 3px 4px rgba(0, 0, 0, .6) !important;
+    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.6) !important;
     background-color: #141414;
     border-color: #141414;
 }
@@ -43,36 +51,36 @@
     background-color: #141414 !important;
 }
 
-.pear-admin-dark .layui-header .pear-nav-control .layui-this a{
+.pear-admin-dark .layui-header .pear-nav-control .layui-this a {
     background-color: #0c0c0c !important;
 }
 
-.pear-admin-dark .auto-theme .layui-logo .title{
+.pear-admin-dark .auto-theme .layui-logo .title {
     color: var(--global-primary-color) !important;
 }
 
 /** side */
 .pear-admin-dark .layui-side {
-    box-shadow: 0 3px 4px rgba(0, 0, 0, .6) !important;
+    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.6) !important;
 }
 
 .pear-admin-dark .layui-logo {
-    border-color: rgba(0, 0, 0, .30) !important;
+    border-color: rgba(0, 0, 0, 0.3) !important;
 }
 
 .pear-admin-dark .layui-side .layui-logo,
-.pear-admin-dark .layui-side .layui-side-scroll, 
-.pear-admin-dark .layui-side .layui-side-scroll .layui-nav-tree{
+.pear-admin-dark .layui-side .layui-side-scroll,
+.pear-admin-dark .layui-side .layui-side-scroll .layui-nav-tree {
     background-color: #141414 !important;
 }
 
 .pear-admin-dark .layui-side .layui-side-scroll .layui-nav-tree .layui-nav-child {
-    background-color: rgba(0,0,0,.3)!important;
+    background-color: rgba(0, 0, 0, 0.3) !important;
 }
 
 .pear-admin-dark .layui-side .layui-side-scroll .layui-nav .layui-nav-item a,
 .pear-admin-dark .layui-side .layui-side-scroll .layui-nav .layui-nav-item a > .layui-nav-more {
-    color: rgba(255,255,255,.7) !important;
+    color: rgba(255, 255, 255, 0.7) !important;
 }
 
 .pear-admin-dark .layui-side .layui-side-scroll .layui-nav .layui-nav-child dd.layui-this a,
@@ -89,12 +97,16 @@
     background-color: #0a0a0a !important;
 }
 
+.pear-admin-dark .layui-tab-title {
+    border: 1px solid #000 !important;
+}
+
 .pear-admin-dark .layui-body .layui-tab .layui-tab-title,
 .pear-admin-dark .layui-body .layui-tab .layui-tab-title li,
 .pear-admin-dark .layui-body .layui-tab .layui-tab-control li {
     background-color: #141414 !important;
-    border-color:rgba(0, 0, 0, .30) !important;
-    color: #ffffff;
+    border-color: rgba(0, 0, 0, 0.3) !important;
+    color: #cfd3dc;
 }
 
 .pear-admin-dark .layui-body .layui-tab .layui-tab-title li > span:first-child {
@@ -145,31 +157,30 @@
 }
 
 .pear-admin-dark .menu-search-tips kbd {
-    border-color: rgba(0, 0, 0, .30) !important;
+    border-color: rgba(0, 0, 0, 0.3) !important;
 }
 
-.pear-admin-dark .menu-search-list li{
-    background-color:#141414;
-    box-shadow: 0 3px 4px rgba(0, 0, 0, .6) !important;
+.pear-admin-dark .menu-search-list li {
+    background-color: #141414;
+    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.6) !important;
     color: #ffffff;
 }
 
-.pear-admin-dark .menu-search-list li:hover{
-    background-color:var(--global-primary-color) !important;
+.pear-admin-dark .menu-search-list li:hover {
+    background-color: var(--global-primary-color) !important;
 }
-
 
 /** message center */
 .pear-admin-dark .pear-message-center .layui-tab-title,
 .pear-admin-dark .pear-message-center .message-item {
-    border-color: rgba(0, 0, 0, .30) !important;
+    border-color: rgba(0, 0, 0, 0.3) !important;
     color: #ffffff;
 }
 
 /** button */
 .pear-admin-dark .layui-btn {
     color: #ffffff;
-    border-color: #4C4D4F;
+    border-color: #4c4d4f;
 }
 
 /** layer */
@@ -177,12 +188,20 @@
     background-color: #141414;
 }
 
+.pear-admin-dark .layui-layer-badouadmin .layui-layer-title {
+    background-color: #000 !important;
+    border: none;
+}
+.pear-admin-dark .layui-layer-badouadmin .layui-layer-footer {
+    background-color: #000 !important;
+}
+
 .pear-admin-dark .layui-layer-msg {
     border-color: #141414;
 }
 
 .pear-admin-dark .layui-layer-msg .layui-layer-content {
-    color: #E5EAF3;
+    color: #e5eaf3;
 }
 
 .pear-admin-dark .layui-layer .layui-layer-setwin > span,
@@ -208,44 +227,78 @@
 .pear-admin-dark .layui-input {
     background-color: transparent;
     color: #ffffff;
-    border-color: rgba(0, 0, 0, .30) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
 }
 
 /** switch */
 .pear-admin-dark .layui-form-switch {
     border-color: #484849;
-    background-color: rgba(255,255,255,.08);
+    background-color: rgba(255, 255, 255, 0.08);
+}
+.pear-admin-dark .layui-form-onswitch {
+    border-color: #484849;
+    background-color: var(--theme-color);
 }
 
 /** table */
 .pear-admin-dark .layui-table {
     background-color: transparent;
+    color: #cfd3dc;
+}
+.pear-admin-dark .layui-table-view .layui-form-checkbox[lay-skin="primary"] i {
+    background: none;
 }
 
 .pear-admin-dark .layui-table tr:hover {
     background-color: #141414 !important;
 }
 
-.pear-admin-dark .layui-table td, 
+.pear-admin-dark .layui-table-checked {
+    background-color: #1d1d1d !important;
+}
+
+.pear-admin-dark .layui-table td,
 .pear-admin-dark .layui-table th,
 .pear-admin-dark .layui-table-view,
 .pear-admin-dark .layui-table-page,
 .pear-admin-dark .layui-table-tool,
 .pear-admin-dark .layui-table-header {
-    border-color: rgba(0, 0, 0, .40) !important;
+    border-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+.pear-admin-dark .layui-table-header,
+.pear-admin-dark .layui-table-header th {
+    background-color: #141414 !important;
+}
+
+.pear-admin-dark .layui-table > thead > tr > th > .layui-table-cell {
+    color: #e5eaf3 !important;
+}
+
+.pear-admin-dark .layui-tab .layui-tab-title:after {
+    border-bottom-color: #000 !important;
+}
+.pear-admin-dark .layui-table-tool {
+    background-color: #141414 !important;
+}
+
+.pear-admin-dark .layui-table-click,
+.pear-admin-dark .layui-table-hover,
+.pear-admin-dark .layui-table[lay-even] tbody tr:nth-child(even) {
+    background-color: #141414 !important;
 }
 
 .pear-admin-dark .layui-table-tool-self > div {
-    border-color: rgba(0, 0, 0, .40) !important;
+    border-color: rgba(0, 0, 0, 0.4) !important;
     color: #ffffff !important;
-    background-color: transparent; 
+    background-color: transparent;
 }
 
 .pear-admin-dark .layui-laypage select,
 .pear-admin-dark .layui-laypage button {
-    border-color: rgba(0, 0, 0, .40) !important;
+    border-color: rgba(0, 0, 0, 0.4) !important;
     color: #ffffff !important;
-    background-color: transparent; 
+    background-color: transparent;
 }
 
 .pear-admin-dark .layui-laypage a,
@@ -272,7 +325,7 @@
 }
 
 .pear-admin-dark .layui-menu .layui-menu-body-title,
-.pear-admin-dark .layui-menu .layui-menu-body-title:hover  {
+.pear-admin-dark .layui-menu .layui-menu-body-title:hover {
     color: #ffffff;
     background-color: #1d1e1f !important;
 }
@@ -285,7 +338,6 @@
 .pear-admin-dark .layui-timeline-item:before {
     background-color: #414243 !important;
 }
-
 
 /** toast */
 .pear-admin-dark .iziToast {
@@ -301,11 +353,11 @@
 
 .pear-admin-dark .deputy:hover,
 .pear-admin-dark .shortcut-menu:hover {
-    box-shadow: 0 3px 4px rgba(0, 0, 0, .6) !important;
+    box-shadow: 0 3px 4px rgba(0, 0, 0, 0.6) !important;
 }
 
 .pear-admin-dark .message-board li {
-    border-bottom: 1px solid rgba(0, 0, 0, .40) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4) !important;
 }
 
 /** analysis */
@@ -314,7 +366,6 @@
     border-color: #414243;
 }
 
-
 .pear-admin-dark .dynamic-status dd {
     border-color: #414243;
 }
@@ -322,30 +373,30 @@
 /** success failure */
 .pear-admin-dark .pear-result .content {
     background-color: rgba(153, 153, 153, 0.12);
-    color: #E5EAF3;
+    color: #e5eaf3;
 }
 
-.pear-admin-dark .pear-result .title{
+.pear-admin-dark .pear-result .title {
     color: #ffffff;
 }
 
-.pear-admin-dark .pear-result .description{
-    color: #8D9095;
+.pear-admin-dark .pear-result .description {
+    color: #8d9095;
 }
 
 /** 403 404 500*/
-.pear-admin-dark .pear-exception .title p{
-    color: #E5EAF3 !important;
+.pear-admin-dark .pear-exception .title p {
+    color: #e5eaf3 !important;
 }
 
 /** scroll */
 .pear-admin-dark *::-webkit-scrollbar-thumb {
-	background: #141414;
-	border-radius: 4px;
+    background: #141414;
+    border-radius: 4px;
 }
 
 .pear-admin-dark *::-webkit-scrollbar-thumb:hover {
-	background: #0a0a0a;
+    background: #0a0a0a;
 }
 
 /** profile */
@@ -356,4 +407,53 @@
 
 .pear-admin-dark .user-desc {
     border-top: 1px solid #141414;
+}
+
+/** form  */
+.pear-admin-dark .layui-form-label {
+    color: #cfd3dc;
+}
+
+.pear-admin-dark xm-select {
+    background-color: transparent;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.pear-admin-dark xm-select > .xm-body {
+    background-color: #141414;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.pear-admin-dark xm-select .xm-option.selected {
+    background-color: #000 !important;
+}
+
+.pear-admin-dark .layui-input,
+.pear-admin-dark .layui-select,
+.pear-admin-dark .layui-textarea {
+    background-color: #141414;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.pear-admin-dark .layui-input:focus,
+.pear-admin-dark .layui-textarea:focus {
+    box-shadow: 0 0 0 3px #141414 !important;
+}
+
+.pear-admin-dark .pear-tab-loading {
+    background-color: #141414;
+}
+/** icon */
+.pear-admin-dark .layui-iconpicker .layui-anim {
+    background-color: #141414 !important;
+}
+.pear-admin-dark .layui-iconpicker .layui-iconpicker-list {
+    background-color: #141414 !important;
+}
+.pear-admin-dark .layui-iconpicker .layui-iconpicker-icon-item {
+    color: #fff;
+}
+.pear-admin-dark .layui-iconpicker-icon {
+    background-color: #141414 !important;
+    color: #fff;
 }

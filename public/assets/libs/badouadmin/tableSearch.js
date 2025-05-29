@@ -4,7 +4,7 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
     var $ = layui.jquery;
     var form = layui.form;
     var http = layui.bdHttp;
-
+    var ColumnsForSearch = [];
     var CommonSearch = {
         config: {
             elem: null,
@@ -48,7 +48,8 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
             html.push('<div class="layui-row layui-col-space10">');
 
             $.each(columns, function (i, col) {
-                if (col.type != 'checkbox' && col.type != 'radio' && col.field && col.field !== 'operate' && col.operate !== false) {
+                if (col.field && col.field !== 'operate' && col.operate !== false) {
+                    ColumnsForSearch.push(col);
                     html.push('<div class="layui-col-xs12 layui-col-sm6 layui-col-md4 layui-col-lg3">');
                     html.push('<div class="layui-form-item">');
                     html.push('<label class="layui-form-label">' + col.title + '</label>');
@@ -56,11 +57,16 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
 
                     // 隐藏的操作符字段
                     col.operate = col.operate ? col.operate.toUpperCase() : '=';
-                    html.push('<input type="hidden" name="' + col.field + '-operate" value="' + col.operate + '">');
+                    var hiddenOperateHtml = '<input type="hidden" class="badouadmin-commonsearch-operate" data-name="' + col.field + '" id="' + col.field + '" name="' + col.field + '-opearate" value="' + col.operate + '">';
+
+                    var placeholder = col.placeholder || col.title;
+                    var type = col.inputType || 'text';
+                    var defaultValue = col.defaultValue || '';
 
                     if (col.searchList) {
+                        html.push(hiddenOperateHtml);
                         // 下拉选择框
-                        html.push('<select name="' + col.field + '" lay-filter="commonsearch">');
+                        html.push('<select id="' + col.field + '" name="' + col.field + '" lay-filter="commonsearch">');
                         html.push('<option value="">请选择</option>');
 
                         if (typeof col.searchList === 'object') {
@@ -74,33 +80,39 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
                         }
 
                         html.push('</select>');
-                    } else if (col.searchType == 'remoteSelect') {
+                    }
+                    // 远程下拉选择框
+                    else if (col.searchType == 'remoteSelect') {
                         if (!col.extend) col.extend = '';
-                        // 远程下拉选择框
+                        html.push(hiddenOperateHtml);
                         html.push('<div id="remoteSelect-' + col.field + '" class="remoteSelect" ' + col.extend + '></div>');
-                    } else {
-                        // 普通输入框
-                        var placeholder = col.placeholder || col.title;
-                        var type = col.type || 'text';
-                        var defaultValue = col.defaultValue || '';
-
-                        if (/BETWEEN$/.test(col.operate)) {
-                            // 范围搜索
-                            var defaultValueArr = defaultValue.toString().match(/\|/) ? defaultValue.split('|') : ['', ''];
-                            var placeholderArr = placeholder.toString().match(/\|/) ? placeholder.split('|') : [placeholder, placeholder];
-
-                            html.push('<div class="layui-row layui-col-space5" style="display:inline-block">');
-                            html.push('<div class="layui-col-xs6">');
-                            html.push('<input type="' + type + '" name="' + col.field + '" value="' + defaultValueArr[0] + '" placeholder="' + placeholderArr[0] + '" class="layui-input">');
-                            html.push('</div>');
-                            html.push('<div class="layui-col-xs6">');
-                            html.push('<input type="' + type + '" name="' + col.field + '" value="' + defaultValueArr[1] + '" placeholder="' + placeholderArr[1] + '" class="layui-input">');
-                            html.push('</div>');
-                            html.push('</div>');
-                        } else {
-                            // 普通搜索
-                            html.push('<input type="' + type + '" name="' + col.field + '" value="' + defaultValue + '" placeholder="' + placeholder + '" class="layui-input">');
-                        }
+                    }
+                    // 区间范围
+                    else if (col.searchType == 'between') {
+                        // 范围搜索
+                        var defaultValueArr = defaultValue.toString().match(/\|/) ? defaultValue.split('|') : ['', ''];
+                        var placeholderArr = placeholder.toString().match(/\|/) ? placeholder.split('|') : [placeholder, placeholder];
+                        col.operate = 'BETWEEN';
+                        html.push('<input type="hidden" class="badouadmin-commonsearch-operate" data-name="' + col.field + '" id="' + col.field + '" name="' + col.field + '-opearate" value="' + col.operate + '">');
+                        html.push('<div class="layui-row layui-col-space5" style="display:inline-block">');
+                        html.push('<div class="layui-col-xs6">');
+                        html.push('<input type="' + type + '" id="' + col.field + '-min" name="' + col.field + '" value="' + defaultValueArr[0] + '" placeholder="' + placeholderArr[0] + '" class="layui-input">');
+                        html.push('</div>');
+                        html.push('<div class="layui-col-xs6">');
+                        html.push('<input type="' + type + '" id="' + col.field + '-max" name="' + col.field + '" value="' + defaultValueArr[1] + '" placeholder="' + placeholderArr[1] + '" class="layui-input">');
+                        html.push('</div>');
+                        html.push('</div>');
+                    }
+                    // 时间组件
+                    else if (col.searchType == 'time') {
+                        col.operate = 'RANGE';
+                        html.push('<input type="hidden" class="badouadmin-commonsearch-operate" data-name="' + col.field + '" id="' + col.field + '" name="' + col.field + '-opearate" value="' + col.operate + '">');
+                        html.push('<input type="' + type + '" name="' + col.field + '" value="' + defaultValue + '" placeholder="' + placeholder + '" class="layui-input badouadmin-datetime" data-range="true">');
+                    }
+                    else {
+                        html.push(hiddenOperateHtml);
+                        // 普通搜索
+                        html.push('<input type="' + type + '" name="' + col.field + '" value="' + defaultValue + '" placeholder="' + placeholder + '" class="layui-input">');
                     }
 
                     html.push('</div>');
@@ -113,8 +125,8 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
             html.push('<div class="layui-col-xs12 layui-col-sm6 layui-col-md4 layui-col-lg3">');
             html.push('<div class="layui-form-item">');
             html.push('<div class="layui-input-block">');
-            html.push('<button class="pear-btn pear-btn-md pear-btn-primary commonsearch-submit" lay-submit lay-filter="commonsearch"> <i class="layui-icon layui-icon-search"></i> 搜索</button>');
-            html.push('<button type="reset" class="pear-btn pear-btn-md commonsearch-rest"> <i class="layui-icon layui-icon-refresh"></i> 重置</button>');
+            html.push('<button class="layui-btn btn-theme-color commonsearch-submit" lay-submit lay-filter="commonsearch">  搜索</button>');
+            html.push('<button type="reset" class="layui-btn layui-btn-primary layui-border commonsearch-rest"> 重置</button>');
             html.push('</div>');
             html.push('</div>');
             html.push('</div>');
@@ -124,10 +136,12 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
 
             return html.join('');
         },
-
+        // 绑定事件
         _bindEvents: function () {
             var that = this;
             CommonSearch._remoteSelect();
+            // 时间组件
+            that._laydate();
             // 表单提交
             form.on('submit(commonsearch)', function (data) {
                 that._triggerSearch();
@@ -136,7 +150,6 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
 
             // 重置搜索
             $('.badouadmin-commonsearch button[type="reset"]').on('click', function () {
-
                 setTimeout(function () {
                     that._resetRemoteSelect();
                     that._triggerSearch();
@@ -145,6 +158,8 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
         },
         // 远程下拉选择框
         _remoteSelect: function (params) {
+            var themeColor = localStorage.getItem("theme-color-color");
+            var dark = localStorage.getItem("dark");
             $('.remoteSelect').each(function (i) {
                 var id = $(this).attr('id');
                 var url = $(this).data('source');
@@ -169,8 +184,16 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
                     prop: {
                         name: field,
                         value: key
+                    },
+                    theme: {
+                        color: themeColor
                     }
                 }
+
+                if (dark == 'true') {
+                    options.theme.hover = '#000';
+                }
+
                 // 单选
                 if (!multiple) {
                     options.radio = true;
@@ -215,7 +238,122 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
                         return false;
                     });
                 }
+
+                window.addEventListener('storage', (e) => {
+                    // 暗色模式
+                    if (e.key === 'dark') {
+                        if (e.newValue == 'true') {
+                            xmSelect.batch('', 'update', {
+                                theme: {
+                                    hover: '#000'
+                                }
+                            });
+                        } else {
+                            xmSelect.batch('', 'update', {
+                                theme: {
+                                    hover: '#f2f2f2'
+                                }
+                            });
+                        }
+                    }
+                    if (e.key === 'theme-color-color') {
+                        xmSelect.batch('', 'update', {
+                            theme: {
+                                color: e.newValue
+                            }
+                        });
+                    }
+                });
             });
+        },
+        // 时间组件
+        _laydate: function () {
+            if ($('.badouadmin-datetime').length > 0) {
+                $('.badouadmin-datetime').each(function (i) {
+                    var type = $(this).data('type') || 'datetime';
+                    var range = $(this).data('range') || false;
+
+                    var options = {
+                        elem: this,
+                        type: type,
+                        trigger: 'click'
+                    };
+                    if (range) {
+                        options['range'] = range;
+                        options['shortcuts'] = [{
+                            text: "今天",
+                            value: function () {
+                                var today = new Date();
+                                return [
+                                    new Date(today.getFullYear(), today.getMonth(), today.getDate()),
+                                    new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59)
+                                ];
+                            }
+                        },
+                        {
+                            text: "昨天",
+                            value: function () {
+                                var yesterday = new Date();
+                                yesterday.setDate(yesterday.getDate() - 1);
+                                return [
+                                    new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate()),
+                                    new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 23, 59, 59)
+                                ];
+                            }
+                        },
+                        {
+                            text: "最近7天",
+                            value: function () {
+                                var today = new Date();
+                                var sevenDaysAgo = new Date();
+                                sevenDaysAgo.setDate(today.getDate() - 7);
+                                return [
+                                    new Date(sevenDaysAgo.getFullYear(), sevenDaysAgo.getMonth(), sevenDaysAgo.getDate()),
+                                    new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59)
+                                ];
+                            }
+                        },
+                        {
+                            text: "最近30天",
+                            value: function () {
+                                var today = new Date();
+                                var sevenDaysAgo = new Date();
+                                sevenDaysAgo.setDate(today.getDate() - 30);
+                                return [
+                                    new Date(sevenDaysAgo.getFullYear(), sevenDaysAgo.getMonth(), sevenDaysAgo.getDate()),
+                                    new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59)
+                                ];
+                            }
+                        },
+                        {
+                            text: "本月",
+                            value: function () {
+                                var date = new Date();
+                                var year = date.getFullYear();
+                                var month = date.getMonth();
+                                return [
+                                    new Date(year, month, 1),
+                                    new Date(year, month + 1, 0, 23, 59, 59)
+                                ];
+                            }
+                        },
+                        {
+                            text: "上个月",
+                            value: function () {
+                                var date = new Date();
+                                var year = date.getFullYear();
+                                var month = date.getMonth();
+                                return [
+                                    new Date(year, month - 1, 1),
+                                    new Date(year, month, 0, 23, 59, 59)
+                                ];
+                            }
+                        }
+                        ]
+                    }
+                    layui.laydate.render(options);
+                });
+            }
         },
         // 重置远程下拉选择框
         _resetRemoteSelect: function () {
@@ -228,50 +366,75 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
                 }
             });
         },
+        // 触发搜索事件
         _triggerSearch: function () {
             var that = this;
             if (typeof that.config.onSearch === 'function') {
-                that.config.onSearch(that._getSearchParams());
+                var searchQuery = that._getSearchQuery(true)
+                that.config.onSearch({
+                    op: JSON.stringify(searchQuery.op),
+                    filter: JSON.stringify(searchQuery.filter)
+                });
             }
         },
-
-        _getSearchParams: function () {
+        // 获取搜索参数
+        _getSearchQuery: function (removeempty) {
+            var op = {};
+            var filter = {};
             var formElem = $('.badouadmin-commonsearch form');
-            var params = {};
-            var filters = {};
+            $(".badouadmin-commonsearch-operate", formElem).each(function (i) {
+                var name = $(this).data("name");
+                var obj = $("[name='" + name + "']", formElem);
+                if (obj.length == 0)
+                    return true;
+                var sym = $(this).is("select") ? $("option:selected", this).val() : $(this).val().toUpperCase();
+                var value = obj.val();  // 普通表单字段
+                var vObjCol = ColumnsForSearch[i];
+                var process = vObjCol && typeof vObjCol.process == 'function' ? vObjCol.process : null;
 
-            formElem.find('input[name$="-operate"]').each(function () {
-                var name = $(this).attr('name').replace('-operate', '');
-                var operate = $(this).val();
-                var value;
+                if (obj.length > 1) {
+                    // 处理xm-select组件
+                    var remoteSelect = $(this).next('.remoteSelect');
+                    if (remoteSelect.length > 0) {
+                        var id = remoteSelect.attr('id');
+                        var select = xmSelect.get('#' + id, true);
+                        if (select) {
+                            value = select.getValue('valueStr');
+                        }
+                    }
 
-                // 处理xm-select组件
-                var remoteSelect = $(this).next('.remoteSelect');
-
-                if (remoteSelect.length > 0) {
-                    var id = remoteSelect.attr('id');
-                    var select = xmSelect.get('#' + id, true);
-
-                    if (select) {
-                        value = select.getValue('valueStr');
+                    if (/BETWEEN$/.test(sym)) {
+                        var value_begin = $.trim($("[name='" + name + "']:first", formElem).val()),
+                            value_end = $.trim($("[name='" + name + "']:last", formElem).val());
+                        if (value_begin.length || value_end.length) {
+                            if (process) {
+                                value_begin = process(value_begin, 'begin');
+                                value_end = process(value_end, 'end');
+                            }
+                            value = value_begin + ',' + value_end;
+                        } else {
+                            value = '';
+                        }
+                    } else {
+                        value = $("[name='" + name + "']:checked", formElem).val();
+                        value = process ? process(value) : value;
                     }
                 } else {
-                    // 普通表单字段
-                    value = formElem.find('[name="' + name + '"]').val();
+                    value = process ? process(obj.val()) : obj.val();
+                }
+                if (removeempty && (value === '' || value == null || ($.isArray(value) && value.length === 0)) && !sym.match(/null/i)) {
+                    return true;
                 }
 
                 if (value !== undefined && value !== '') {
-                    params[name] = operate;
-                    filters[name] = value;
+                    op[name] = sym;
+                    filter[name] = value;
                 }
             });
-
-            return {
-                op: params,
-                filter: filters
-            };
+            return { op: op, filter: filter };
         },
 
+        // 显示搜索框
         toggle: function () {
             $('.badouadmin-commonsearch').toggleClass('layui-hide');
         }

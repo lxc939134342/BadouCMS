@@ -3,9 +3,12 @@
 <!-- 头部 -->
 <div class="layui-card">
     <div class="layui-card-body">
-        <a href="javascript:;" lay-event="refresh" class="layui-btn layui-btn-sm btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
-        <button class="layui-btn layui-btn-sm layui-bg-green" lay-event="add"><i class="fa fa-plus"></i> {:__('All')}</button>
-        <button class="layui-btn layui-btn-sm layui-bg-red"><i class="fa fa-user"></i> {:__('BADOU 会员登录')}</button>
+        <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
+        <div class="layui-btn-group">
+            <button class="layui-btn layui-bg-blue" lay-event="add"><i class="fa fa-list"></i> {:__('All')}</button>
+            <button type="button" class="layui-btn layui-bg-blue"><i class="fa fa-laptop"></i> {:__('Installed')}</button>
+        </div>
+        <button type="button" class="layui-btn layui-bg-red btn-userinfo"><i class="fa fa-user"></i> {:__('BADOU Userinfo')}</button>
     </div>
 </div>
 <!-- 表格 -->
@@ -15,26 +18,69 @@
     </div>
 </div>
 
-<script>
-    layui.use(["badou", "card","form"], function () {
-        var bdTable = layui.bdTable;
-        var card = layui.card;
-        var form = layui.form;
+<script type="text/html" id="cardTpl">
+    <div id='{{=d.item.name}}' data-name="{{=d.item.name}}" class="layui-col-md{{=d.line }} ew-datagrid-item btn-item" data-number="1">
+        <div class="project-list-item">
+            <img class="project-list-item-cover" src="{{=d.item.image }}">
+            <div class="project-list-item-body">
+                <h2 class="layui-elip">{{=d.item.title }}</h2>
+                <div> {{=d.item.intro }}</div>
+                <div class="project-list-item-text layui-text">
+                    <span class="layui-badge layui-bg-black">{{=d.item.author}}</span>
+                    <span class="layui-badge layui-bg-green">{{=d.item.version}}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>
+                        <i class="fa fa-download"></i> 0
+                    </span>
+                    {{ if(d.item.module) { }}
+                        {{ if(d.item.state==1) { }}
+                         <button class="layui-btn layui-bg-green"> 已安装</button>
+                        {{ } else { }}
+                         <button class="layui-btn layui-bg-orange"> 已禁用</button>
+                        {{ } }}
+                    {{ } else { }}
+                    <span>
+                       ￥{{=d.item.price}}
+                    </span>
+                    {{ } }}
+                </div>
+            </div>
+        </div >
+    </div >
+</script>
 
-        card.render({
+<script type="text/javascript">
+    layui.use(["badou", "cardList","form",'laytpl'], function () {
+        var bdTable = layui.bdTable;
+        var card = layui.cardList;
+        var form = layui.form;
+        var laytpl = layui.laytpl;
+        var badou = layui.badou;
+        var layer = layui.layer;
+        var dropdown = layui.dropdown;
+        var template = document.getElementById('cardTpl').innerHTML; // 获取模板字符
+        var cardOptions = {
             elem: "#modules-wrapper",
             url: "{:url('module/index')}", // 接口数据
             data: [], // 静态数据
             page: true, // 是否分页
             limit: 8, // 每页数量
             linenum: 4, // 每行数量
+            itemTpl:template,
             response: {
                 statusCode:1,
             },
-            clickItem: function (data) {
-                // 单击事件
-                console.log(data);
+            done: function () {
+                dropdown.render({
+                    elem: '.btn-upgrade',
+                })
             },
+        }
+        card.render(cardOptions);
+
+        $(document).on("click", ".btn-refresh", function () {
+            card.reload('modules-wrapper');
         });
 
         // 监听搜索操作
@@ -45,6 +91,7 @@
             });
             return false;
         });
+
         form.on("submit(data-checked-btn)", function () {
             var data = card.getChecked("currentTableId");
             layer.msg(JSON.stringify(data));
@@ -54,6 +101,121 @@
             var data = card.getAllData("currentTableId");
             layer.msg(JSON.stringify(data));
             return false;
+        });
+
+        $(document).on("click", ".btn-item", function () {
+            var name=$(this).data("name");
+            var userinfo = badou.api.badouStorage.get('userinfo');
+            if (!userinfo) {
+                $(".btn-userinfo").trigger("click");
+                return false;
+            }
+            var url = "{:url('module/info')}?name="+name+'&uid='+userinfo.id+'&token='+userinfo.token+'&bdversion='+Config.bdversion;
+            badou.api.open(url,__('Module info'),{
+                area: ['80%','95%'],
+                end:function(){
+                    card.reload('modules-wrapper');
+                }
+            });
+        });
+
+        // 会员信息
+        $(document).on("click", ".btn-userinfo", function (e, name, version) {
+            var that = this;
+            var area = [$(window).width() > 800 ? '500px' : '95%', $(window).height() > 600 ? '400px' : '95%'];
+            var userinfo = badou.api.badouStorage.get('userinfo');
+            if (!userinfo) {
+                badou.api.ajax({
+                    url: Config.api_url + '/member/logintpl',
+                    type: 'post',
+                    loading: false,
+                    data: {
+                        version: Config.bdversion,
+                        sid: badou.api.badouStorage.getSid()
+                    }
+                }, function (tpldata, ret) {
+                    layer.open({
+                        content: laytpl(tpldata).render(),
+                        zIndex: 99,
+                        area: area,
+                        title: __('Login'),
+                        resize: false,
+                        btn: [__('Login')],
+                        yes: function (index, layero) {
+                            var data = $("form", layero).serializeArray();
+                            data.push({name: "bdversion", value: Config.bdversion});
+                            data.push({name: "sid", value: badou.api.badouStorage.getSid()});
+                            badou.api.ajax({
+                                url: Config.api_url + '/member/login',
+                                type: 'post',
+                                data: data
+                            }, function (data, ret) {
+                                badou.api.badouStorage.set({key:'userinfo', value:data});
+                                layer.closeAll();
+                                layer.alert(ret.msg, {title: __('Warning'), icon: 1});
+                                return false;
+                            }, function (data, ret) {
+                            });
+                        },
+                        success: function (layero, index) {
+                            this.checkEnterKey = function (event) {
+                                if (event.keyCode === 13) {
+                                    $(".layui-layer-btn0").trigger("click");
+                                    return false;
+                                }
+                            };
+                            $(document).on('keydown', this.checkEnterKey);
+                        },
+                        end: function () {
+                            $(document).off('keydown', this.checkEnterKey);
+                        }
+                    });
+                    return false;
+                });
+            } else {
+                badou.api.ajax({
+                    url: Config.api_url + '/member/userinfotpl',
+                    type: 'post',
+                    data: {
+                        uid: userinfo.id,
+                        token: userinfo.token,
+                        version: Config.bdversion,
+                        sid: badou.api.badouStorage.getSid()
+                    }
+                }, function (tpldata, ret) {
+                    layer.open({
+                        content:  laytpl(tpldata).render(userinfo),
+                        area: area,
+                        title: __('Userinfo'),
+                        resize: false,
+                        btn: [__('Logout'), __('Close')],
+                        yes: function () {
+                            badou.api.ajax({
+                                url: Config.api_url + '/member/logout',
+                                data: {
+                                    uid: userinfo.id,
+                                    token: userinfo.token,
+                                    version: Config.bdversion,
+                                    sid: badou.api.badouStorage.getSid()
+                                }
+                            }, function (data, ret) {
+                                badou.api.badouStorage.remove('userinfo');
+                                layer.closeAll();
+                                layer.alert(ret.msg, {title: __('Warning'), icon: 0});
+                            }, function (data, ret) {
+                                badou.api.badouStorage.remove('userinfo');
+                                layer.closeAll();
+                                layer.alert(ret.msg, {title: __('Warning'), icon: 0});
+                            });
+                        }
+                    });
+                    return false;
+                }, function (data) {
+                    badou.api.badouStorage.remove('userinfo');
+                    $(that).trigger('click');
+                    return false;
+                });
+            }
         });
     });
 </script>

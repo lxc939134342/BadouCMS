@@ -26,7 +26,7 @@ class Index extends Backend
         $adminConfig = [
             "logo" => [
                 "title" => "BADOUADMIN",
-                "image" => "/static/admin/images/logo.png"
+                "image" => "/assets/images/logo.png"
             ],
             "menu" => [
                 "data" => (string)url('/index/index'),
@@ -47,7 +47,7 @@ class Index extends Backend
                 "index" => [
                     "id" => "1",
                     "href" => (string)url('/dashboard/index'),
-                    "title" => "首页"
+                    "title" => __('Home')
                 ]
             ],
             "theme" => [
@@ -55,7 +55,8 @@ class Index extends Backend
                 "defaultMenu" => "dark-theme",
                 "defaultHeader" => "light-theme",
                 "allowCustom" => true,
-                "banner" => false
+                "banner" => false,
+                "dark" => true
             ],
             "colors" => [
                 [
@@ -65,12 +66,12 @@ class Index extends Backend
                 ],
                 [
                     "id" => "2",
-                    "color" => "#36b368",
+                    "color" => "#67c23a",
                     "second" => "#f0f9eb"
                 ],
                 [
                     "id" => "3",
-                    "color" => "#FF6C02",
+                    "color" => "#ff6c02",
                     "second" => "#fdf6ec"
                 ],
                 [
@@ -80,9 +81,9 @@ class Index extends Backend
                 ],
                 [
                     "id" => "5",
-                    "color" => "#3963bc",
+                    "color" => "#4e73df",
                     "second" => "#ecf5ff"
-                ]
+                ],
             ],
             "other" => [
                 "keepLoad" => "700",
@@ -90,7 +91,7 @@ class Index extends Backend
                 "footer" => false
             ],
             "header" => [
-                "message" => "admin/data/message.json"
+                "message" => false
             ]
         ];
         return response($adminConfig, 200, [], 'json');

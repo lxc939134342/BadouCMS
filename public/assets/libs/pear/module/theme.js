@@ -9,6 +9,7 @@ layui.define(["jquery", "layer"], function (exports) {
 		this.autoHead = autoHead;
 		var color = localStorage.getItem("theme-color-color");
 		var second = localStorage.getItem("theme-color-second");
+
 		this.colorSet(color, second);
 		if (target.frames.length == 0) return;
 		for (var i = 0; i < target.frames.length; i++) {
@@ -27,7 +28,7 @@ layui.define(["jquery", "layer"], function (exports) {
 		var style = '';
 		style += ':root {--theme-color: ' + color + '; --theme-second-color: ' + second + ';}';
 		style += '.light-theme .pear-nav-tree .layui-this a:hover,.light-theme .pear-nav-tree .layui-this,.light-theme .pear-nav-tree .layui-this a,.pear-nav-tree .layui-this a,.pear-nav-tree .layui-this{background-color: ' + color + '!important;}';
-		style += '.pear-admin .layui-logo .title{color:' + color + '!important;}';
+		style += '.pear-admin .layui-logo .title{color:' + color + ';}';
 		style += '.pear-frame-title .dot,.pear-tab .layui-this .pear-tab-active{background-color: ' + color + '!important;}';
 		style += '.bottom-nav li a:hover{background-color:' + color + '!important;}';
 		style += '.pear-btn-primary {border: 1px solid ' + color + '!important;}';
@@ -96,6 +97,12 @@ layui.define(["jquery", "layer"], function (exports) {
 			colorPane.html(style);
 		} else {
 			$("head").append("<style id='pear-admin-color'>" + style + "</style>")
+		}
+		var dark = localStorage.getItem("dark");
+		if (dark == "true") {
+			$('body.badouadmin-theme').addClass('pear-admin-dark');
+		} else {
+			$('body.badouadmin-theme').removeClass('pear-admin-dark');
 		}
 	}
 

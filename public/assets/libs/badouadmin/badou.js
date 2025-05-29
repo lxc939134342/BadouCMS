@@ -6,8 +6,6 @@ layui.define(['lang', 'bdHttp', 'bdTable', 'bdForm'], function (exports) {
         bdForm = layui.bdForm;
     // var jstree = layui.jstree;
 
-    console.log();
-
     var Badou = new function () {
         this.lang = lang;
         this.bdTable = bdTable;
