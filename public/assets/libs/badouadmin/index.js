@@ -15,4 +15,6 @@ layui.config({
     bdForm: "bdForm",
     tableSearch: "tableSearch", // 通用搜索
     badou: "badou",
-}).use([], function () { });
+    jstree: 'jstree' // 配置 jstree 所在目录
+})
+
