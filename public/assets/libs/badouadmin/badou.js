@@ -4,6 +4,7 @@ layui.define(['lang', 'bdHttp', 'bdTable', 'bdForm'], function (exports) {
         http = layui.bdHttp,
         bdTable = layui.bdTable,
         bdForm = layui.bdForm;
+    // var jstree = layui.jstree;
 
     var Badou = new function () {
         this.lang = lang;
@@ -11,6 +12,7 @@ layui.define(['lang', 'bdHttp', 'bdTable', 'bdForm'], function (exports) {
         this.http = http;
         this.api = http.api;
         this.bdForm = bdForm;
+        // this.jstree = jstree;
     }
     exports('badou', Badou);
 });

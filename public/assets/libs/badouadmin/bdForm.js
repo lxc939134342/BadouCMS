@@ -1,9 +1,14 @@
-layui.define(['jquery', 'bdHttp', 'form', 'iconPicker'], function (exports) {
+
+layui.define(['jquery', 'bdHttp', 'form', 'iconPicker','toast'], function (exports) {
+    var $ = layui.jquery;
     var http = layui.bdHttp;
     var form = layui.form;
     var iconPicker = layui.iconPicker;
+    var toast = layui.toast;
+    // var jstree = layui.jstree;
     var bdForm = {
         events: {
+            //绑定事件
             bindevent: function (layform) {
                 //选择图标水电费
                 if ($('.icon-select').length > 0) {
@@ -22,6 +27,7 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker'], function (exports) {
                     });
                 }
             },
+            //表单校验事件
             validator: function (layform, success, error, submit) {
                 if (!layform.is("form"))
                     return;
@@ -81,6 +87,99 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker'], function (exports) {
                     return false;
                 });
             },
+            authGroupBindevent: function () {
+                
+                // var events = bdForm.events;
+                // events.authGroupBindevent($("form.layui-form"), null, null, function() {
+                //     console.log(123)
+                //     if ($("#treeview").length > 0) {
+                //         var r = $("#treeview").jstree("get_all_checked");
+                //         $("input[name='row[rules]']").val(r.join(','));
+                //     }
+                //     return true;
+                // });
+
+                //渲染权限节点树
+                //变更级别后需要重建节点树
+                layui.form.on('select(parentid)', function(data){
+                    var parentid = $(data.elem).data("parentid");
+                    var id = $(data.elem).data("id");
+                    var val = data.value;
+
+                    if (val == id) {
+                        $("option[value='" + parentid + "']", this).prop("selected", true).change();
+                        // Backend.api.toastr.error('父级不能是它自己');
+                        // parent.layui.toast.error('父级不能是它自己');
+                        // Toastr.success('父级不能是它自己');
+                        toast.success('父级不能是它自己');
+                        // parent.layui.toast.success({ message: msg })
+                        // parent.layui.toast.success({ message: msg })
+                        return false;
+                    }
+                    $.ajax({
+                        url: "auth.group/roletrees",
+                        type: 'post',
+                        dataType: 'json',
+                        data: { id: id, parentid: val },
+                        success: function(ret) {
+                            console.log(ret)
+                            if (ret.hasOwnProperty("code")) {
+                                var data = ret.hasOwnProperty("data") && ret.data != "" ? ret.data : "";
+                                if (ret.code === 1) {
+                                    //销毁已有的节点树
+                                    $("#treeview").jstree("destroy");
+                                    var events = bdForm.events;
+                                    events.rendertree(data);
+                                } else {
+
+                                    toast.success({ message: msg });
+                                    
+                                }
+                            }
+                        },
+                        error: function(e) {
+                            toast.success({ message: e.message });
+                        }
+                    });
+                });
+
+                //全选和展开
+                layui.form.on('checkbox(checkall)', function(data){
+                    $("#treeview").jstree($(this).prop("checked") ? "check_all" : "uncheck_all");
+                });
+                layui.form.on('checkbox(expandall)', function(data){
+                    $("#treeview").jstree($(this).prop("checked") ? "open_all" : "close_all");
+                });
+                $("select[name='row[parentid]']").siblings("div.layui-form-select").find("dd.layui-this").click();
+            },
+            rendertree: function(content) {
+                $("#treeview")
+                    .on('redraw.jstree', function(e) {
+                        $(".layer-footer").attr("domrefresh", Math.random());
+                    })
+                    .jstree({
+                        "themes": { "stripes": true },
+                        "checkbox": {
+                            "keep_selected_style": false,
+                        },
+                        "types": {
+                            "root": {
+                                "icon": "fa fa-folder-open",
+                            },
+                            "menu": {
+                                "icon": "fa fa-folder-open",
+                            },
+                            "file": {
+                                "icon": "fa fa-file-o",
+                            }
+                        },
+                        "plugins": ["checkbox", "types"],
+                        "core": {
+                            'check_callback': true,
+                            "data": content
+                        }
+                    });
+            }
         },
         api: {
             submit: function (form, success, error, submit) {
@@ -151,12 +250,30 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker'], function (exports) {
                 });
                 return true;
             },
+            //这是一个函数，接收四个参数：form: 表单元素或表单的选择器。success: 成功回调函数。error: 错误回调函数。submit: 提交回调函数。
             bindevent: function (form, success, error, submit) {
+                //如果传入的 form 不是对象，则将其转换为 jQuery 对象。这确保了后续操作可以直接使用 jQuery 方法。
                 form = typeof form === 'object' ? form : $(form);
+                //从 bdForm 对象中获取 events 对象，它包含了一些与表单相关的事件处理方法。
                 var events = bdForm.events;
+                //绑定表单事件,调用 events 对象中的 bindevent 方法，用于绑定表单的事件（例如图标选择器等）。
                 events.bindevent(form);
+                //绑定表单验证事件 调用 events 对象中的 validator 方法，用于绑定表单的验证逻辑。
+                //success, error, 和 submit 参数会被传递给验证逻辑，分别表示成功、错误和提交时的回调函数。
                 events.validator(form, success, error, submit);
-            }
+            },
+            //权限角色组
+            authGroupBindevent:function (form, success, error, submit) {
+                //如果传入的 form 不是对象，则将其转换为 jQuery 对象。这确保了后续操作可以直接使用 jQuery 方法。
+                form = typeof form === 'object' ? form : $(form);
+                //从 bdForm 对象中获取 events 对象，它包含了一些与表单相关的事件处理方法。
+                var events = bdForm.events;
+                //绑定表单事件,调用 events 对象中的 bindevent 方法，用于绑定表单的事件（例如图标选择器等）。
+                events.authGroupBindevent(form);
+                //绑定表单验证事件 调用 events 对象中的 validator 方法，用于绑定表单的验证逻辑。
+                //success, error, 和 submit 参数会被传递给验证逻辑，分别表示成功、错误和提交时的回调函数。
+                // events.validator(form, success, error, submit);
+            },
         }
     };
     exports('bdForm', bdForm);

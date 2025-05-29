@@ -15,6 +15,7 @@ layui.config({
     bdForm: "bdForm",
     tableSearch: "tableSearch", // 通用搜索
     badou: "badou",
+    jstree: 'jstree', // 配置 jstree 所在目录
     cardList: "cardList",
 });
 
@@ -44,3 +45,4 @@ layui.use(['layer', 'badou'], function () {
         return false;
     });
 });
+

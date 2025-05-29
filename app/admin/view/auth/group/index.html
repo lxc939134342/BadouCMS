@@ -23,15 +23,17 @@
         // var treeTable = layui.treeTable;
         var layer = layui.layer;
         var dropdown = layui.dropdown;
+        // var jstree = layui.jstree;
+        //初始化表格
         bdTable.api.init({
-            table:table,
+            table:table, // layui 表格对象，支持普通table与树结构table
             extend: {
-                index_url: "auth.group/index",
-                add_url: "auth.group/add",
-                edit_url: "auth.group/edit",
-                del_url: "auth.group/del",
-                multi_url: "auth.group/multi",
-                table: "auth_group",
+                index_url: "auth.group/index", //获取表格数据
+                add_url: "auth.group/add", //添加数据
+                edit_url: "auth.group/edit", //编辑数据
+                del_url: "auth.group/del", //删除数据
+                multi_url: "auth.group/multi", //批量处理
+                table: "auth_group", //数据表名称
             },
         });
         // 创建渲染实例

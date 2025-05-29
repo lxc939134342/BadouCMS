@@ -37,7 +37,7 @@ class Group extends Backend
     protected $groupdata = [];
 
     //无需要权限判断的方法
-    protected $noNeedRight = ['roletree'];
+    protected $noNeedRight = ['roletree','roletrees'];
 
     public function initialize()
     {
@@ -329,6 +329,556 @@ class Group extends Backend
             $this->error('组别未找到');
         }
     }
+
+    public function roletrees()
+    {
+        $nodeList = [
+            [
+                "id" => 1,
+                "parent" => "#",
+                "text" => "常规管理",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 10,
+                "parent" => 1,
+                "text" => "配置管理",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 23,
+                "parent" => 10,
+                "text" => "新增",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 24,
+                "parent" => 10,
+                "text" => "编辑",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 25,
+                "parent" => 10,
+                "text" => "删除",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 26,
+                "parent" => 10,
+                "text" => "批量更新",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 27,
+                "parent" => 10,
+                "text" => "查看",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 11,
+                "parent" => 1,
+                "text" => "网站设置",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 13,
+                "parent" => 1,
+                "text" => "附件管理",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 14,
+                "parent" => 13,
+                "text" => "查看",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 15,
+                "parent" => 13,
+                "text" => "删除",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 16,
+                "parent" => 13,
+                "text" => "图片本地化",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 17,
+                "parent" => 13,
+                "text" => "图片选择",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 4,
+                "parent" => 1,
+                "text" => "个人资料",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 5,
+                "parent" => 4,
+                "text" => "查看",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 6,
+                "parent" => 4,
+                "text" => "资料更新",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 28,
+                "parent" => "#",
+                "text" => "权限管理",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 29,
+                "parent" => 28,
+                "text" => "管理员管理",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 30,
+                "parent" => 29,
+                "text" => "查看",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 31,
+                "parent" => 29,
+                "text" => "编辑",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 32,
+                "parent" => 29,
+                "text" => "删除",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 33,
+                "parent" => 29,
+                "text" => "新增",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 34,
+                "parent" => 28,
+                "text" => "管理日志",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 35,
+                "parent" => 34,
+                "text" => "查看",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 36,
+                "parent" => 34,
+                "text" => "删除",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 37,
+                "parent" => 34,
+                "text" => "详情",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 38,
+                "parent" => 28,
+                "text" => "角色管理",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 41,
+                "parent" => 38,
+                "text" => "查看",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 42,
+                "parent" => 38,
+                "text" => "新增",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 43,
+                "parent" => 38,
+                "text" => "编辑",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 44,
+                "parent" => 38,
+                "text" => "删除",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 12,
+                "parent" => 28,
+                "text" => "菜单管理",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 18,
+                "parent" => 12,
+                "text" => "查看",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 19,
+                "parent" => 12,
+                "text" => "新增",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 20,
+                "parent" => 12,
+                "text" => "编辑",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 21,
+                "parent" => 12,
+                "text" => "删除",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 22,
+                "parent" => 12,
+                "text" => "批量更新",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 50,
+                "parent" => "#",
+                "text" => "会员管理",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 51,
+                "parent" => 50,
+                "text" => "会员管理",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 52,
+                "parent" => 51,
+                "text" => "查看",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 53,
+                "parent" => 51,
+                "text" => "新增",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 54,
+                "parent" => 51,
+                "text" => "编辑",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 55,
+                "parent" => 51,
+                "text" => "删除",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 56,
+                "parent" => 51,
+                "text" => "审核",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 57,
+                "parent" => 50,
+                "text" => "审核会员",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 58,
+                "parent" => 50,
+                "text" => "会员组管理",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 59,
+                "parent" => 58,
+                "text" => "查看",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 60,
+                "parent" => 58,
+                "text" => "新增",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 61,
+                "parent" => 58,
+                "text" => "编辑",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 62,
+                "parent" => 58,
+                "text" => "删除",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 63,
+                "parent" => 50,
+                "text" => "VIP等级管理",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 64,
+                "parent" => 63,
+                "text" => "查看",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 65,
+                "parent" => 63,
+                "text" => "新增",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 66,
+                "parent" => 63,
+                "text" => "编辑",
+                "type" => "menu",
+                "state" => [    
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 67,
+                "parent" => 63,
+                "text" => "删除",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 68,
+                "parent" => 63,
+                "text" => "批量更新",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 2,
+                "parent" => "#",
+                "text" => "插件管理",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 45,
+                "parent" => 2,
+                "text" => "查看",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 46,
+                "parent" => 2,
+                "text" => "配置",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ],
+            [
+                "id" => 49,
+                "parent" => 2,
+                "text" => "禁用启用",
+                "type" => "menu",
+                "state" => [
+                    "selected" => false
+                ]
+            ]
+        ];
+       $this->success('', null, $nodeList);
+
+    }
+
+
 
     //批量更新
     public function multi()
