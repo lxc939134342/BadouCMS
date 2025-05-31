@@ -289,6 +289,24 @@
     margin-left: -18px;
     left: 100%;
 }
+.layui-upload-list {
+    margin: 10px -5px;
+}
+.layui-upload-list:after,
+.layui-upload-list:before {
+    content: "";
+    display: block;
+    clear: both;
+}
 .layui-upload-list .layui-upload-item {
-    width: 25%;
+    padding: 5px;
+}
+
+.layui-upload-list .layui-upload-img {
+    width: 100%;
+    height: 80px;
+}
+
+.layui-upload-list .layui-upload-item .btn-delete-img {
+    width: 100%;
 }

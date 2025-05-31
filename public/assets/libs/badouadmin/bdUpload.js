@@ -9,13 +9,40 @@ layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer'], functio
     var bdUpload = {
         config: {
             previewtpl: `
-                <div class="layui-upload-item" >
-                    <img src="{{=d.fullurl}}" class="layui-upload-img" style="width: 100%; height: 92px" />
+                <div class="layui-col-xs3 layui-upload-item" >
+                    <img src="{{=d.fullurl}}" class="layui-upload-img" />
+                    <a href="javascript:;" class="layui-btn layui-btn-xs layui-bg-red btn-delete-img"><i class="fa fa-trash"></i></a>
                 </div>
             `
         },
         render: function (options) {
             options = $.extend({}, this.config, options || {});
+            //刷新隐藏textarea的值
+            var refresh = function (name) {
+                var data = {};
+                var textarea = $("textarea[name='" + name + "']");
+                var container = textarea.prev("ul");
+                $.each($("input,select,textarea", container).serializeArray(), function (i, j) {
+                    var reg = /\[?(\w+)\]?\[(\w+)\]$/g;
+                    var match = reg.exec(j.name);
+                    if (!match)
+                        return true;
+                    if (!isNaN(match[2])) {
+                        data[i] = j.value;
+                    } else {
+                        match[1] = "x" + parseInt(match[1]);
+                        if (typeof data[match[1]] === 'undefined') {
+                            data[match[1]] = {};
+                        }
+                        data[match[1]][match[2]] = j.value;
+                    }
+                });
+                var result = [];
+                $.each(data, function (i, j) {
+                    result.push(j);
+                });
+                textarea.val(JSON.stringify(result));
+            };
             $('.btn-bdupload').each(function () {
                 var that = this;
                 //填充ID
@@ -63,16 +90,36 @@ layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer'], functio
                         html = laytpl(html).render(data);
                         previewObj.append(html);
                     });
-                    console.log(top.layer);
                     layer.photos({
                         photos: '#' + preview_id,
                     })
-                    // refresh(previewObj.data("name"));
+                    refresh(previewObj.data("name"));
                 });
                 $("#" + input_id).trigger("change");
+
+                //监听文本框改变事件
+                $("#" + preview_id).on('change keyup', "input,textarea,select", function () {
+                    refresh($(this).closest(".layui-upload-list").data("name"));
+                });
+                // 监听事件
+                $(document.body).on("bd.preview.change", "#" + preview_id, function () {
+                    var urlArr = [];
+                    $("#" + preview_id + " [data-url]").each(function (i, j) {
+                        urlArr.push($(this).data("url"));
+                    });
+                    if (input_id) {
+                        $("#" + input_id).val(urlArr.join(","));
+                    }
+                    refresh($("#" + preview_id).data("name"));
+                });
+
+                // 移除按钮事件
+                $(document.body).on("click", "#" + preview_id + " .btn-delete-img", function () {
+                    console.log($(this).closest(".layui-upload-item"));
+                    $(this).closest(".layui-upload-item").remove();
+                    $("#" + preview_id).trigger("bd.preview.change");
+                });
             })
-
-
 
         },
         events: {

@@ -4,22 +4,22 @@
     <div class="layui-form-item">
         <label class="layui-form-label">标题</label>
         <div class="layui-input-block">
-            <input type="text" name="row[title]" lay-verify="required" autocomplete="off" placeholder="标题" class="layui-input" />
+            <input type="text" name="row[title]" lay-verify="required" autocomplete="off" value="{$row.title}" placeholder="标题" class="layui-input" />
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">缩略图</label>
         <div class="layui-input-block">
-
             <div class="layui-input-group" style="width: 100%;">
-                <input type="text" id="c-ico" name="row[ico]" lay-verify="required" class="layui-input">
+                <input type="text" id="c-ico" name="row[ico]" lay-verify="required" class="layui-input" value="{$row.ico}">
                 <div class="layui-input-suffix" style="width: 30%;">
-                    <button type="button" data-input-id="c-ico" data-preview-id="p-ico" data-multiple="true" class="layui-btn btn-bdupload"><i class="fa fa-upload"></i> 上传</button>
+                    <button type="button" data-multiple="true" data-input-id="c-ico" data-preview-id="p-ico" class="layui-btn btn-bdupload"><i class="fa fa-upload"></i> 上传</button>
                     <button type="button" class="layui-btn layui-bg-green btn-bdchoose"><i class="fa fa-list"></i> 选择</button>
                 </div>
             </div>
 
-            <div class="layui-upload-list d-flex" id="p-ico"></div>
+            <div class="layui-upload-list" id="p-ico">
+            </div>
         </div>
     </div>
     <div class="layui-form-item">

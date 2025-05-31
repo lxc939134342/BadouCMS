@@ -146,7 +146,6 @@ trait Backend
                 $this->error(__('No rows updated'));
             }
         }
-
         $this->view->assign('row', $row);
         return $this->view->fetch();
     }
