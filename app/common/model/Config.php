@@ -20,7 +20,7 @@ class Config extends Model
         $uploadurl = app('http')->getName() ? $uploadcfg['uploadurl'] : ($uploadcfg['uploadurl'] === 'ajax/upload' ? 'index/' . $uploadcfg['uploadurl'] : $uploadcfg['uploadurl']);
 
         if (!preg_match("/^((?:[a-z]+:)?\/\/)(.*)/i", $uploadurl) && substr($uploadurl, 0, 1) !== '/') {
-            $uploadurl = url($uploadurl, [], false);
+            $uploadurl = (string) url($uploadurl, [], false);
         }
         $uploadcfg['fullmode'] = isset($uploadcfg['fullmode']) && $uploadcfg['fullmode'];
         $uploadcfg['thumbstyle'] = $uploadcfg['thumbstyle'] ?? '';

@@ -43,6 +43,7 @@ trait Backend
         }
 
         [$where, $sort, $order, $offset, $limit] = $this->buildparams();
+
         $res = $this->model
             ->where($where)
             ->order($sort, $order)
@@ -162,7 +163,7 @@ trait Backend
             $where[] = [$this->dataLimitField, 'in', $dataLimitAdminIds];
         }
 
-        $ids     = $this->request->param('ids/a', []);
+        $ids     = $this->request->param('ids');
         $where[] = [$this->model->getPk(), 'in', $ids];
         $data    = $this->model->where($where)->select();
 

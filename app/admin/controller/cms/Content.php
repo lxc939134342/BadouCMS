@@ -107,100 +107,99 @@ class Content extends Base
     /**
      * 添加
      */
-    public function add(): void
+    public function add()
     {
-        if ($this->request->isPost()) {
+        if (!$this->isAjax()) {
+            return $this->view->fetch();
+        }
+        $data = $this->getPostData();
+        $data['content'] ?? $data['content'] = '';
+        $data['content'] = $this->request->param('content', '', 'clean_xss');
 
-            $data = $this->getPostData();
-            $data['content'] ?? $data['content'] = '';
-            $data['content'] = $this->request->param('content', '', 'clean_xss');
+        // 构建数据
+        $default = [
+            'acode' => get_backend_lang(),
+            'scode' => '',
+            'subscode' => '',
+            'title' => '',
+            'titlecolor' => '',
+            'subtitle' => '',
+            'filename' => '',
+            'author' => $this->auth->nickname,
+            'source' => '',
+            'outlink' => '',
+            'date' => '',
+            'ico' => '',
+            'pics' => '',
+            'picstitle' => '',
+            'content' => '',
+            'tags' => '',
+            'enclosure' => '',
+            'keywords' => '',
+            'description' => '',
+            'sorting' => 255,
+            'status' => 1,
+            'istop' => 0,
+            'isrecommend' => 0,
+            'isheadline' => 0,
+            'gid' => '',
+            'gtype' => '',
+            'gnote' => '',
+            'visits' => 0,
+            'likes' => 0,
+            'oppose' => 0,
+            'create_user' => $this->auth->username,
+            'update_user' => $this->auth->username
+        ];
 
-            // 构建数据
-            $default = [
-                'acode' => get_backend_lang(),
-                'scode' => '',
-                'subscode' => '',
-                'title' => '',
-                'titlecolor' => '',
-                'subtitle' => '',
-                'filename' => '',
-                'author' => $this->auth->nickname,
-                'source' => '',
-                'outlink' => '',
-                'date' => '',
-                'ico' => '',
-                'pics' => '',
-                'picstitle' => '',
-                'content' => '',
-                'tags' => '',
-                'enclosure' => '',
-                'keywords' => '',
-                'description' => '',
-                'sorting' => 255,
-                'status' => 1,
-                'istop' => 0,
-                'isrecommend' => 0,
-                'isheadline' => 0,
-                'gid' => '',
-                'gtype' => '',
-                'gnote' => '',
-                'visits' => 0,
-                'likes' => 0,
-                'oppose' => 0,
-                'create_user' => $this->auth->username,
-                'update_user' => $this->auth->username
-            ];
+        $data = array_merge($default, $data);
 
-            $data = array_merge($default, $data);
+        $result = false;
+        Db::startTrans();
+        try {
+            // 模型验证
+            $this->modelValidateFunction($data);
 
-            $result = false;
-            Db::startTrans();
-            try {
-                // 模型验证
-                $this->modelValidateFunction($data);
-
-                if ($data['filename'] && ! preg_match('/^[a-zA-Z0-9\-_\/]+$/', $data['filename'])) {
-                    throw new Exception(__('URL name only allows letters, numbers, lines, underscores'));
-                }
-
-                // 自动提起前一百个字符为描述
-                if (! $data['description'] && isset($data['content'])) {
-                    $data['description'] = escape_string(clear_html_blank(substr_both(strip_tags($data['content']), 0, 150)));
-                }
-
-                // 无缩略图时，自动提取文章第一张图为缩略图
-                if (! $data['ico'] && preg_match('/<img\s+.*?src=\s?[\'|\"](.*?(\.gif|\.jpg|\.png|\.jpeg))[\'|\"].*?[\/]?>/i', decode_string($data['content']), $srcs) && isset($srcs[1])) {
-                    $data['ico'] = $srcs[1];
-                }
-
-                // 检查自定义URL名称
-                if ($data['filename']) {
-                    while ($this->model->checkFilename($data['filename'])) {
-                        $data['filename'] = $data['filename'] . '-' . mt_rand(1, 20);
-                    }
-                }
-
-                $result = $this->model->save($data);
-
-                /* 添加扩展数据 */
-                $extdata = $this->contentExtModel->getExtData($data);
-                $extdata['contentid'] = $this->model->id;
-
-                $this->contentExtModel->save($extdata);
-
-                Db::commit();
-            } catch (Throwable $e) {
-                Db::rollback();
-                $this->error($e->getMessage());
+            if ($data['filename'] && ! preg_match('/^[a-zA-Z0-9\-_\/]+$/', $data['filename'])) {
+                throw new Exception(__('URL name only allows letters, numbers, lines, underscores'));
             }
-            if ($result !== false) {
-                $this->success(__('Added successfully'));
-            } else {
-                $this->error(__('No rows were added'));
+
+            // 自动提起前一百个字符为描述
+            if (! $data['description'] && isset($data['content'])) {
+                $data['description'] = escape_string(clear_html_blank(substr_both(strip_tags($data['content']), 0, 150)));
             }
+
+            // 无缩略图时，自动提取文章第一张图为缩略图
+            if (! $data['ico'] && preg_match('/<img\s+.*?src=\s?[\'|\"](.*?(\.gif|\.jpg|\.png|\.jpeg))[\'|\"].*?[\/]?>/i', decode_string($data['content']), $srcs) && isset($srcs[1])) {
+                $data['ico'] = $srcs[1];
+            }
+
+            // 检查自定义URL名称
+            if ($data['filename']) {
+                while ($this->model->checkFilename($data['filename'])) {
+                    $data['filename'] = $data['filename'] . '-' . mt_rand(1, 20);
+                }
+            }
+
+            $result = $this->model->save($data);
+
+            /* 添加扩展数据 */
+            $extdata = $this->contentExtModel->getExtData($data);
+            $extdata['contentid'] = $this->model->id;
+
+            $this->contentExtModel->save($extdata);
+
+            Db::commit();
+        } catch (Throwable $e) {
+            Db::rollback();
+            $this->error($e->getMessage());
+        }
+        if ($result !== false) {
+            $this->success(__('Added successfully'));
+        } else {
+            $this->error(__('No rows were added'));
         }
 
-        $this->error(__('Parameter error'));
     }
 
     /**

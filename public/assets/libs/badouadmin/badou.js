@@ -3,8 +3,8 @@ layui.define(['lang', 'bdHttp', 'bdTable', 'bdForm'], function (exports) {
     var lang = layui.lang,
         http = layui.bdHttp,
         bdTable = layui.bdTable,
-        bdForm = layui.bdForm;
-    // var jstree = layui.jstree;
+        bdForm = layui.bdForm,
+        bdUpload = layui.bdUpload;
 
     var Badou = new function () {
         this.lang = lang;
@@ -12,7 +12,7 @@ layui.define(['lang', 'bdHttp', 'bdTable', 'bdForm'], function (exports) {
         this.http = http;
         this.api = http.api;
         this.bdForm = bdForm;
-        // this.jstree = jstree;
+        this.bdUpload = bdUpload;
     }
     exports('badou', Badou);
 });

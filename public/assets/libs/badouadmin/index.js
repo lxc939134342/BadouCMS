@@ -10,13 +10,13 @@ layui.config({
     version: "1.0.0"
 }).extend({
     lang: "lang",
-    bdHttp: "bdHttp",
-    bdTable: "bdTable",
-    bdForm: "bdForm",
-    tableSearch: "tableSearch", // 通用搜索
     badou: "badou",
-    jstree: 'jstree', // 配置 jstree 所在目录
-    cardList: "cardList",
+    bdHttp: "bdHttp",
+    bdTable: "bdTable",       // 表格组件
+    bdForm: "bdForm",        // 表单组件
+    tableSearch: "tableSearch",   // 通用搜索
+    cardList: "cardList",      // 卡片列表
+    bdUpload: "bdUpload",      // 上传组件
 });
 
 layui.use(['layer', 'badou'], function () {

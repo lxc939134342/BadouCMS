@@ -514,7 +514,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         dropdown = j.dropdown ? j.dropdown : '';
                         url = j.url ? j.url : '';
                         url = typeof url === 'function' ? url.call(table, row, j) : (url ? http.api.fixurl(bdTable.api.replaceurl(url, row, table)) : 'javascript:;');
-                        classname = j.classname ? j.classname : 'layui-btn layui-btn-xs';
+                        classname = j.classname ? j.classname : 'layui-btn';
                         icon = j.icon ? j.icon : '';
                         text = typeof j.text === 'function' ? j.text.call(table, row, j) : j.text ? j.text : '';
                         title = typeof j.title === 'function' ? j.title.call(table, row, j) : j.title ? j.title : text;

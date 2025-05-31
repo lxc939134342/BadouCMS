@@ -69,4 +69,6 @@ return [
     'Register'                                              => '注册',
     'User Center'                                           => '会员中心',
     'Title'                                                 => '标题',
+    'Uploaded successful' => '上传成功',
+    'Chunk file disabled' => '分片上传已禁用',
 ];
