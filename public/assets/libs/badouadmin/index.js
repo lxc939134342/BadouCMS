@@ -17,6 +17,11 @@ layui.config({
     tableSearch: "tableSearch",   // 通用搜索
     cardList: "cardList",      // 卡片列表
     bdUpload: "bdUpload",      // 上传组件
+    // 组件扩展
+    Sortable: {
+        src: '/assets/libs/sortablejs/Sortable.min.js',
+        api: 'Sortable'
+    }
 });
 
 layui.use(['layer', 'badou'], function () {

@@ -1,54 +1,32 @@
-layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer'], function (exports) {
+layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer', 'Sortable'], function (exports) {
     "use strict";
     var $ = layui.jquery;
     var upload = layui.upload;
     var http = layui.bdHttp;
     var laytpl = layui.laytpl;
     var layer = layui.layer;
+    var Sortable = layui.Sortable;
 
     var bdUpload = {
         config: {
             previewtpl: `
-                <div class="layui-col-xs3 layui-upload-item" >
-                    <img src="{{=d.fullurl}}" class="layui-upload-img" />
+                <div class="layui-col-xs3 layui-upload-item"  >
+                    <img src="{{=d.fullurl}}" data-url="{{=d.url}}" class="layui-upload-img" />
                     <a href="javascript:;" class="layui-btn layui-btn-xs layui-bg-red btn-delete-img"><i class="fa fa-trash"></i></a>
                 </div>
             `
         },
         render: function (options) {
             options = $.extend({}, this.config, options || {});
-            //刷新隐藏textarea的值
-            var refresh = function (name) {
-                var data = {};
-                var textarea = $("textarea[name='" + name + "']");
-                var container = textarea.prev("ul");
-                $.each($("input,select,textarea", container).serializeArray(), function (i, j) {
-                    var reg = /\[?(\w+)\]?\[(\w+)\]$/g;
-                    var match = reg.exec(j.name);
-                    if (!match)
-                        return true;
-                    if (!isNaN(match[2])) {
-                        data[i] = j.value;
-                    } else {
-                        match[1] = "x" + parseInt(match[1]);
-                        if (typeof data[match[1]] === 'undefined') {
-                            data[match[1]] = {};
-                        }
-                        data[match[1]][match[2]] = j.value;
-                    }
-                });
-                var result = [];
-                $.each(data, function (i, j) {
-                    result.push(j);
-                });
-                textarea.val(JSON.stringify(result));
-            };
+
             $('.btn-bdupload').each(function () {
                 var that = this;
                 //填充ID
                 var input_id = $(that).data("input-id") ? $(that).data("input-id") : "";
                 //预览ID
                 var preview_id = $(that).data("preview-id") ? $(that).data("preview-id") : "";
+                var multiple = $(this).data("multiple");
+
                 var url = $(that).data('url') ? $(that).data('url') : Config.upload.uploadurl;
                 upload.render({
                     elem: that, // 绑定多个元素
@@ -93,13 +71,13 @@ layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer'], functio
                     layer.photos({
                         photos: '#' + preview_id,
                     })
-                    refresh(previewObj.data("name"));
+                    bdUpload.api.refresh(previewObj.data("name"));
                 });
                 $("#" + input_id).trigger("change");
 
                 //监听文本框改变事件
                 $("#" + preview_id).on('change keyup', "input,textarea,select", function () {
-                    refresh($(this).closest(".layui-upload-list").data("name"));
+                    bdUpload.api.refresh($(this).closest(".layui-upload-list").data("name"));
                 });
                 // 监听事件
                 $(document.body).on("bd.preview.change", "#" + preview_id, function () {
@@ -110,7 +88,7 @@ layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer'], functio
                     if (input_id) {
                         $("#" + input_id).val(urlArr.join(","));
                     }
-                    refresh($("#" + preview_id).data("name"));
+                    bdUpload.api.refresh($("#" + preview_id).data("name"));
                 });
 
                 // 移除按钮事件
@@ -119,8 +97,50 @@ layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer'], functio
                     $(this).closest(".layui-upload-item").remove();
                     $("#" + preview_id).trigger("bd.preview.change");
                 });
+
+                //拖动排序
+                if (preview_id && multiple) {
+                    console.log(preview_id);
+                    var previewEl = document.getElementById(preview_id);
+                    new Sortable(previewEl, {
+                        animation: 150,
+                        ghostClass: 'sortable-ghost', // 拖动时的样式类名
+                        onEnd: function (evt) {
+                            // 排序完成后刷新隐藏的 textarea 值
+                            $("#" + preview_id).trigger("bd.preview.change");
+                        }
+                    });
+                }
             })
 
+        },
+        api: {
+            //刷新隐藏textarea的值
+            refresh: function (name) {
+                var data = {};
+                var textarea = $("textarea[name='" + name + "']");
+                var container = textarea.prev("ul");
+                $.each($("input,select,textarea", container).serializeArray(), function (i, j) {
+                    var reg = /\[?(\w+)\]?\[(\w+)\]$/g;
+                    var match = reg.exec(j.name);
+                    if (!match)
+                        return true;
+                    if (!isNaN(match[2])) {
+                        data[i] = j.value;
+                    } else {
+                        match[1] = "x" + parseInt(match[1]);
+                        if (typeof data[match[1]] === 'undefined') {
+                            data[match[1]] = {};
+                        }
+                        data[match[1]][match[2]] = j.value;
+                    }
+                });
+                var result = [];
+                $.each(data, function (i, j) {
+                    result.push(j);
+                });
+                textarea.val(JSON.stringify(result));
+            }
         },
         events: {
             onUploadSuccess: function (data, index, upload) {

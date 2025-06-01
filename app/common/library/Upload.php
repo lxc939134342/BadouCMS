@@ -4,7 +4,6 @@ namespace app\common\library;
 
 use think\File;
 use badou\Random;
-use FilesystemIterator;
 use app\common\model\Attachment;
 use app\common\exception\UploadException;
 use think\facade\Event;
@@ -14,10 +13,6 @@ use think\facade\Event;
  */
 class Upload
 {
-    protected $merging = false;
-
-    protected $chunkDir = null;
-
     protected $config = [];
 
     protected $error = '';
@@ -31,19 +26,9 @@ class Upload
     public function __construct($file = null)
     {
         $this->config = config('upload');
-        $this->chunkDir = runtime_path() . 'chunks';
         if ($file) {
             $this->setFile($file);
         }
-    }
-
-    /**
-     * 设置分片目录
-     * @param $dir
-     */
-    public function setChunkDir($dir)
-    {
-        $this->chunkDir = $dir;
     }
 
     /**
@@ -217,143 +202,6 @@ class Upload
     }
 
     /**
-     * 清理分片文件
-     * @param $chunkid
-     */
-    public function clean($chunkid)
-    {
-        if (!preg_match('/^[a-z0-9\-]{36}$/', $chunkid)) {
-            throw new UploadException(__('Invalid parameters'));
-        }
-        $iterator = new \GlobIterator($this->chunkDir . DS . $chunkid . '-*', FilesystemIterator::KEY_AS_FILENAME);
-        $array = iterator_to_array($iterator);
-        foreach ($array as $index => &$item) {
-            $sourceFile = $item->getRealPath() ?: $item->getPathname();
-            $item = null;
-            @unlink($sourceFile);
-        }
-    }
-
-    /**
-     * 合并分片文件
-     * @param string $chunkid
-     * @param int    $chunkcount
-     * @param string $filename
-     * @return attachment|\think\Model
-     * @throws UploadException
-     */
-    public function merge($chunkid, $chunkcount, $filename)
-    {
-        if (!preg_match('/^[a-z0-9\-]{36}$/', $chunkid)) {
-            throw new UploadException(__('Invalid parameters'));
-        }
-
-        $filePath = $this->chunkDir . DS . $chunkid;
-
-        $completed = true;
-        //检查所有分片是否都存在
-        for ($i = 0; $i < $chunkcount; $i++) {
-            if (!file_exists("{$filePath}-{$i}.part")) {
-                $completed = false;
-                break;
-            }
-        }
-        if (!$completed) {
-            $this->clean($chunkid);
-            throw new UploadException(__('Chunk file info error'));
-        }
-
-        //如果所有文件分片都上传完毕，开始合并
-        $uploadPath = $filePath;
-
-        if (!$destFile = @fopen($uploadPath, "wb")) {
-            $this->clean($chunkid);
-            throw new UploadException(__('Chunk file merge error'));
-        }
-        if (flock($destFile, LOCK_EX)) { // 进行排他型锁定
-            for ($i = 0; $i < $chunkcount; $i++) {
-                $partFile = "{$filePath}-{$i}.part";
-                if (!$handle = @fopen($partFile, "rb")) {
-                    break;
-                }
-                while ($buff = fread($handle, filesize($partFile))) {
-                    fwrite($destFile, $buff);
-                }
-                @fclose($handle);
-                @unlink($partFile); //删除分片
-            }
-
-            flock($destFile, LOCK_UN);
-        }
-        @fclose($destFile);
-
-        $attachment = null;
-        try {
-            $file = new File($uploadPath);
-            $info = [
-                'name'     => $filename,
-                'type'     => $file->getMime(),
-                'tmp_name' => $uploadPath,
-                'error'    => 0,
-                'size'     => $file->getSize()
-            ];
-            $file->setSaveName($filename)->setUploadInfo($info);
-            $file->isTest(true);
-
-            //重新设置文件
-            $this->setFile($file);
-
-            unset($file);
-            $this->merging = true;
-
-            //允许大文件
-            $this->config['maxsize'] = "1024G";
-
-            $attachment = $this->upload();
-        } catch (\Exception $e) {
-            @unlink($uploadPath);
-            throw new UploadException($e->getMessage());
-        }
-        return $attachment;
-    }
-
-    /**
-     * 分片上传
-     * @throws UploadException
-     */
-    public function chunk($chunkid, $chunkindex, $chunkcount, $chunkfilesize = null, $chunkfilename = null, $direct = false)
-    {
-        if ($this->fileInfo['type'] != 'application/octet-stream') {
-            throw new UploadException(__('Uploaded file format is limited'));
-        }
-
-        if (!preg_match('/^[a-z0-9\-]{36}$/', $chunkid)) {
-            throw new UploadException(__('Invalid parameters'));
-        }
-
-        $destDir = runtime_path() . 'chunks';
-        $fileName = $chunkid . "-" . $chunkindex . '.part';
-        $destFile = $destDir . DS . $fileName;
-        if (!is_dir($destDir)) {
-            @mkdir($destDir, 0755, true);
-        }
-        if (!move_uploaded_file($this->file->getPathname(), $destFile)) {
-            throw new UploadException(__('Chunk file write error'));
-        }
-        $file = new File($destFile);
-        $info = [
-            'name'     => $fileName,
-            'type'     => $file->getMime(),
-            'tmp_name' => $destFile,
-            'error'    => 0,
-            'size'     => $file->getSize()
-        ];
-        $file->setSaveName($fileName)->setUploadInfo($info);
-        $this->setFile($file);
-        return $file;
-    }
-
-    /**
      * 普通上传
      * @return \app\common\model\attachment|\think\Model
      * @throws UploadException
@@ -378,28 +226,12 @@ class Upload
 
         $sha1 = $this->file->hash();
 
-        //如果是合并文件
-        if ($this->merging) {
-            if (!$this->file->check()) {
-                throw new UploadException($this->file->getError());
-            }
-            $destFile = $destDir . $fileName;
-            $sourceFile = $this->file->getRealPath() ?: $this->file->getPathname();
-            $info = $this->file->getInfo();
-            $this->file = null;
-            if (!is_dir($destDir)) {
-                @mkdir($destDir, 0755, true);
-            }
-            rename($sourceFile, $destFile);
-            $file = new File($destFile);
-            $file->setSaveName($fileName)->setUploadInfo($info);
-        } else {
-            $file = $this->file->move($destDir, $fileName);
-            if (!$file) {
-                // 上传失败获取错误信息
-                throw new UploadException($this->file->getError());
-            }
+        $file = $this->file->move($destDir, $fileName);
+        if (!$file) {
+            // 上传失败获取错误信息
+            throw new UploadException($this->file->getError());
         }
+
         $this->file = $file;
         $category = request()->post('category');
         $category = array_key_exists($category, config('site.attachmentcategory') ?? []) ? $category : '';
