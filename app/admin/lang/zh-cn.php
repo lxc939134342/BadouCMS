@@ -71,4 +71,6 @@ return [
     'Title'                                                 => '标题',
     'Uploaded successful'                                   => '上传成功',
     'Please configure the model first'                      => '请先配置model',
+    'Choose'                                                => '选择',
+    'Upload'                                                => '上传',
 ];

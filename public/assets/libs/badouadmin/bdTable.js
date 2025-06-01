@@ -330,8 +330,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         return '-';
                     }
                 },
-                thumb: function (data) {
-                    console.log(this.field);
+                image: function (data) {
                     return '<img src="' + getItemField(data, this.field) + '" class="layui-table-thumb" alt="' + __('Image') + '">';
                 }
             },

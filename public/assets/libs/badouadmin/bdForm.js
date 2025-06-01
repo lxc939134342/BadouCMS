@@ -28,6 +28,8 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload'], fu
                 }
                 //绑定上传组件
                 bdUpload.render()
+                //绑定选择附件事件
+                bdForm.events.bdchoosefile(layform);
             },
             //表单校验事件
             validator: function (layform, success, error, submit) {
@@ -83,11 +85,62 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload'], fu
                 //自定义关闭按钮事件
                 layform.on("click", ".layer-close", function () {
                     if (window.name) {
-                        var index = parent.Layer.getFrameIndex(window.name);
-                        parent.Layer.close(index);
+                        var index = parent.layer.getFrameIndex(window.name);
+                        parent.layer.close(index);
                     }
                     return false;
                 });
+            },
+            //绑定选择附件事件
+            bdchoosefile: function (form) {
+                if ($(".btn-bdchoose", form).length > 0) {
+                    $(".btn-bdchoose", form).off('click').on('click', function () {
+                        var that = this;
+                        var multiple = $(this).data("multiple") ? $(this).data("multiple") : false;
+                        var mimetype = $(this).data("mimetype") ? $(this).data("mimetype") : '';
+                        var admin_id = $(this).data("admin-id") ? $(this).data("admin-id") : '';
+                        var user_id = $(this).data("user-id") ? $(this).data("user-id") : '';
+                        mimetype = mimetype.replace(/\/\*/ig, '/');
+                        var url = $(this).data("url") ? $(this).data("url") : "general.attachment/select";
+
+                        parent.layui.badou.api.open(url + "?element_id=" + $(this).attr("id") + "&multiple=" + multiple + "&mimetype=" + mimetype + "&admin_id=" + admin_id + "&user_id=" + user_id, __('Choose'), {
+                            callback: function (data) {
+                                var button = $(that);
+                                var maxcount = $(button).data("maxcount");
+                                var input_id = $(button).data("input-id") ? $(button).data("input-id") : "";
+                                maxcount = typeof maxcount !== "undefined" ? maxcount : 0;
+                                if (input_id && data.multiple) {
+                                    var urlArr = [];
+                                    var inputObj = $("#" + input_id);
+                                    var value = $.trim(inputObj.val());
+                                    if (value !== "") {
+                                        urlArr.push(inputObj.val());
+                                    }
+                                    var nums = value === '' ? 0 : value.split(/\,/).length;
+                                    var files = data.url !== "" ? data.url.split(/\,/) : [];
+                                    $.each(files, function (i, j) {
+                                        var url = Config.upload.fullmode ? http.api.cdnurl(j) : j;
+                                        urlArr.push(url);
+                                    });
+                                    if (maxcount > 0) {
+                                        var remains = maxcount - nums;
+                                        if (files.length > remains) {
+                                            toast.error(__('You can choose up to %d file%s', remains));
+                                            return false;
+                                        }
+                                    }
+                                    var result = urlArr.join(",");
+                                    inputObj.val(result).trigger("change").trigger("validate");
+                                } else if (input_id) {
+                                    var url = Config.upload.fullmode ? http.api.cdnurl(data.url) : data.url;
+                                    $("#" + input_id).val(url).trigger("change").trigger("validate");
+                                }
+
+                            }
+                        });
+                        return false;
+                    });
+                }
             },
         },
         api: {
