@@ -329,6 +329,10 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     } else {
                         return '-';
                     }
+                },
+                thumb: function (data) {
+                    console.log(this.field);
+                    return '<img src="' + getItemField(data, this.field) + '" class="layui-table-thumb" alt="' + __('Image') + '">';
                 }
             },
             // 批量操作请求

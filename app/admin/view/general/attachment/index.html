@@ -1,0 +1,93 @@
+{layout name="layout/default" /}
+<!-- 表格 -->
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table class="layui-hide" id="rule" data-operate-edit="{:$auth->check('general.attachment/edit')}" data-operate-del="{:$auth->check('general.attachment/del')}"></table>
+    </div>
+</div>
+<script>
+    layui.use(["badou"], function () {
+        var bdTable = layui.bdTable;
+        var layer = layui.layer;
+        var table = layui.table;
+        var badou = layui.badou;
+
+        var formatter = {
+            thumb: function (row) {
+                var html = "";
+                if (row.mimetype.indexOf("image") > -1) {
+                    html = '<a href="' + row.fullurl + '" target="_blank"><img src="' + row.fullurl + row.thumb_style + '" alt="" style="max-height:60px;max-width:120px"></a>';
+                } else {
+                    html = '<a href="' + row.fullurl + '" target="_blank"><img src="' + badou.api.fixurl("ajax/icon") + "?suffix=" + row.imagetype + '" alt="" style="max-height:90px;max-width:120px"></a>';
+                }
+                return '<div style="width:120px;margin:0 auto;text-align:center;overflow:hidden;white-space: nowrap;text-overflow: ellipsis;">' + html + "</div>";
+            },
+            url: function (value, row, index) {
+                return '<a href="' + row.fullurl + '" target="_blank" class="label bg-green">' + row.url + "</a>";
+            },
+            filename: function (value, row, index) {
+                return '<div style="width:150px;margin:0 auto;text-align:center;overflow:hidden;white-space: nowrap;text-overflow: ellipsis;">' + Table.api.formatter.search.call(this, value, row, index) + "</div>";
+            },
+            mimetype: function (value, row, index) {
+                return '<div style="width:80px;margin:0 auto;text-align:center;overflow:hidden;white-space: nowrap;text-overflow: ellipsis;">' + Table.api.formatter.search.call(this, value, row, index) + "</div>";
+            },
+        };
+
+        bdTable.api.init({
+            table: table,
+            extend: {
+                index_url: "general.attachment/index",
+                add_url: "general.attachment/add",
+                edit_url: "general.attachment/edit",
+                del_url: "general.attachment/del",
+                multi_url: "general.attachment/multi",
+                table: "attachment",
+            },
+        });
+        bdTable.render({
+            elem: "#rule",
+            url: "{:url('general.attachment/index')}",
+            pk: "id",
+            even: true,
+            toolbar: "#toolbar",
+            page: true,
+            cols: [
+                [
+                    { type: "checkbox" },
+                    { field: "id", title: "ID", width: 80, sort: true },
+                    { field: "admin_id", title: __("Admin_id"), hide: true, searchType: "remoteSelect", extend: "data-source='auth.admin/index' data-field='nickname'" },
+                    { field: "user_id", title: __("User_id"), hide: true,searchType: "remoteSelect", extend: "data-source='user.user/index' data-field='nickname'" },
+                    { field: "preview", title: __("Preview"), templet: formatter.thumb, operate: false },
+                    { field: "url", title: __("Url"), templet: bdTable.api.formatter.url, visible: false },
+                    { field: "filename", title: __("Filename"), sortable: true, templet: bdTable.api.formatter.filename, operate: "like" },
+                    {
+                        field: "filesize",
+                        title: __("Filesize"),
+                        operate: "BETWEEN",
+                        sortable: true,
+                        templet: function (value, row, index) {
+                            var size = parseFloat(value);
+                            var i = Math.floor(Math.log(size) / Math.log(1024));
+                            return (size / Math.pow(1024, i)).toFixed(i < 2 ? 0 : 2) * 1 + " " + ["B", "KB", "MB", "GB", "TB"][i];
+                        },
+                    },
+                    { field: "imagewidth", title: __("Imagewidth"), sortable: true },
+                    { field: "imageheight", title: __("Imageheight"), sortable: true },
+                    { field: "imagetype", title: __("Imagetype"), sortable: true, templet: bdTable.api.formatter.search, operate: "like" },
+                    { field: "storage", title: __("Storage"), templet: bdTable.api.formatter.search, operate: "like" },
+                    { field: "mimetype", title: __("Mimetype"), templet: bdTable.api.formatter.mimetype },
+                    {
+                        field: "createtime",
+                        title: __("Create time"),
+                        templet: bdTable.api.formatter.datetime,
+                        operate: "RANGE",
+                        addclass: "datetimerange",
+                        sortable: true,
+                        width: 150,
+                    },
+                    { field: "operate", title: __("Operate"), align: "center", templet: bdTable.api.formatter.operate, operate: true, fixed: "right" },
+                ],
+            ],
+        });
+    });
+</script>

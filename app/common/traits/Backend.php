@@ -38,6 +38,10 @@ trait Backend
             return $this->view->fetch();
         }
 
+        if (!$this->model) {
+            $this->error(__('Please configure the model first'));
+        }
+
         if ($this->request->param('select')) {
             $this->select();
         }
