@@ -3,7 +3,9 @@ layui.define(['toast'], function (exports) {
     var toast = layui.toast;
     var bdHttp = {
         config: {
-
+            open: {
+                area: null
+            }
         },
         events: {
             //请求成功的回调
@@ -118,8 +120,10 @@ layui.define(['toast'], function (exports) {
             open: function (url, title, options) {
                 title = options && options.title ? options.title : (title ? title : "");
                 url = bdHttp.api.fixurl(url);
+
                 // url = url + (url.indexOf("?") > -1 ? "&" : "?") + "";
-                var area = [$(window).width() > 800 ? '800px' : '95%', $(window).height() > 600 ? '600px' : '95%'];
+                console.log(bdHttp);
+                var area = bdHttp.config.open.area ? bdHttp.config.open.area : [$(window).width() > 800 ? '800px' : '95%', $(window).height() > 600 ? '600px' : '95%'];
                 var success = options && typeof options.success === 'function' ? options.success : $.noop;
                 if (options && typeof options.success === 'function') {
                     delete options.success;

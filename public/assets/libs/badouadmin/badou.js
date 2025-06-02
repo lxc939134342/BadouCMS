@@ -1,4 +1,4 @@
-layui.define(['lang', 'bdHttp', 'bdTable', 'bdForm'], function (exports) {
+layui.define(['lang', 'bdHttp', 'bdTable', 'bdForm', 'bdUpload', 'bdTool'], function (exports) {
     "use strict";
     var lang = layui.lang,
         http = layui.bdHttp,
@@ -13,6 +13,7 @@ layui.define(['lang', 'bdHttp', 'bdTable', 'bdForm'], function (exports) {
         this.api = http.api;
         this.bdForm = bdForm;
         this.bdUpload = bdUpload;
+        this.tool = layui.bdTool;
     }
     exports('badou', Badou);
 });

@@ -1,35 +1,29 @@
 
-layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload'], function (exports) {
+layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'colorpicker', 'bdTool'], function (exports) {
     var $ = layui.jquery;
     var http = layui.bdHttp;
     var form = layui.form;
     var iconPicker = layui.iconPicker;
     var toast = layui.toast;
     var bdUpload = layui.bdUpload;
+    var colorpicker = layui.colorpicker;
+    var bdTool = layui.bdTool;
     var bdForm = {
         events: {
             //绑定事件
             bindevent: function (layform) {
-                //选择图标
-                if ($('.icon-select').length > 0) {
-                    $(".icon-select").each(function (i, j) {
-                        var that = this;
-                        iconPicker.render({
-                            elem: this,
-                            type: 'fontClass',
-                            search: true,
-                            page: true,
-                            limit: 16,
-                            click: function (data) {
-                                $(that).val(data.class);
-                            },
-                        });
-                    });
-                }
                 //绑定上传组件
                 bdUpload.render()
-                //绑定选择附件事件
+                //绑定颜色选择器事件
+                bdForm.events.colorpicker(layform);
+                //绑定图标选择器事件
+                bdForm.events.iconpicker(layform);
+                //绑定选择图片事件
                 bdForm.events.bdchoosefile(layform);
+                // 绑定远程下拉事件
+                bdTool.remoteSelect();
+                // 绑定时间选择器
+                bdTool.laydate();
             },
             //表单校验事件
             validator: function (layform, success, error, submit) {
@@ -89,6 +83,38 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload'], fu
                         parent.layer.close(index);
                     }
                     return false;
+                });
+            },
+            //绑定图标选择器事件
+            iconpicker: function (form) {
+                //选择图标
+                if ($('.icon-select').length > 0) {
+                    $(".icon-select").each(function (i, j) {
+                        var that = this;
+                        iconPicker.render({
+                            elem: this,
+                            type: 'fontClass',
+                            search: true,
+                            page: true,
+                            limit: 16,
+                            click: function (data) {
+                                $(that).val(data.class);
+                            },
+                        });
+                    });
+                }
+            },
+            //绑定颜色选择器事件
+            colorpicker: function (form) {
+                colorpicker.render({
+                    elem: '.colorpicker',
+                    done: function (color) {
+                        var elem = this.elem;
+                        var input_id = $(elem).data("input-id") ? $(elem).data("input-id") : '';
+                        if (input_id) {
+                            $('#' + input_id).val(color);
+                        }
+                    }
                 });
             },
             //绑定选择附件事件

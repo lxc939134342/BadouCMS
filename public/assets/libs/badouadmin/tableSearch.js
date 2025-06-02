@@ -1,9 +1,10 @@
-layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
+layui.define(['jquery', 'form', 'bdHttp', 'bdTool'], function (exports) {
     'use strict';
 
     var $ = layui.jquery;
     var form = layui.form;
     var http = layui.bdHttp;
+    var bdTool = layui.bdTool;
     var ColumnsForSearch = [];
     var CommonSearch = {
         config: {
@@ -108,7 +109,7 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
                     else if (col.searchType == 'time') {
                         col.operate = 'RANGE';
                         html.push('<input type="hidden" class="badouadmin-commonsearch-operate" data-name="' + col.field + '" id="' + col.field + '" name="' + col.field + '-opearate" value="' + col.operate + '">');
-                        html.push('<input type="' + type + '" name="' + col.field + '" value="' + defaultValue + '" placeholder="' + placeholder + '" class="layui-input badouadmin-datetime" autocomplete="off" data-range="true">');
+                        html.push('<input type="' + type + '" name="' + col.field + '" value="' + defaultValue + '" placeholder="' + placeholder + '" class="layui-input laydate" autocomplete="off" data-range="true">');
                     }
                     else {
                         html.push(hiddenOperateHtml);
@@ -140,9 +141,10 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
         // 绑定事件
         _bindEvents: function () {
             var that = this;
-            CommonSearch._remoteSelect();
+            // 远程下拉选择框
+            bdTool.remoteSelect();
             // 时间组件
-            that._laydate();
+            bdTool.laydate();
             // 表单提交
             form.on('submit(commonsearch)', function (data) {
                 that._triggerSearch();
@@ -156,208 +158,9 @@ layui.define(['jquery', 'form', 'bdHttp'], function (exports) {
                 }, 1);
             });
         },
-        // 远程下拉选择框
-        _remoteSelect: function (params) {
-            var themeColor = localStorage.getItem("theme-color-color");
-            var dark = localStorage.getItem("dark");
-            $('.remoteSelect').each(function (i) {
-                var id = $(this).attr('id');
-                var url = $(this).data('source');
-                var field = $(this).data('field');
-                var searchField = $(this).data('search-field');
-                var key = $(this).data('primary-key') || 'id';
-                var pagination = $(this).data('pagination') || false;
-                var pageSize = $(this).data('page-size') || 10;
-                var multiple = $(this).data('multiple');
-                var isTree = $(this).data('is-tree') || 0;
-
-                var maxSelectLimit = $(this).data('max-select-limit');
-                var orderBy = $(this).data('order-by');
-                var params = $(this).data('params');
-
-                var options = {
-                    el: '#' + id,
-                    toolbar: { show: true },
-                    data: [],
-                    paging: pagination,
-                    pageSize: pageSize,
-                    prop: {
-                        name: field,
-                        value: key
-                    },
-                    theme: {
-                        color: themeColor
-                    }
-                }
-
-                if (dark == 'true') {
-                    options.theme.hover = '#000';
-                }
-
-                // 单选
-                if (!multiple) {
-                    options.radio = true;
-                    options.clickClose = true;
-                    options.model = {
-                        label: {
-                            type: 'text',
-                        }
-                    };
-                }
-                // 多选的最大数量
-                if (maxSelectLimit) {
-                    options.maxSelectLimit = maxSelectLimit;
-                }
-
-                var remoteSelect = xmSelect.render(options);
-                var data = {
-                    pageNumber: 1,
-                    pageSize: pageSize,
-                    showField: field,
-                    keyField: key,
-                    orderBy: orderBy,
-                    custom: params,
-                    isTree: isTree
-                };
-                // 搜索字段
-                if (searchField) {
-                    searchField = searchField.split(',');
-                    data.searchField = searchField;
-                }
-
-                if (url) {
-                    http.api.ajax({
-                        url: url,
-                        data: data
-                    }, function (ret, res) {
-                        remoteSelect.update({
-                            data: ret.list
-                        });
-                        return false;
-                    }, function (ret) {
-                        return false;
-                    });
-                }
-
-                window.addEventListener('storage', (e) => {
-                    // 暗色模式
-                    if (e.key === 'dark') {
-                        if (e.newValue == 'true') {
-                            xmSelect.batch('', 'update', {
-                                theme: {
-                                    hover: '#000'
-                                }
-                            });
-                        } else {
-                            xmSelect.batch('', 'update', {
-                                theme: {
-                                    hover: '#f2f2f2'
-                                }
-                            });
-                        }
-                    }
-                    if (e.key === 'theme-color-color') {
-                        xmSelect.batch('', 'update', {
-                            theme: {
-                                color: e.newValue
-                            }
-                        });
-                    }
-                });
-            });
-        },
-        // 时间组件
-        _laydate: function () {
-            if ($('.badouadmin-datetime').length > 0) {
-                $('.badouadmin-datetime').each(function (i) {
-                    var type = $(this).data('type') || 'datetime';
-                    var range = $(this).data('range') || false;
-
-                    var options = {
-                        elem: this,
-                        type: type,
-                        trigger: 'click'
-                    };
-                    if (range) {
-                        options['range'] = range;
-                        options['shortcuts'] = [{
-                            text: "今天",
-                            value: function () {
-                                var today = new Date();
-                                return [
-                                    new Date(today.getFullYear(), today.getMonth(), today.getDate()),
-                                    new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59)
-                                ];
-                            }
-                        },
-                        {
-                            text: "昨天",
-                            value: function () {
-                                var yesterday = new Date();
-                                yesterday.setDate(yesterday.getDate() - 1);
-                                return [
-                                    new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate()),
-                                    new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate(), 23, 59, 59)
-                                ];
-                            }
-                        },
-                        {
-                            text: "最近7天",
-                            value: function () {
-                                var today = new Date();
-                                var sevenDaysAgo = new Date();
-                                sevenDaysAgo.setDate(today.getDate() - 7);
-                                return [
-                                    new Date(sevenDaysAgo.getFullYear(), sevenDaysAgo.getMonth(), sevenDaysAgo.getDate()),
-                                    new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59)
-                                ];
-                            }
-                        },
-                        {
-                            text: "最近30天",
-                            value: function () {
-                                var today = new Date();
-                                var sevenDaysAgo = new Date();
-                                sevenDaysAgo.setDate(today.getDate() - 30);
-                                return [
-                                    new Date(sevenDaysAgo.getFullYear(), sevenDaysAgo.getMonth(), sevenDaysAgo.getDate()),
-                                    new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59)
-                                ];
-                            }
-                        },
-                        {
-                            text: "本月",
-                            value: function () {
-                                var date = new Date();
-                                var year = date.getFullYear();
-                                var month = date.getMonth();
-                                return [
-                                    new Date(year, month, 1),
-                                    new Date(year, month + 1, 0, 23, 59, 59)
-                                ];
-                            }
-                        },
-                        {
-                            text: "上个月",
-                            value: function () {
-                                var date = new Date();
-                                var year = date.getFullYear();
-                                var month = date.getMonth();
-                                return [
-                                    new Date(year, month - 1, 1),
-                                    new Date(year, month, 0, 23, 59, 59)
-                                ];
-                            }
-                        }
-                        ]
-                    }
-                    layui.laydate.render(options);
-                });
-            }
-        },
         // 重置远程下拉选择框
         _resetRemoteSelect: function () {
-            this._remoteSelect();
+            bdTool.remoteSelect();
             this._triggerSearch();
         },
         // 触发搜索事件

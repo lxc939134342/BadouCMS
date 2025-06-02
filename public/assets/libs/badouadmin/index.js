@@ -10,18 +10,20 @@ layui.config({
     version: "1.0.0"
 }).extend({
     lang: "lang",
+
     badou: "badou",
     bdHttp: "bdHttp",
+    tableSearch: "tableSearch",   // 通用搜索
     bdTable: "bdTable",       // 表格组件
     bdForm: "bdForm",        // 表单组件
-    tableSearch: "tableSearch",   // 通用搜索
     cardList: "cardList",      // 卡片列表
     bdUpload: "bdUpload",      // 上传组件
     // 组件扩展
     Sortable: {
         src: '/assets/libs/sortablejs/Sortable.min.js',
         api: 'Sortable'
-    }
+    },
+    bdTool: "bdTool",        // 工具组件
 });
 
 layui.use(['layer', 'badou'], function () {
