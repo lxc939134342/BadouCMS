@@ -1,0 +1,93 @@
+{layout name="layout/form" /}
+
+<form class="layui-form" lay-filter="edit-form" method="POST">
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Url')}</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[url]" value="{$row.url|htmlentities}" lay-verify="required" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Imagewidth')}</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[imagewidth]" value="{$row.imagewidth|htmlentities}" lay-verify="required" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Imageheight')}</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[imageheight]" value="{$row.imageheight|htmlentities}" lay-verify="required" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Imagetype')}</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[imagetype]" value="{$row.imagetype|htmlentities}" lay-verify="required" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Imageframes')}</label>
+        <div class="layui-input-block">
+            <input type="number" name="row[imageframes]" value="{$row.imageframes|htmlentities}" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Filename')}</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[filename]" value="{$row.filename|htmlentities}" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Filesize')}</label>
+        <div class="layui-input-block">
+            <input type="number" name="row[filesize]" value="{$row.filesize|htmlentities}" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Mimetype')}</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[mimetype]" value="{$row.mimetype|htmlentities}" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Upload time')}</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[upload_time]" value="{$row.upload_time|date='Y-m-d H:i:s'}" id="c-uploadtime" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Storage')}</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[storage]" value="{$row.storage|htmlentities}" class="layui-input">
+        </div>
+    </div>
+
+    <div class="layui-form-item layer-footer hide">
+        <div class="layui-input-block">
+            <button class="layui-btn" lay-submit>确定</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<script>
+layui.use(['form','laydate'], function () {
+    var form = layui.form;
+    var laydate = layui.laydate;
+
+    //日期时间选择器
+    laydate.render({
+        elem: '#c-uploadtime',
+        type: 'datetime'
+    });
+});
+</script>

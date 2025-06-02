@@ -12,4 +12,7 @@ return [
     'Mimetype'    => 'Mime类型',
     'Admin_id'    => '管理员',
     'User_id'     => '用户',
+    'Imageframes' => '图片帧数',
+    'Upload time' => '上传时间',
+    'Extparam'    => '扩展参数',
 ];
