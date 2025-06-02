@@ -4,6 +4,15 @@
     <div class="layui-row layui-col-space20">
         <div class="layui-col-xs8">
             <div class="layui-form-item">
+                <label class="layui-form-label">
+                    栏目<span class="layui-font-red">*</span>
+                </label>
+                <div class="layui-input-block">
+                    <input type="text" id="c-scode" name="row[scode]" value="{$row.scode}" class="layui-input " />
+                    <div class="remoteSelect" id="remoteSelect-scode" data-input-id="c-scode" data-field="nickname" data-source="user.user/index" ></div>
+                </div>
+            </div>
+            <div class="layui-form-item">
                 <label class="layui-form-label">标题</label>
                 <div class="layui-input-block">
                     <input
@@ -92,8 +101,9 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">状态</label>
                 <div class="layui-input-block">
-                    <input type="radio" name="row[status]" value="1" title="显示" {if $row.status==1} checked="checked"{/if}>
-                    <input type="radio" name="row[status]" value="0" title="隐藏" {if$row.status==0} checked="checked"{/if}>
+                    <input type="radio" name="row[status]" value="1" title="显示" {if $row.status==1}
+                    checked="checked"{/if}> <input type="radio" name="row[status]" value="0" title="隐藏"
+                    {if$row.status==0} checked="checked"{/if}>
                 </div>
             </div>
         </div>
@@ -140,7 +150,6 @@
                                 readonly
                                 placeholder="请选择发布时间"
                                 class="layui-input laydate" />
-                            <div class="layui-form-mid layui-word-aux">温馨提示：单页不支持定时发布！</div>
                         </div>
                     </div>
 
@@ -155,10 +164,7 @@
                                     class="layui-input"
                                     value="{$row.enclosure}" />
                                 <div class="layui-input-suffix" style="width: 50%">
-                                    <button
-                                        type="button"
-                                        data-input-id="c-enclosure"
-                                        class="layui-btn btn-bdupload">
+                                    <button type="button" data-input-id="c-enclosure" class="layui-btn btn-bdupload">
                                         <i class="fa fa-upload"></i>
                                         上传
                                     </button>

@@ -7,6 +7,11 @@ layui.define(['bdHttp'], function (exports) {
             var themeColor = localStorage.getItem("theme-color-color");
             var dark = localStorage.getItem("dark");
             if ($('.remoteSelect').length > 0) {
+                $(document).on('click', '.remoteSelectClearAll', function () {
+                    console.log(111);
+                    xmSelect.batch(null, 'setValue', []);
+                });
+
                 $('.remoteSelect').each(function (i) {
                     var id = $(this).attr('id');
                     var url = $(this).data('source');
@@ -17,6 +22,10 @@ layui.define(['bdHttp'], function (exports) {
                     var pageSize = $(this).data('page-size') || 10;
                     var multiple = $(this).data('multiple');
                     var isTree = $(this).data('is-tree') || 0;
+                    var toolbarShow = $(this).data('toolbar-show') || true;
+                    var toolbarShowIcon = $(this).data('toolbar-showIcon') || true;
+                    var toolbarList = $(this).data('toolbar-list') || ["ALL", "CLEAR"];
+                    var inputId = $(this).data('input-id');
 
                     var maxSelectLimit = $(this).data('max-select-limit');
                     var orderBy = $(this).data('order-by');
@@ -24,7 +33,11 @@ layui.define(['bdHttp'], function (exports) {
 
                     var options = {
                         el: '#' + id,
-                        toolbar: { show: true },
+                        toolbar: {
+                            show: toolbarShow,
+                            showIcon: toolbarShowIcon,
+                            list: toolbarList
+                        },
                         data: [],
                         paging: pagination,
                         pageSize: pageSize,
@@ -34,6 +47,16 @@ layui.define(['bdHttp'], function (exports) {
                         },
                         theme: {
                             color: themeColor
+                        },
+                        on: function (data) {
+                            //arr:  当前多选已选中的数据
+                            var arr = data.arr;
+                            var values = arr.map(function (item) {
+                                return item[key];
+                            });
+                            if (inputId) {
+                                $('#' + inputId).val(values.join(','))
+                            }
                         }
                     }
 
@@ -57,7 +80,6 @@ layui.define(['bdHttp'], function (exports) {
                     }
 
                     var remoteSelect = xmSelect.render(options);
-                    console.log(remoteSelect);
                     var data = {
                         pageNumber: 1,
                         pageSize: pageSize,
@@ -87,6 +109,7 @@ layui.define(['bdHttp'], function (exports) {
                         });
                     }
 
+
                     window.addEventListener('storage', (e) => {
                         // 暗色模式
                         if (e.key === 'dark') {
@@ -114,6 +137,25 @@ layui.define(['bdHttp'], function (exports) {
                     });
                 });
             }
+        },
+        // 清空远程下拉
+        clearRemoteSelect: function () {
+            // 获取所有远程选择框的实例
+            $('.remoteSelect').each(function () {
+                var $this = $(this);
+                var id = $(this).attr('id');
+                var select = xmSelect.get('#' + id, true);
+                // 获取必要的数据属性
+                var inputId = $this.data('input-id');
+                if (select) {
+                    // 清空选择
+                    select.setValue([]);
+                    // 确保关联的 input 也被清空
+                    if (inputId) {
+                        $('#' + inputId).val('');
+                    }
+                }
+            });
         },
         // 时间选择组件
         laydate: function () {

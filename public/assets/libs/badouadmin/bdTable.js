@@ -6,7 +6,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
         Layer = layui.layer,
         tableSearch = layui.tableSearch,
         laytpl = layui.laytpl;
-
+    var util = layui.util;
 
     var bdTable = {
         // 导入layui的table 或者 treeTable
@@ -147,6 +147,19 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     }
                     return false;
                 });
+
+                // 图片预览
+                $(document).on('click', '.table-image', function (el) {
+                    var src = $(this).find('img').attr('src');
+                    console.log(src);
+                    Layer.photos({
+                        photos: {
+                            data: [{
+                                src: src
+                            }]
+                        }
+                    })
+                })
             },
             // 过滤表格列
             filterCols: function (cols) {
@@ -331,7 +344,11 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     }
                 },
                 image: function (data) {
-                    return '<img src="' + getItemField(data, this.field) + '" class="layui-table-thumb" alt="' + __('Image') + '">';
+                    var that = this;
+                    that.filter = that.filter || that.field || null;
+                    var html = '<div class="table-image" lay-on="table-image" ><img src="' + getItemField(data, this.field) + '"></div>';
+
+                    return html;
                 }
             },
             // 批量操作请求

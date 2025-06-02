@@ -86,8 +86,8 @@ layui.define(['jquery', 'form', 'bdHttp', 'bdTool'], function (exports) {
                     else if (col.searchType == 'remoteSelect') {
                         if (!col.extend) col.extend = '';
                         html.push(hiddenOperateHtml);
-                        html.push('<div id="remoteSelect-' + col.field + '" class="remoteSelect" ' + col.extend + '></div>');
-                        html.push('<input type="hidden" class="remoteSelect-name" name="' + col.field + '" value="">');
+                        html.push('<div data-input-id="c-' + col.field + '" id="remoteSelect-' + col.field + '" class="remoteSelect" ' + col.extend + '></div>');
+                        html.push('<input type="hidden" id="c-' + col.field + '" class="remoteSelect-name" name="' + col.field + '" value="">');
                     }
                     // 区间范围
                     else if (col.searchType == 'between') {
@@ -160,7 +160,7 @@ layui.define(['jquery', 'form', 'bdHttp', 'bdTool'], function (exports) {
         },
         // 重置远程下拉选择框
         _resetRemoteSelect: function () {
-            bdTool.remoteSelect();
+            bdTool.clearRemoteSelect();
             this._triggerSearch();
         },
         // 触发搜索事件
@@ -188,16 +188,7 @@ layui.define(['jquery', 'form', 'bdHttp', 'bdTool'], function (exports) {
                 var value = obj.val();  // 普通表单字段
                 var vObjCol = ColumnsForSearch[i];
                 var process = vObjCol && typeof vObjCol.process == 'function' ? vObjCol.process : null;
-                // 处理xm-select组件
-                var remoteSelect = $(this).siblings('.remoteSelect');
-                if (remoteSelect.length > 0) {
-                    var id = remoteSelect.attr('id');
-                    var select = xmSelect.get('#' + id, true);
-                    if (select) {
-                        value = select.getValue('valueStr');
-                        obj.val(value)
-                    }
-                }
+
                 if (obj.length > 1) {
                     if (/BETWEEN$/.test(sym)) {
                         var value_begin = $.trim($("[name='" + name + "']:first", formElem).val()),

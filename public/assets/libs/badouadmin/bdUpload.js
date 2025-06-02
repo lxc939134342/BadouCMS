@@ -74,7 +74,7 @@ layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer', 'Sortabl
                         });
                         layer.photos({
                             photos: '#' + preview_id,
-                        })
+                        });
                         bdUpload.api.refresh(previewObj.data("name"));
                     });
                     $("#" + input_id).trigger("change");
@@ -99,7 +99,6 @@ layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer', 'Sortabl
 
                     // 移除按钮事件
                     $(document.body).on("click", "#" + preview_id + " .btn-delete-img", function () {
-                        console.log($(this).closest(".layui-upload-item"));
                         $(this).closest(".layui-upload-item").remove();
                         $("#" + preview_id).trigger("bd.preview.change");
                     });

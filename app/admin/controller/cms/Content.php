@@ -28,19 +28,7 @@ class Content extends Base
      */
     protected object $contentExtModel;
 
-    protected array|string $preExcludeFields = ['id', 'create_time', 'update_time'];
     protected string|array $quickSearchField = ['id','title'];
-    protected string $weighField = 'sorting';
-
-    /* 设置默认排序 */
-    protected array|string $defaultSortField = [
-        'istop' => 'desc',
-        'isrecommend' => 'desc',
-        'isheadline' => 'desc',
-        'sorting' => 'asc',
-        'date' => 'desc',
-        'id' => 'desc'
-    ];
 
     /**
      * 模型ID
@@ -54,6 +42,7 @@ class Content extends Base
         $this->model = new \app\admin\model\cms\Content();
         $this->contentExtModel = new \app\admin\model\cms\ContentExt();
         $this->mcode = $this->request->param('mcode') ?? 0;
+        $this->assign('mcode', $this->mcode);
     }
 
     public function index()
@@ -204,15 +193,18 @@ class Content extends Base
 
     /**
      * 修改
-     * @return void
      */
-    public function edit(): void
+    public function edit()
     {
-        $pk  = $this->model->getPk();
-        $id  = $this->request->param($pk);
-        $row = $this->model->find($id);
+        $ids = $this->request->param('ids/d');
+        $row = $this->model->find($ids);
         if (!$row) {
             $this->error(__('Record not found'));
+        }
+
+        if (!$this->isAjax()) {
+            $this->assign('row', $row);
+            return $this->view->fetch();
         }
         /* 获取扩展数据 */
         $extRow = $this->contentExtModel->where('contentid', $row['id'])->find();
@@ -229,17 +221,19 @@ class Content extends Base
         }
 
         if ($this->request->isPost()) {
-            $data = $this->getPostData();
+            $post = $this->getPostData();
+            $data = $post['row'];
             $data['filename'] ?? $data['filename'] = $row['filename'];
             $data['description'] ?? $data['description'] = $row['description'];
             $data['ico'] ?? $data['ico'] = $row['ico'];
             $data['scode'] ?? $data['scode'] = $row['scode'];
             $data['title'] ?? $data['title'] = $row['title'];
             $data['content'] = $this->request->param('content', $row['content'], 'clean_xss');
+            $data['update_user'] = $post['update_user'];
             $result = false;
             $this->model->startTrans();
             try {
-                $data[$pk] = $row[$pk];
+                $data['id'] = $row['id'];
                 $this->modelValidateFunction($data);
 
                 if ($data['filename'] && ! preg_match('/^[a-zA-Z0-9\-_\/]+$/', $data['filename'])) {
@@ -285,10 +279,6 @@ class Content extends Base
                 $this->error(__('No rows updated'));
             }
         }
-
-        $this->success('', '', [
-            'row' => $row
-        ]);
     }
 
     /**
