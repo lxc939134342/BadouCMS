@@ -112,6 +112,17 @@ class Backend extends BaseController
      */
     protected $importHeadType = 'comment';
 
+    // 关联查询时需要连接的表
+    protected $withJoinTable = [];
+
+    // 关联查询时的连接类型
+    protected $withJoinType = 'LEFT';
+
+    // 默认的排序方式
+    // 例如：id
+    protected $defaultSort = 'id';
+    protected $defaultOrder = 'DESC';
+
     public function initialize()
     {
         $this->view     = View::instance();
@@ -248,8 +259,8 @@ class Backend extends BaseController
         $search = $this->request->get("search", '');
         $filter = $this->request->get("filter", '', 'trim,strip_tags');
         $op = $this->request->get("op", '', 'trim,strip_tags');
-        $sort = $this->request->get("sort", !empty($this->model) && $this->model->getPk() ? $this->model->getPk() : 'id');
-        $order = $this->request->get("order", "DESC");
+        $sort = $this->request->get("sort", !empty($this->model) && $this->model->getPk() ? $this->model->getPk() : $this->defaultSort);
+        $order = $this->request->get("order", $this->defaultOrder);
         $offset = max(0, $this->request->get("offset/d", 0));
         $limit = max(0, $this->request->get("limit/d", 0));
         $limit = $limit ?: 999999;

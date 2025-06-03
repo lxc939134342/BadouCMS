@@ -47,7 +47,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
             if (options.cols.length > 0) {
                 options.cols = bdTable.api.filterCols(options.cols);
             }
-            options.url = options.url || '';
+            options.url = options.url || bdTable.extend.index_url || '';
             options.searchFormVisible = options.searchFormVisible || false;
             options.commonSearch === undefined || options.commonSearch === true ? options.commonSearch = true : options.commonSearch = false;
             options.defaultToolbar = options.defaultToolbar || [

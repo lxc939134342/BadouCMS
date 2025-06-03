@@ -73,4 +73,6 @@ return [
     'Please configure the model first'                      => '请先配置model',
     'Choose'                                                => '选择',
     'Upload'                                                => '上传',
+    'Expendall'                                             => '展开全部',
+    'Collapseall'                                           => '收起全部',
 ];

@@ -34,7 +34,7 @@ trait Backend
      */
     public function index()
     {
-        if (!$this->request->isAjax()) {
+        if (!$this->isAjax()) {
             return $this->view->fetch();
         }
 

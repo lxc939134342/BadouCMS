@@ -26,6 +26,7 @@ class Tree
      */
     public array $icon = array('│', '├', '└');
     public string $pidname = 'pid';
+    public string $pk = 'id';
     public string $nbsp = "&nbsp;";
 
     public function __construct($options = [])
@@ -53,26 +54,30 @@ class Tree
     * 初始化方法
     * @param array  $arr     2维数组，例如：
     *      array(
-    *      1 => array('id'=>'1','pid'=>0,'name'=>'一级栏目一'),
-    *      2 => array('id'=>'2','pid'=>0,'name'=>'一级栏目二'),
-    *      3 => array('id'=>'3','pid'=>1,'name'=>'二级栏目一'),
-    *      4 => array('id'=>'4','pid'=>1,'name'=>'二级栏目二'),
-    *      5 => array('id'=>'5','pid'=>2,'name'=>'二级栏目三'),
-    *      6 => array('id'=>'6','pid'=>3,'name'=>'三级栏目一'),
-    *      7 => array('id'=>'7','pid'=>3,'name'=>'三级栏目二')
+    *      1 => array($this->pk=>'1','pid'=>0,'name'=>'一级栏目一'),
+    *      2 => array($this->pk=>'2','pid'=>0,'name'=>'一级栏目二'),
+    *      3 => array($this->pk=>'3','pid'=>1,'name'=>'二级栏目一'),
+    *      4 => array($this->pk=>'4','pid'=>1,'name'=>'二级栏目二'),
+    *      5 => array($this->pk=>'5','pid'=>2,'name'=>'二级栏目三'),
+    *      6 => array($this->pk=>'6','pid'=>3,'name'=>'三级栏目一'),
+    *      7 => array($this->pk=>'7','pid'=>3,'name'=>'三级栏目二')
     *      )
     * @param string $pidname 父字段名称
     * @param string $nbsp    空格占位符
     * @return Tree
     */
-    public function init($arr = [], $pidname = null, $nbsp = null)
+    public function init($arr = [], $pidname = null, $nbsp = null, $pk = null)
     {
         $this->arr = $arr;
+
         if (!is_null($pidname)) {
             $this->pidname = $pidname;
         }
         if (!is_null($nbsp)) {
             $this->nbsp = $nbsp;
+        }
+        if (!is_null($pk)) {
+            $this->pk = $pk;
         }
         return $this;
     }
@@ -86,11 +91,11 @@ class Tree
     {
         $newarr = [];
         foreach ($this->arr as $value) {
-            if (!isset($value['id'])) {
+            if (!isset($value[$this->pk])) {
                 continue;
             }
             if ($value[$this->pidname] == $myid) {
-                $newarr[$value['id']] = $value;
+                $newarr[$value[$this->pk]] = $value;
             }
         }
         return $newarr;
@@ -106,13 +111,13 @@ class Tree
     {
         $newarr = [];
         foreach ($this->arr as $value) {
-            if (!isset($value['id'])) {
+            if (!isset($value[$this->pk])) {
                 continue;
             }
             if ((string)$value[$this->pidname] == (string)$myid) {
                 $newarr[] = $value;
-                $newarr   = array_merge($newarr, $this->getChildren($value['id']));
-            } elseif ($withself && (string)$value['id'] == (string)$myid) {
+                $newarr   = array_merge($newarr, $this->getChildren($value[$this->pk]));
+            } elseif ($withself && (string)$value[$this->pk] == (string)$myid) {
                 $newarr[] = $value;
             }
         }
@@ -130,7 +135,7 @@ class Tree
         $childrenlist = $this->getChildren($myid, $withself);
         $childrenids  = [];
         foreach ($childrenlist as $k => $v) {
-            $childrenids[] = $v['id'];
+            $childrenids[] = $v[$this->pk];
         }
         return $childrenids;
     }
@@ -145,17 +150,17 @@ class Tree
         $pid    = 0;
         $newarr = [];
         foreach ($this->arr as $value) {
-            if (!isset($value['id'])) {
+            if (!isset($value[$this->pk])) {
                 continue;
             }
-            if ($value['id'] == $myid) {
+            if ($value[$this->pk] == $myid) {
                 $pid = $value[$this->pidname];
                 break;
             }
         }
         if ($pid) {
             foreach ($this->arr as $value) {
-                if ($value['id'] == $pid) {
+                if ($value[$this->pk] == $pid) {
                     $newarr[] = $value;
                     break;
                 }
@@ -175,10 +180,10 @@ class Tree
         $pid    = 0;
         $newarr = [];
         foreach ($this->arr as $value) {
-            if (!isset($value['id'])) {
+            if (!isset($value[$this->pk])) {
                 continue;
             }
-            if ($value['id'] == $myid) {
+            if ($value[$this->pk] == $myid) {
                 if ($withself) {
                     $newarr[] = $value;
                 }
@@ -204,7 +209,7 @@ class Tree
         $parentlist = $this->getParents($myid, $withself);
         $parentsids = [];
         foreach ($parentlist as $k => $v) {
-            $parentsids[] = $v['id'];
+            $parentsids[] = $v[$this->pk];
         }
         return $parentsids;
     }
@@ -258,7 +263,7 @@ class Tree
             unset($v['childlist']);
             $v[$field] = $v['spacer'] . ' ' . $v[$field];
             $v['haschild'] = $childlist ? 1 : 0;
-            if ($v['id']) {
+            if ($v[$this->pk]) {
                 $arr[] = $v;
             }
             if ($childlist) {
