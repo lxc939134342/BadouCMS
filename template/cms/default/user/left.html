@@ -1,0 +1,67 @@
+<el-aside class="ba-user-layouts user-left-box">
+  <div class="userinfo">
+    <div class="user-avatar-box">
+      <img
+        class="user-avatar"
+        src="{:full_url($user.avatar ? $user.avatar : '/static/images/avatar.png')}"
+        alt=""
+      />
+      {if $user.gender == 1}
+      <i
+        class="fa fa-transgender-alt icon user-avatar-gender"
+        style="font-size: 14px; color: var(--el-text-color-secondary)"
+      ></i>
+      {elseif $user.gender == 2}
+      <i
+        class="fa fa-mars-stroke icon user-avatar-gender"
+        style="font-size: 14px; color: var(--el-color-danger)"
+      ></i>
+      {/if}
+    </div>
+    <p class="username">{$user.nickname}</p>
+    <el-button-group>
+      <el-button
+        v-blur
+        class="userinfo-button-item"
+        size="default"
+        plain
+        onclick="window.location.href='/account/integral'"
+      >
+        <span>{:__('Integral')} {$user.score}</span>
+      </el-button>
+      <el-button
+        v-blur
+        class="userinfo-button-item"
+        size="default"
+        plain
+        onclick="window.location.href='/account/balance'"
+      >
+        <span>{:__('Balance')} {$user.money}</span>
+      </el-button>
+    </el-button-group>
+  </div>
+
+  <div class="user-menus">
+    {foreach $menus as $menu} {foreach $menu.children as $item}
+    <a
+      class="user-menu-item {if strtolower($config.actionPath) == strtolower($item.path)}active{/if}"
+      href="{:strtolower($item.path)}"
+    >
+      <i class="icon {$item.icon}"></i>
+      <span>{$item.title}</span>
+    </a>
+    {/foreach} {/foreach}
+
+    <a
+      class="user-menu-item {if strtolower($config.actionPath) == '/comment/mycomment'}active{/if}"
+      href="/comment/mycomment"
+    >
+      <i class="icon fa fa-comment"></i>
+      <span>{:__('CommentRecord')}</span>
+    </a>
+    <a class="user-menu-item" href="/user/logout">
+      <i class="icon fa fa-sign-out"></i>
+      <span>{:__('Logout')}</span>
+    </a>
+  </div>
+</el-aside>

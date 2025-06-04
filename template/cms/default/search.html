@@ -1,0 +1,45 @@
+{extend name="base" /} {block name="main"}
+
+<div class="container Wauto">
+    <div class="main w1200">
+        <div class="article w1">
+            <form action="" class="search-container">
+                <div class="col-xs-12 col-sm-6 col-sm-offset-3 col-md-2 col-md-offset-5">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="keyword" value="{$keyword}" />
+                        <div class="input-group-btn">
+                            <button class="btn btn-danger submit" type="submit">{:__('Search')}</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </form>
+
+            <div class="post list">
+                <div class="PostShow">
+                    <ul>
+                        {bd:search }
+                        <li data-id="{$search.id}" class="anim fadeInUp">
+                            <div class="post-img loading">
+                                <a class="pic float-left" href="{$search.link}" title="{$search.title}" rel="bookmark">
+                                    <div class="msk"></div>
+                                    <i class="fa fa-search"></i>
+                                    <img class="b-lazy" src="{$search.ico}" data-src="{$search.ico}" alt="{$search.title}" />
+                                </a>
+                            </div>
+                            <h4><a href="{$search.link}" title="{$search.title}">{$search.title}</a></h4>
+                            <i> {$search.description}</i>
+                        </li>
+                        {/bd:search}
+                    </ul>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        <div class="text-center">{$page.bar |raw}</div>
+    </div>
+</div>
+<script>
+    $(".header").removeClass("opaque").addClass("noOpaque");
+</script>
+{/block}

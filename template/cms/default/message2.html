@@ -1,0 +1,149 @@
+{extend name="base" /} {block name="main"}
+<div class="container">
+  <div class="main w1200">
+    <div class="article w1">
+      <div class="article-box">
+        <header class="article-top">
+          <h1 class="article-tit">{$sort.name}</h1>
+        </header>
+        <article class="article-main">
+          <form action="{bd:form fcode='2'}" method="post" id="saypl">
+            <ul>
+              <li>
+                <input
+                  type="text"
+                  name="tel"
+                  class="text"
+                  value=""
+                  placeholder="{:__('Mobile')} ({:__('Required')})"
+                  size="28"
+                  id="mobile"
+                />
+              </li>
+              {if get_sys_config('form_check_code')}
+              <li style="position: relative">
+                <input
+                  type="text"
+                  name="captcha"
+                  class="text"
+                  value=""
+                  placeholder="{:__('CaptchaCode')}"
+                  size="28"
+                  id="captcha"
+                />
+                <img
+                  src=""
+                  style="position: absolute; right: 0; top: 0; margin: 3px"
+                  width="100"
+                  height="31"
+                  class="codeimg"
+                />
+              </li>
+              {/if}
+            </ul>
+
+            <p>
+              <input
+                type="submit"
+                tabindex="6"
+                value="{:__('Submit')}"
+                class="button btn-submit"
+              />
+            </p>
+          </form>
+        </article>
+      </div>
+      <!-- 留言记录 -->
+      {bd:formlist fcode='2'}
+      <div class="media border-bottom pb-3 pt-3">
+        <div class="media-body">
+          <p>{$form.tel}</p>
+          <p>
+            <span class="badge badge-light text-secondary font-weight-normal">
+              {$form.date}
+            </span>
+          </p>
+        </div>
+      </div>
+      {/bd:formlist}
+
+      <!-- 分页 -->
+      <div class="text-center pt-5">{$page.bar |raw}</div>
+    </div>
+  </div>
+</div>
+<script>
+  $(".header").removeClass("opaque").addClass("noOpaque");
+
+  layui.use(function () {
+    var layer = layui.layer;
+
+    $(".btn-submit").on("click", function () {
+      submitcomment($(this).parents("form"));
+      return false;
+    });
+
+    //提交评论
+    function submitcomment(obj) {
+      var url = $(obj).attr("action");
+      var content = $(obj).find("#content").val();
+      var captcha = $(obj).find("#captcha").val();
+      var captchaId = $(obj).find("img.codeimg").data("id");
+      var loadIndex = layer.load(0);
+      var formData = $(obj).serializeArray();
+      formData.push({
+        name: "captcha_id",
+        value: captchaId,
+      });
+
+      $.ajax({
+        type: "POST",
+        url: url,
+        dataType: "json",
+        data: formData,
+        success: function (response, status) {
+          layer.close(loadIndex);
+          if (response.code === undefined) {
+            layer.msg(__("ReturnDataAbnormal"));
+            return false;
+          }
+
+          if (response.code) {
+            layer.msg(
+              response.msg,
+              {
+                icon: 1,
+              },
+              function () {
+                $(obj)[0].reset();
+                $(".modal").modal("hide");
+                window.location.reload();
+              }
+            );
+          } else {
+            if (response.url && response.url != "") {
+              layer.confirm(
+                response.msg,
+                {
+                  icon: 2,
+                },
+                function () {
+                  location.href = response.url;
+                }
+              );
+            } else {
+              layer.msg(response.msg);
+              $(".codeimg").click(); //更新验证码
+            }
+          }
+        },
+        error: function (xhr, status, error) {
+          layer.close(loadIndex);
+          layer.msg(__("ReturnDataAbnormal"));
+        },
+      });
+      return false;
+    }
+  });
+</script>
+{/block}

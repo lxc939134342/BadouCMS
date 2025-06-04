@@ -1,0 +1,51 @@
+<header class="header">
+    <div id="navBox" class="header-nav menu" data-type="index">
+        <div class="container nav-content d-flex justify-content-between">
+            <div class="logobox">
+                <h1 class="logo">
+                    <a href="{:url('/')}" title="{$bd.sitetitle}">
+                        <img class="logoa" src="{$bd.sitelogo}" alt="{$bd.sitetitle}">
+                        <img class="logob" src="{$bd.sitelogo}" alt="{$bd.sitetitle}">{$bd.sitetitle}</a>
+                </h1>
+            </div>
+
+            <div class="navbar-light d-flex align-items-center">
+                <ul class="navbar">
+                    <li {if $sort['tcode']===0}class="active" {/if}><a href="{:url('/')}">{:__('Home')}</a>
+                    </li>
+                    {bd:nav }
+                    <li class="{if $sort['tcode']==$nav['scode']} active {/if}">
+                        <a href="{$nav.link}">{$nav.name}</a>
+                        <ul>
+                            {bd:nav parent="$nav['scode']"}
+                            <li><a href="{$nav.link}">{$nav.name}</a></li>
+                            {/bd:nav}
+                        </ul>
+                    </li>
+                    {/bd:nav}
+                </ul>
+                <div class="sbtn">
+                    <i class="fa fa-search"></i>
+                </div>
+
+                {include file="user/userinfo"}
+
+            </div>
+        </div>
+    </div>
+    <div class="searchBox">
+        <div class="search-pup">
+            <form method="get" name="searchform" class="dropdown search-form"
+                action="{$bd.scaction}">
+                <input class="search-input" name="keyword" style="color: #333"
+                    placeholder="{:__('Please enter keywords')}" type="text">
+                <button><i class="fa fa-search"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <div class="moble">
+        <a class="moble-bars" id="btn-bars"><i class="fa fa-bars nav-btn"></i></a>
+    </div>
+
+</header>

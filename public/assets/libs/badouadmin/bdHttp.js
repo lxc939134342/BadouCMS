@@ -122,7 +122,6 @@ layui.define(['toast'], function (exports) {
                 url = bdHttp.api.fixurl(url);
 
                 // url = url + (url.indexOf("?") > -1 ? "&" : "?") + "";
-                console.log(bdHttp);
                 var area = bdHttp.config.open.area ? bdHttp.config.open.area : [$(window).width() > 800 ? '800px' : '95%', $(window).height() > 600 ? '600px' : '95%'];
                 var success = options && typeof options.success === 'function' ? options.success : $.noop;
                 if (options && typeof options.success === 'function') {

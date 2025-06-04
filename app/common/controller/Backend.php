@@ -123,6 +123,9 @@ class Backend extends BaseController
     protected $defaultSort = 'id';
     protected $defaultOrder = 'DESC';
 
+    // 表主键
+    protected $pk = 'id';
+
     public function initialize()
     {
         $this->view     = View::instance();
@@ -465,6 +468,7 @@ class Backend extends BaseController
         //是否返回树形结构
         $istree = $this->request->request("isTree", 0);
         $ishtml = $this->request->request("isHtml", 0);
+        $pidname = $this->request->param('pidname', 'pid');
         if ($istree) {
             $word = [];
             $pagesize = 999999;
@@ -549,13 +553,13 @@ class Backend extends BaseController
                 } else {
                     $result = array_intersect_key(($item instanceof Model ? $item->toArray() : (array)$item), array_flip($fields));
                 }
-                $result['pid'] = isset($item['pid']) ? $item['pid'] : (isset($item['parent_id']) ? $item['parent_id'] : 0);
+                $result[$pidname] = isset($item[$pidname]) ? $item[$pidname] : (isset($item['parent_id']) ? $item['parent_id'] : 0);
                 $list[] = $result;
             }
             if ($istree && !$primaryvalue) {
                 $tree = Tree::instance();
 
-                $tree->init($list, 'pid');
+                $tree->init($list, $pidname);
                 $list = $tree->getTreeList($tree->getTreeArray(0), $field);
                 if (!$ishtml) {
                     foreach ($list as &$item) {

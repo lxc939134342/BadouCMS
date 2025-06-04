@@ -5,11 +5,20 @@
         <div class="layui-col-xs8">
             <div class="layui-form-item">
                 <label class="layui-form-label">
-                    栏目<span class="layui-font-red">*</span>
+                    栏目
+                    <span class="layui-font-red">*</span>
                 </label>
                 <div class="layui-input-block">
-                    <input type="text" id="c-scode" name="row[scode]" value="{$row.scode}" class="layui-input " />
-                    <div class="remoteSelect" id="remoteSelect-scode" data-input-id="c-scode" data-field="nickname" data-source="user.user/index" ></div>
+                    <input type="hidden" id="c-scode" name="row[scode]" value="{$row.scode}" class="layui-input" />
+                    <div
+                        class="remoteSelect"
+                        id="remoteSelect-scode"
+                        data-input-id="c-scode"
+                        data-field="name"
+                        data-source="cms.contentsort/selectpage"
+                        data-is-tree="true"
+                        data-pidname="pcode"
+                        data-params='{"acode":"{$acode}","mcode":"{$mcode}"}'></div>
                 </div>
             </div>
             <div class="layui-form-item">

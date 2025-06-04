@@ -1,0 +1,108 @@
+{extend name="user/base" /} {block name="main"}
+<style>
+  .user-views-card .el-card__body {
+    padding-top: 0;
+  }
+</style>
+<div id="app">
+  <el-row class="frontend-footer-brother" justify="center">
+    <el-col class="user-layouts" :span="16" :xs="24">
+      {include file="user/left" /}
+      <el-main class="layout-main">
+        <div class="user-views">
+          <el-card class="user-views-card" shadow="hover">
+            <template #header>
+              <div class="card-header">
+                <span>{:__('Score change record')}</span>
+                <span class="right-title">
+                  {:__('Current Points')} {$user.score}
+                </span>
+              </div>
+            </template>
+            <div v-loading="state.pageLoading" class="logs">
+              <div
+                class="log-item"
+                v-for="(item, idx) in state.logs"
+                :key="idx"
+              >
+                <div class="log-title">{{ item.memo }}</div>
+                <div v-if="item.score > 0" class="log-change-amount increase">
+                  {{ __('Integral') + '：+' + item.score }}
+                </div>
+                <div v-else class="log-change-amount reduce">
+                  {{ __('Integral') + '：' + item.score }}
+                </div>
+                <div class="log-after">
+                  {{ __('Points after change') + '：' + item.after }}
+                </div>
+                <div class="log-change-time">
+                  {{ __('Change time') + '：' + timeFormat(item.create_time) }}
+                </div>
+              </div>
+            </div>
+            <div v-if="state.total > 0" class="log-footer">
+              <el-pagination
+                :currentPage="state.currentPage"
+                :page-size="state.pageSize"
+                :page-sizes="[10, 20, 50, 100]"
+                background
+                :layout="'sizes, ->, prev, pager, next, jumper'"
+                :total="state.total"
+                @size-change="onTableSizeChange"
+                @current-change="onTableCurrentChange"
+              ></el-pagination>
+            </div>
+            <el-empty v-else />
+          </el-card>
+        </div>
+      </el-main>
+    </el-col>
+  </el-row>
+</div>
+
+<script>
+  const App = {
+    setup() {
+      const { ref, reactive } = Vue;
+      const user = Config.user;
+      const formRef = ref();
+      const state = reactive({
+        logs: [],
+        currentPage: 1,
+        total: 0,
+        pageSize: 10,
+        pageLoading: true,
+      });
+
+      const onTableSizeChange = (val) => {
+        state.pageSize = val;
+        loadData();
+      };
+      const onTableCurrentChange = (val) => {
+        state.currentPage = val;
+        loadData();
+      };
+
+      const loadData = () => {
+        getIntegralLog(state.currentPage, state.pageSize).then((res) => {
+          state.pageLoading = false;
+          state.logs = res.data.list;
+          state.total = res.data.total;
+        });
+      };
+      loadData();
+      return {
+        state,
+        onTableSizeChange,
+        onTableCurrentChange,
+        timeFormat,
+      };
+    },
+  };
+  const app = Vue.createApp(App);
+
+  app.use(ElementPlus, { locale: ElementPlusLocaleZhCn });
+  app.mount("#app");
+</script>
+
+{/block}

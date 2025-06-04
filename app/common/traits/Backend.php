@@ -107,7 +107,7 @@ trait Backend
     public function edit()
     {
         $id  = $this->request->param('ids');
-        $row = $this->model->find($id);
+        $row = $this->model->where($this->pk, 'in', $id)->find();
         if (!$row) {
             $this->error(__('Record not found'));
         }
@@ -167,7 +167,7 @@ trait Backend
         }
 
         $ids     = $this->request->param('ids');
-        $where[] = [$this->model->getPk(), 'in', $ids];
+        $where[] = [$this->pk, 'in', $ids];
         $data    = $this->model->where($where)->select();
 
         $count = 0;

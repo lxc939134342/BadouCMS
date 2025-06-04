@@ -13,9 +13,10 @@
 namespace app\admin\controller\cms;
 
 use Throwable;
-use think\facade\Db;
-use app\admin\model\cms\Models;
 use badou\Tree;
+use think\facade\Db;
+use badou\Filesystem;
+use app\admin\model\cms\Models;
 
 /**
  * 栏目管理
@@ -28,7 +29,6 @@ class ContentSort extends Base
      * @phpstan-var \app\admin\model\cms\ContentSort
      */
     protected $model;
-    protected $noNeedRight = ['models','getTpls'];
     protected $withJoinTable = ['models'];
     protected $pk = 'scode';
     protected $modelValidate = true;
@@ -41,11 +41,16 @@ class ContentSort extends Base
         parent::initialize();
         $this->tree  = Tree::instance();
         $this->model = new \app\admin\model\cms\ContentSort();
-
+        $modelsModel = new Models();
         $this->rules = [
             'name|'.__('name') => 'require',
             'mcode|'.__('mcode') => 'require',
         ];
+
+        $res = $modelsModel->where('status', 1)->order('id', 'desc')->select();
+        $this->assign('models', $res);
+
+        $this->assign('tpls', $this->getTpls());
     }
 
     public function index()
@@ -72,48 +77,19 @@ class ContentSort extends Base
          * 1. 获取表格数据（没有分页，所以简化了以上的数据查询代码）
          * 2. 递归的根据指定字段组装 children 数组，此时直接给前端，表格就可以正常的渲染为树状了，一个方法搞定
          */
-        // $res = $this->tree->assembleChild($res, 'pcode', 'scode');
-        $treeLib = Tree::instance();
-        $list = $treeLib->init($res, 'pcode', null, 'scode')->getTreeArray(0);
-
-        // if ($this->request->param('select')) {
-        //     /**
-        //      * 树状表格必看注释二
-        //      * 1. 在远程 select 中，数据要成树状显示，需要对数据做一些改动
-        //      * 2. 通过已组装好 children 的数据，建立`树枝`结构，并最终合并为一个二维数组方便渲染
-        //      * 3. 简单讲就是把组装好 children 的数据，给以下这两个方法即可
-        //      */
-        //     $res = $this->tree->assembleTree($this->tree->getTreeArray($res));
-        //     if ($istop) {
-        //         array_unshift($res, ['id' => 0, 'name' => '顶级栏目','scode' => 0]);
-        //     }
-        // }
+        $list = $this->tree->init($res, 'pcode', null, 'scode')->getTreeArray(0);
 
         $this->result('', $list);
     }
 
     /**
-     * 获取模型
-     * @return void
-     */
-    public function models(): void
-    {
-        $modelsModel = new Models();
-        $res = $modelsModel->where('status', 1)->order('id', 'desc')->select();
-        $this->success('', '', [
-            'list'   => $res,
-        ]);
-    }
-
-    /**
      * 获取模版文件列表
-     * @return void
      */
-    public function getTpls(): void
+    protected function getTpls()
     {
         $acode = get_backend_lang();
         $template = Db::name('cms_site')->where('acode', $acode)->value('theme');
-        $path = root_path().'template'.DIRECTORY_SEPARATOR.$template.DIRECTORY_SEPARATOR;
+        $path = root_path().'template'.DIRECTORY_SEPARATOR.'cms'.DIRECTORY_SEPARATOR.$template.DIRECTORY_SEPARATOR;
         if (!is_dir($path)) {
             $this->error('template/'.$template.'模版目录不存在');
         }
@@ -123,19 +99,16 @@ class ContentSort extends Base
         foreach ($files as $key => $value) {
             $list[] = ['id' => $key,'name' => $value];
         }
-        $this->success('', [
-            'list'   => $list,
-        ]);
+        return $list;
     }
 
     /**
      * 添加
-     * @return void
      */
-    public function add(): void
+    public function add()
     {
         if ($this->request->isPost()) {
-            $data = $this->getPostData();
+            $data = $this->getPostData('row/a');
             $result = false;
             $this->model->startTrans();
             try {
@@ -184,8 +157,7 @@ class ContentSort extends Base
                 $this->error(__('No rows were added'));
             }
         }
-
-        $this->error(__('Parameter error'));
+        return $this->view->fetch();
     }
 
     /**
@@ -250,5 +222,11 @@ class ContentSort extends Base
         }
 
         $this->error(__('Parameter error'));
+    }
+
+
+    public function selectpage()
+    {
+        return parent::selectpage();
     }
 }

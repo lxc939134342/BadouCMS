@@ -22,31 +22,11 @@ class Base extends Backend
      */
     protected array $rules = [];
 
-    /**
-     * 是否写入管理员
-     * @var bool
-     */
-    protected bool $writeAdmin = true;
-
     public function initialize()
     {
         parent::initialize();
 
-        /* 默认在添加和编辑时写入管理员 */
-        if ($this->writeAdmin && $this->request->isPost()) {
-            $post = $this->getOriginalInputData();
-            $action = $this->request->action();
-            if ($action == 'add') {
-                $post['create_user'] = $this->auth->nickname;
-                $post['update_user'] = $this->auth->nickname;
-            }
-
-            if ($action == 'edit') {
-                $post['update_user'] = $this->auth->nickname;
-            }
-
-            $this->request->withPost($post);
-        }
+        $this->assign('acode', get_backend_lang());
     }
 
     /**
@@ -72,13 +52,50 @@ class Base extends Backend
     }
 
     /**
-     * 获取原始输入数据 , 防止被多次过滤转义
-     * @return array
+     * 强制类型转换
+     * @access protected
+     * @param  mixed  $data
+     * @param  string $type
+     * @return mixed
      */
-    protected function getOriginalInputData(): array
+    protected function typeCast(&$data, string $type)
+    {
+        $data = match (strtolower($type)) {
+            'a'     => (array) $data,
+            'b'     => (bool) $data,
+            'd'     => (int) $data,
+            'f'     => (float) $data,
+            's'     => is_scalar($data) ? (string) $data : throw new \InvalidArgumentException('variable type error：' . gettype($data)),
+            default => $data,
+        };
+    }
+
+    /**
+     * 获取数据
+     * @access protected
+     * @param  array  $data 数据源
+     * @param  string $name 字段名
+     * @param  mixed  $default 默认值
+     * @return mixed
+     */
+    protected function getData(array $data, string $name, $default = null)
+    {
+        foreach (explode('.', $name) as $val) {
+            if (isset($data[$val])) {
+                $data = $data[$val];
+            } else {
+                return $default;
+            }
+        }
+
+        return $data;
+    }
+
+    protected function getInputData(): array
     {
         $contentType = $this->request->contentType();
         $input = $this->request->getInput();
+        $data = [];
         if ('application/x-www-form-urlencoded' == $contentType) {
             parse_str($input, $data);
             return $data;
@@ -87,17 +104,43 @@ class Base extends Backend
         if (str_contains($contentType, 'json')) {
             return (array) json_decode($input, true);
         }
+
         return [];
     }
 
     /**
+     * 获取原始输入数据 , 防止被多次过滤转义
+     * @return array
+     */
+    protected function getOriginalInputData($name = ''): array
+    {
+        $data = $this->getInputData();
+        $type = '';
+        $name = (string) $name;
+        if ('' != $name) {
+            // 解析name
+            if (str_contains($name, '/')) {
+                [$name, $type] = explode('/', $name);
+            }
+
+            $data = $this->getData($data, $name);
+        }
+        if ($type) {
+            // 强制类型转换
+            $this->typeCast($data, $type);
+        }
+        return $data;
+    }
+
+    /**
      * 获取post数据
+     * @param string $name
      * @param bool $original 是否获取原始数据
      * @return array
      */
-    protected function getPostData($original = false): array
+    protected function getPostData($name = '', $original = false): array
     {
-        $data = $original ? $this->getOriginalInputData() : $this->request->post();
+        $data = $original ? $this->getOriginalInputData($name) : $this->request->post($name);
         if (!$data) {
             $this->error(__('Parameter %s can not be empty', ['']));
         }

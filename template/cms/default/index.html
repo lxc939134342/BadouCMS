@@ -1,0 +1,258 @@
+{extend name="base" /} {block name="main"}
+<div class="container Wauto">
+  <div class="sliderbox">
+    <div class="slider">
+      <div id="slideBox" class="slideBox">
+        <ul id="slider">
+          {bd:slide gid="1"}
+          <li class="slide">
+            <img src="{$slide.pic}" alt="{$slide.title}" />
+            <div class="container slide-content text-center">
+              <div class="style-banner">
+                <h5>{$slide.title}</h5>
+                <h4 class="mb-lg-3 mb-2">{$slide.subtitle}</h4>
+              </div>
+              <div class="view-buttn mt-md-4 mt-sm-4 mt-3">
+                <a href="{$slide.link}" class="btn scroll">立即查看</a>
+              </div>
+            </div>
+          </li>
+          {/bd:slide}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="main w1200">
+    <div class="article w1">
+      <!--产品中心 s-->
+      <div class="PostBox back2">
+        <article class="post">
+          {bd:sort scode="5"}
+          <div class="postTitle anim fadeInUp">
+            <h3>
+              <i class="fa fa-quote-left"></i>
+              {$sort.name}
+            </h3>
+            <span class="title2">{$sort.subname}</span>
+          </div>
+          {/bd:sort}
+          <div class="PostShow">
+            <ul>
+              {bd:list scode="5" num="8"}
+              <li class="anim fadeInUp">
+                <div class="post-img loading">
+                  <a
+                    class="pic float-left"
+                    href="{$list.link}"
+                    title="{$list.title}"
+                    rel="bookmark"
+                  >
+                    <div class="msk"></div>
+                    <i class="fa fa-search"></i>
+                    <img
+                      class="b-lazy"
+                      src="{$list.ico}"
+                      data-src="{$list.ico}"
+                      alt="{$list.title}"
+                    />
+                  </a>
+                </div>
+                <a href="{$list.link}" title="{$list.title}">
+                  <h4>{$list.title}</h4>
+                  <i class="h2">{$list.description}</i>
+                  <div class="pt-2">
+                    <i class="fa fa-long-arrow-right"></i>
+                  </div>
+                </a>
+              </li>
+              {/bd:list}
+            </ul>
+          </div>
+        </article>
+      </div>
+      <!--产品中心 e-->
+
+      <!--关于我们 s-->
+      <div class="PostBox about">
+        <article class="post">
+          <div class="postAbout anim fadeInRight">
+            {bd:sort scode="1"}
+            <div class="postTitle">
+              <h3>
+                <i class="fa fa-quote-left"></i>
+                {$sort.name}
+              </h3>
+              <span class="title2">{$sort.subname}</span>
+            </div>
+            {/bd:sort} {bd:content scode="1" }
+            <div class="PostText">{$content.description}</div>
+            <div class="more anim fadeInUp">
+              <a href="{$content.link}">
+                <span>{:__('View Details')} +</span>
+              </a>
+            </div>
+            {/bd:content}
+          </div>
+          {bd:slide gid="2"}
+          <div
+            class="aboutImg anim fadeInLeft"
+            style="background-image: url({$slide.pic})"
+          ></div>
+          {/bd:slide}
+        </article>
+      </div>
+      <!--关于我们 e-->
+
+      <!--案例展示 s-->
+      <div class="PostBox back1">
+        <article class="post">
+          {bd:sort scode="8"}
+          <div class="postTitle anim fadeInUp">
+            <h3>
+              <i class="fa fa-quote-left"></i>
+              {$sort.name}
+            </h3>
+            <span class="title2">{$sort.subname}</span>
+          </div>
+
+          <div class="PostShow">
+            <ul>
+              {bd:list scode="8"}
+              <li class="anim fadeInUp case-item">
+                <div class="post-img loading">
+                  <a
+                    class="pic float-left"
+                    href="{$list.link}"
+                    title="{$list.title}"
+                    rel="bookmark"
+                  >
+                    <div class="msk"></div>
+                    <i class="fa fa-search"></i>
+                    <img
+                      class="b-lazy"
+                      src="{$list.ico}"
+                      data-src="{$list.ico}"
+                      alt="{$list.title}"
+                    />
+                  </a>
+                </div>
+                <h4>
+                  <a href="{$list.link}" title="{$list.title}">{$list.title}</a>
+                </h4>
+              </li>
+              {/bd:list}
+            </ul>
+          </div>
+          <div class="more anim fadeInUp">
+            <a href="{$sort.link}">
+              <span>{:__('View More')} +</span>
+            </a>
+          </div>
+          {/bd:sort}
+        </article>
+      </div>
+      <!--案例展示 e-->
+
+      <!--服务团队 s-->
+      <div
+        class="PostBox back3"
+        style="background-image: url('template/default/images/cbg.jpg')"
+      >
+        <article class="post team">
+          {bd:sort scode="9"}
+          <div class="postTitle anim fadeInUp">
+            <h3>
+              <i class="fa fa-quote-left"></i>
+              {$sort.name}
+            </h3>
+            <span class="title2">{$sort.subname}</span>
+          </div>
+          {/bd:sort}
+          <div class="PicBox">
+            <div class="ImgBox">
+              <ul class="slider2">
+                {bd:list scode="9"}
+                <li class="anim fadeInUp">
+                  <div class="LiBox">
+                    <a href="{$list.link}" title="{$list.title}" rel="bookmark">
+                      <div class="post-img loading">
+                        <img src="{$list.ico}" alt="{$list.title}" />
+                      </div>
+                      <div class="post-text">
+                        <span>{$list.title}</span>
+                        <p>{$list.description}</p>
+                      </div>
+                    </a>
+                  </div>
+                </li>
+                {/bd:list}
+              </ul>
+            </div>
+          </div>
+        </article>
+      </div>
+      <!--服务团队 e-->
+
+      <!--新闻中心 s-->
+      <div class="PostBox back2">
+        <article class="post news n1">
+          {bd:sort scode="2"}
+          <div class="postTitle anim fadeInUp">
+            <h3>
+              <i class="fa fa-quote-left"></i>
+              {$sort.name}
+            </h3>
+            <span class="title2">{$sort.subname}</span>
+          </div>
+
+          <div class="PostNews">
+            <ul>
+              {bd:list scode="2"}
+              <li class="anim fadeInUp">
+                <div class="post-img loading">
+                  <a
+                    class="pic"
+                    href="{$list.link}"
+                    title="{$list.title}"
+                    rel="bookmark"
+                  >
+                    <div class="msk"></div>
+                    <i class="fa fa-search"></i>
+                    <img
+                      class="b-lazy"
+                      src="{$list.ico}"
+                      data-src="{$list.ico}"
+                      alt="{$list.title}"
+                    />
+                  </a>
+                </div>
+                <h4>
+                  <a href="{$list.link}" title="{$list.title}">{$list.title}</a>
+                </h4>
+                <span class="time">
+                  <i class="fa fa-clock-o"></i>
+                  {$list.date}
+                </span>
+                <span>
+                  <i class="fa fa-eye fa-fw"></i>
+                  {$list.visits}
+                </span>
+                <p>{$list.description|substr_both=0,55}</p>
+              </li>
+              {/bd:list}
+            </ul>
+          </div>
+          <div class="more anim fadeInUp">
+            <a href="{$sort.link}">
+              <span>{:__('View More')} +</span>
+            </a>
+          </div>
+          {/bd:sort}
+        </article>
+      </div>
+      <!--新闻中心 e-->
+    </div>
+  </div>
+</div>
+{/block}

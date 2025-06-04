@@ -22,6 +22,8 @@ layui.define(['bdHttp'], function (exports) {
                     var pageSize = $(this).data('page-size') || 10;
                     var multiple = $(this).data('multiple');
                     var isTree = $(this).data('is-tree') || 0;
+                    var initValue = $(this).data('init-value');
+                    var pidname = $(this).data('pidname') || 'pid';
                     var toolbarShow = $(this).data('toolbar-show') || true;
                     var toolbarShowIcon = $(this).data('toolbar-showIcon') || true;
                     var toolbarList = $(this).data('toolbar-list') || ["ALL", "CLEAR"];
@@ -30,6 +32,15 @@ layui.define(['bdHttp'], function (exports) {
                     var maxSelectLimit = $(this).data('max-select-limit');
                     var orderBy = $(this).data('order-by');
                     var params = $(this).data('params');
+                    var inputValue = '';
+                    // 设置值
+                    if (inputId) {
+                        inputValue = $('#' + inputId).val();
+                        initValue = inputValue;
+                    }
+                    if (typeof initValue === 'string' && initValue) {
+                        initValue = initValue.split(',');
+                    }
 
                     var options = {
                         el: '#' + id,
@@ -41,6 +52,7 @@ layui.define(['bdHttp'], function (exports) {
                         data: [],
                         paging: pagination,
                         pageSize: pageSize,
+                        initValue: initValue,
                         prop: {
                             name: field,
                             value: key
@@ -87,7 +99,8 @@ layui.define(['bdHttp'], function (exports) {
                         keyField: key,
                         orderBy: orderBy,
                         custom: params,
-                        isTree: isTree
+                        isTree: isTree,
+                        pidname: pidname
                     };
                     // 搜索字段
                     if (searchField) {

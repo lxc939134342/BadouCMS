@@ -43,6 +43,7 @@ class Content extends Base
         $this->contentExtModel = new \app\admin\model\cms\ContentExt();
         $this->mcode = $this->request->param('mcode') ?? 0;
         $this->assign('mcode', $this->mcode);
+
     }
 
     public function index()
@@ -221,7 +222,7 @@ class Content extends Base
         }
 
         if ($this->request->isPost()) {
-            $post = $this->getPostData();
+            $post = $this->getPostData('row/a');
             $data = $post['row'];
             $data['filename'] ?? $data['filename'] = $row['filename'];
             $data['description'] ?? $data['description'] = $row['description'];
