@@ -558,8 +558,7 @@ class Backend extends BaseController
             }
             if ($istree && !$primaryvalue) {
                 $tree = Tree::instance();
-
-                $tree->init($list, $pidname);
+                $tree->init($list, $pidname, null, $this->pk);
                 $list = $tree->getTreeList($tree->getTreeArray(0), $field);
                 if (!$ishtml) {
                     foreach ($list as &$item) {
@@ -573,13 +572,6 @@ class Backend extends BaseController
         $this->success('ok', '', ['list' => $list, 'total' => $total]);
     }
 
-
-    /**
-     * 通用的添加方法
-     *
-     * @param array $data 提交的数据
-     * @return array
-     */
     protected function token()
     {
         $check = $this->request->checkToken('__token__');
@@ -592,6 +584,4 @@ class Backend extends BaseController
             $this->error('令牌错误！', '', ['__token__' => $token]);
         }
     }
-
-
 }

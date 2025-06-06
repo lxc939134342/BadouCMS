@@ -22,7 +22,9 @@
                 <!-- 顶 部 左 侧 功 能 -->
                 <ul class="layui-nav layui-layout-left">
                     <li class="collapse layui-nav-item"><a href="#" class="layui-icon layui-icon-shrink-right"></a></li>
-                    <li class="refresh layui-nav-item"><a href="#" class="layui-icon layui-icon-refresh-1" loading="600"></a></li>
+                    <li class="refresh layui-nav-item">
+                        <a href="#" class="layui-icon layui-icon-refresh-1" loading="600"></a>
+                    </li>
                 </ul>
                 <!-- 多 系 统 菜 单 -->
                 <div id="control" class="layui-layout-control"></div>
@@ -32,38 +34,58 @@
                         <a href="/" target="_blank" class="layui-icon layui-icon-home"></a>
                     </li>
                     <li class="layui-nav-item layui-hide-xs langs">
-                        <a href="javascript:;" >
-                            <svg width="1.2em" height="1.2em" viewBox="0 0 24 24" style="color:#333;">
-                                <path d="M18.5 10l4.4 11h-2.155l-1.201-3h-4.09l-1.199 3h-2.154L16.5 10h2zM10 2v2h6v2h-1.968a18.222 18.222 0 0 1-3.62 6.301a14.864 14.864 0 0 0 2.336 1.707l-.751 1.878A17.015 17.015 0 0 1 9 13.725a16.676 16.676 0 0 1-6.201 3.548l-.536-1.929a14.7 14.7 0 0 0 5.327-3.042A18.078 18.078 0 0 1 4.767 8h2.24A16.032 16.032 0 0 0 9 10.877a16.165 16.165 0 0 0 2.91-4.876L2 6V4h6V2h2zm7.5 10.885L16.253 16h2.492L17.5 12.885z" fill="currentColor"></path>
+                        <a href="javascript:;">
+                            <svg width="1.2em" height="1.2em" viewBox="0 0 24 24" style="color: #333">
+                                <path
+                                    d="M18.5 10l4.4 11h-2.155l-1.201-3h-4.09l-1.199 3h-2.154L16.5 10h2zM10 2v2h6v2h-1.968a18.222 18.222 0 0 1-3.62 6.301a14.864 14.864 0 0 0 2.336 1.707l-.751 1.878A17.015 17.015 0 0 1 9 13.725a16.676 16.676 0 0 1-6.201 3.548l-.536-1.929a14.7 14.7 0 0 0 5.327-3.042A18.078 18.078 0 0 1 4.767 8h2.24A16.032 16.032 0 0 0 9 10.877a16.165 16.165 0 0 0 2.91-4.876L2 6V4h6V2h2zm7.5 10.885L16.253 16h2.492L17.5 12.885z"
+                                    fill="currentColor"></path>
                             </svg>
                         </a>
                         <dl class="layui-nav-child text-center">
-                            <dd><a href="javascript:void(0);"> 中文简体</a></dd>
-                            <dd><a href="javascript:void(0);"> English</a></dd>
+                            <dd><a href="?lang=zh-cn">中文简体</a></dd>
+                            <dd><a href="?lang=en">English</a></dd>
                         </dl>
                     </li>
-                    <li class="layui-nav-item layui-hide-xs"><a href="#" class="menuSearch layui-icon layui-icon-search"></a></li>
-                    <li class="layui-nav-item layui-hide-xs"><a href="#" class="fullScreen layui-icon layui-icon-screen-full"></a></li>
+
                     <li class="layui-nav-item">
-                        <a href="javascript:;" class="layui-icon layui-icon-delete" style="font-size:19px !important"></a>
-                        <!-- 功 能 菜 单 -->
+                        <a
+                            href="javascript:;"
+                            class="layui-icon layui-icon-delete"
+                            style="font-size: 19px !important"></a>
                         <dl class="layui-nav-child text-center">
-                            <dd><a href="javascript:void(0);" class="wipecache" data-type="all">一键清理缓存</a></dd>
-                            <hr class="layui-border-cyan">
+                            <dd style="border-bottom: 1px solid #f0f0f0; margin-bottom: 5px">
+                                <a href="javascript:void(0);" class="wipecache" data-type="all">一键清理缓存</a>
+                            </dd>
                             <dd><a href="javascript:void(0);" class="wipecache" data-type="data">清除内容缓存</a></dd>
-                            <dd><a href="javascript:void(0);" class="wipecache" data-type="template">清除模板缓存</a></dd>
-                            <!--							<dd><a href="javascript:void(0);" class="wipecache" data-type="addons">清除插件缓存</a></dd>-->
-                            <dd><a href="javascript:void(0);" class="wipecache" data-type="browser">清除浏览器缓存</a></dd>
+                            <dd>
+                                <a href="javascript:void(0);" class="wipecache" data-type="template">清除模板缓存</a>
+                            </dd>
+                            <dd>
+                                <a href="javascript:void(0);" class="wipecache" data-type="browser">清除浏览器缓存</a>
+                            </dd>
                         </dl>
                     </li>
                     <li class="layui-nav-item user">
                         <!-- 头 像 -->
-                        <a class="layui-icon layui-icon-username" href="javascript:;"> <span>{$auth->nickname}</span> </a>
+                        <a class="layui-icon layui-icon-username" href="javascript:;"><span>{$auth->nickname}</span></a>
                         <!-- 功 能 菜 单 -->
                         <dl class="layui-nav-child">
-                            <dd><a user-menu-url="view/system/person.html" user-menu-id="5555" user-menu-title="基本资料">基本资料</a></dd>
+                            <dd>
+                                <a
+                                    user-menu-url="view/system/person.html"
+                                    user-menu-id="5555"
+                                    user-menu-title="基本资料">
+                                    基本资料
+                                </a>
+                            </dd>
                             <dd><a href="javascript:void(0);" class="logout">注销登录</a></dd>
                         </dl>
+                    </li>
+                    <li class="layui-nav-item layui-hide-xs">
+                        <a href="#" class="menuSearch layui-icon layui-icon-search"></a>
+                    </li>
+                    <li class="layui-nav-item layui-hide-xs">
+                        <a href="#" class="fullScreen layui-icon layui-icon-screen-full"></a>
                     </li>
                     <!-- 主 题 配 置 -->
                     <li class="layui-nav-item setting"><a href="#" class="layui-icon layui-icon-more-vertical"></a></li>
@@ -90,9 +112,9 @@
             </div>
             <!-- 页脚 -->
             <div class="layui-footer layui-text">
-                <span class="left"> Released under the MIT license. </span>
+                <span class="left">Released under the MIT license.</span>
                 <span class="center"></span>
-                <span class="right"> Copyright © 2021-2022 pearadmin.com </span>
+                <span class="right">Copyright © 2021-2022 pearadmin.com</span>
             </div>
             <!-- 遮 盖 层 -->
             <div class="pear-cover"></div>
@@ -121,15 +143,15 @@
                 admin.render();
 
                 //清除缓存
-				$(".wipecache").on('click',function(){
-					var type = $(this).data('type')
-					Badou.api.ajax({
-						url:"{:url('ajax/wipecache')}",
-						data:{
-							type:type
-						}
-					})
-				});
+                $(".wipecache").on("click", function () {
+                    var type = $(this).data("type");
+                    Badou.api.ajax({
+                        url: "{:url('ajax/wipecache')}",
+                        data: {
+                            type: type,
+                        },
+                    });
+                });
 
                 // 登出逻辑
                 admin.logout(function () {

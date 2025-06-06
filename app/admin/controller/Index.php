@@ -153,4 +153,9 @@ class Index extends Backend
             $this->success(__('Logout successful'), 'index/login');
         }
     }
+
+    public function lang()
+    {
+
+    }
 }

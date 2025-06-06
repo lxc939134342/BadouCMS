@@ -8,8 +8,8 @@
                 <div class="layui-input-block">
                     <input type="hidden" id="c-pcode" name="row[pcode]" value="{$row.pcode}" class="layui-input" />
                     <div class="remoteSelect" id="remoteSelect-pcode" data-input-id="c-pcode" data-field="name"
-                        data-is-tree="true" data-pidname="pcode" data-params='{"acode":"{$acode}"}'
-                        data-source="cms.contentsort/selectpage"></div>
+                        data-primary-key="scode" data-is-tree="true" data-pidname="pcode"
+                        data-params='{"acode":"{$acode}"}' data-source="cms.contentsort/selectpage"></div>
                 </div>
             </div>
             <div class="layui-form-item">
@@ -22,8 +22,8 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">URL名称</label>
                 <div class="layui-input-block">
-                    <input type="text" id="c-filename" name="row[filename]" class="layui-input"
-                        value="{$row.filename}" placeholder="URL名称" />
+                    <input type="text" id="c-filename" name="row[filename]" class="layui-input" value="{$row.filename}"
+                        placeholder="URL名称" />
                 </div>
             </div>
 
@@ -107,7 +107,8 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label"> 栏目缩略图</label>
                         <div class="layui-input-block">
-                            <input type="text" id="c-ico" name="row[ico]" style="width: 70%;" class="layui-input" value="{$row.ico}" />
+                            <input type="text" id="c-ico" name="row[ico]" style="width: 70%;" class="layui-input"
+                                value="{$row.ico}" />
                             <div class="layui-input-suffix" style="width: 30%;">
                                 <button type="button" data-input-id="c-ico" data-preview-id="p-ico"
                                     class="layui-btn btn-bdupload">
@@ -127,7 +128,8 @@
                     <div class="layui-form-item">
                         <label class="layui-form-label"> 栏目大图</label>
                         <div class="layui-input-block">
-                            <input type="text" id="c-pic" name="row[pic]"  style="width: 70%;" class="layui-input" value="{$row.pic}" />
+                            <input type="text" id="c-pic" name="row[pic]" style="width: 70%;" class="layui-input"
+                                value="{$row.pic}" />
                             <div class="layui-input-suffix" style="width: 30%;">
                                 <button type="button" data-input-id="c-pic" data-preview-id="p-pic"
                                     class="layui-btn btn-bdupload">

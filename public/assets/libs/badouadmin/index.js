@@ -35,8 +35,7 @@ layui.use(['layer', 'badou'], function () {
         var that = this;
         var options = $.extend({}, $(that).data() || {});
         var url = $(that).attr('href');
-        var title = $(that).attr("title") || $(that).data("title") || $(that).data('original-title');
-        // var button = Backend.api.gettablecolumnbutton(options);
+        var title = $(that).attr("title") || $(that).data("title") || $(that).data('original-title') || $(that).text();
         var button = [];
         if (button && typeof button.callback === 'function') {
             options.callback = button.callback;

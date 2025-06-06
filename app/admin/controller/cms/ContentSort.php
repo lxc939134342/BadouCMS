@@ -162,12 +162,11 @@ class ContentSort extends Base
 
     /**
      * 批量添加
-     * @return void
      */
-    public function batchAdd(): void
+    public function batchAdd()
     {
         if ($this->request->isPost()) {
-            $data = $this->getPostData();
+            $data = $this->getPostData('row/a');
             $result = false;
             $this->model->startTrans();
             try {
@@ -215,13 +214,12 @@ class ContentSort extends Base
                 $this->error($e->getMessage());
             }
             if ($result !== false) {
-                $this->success(__('Added successfully'));
+                $this->success(__('Add successful'));
             } else {
                 $this->error(__('No rows were added'));
             }
         }
-
-        $this->error(__('Parameter error'));
+        return $this->view->fetch();
     }
 
 
