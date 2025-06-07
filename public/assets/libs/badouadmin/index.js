@@ -33,6 +33,9 @@ layui.use(['layer', 'badou'], function () {
     //点击包含.btn-dialog的元素时弹出dialog
     $(document).on('click', '.btn-dialog,.dialogit', function (e) {
         var that = this;
+        if ($(that).attr('disabled') || $(that).hasClass('disabled')) {
+            return false;
+        }
         var options = $.extend({}, $(that).data() || {});
         var url = $(that).attr('href');
         var title = $(that).attr("title") || $(that).data("title") || $(that).data('original-title') || $(that).text();

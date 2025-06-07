@@ -180,6 +180,7 @@ layui.define(['bdHttp'], function (exports) {
                     var options = {
                         elem: this,
                         type: type,
+                        isInitValue: true,
                         trigger: 'click'
                     };
                     if (range) {

@@ -9,7 +9,7 @@
                     <span class="layui-font-red">*</span>
                 </label>
                 <div class="layui-input-block">
-                    <input type="hidden" id="c-scode" name="row[scode]" value="{$row.scode}" class="layui-input" />
+                    <input type="hidden" id="c-scode" name="row[scode]" value="" class="layui-input" />
                     <div
                         class="remoteSelect"
                         id="remoteSelect-scode"
@@ -30,7 +30,7 @@
                         name="row[title]"
                         lay-verify="required"
                         autocomplete="off"
-                        value="{$row.title}"
+                        value=""
                         placeholder="标题"
                         class="layui-input" />
                 </div>
@@ -44,7 +44,7 @@
                             id="c-ico"
                             name="row[ico]"
                             class="layui-input"
-                            value="{$row.ico}" />
+                            value="" />
                         <div class="layui-input-suffix" style="width: 30%">
                             <button
                                 type="button"
@@ -67,7 +67,7 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">内容</label>
                 <div class="layui-input-block">
-                    <textarea class="layui-textarea" name="row[content]" rows="5">{$row.content}</textarea>
+                    <textarea class="layui-textarea" name="row[content]" rows="5"></textarea>
                 </div>
             </div>
 
@@ -78,7 +78,7 @@
                         type="text"
                         name="row[tags]"
                         placeholder="请输入文章tag，英文逗号隔开"
-                        value="{$row.tags}"
+                        value=""
                         class="layui-input" />
                 </div>
             </div>
@@ -90,7 +90,7 @@
                         type="text"
                         name="row[author]"
                         placeholder="请输入作者"
-                        value="{$row.author}"
+                        value=""
                         class="layui-input" />
                 </div>
             </div>
@@ -102,7 +102,7 @@
                         type="text"
                         name="row[source]"
                         placeholder="请输入来源"
-                        value="{$row.source}"
+                        value=""
                         class="layui-input" />
                 </div>
             </div>
@@ -110,9 +110,7 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">状态</label>
                 <div class="layui-input-block">
-                    <input type="radio" name="row[status]" value="1" title="显示" {if $row.status==1}
-                    checked="checked"{/if}> <input type="radio" name="row[status]" value="0" title="隐藏"
-                    {if$row.status==0} checked="checked"{/if}>
+                    <input type="radio" name="row[status]" checked value="1" title="显示"> <input type="radio" name="row[status]" value="0" title="隐藏">
                 </div>
             </div>
         </div>
@@ -127,7 +125,7 @@
                             <input
                                 type="text"
                                 name="row[titlecolor]"
-                                value="{$row.titlecolor}"
+                                value=""
                                 placeholder="请选择标题颜色"
                                 class="layui-input"
                                 id="titlecolor" />
@@ -143,7 +141,7 @@
                             <input
                                 type="text"
                                 name="row[subtitle]"
-                                value="{$row.subtitle}"
+                                value=""
                                 placeholder="请输入副标题"
                                 class="layui-input" />
                         </div>
@@ -155,7 +153,7 @@
                             <input
                                 type="text"
                                 name="row[date]"
-                                value="{$row.date}"
+                                value="{:date('Y-m-d H:i:s')}"
                                 readonly
                                 placeholder="请选择发布时间"
                                 class="layui-input laydate" />
@@ -171,7 +169,7 @@
                                     id="c-enclosure"
                                     name="row[enclosure]"
                                     class="layui-input"
-                                    value="{$row.enclosure}" />
+                                    value="" />
                                 <div class="layui-input-suffix" style="width: 50%">
                                     <button type="button" data-input-id="c-enclosure" class="layui-btn btn-bdupload">
                                         <i class="fa fa-upload"></i>
@@ -195,7 +193,7 @@
                             <input
                                 type="text"
                                 name="row[keywords]"
-                                value="{$row.keywords}"
+                                value=""
                                 placeholder="请输入详情页SEO关键字"
                                 class="layui-input" />
                         </div>
@@ -205,7 +203,7 @@
                         <label class="layui-form-label">SEO描述</label>
                         <div class="layui-input-block">
                             <textarea name="row[description]" placeholder="请输入详情页SEO描述" class="layui-textarea">
-{$row.description}</textarea
+</textarea
                             >
                         </div>
                     </div>
@@ -216,7 +214,6 @@
 
     <div class="layui-form-item layer-footer hide">
         <div class="layui-input-block">
-            <input type="hidden" name="row[id]" value="{$row.id}" />
             <button class="layui-btn pear-btn-primary layui-btn-sm disabled" lay-submit>保存</button>
             <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
         </div>

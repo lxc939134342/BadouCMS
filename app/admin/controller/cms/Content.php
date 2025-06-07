@@ -102,7 +102,7 @@ class Content extends Base
         if (!$this->isAjax()) {
             return $this->view->fetch();
         }
-        $data = $this->getPostData();
+        $data = $this->getPostData('row/a');
         $data['content'] ?? $data['content'] = '';
         $data['content'] = $this->request->param('content', '', 'clean_xss');
 
@@ -118,7 +118,7 @@ class Content extends Base
             'author' => $this->auth->nickname,
             'source' => '',
             'outlink' => '',
-            'date' => '',
+            'date' => date('Y-m-d H:i:s'),
             'ico' => '',
             'pics' => '',
             'picstitle' => '',
@@ -185,7 +185,7 @@ class Content extends Base
             $this->error($e->getMessage());
         }
         if ($result !== false) {
-            $this->success(__('Added successfully'));
+            $this->success(__('Added successful'));
         } else {
             $this->error(__('No rows were added'));
         }
@@ -223,14 +223,13 @@ class Content extends Base
 
         if ($this->request->isPost()) {
             $post = $this->getPostData('row/a');
-            $data = $post['row'];
             $data['filename'] ?? $data['filename'] = $row['filename'];
             $data['description'] ?? $data['description'] = $row['description'];
             $data['ico'] ?? $data['ico'] = $row['ico'];
             $data['scode'] ?? $data['scode'] = $row['scode'];
             $data['title'] ?? $data['title'] = $row['title'];
             $data['content'] = $this->request->param('content', $row['content'], 'clean_xss');
-            $data['update_user'] = $post['update_user'];
+            $data['update_user'] = $this->auth->username;
             $result = false;
             $this->model->startTrans();
             try {
@@ -284,13 +283,15 @@ class Content extends Base
 
     /**
      * 复制数据
-     * @return void
      */
-    public function copy(): void
+    public function copy()
     {
-        $ids = $this->request->param('ids/a');
+        $ids = $this->request->param('ids');
         $scode = $this->request->param('scode');
-        if (count($ids) <= 0) {
+        if (!$this->isAjax()) {
+            return $this->view->fetch();
+        }
+        if (!$ids) {
             $this->error(__('Please select the data'));
         }
         if (! $scode) {
@@ -302,13 +303,16 @@ class Content extends Base
 
     /**
      * 移动数据
-     * @return void
      */
-    public function move(): void
+    public function move()
     {
-        $ids = $this->request->param('ids/a');
+        $ids = $this->request->param('ids');
         $scode = $this->request->param('scode');
-        if (count($ids) <= 0) {
+        if (!$this->isAjax()) {
+            return $this->view->fetch();
+        }
+
+        if (!$ids) {
             $this->error(__('Please select the data'));
         }
         if (! $scode) {

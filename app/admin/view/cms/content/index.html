@@ -2,16 +2,46 @@
 
 <div class="layui-card">
     <div class="layui-card-body">
-        <table class="layui-hide" id="content" data-operate-edit="{:$auth->check('cms.content/edit')}" data-operate-del="{:$auth->check('cms.content/del')}"></table>
+        <table
+            class="layui-hide"
+            id="content"
+            data-operate-edit="{:$auth->check('cms.content/edit')}"
+            data-operate-del="{:$auth->check('cms.content/del')}"></table>
     </div>
 </div>
 <!-- 表格左侧按钮 toolbar  -->
 <script type="text/html" id="toolbar">
-	<a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black"><i class="fa fa-refresh"></i></a>
-    <button class="layui-btn btn-theme-color" lay-event="add"><i class="fa fa-plus"></i> {:__('Add')}</button>
-	<button class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('cms.content/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
-     <button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
+    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black">
+        <i class="fa fa-refresh"></i>
+    </a>
+    <button class="layui-btn btn-theme-color" lay-event="add">
+        <i class="fa fa-plus"></i>
+        {:__('Add')}
+    </button>
+    <button
+        class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('cms.content/edit')?'':'hide'}"
+        lay-event="edit">
+        <i class="fa fa-pencil"></i>
+        {:__('Edit')}
+    </button>
+    <button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del">
+        <i class="fa fa-trash"></i>
+        {:__('Del')}
+    </button>
+    <a
+        href="{:url('cms.content/copy',['mcode'=>$mcode])}"
+        class="layui-btn btn-copy btn-disabled disabled {:$auth->check('cms.content/copy')?'':'hide'}">
+        <i class="fa fa-copy"></i>
+        {:__('Copy')}
+    </a>
+    <a
+        href="{:url('cms.content/move',['mcode'=>$mcode])}"
+        class="layui-btn btn-move btn-disabled disabled {:$auth->check('cms.content/move')?'':'hide'}">
+        <i class="fa fa-magnet"></i>
+        {:__('Move')}
+    </a>
 </script>
+
 <script>
     layui.use(["badou"], function () {
         var bdTable = layui.bdTable;
@@ -19,7 +49,9 @@
         var layer = layui.layer;
         var dropdown = layui.dropdown;
         var badou = layui.badou;
-        badou.http.config.open.area=['100%', '100%'];
+        var laytpl = layui.laytpl;
+        var form = layui.form;
+        badou.http.config.open.area = ["100%", "100%"];
 
         bdTable.api.init({
             table: table,
@@ -39,48 +71,80 @@
             even: true,
             searchFormVisible: true,
             toolbar: "#toolbar",
-            page:true,
+            page: true,
             cols: [
                 [
                     { type: "checkbox" },
                     { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "scode", hide:true, title: __('Scode'), width: 90,operate:false  },
-                    { field: "contentsort.name", title: __('Scode name'), width: 150 },
-                    { field: "title", title:__('Title') },
-                    {field:'ico', title:__('Ico'), width: 80, templet: bdTable.api.formatter.image, operate:false},
-                    { field: "date", title:__('Release time'), width: 180,templet:bdTable.api.formatter.datetime,operate:'RANGE',searchType:'time', },
+                    { field: "scode", hide: true, title: __("Scode"), width: 90, operate: false },
+                    { field: "contentsort.name", title: __("Scode name"), width: 150 },
+                    { field: "title", title: __("Title") },
+                    { field: "ico", title: __("Ico"), width: 80, templet: bdTable.api.formatter.image, operate: false },
+                    {
+                        field: "date",
+                        title: __("Release time"),
+                        width: 180,
+                        templet: bdTable.api.formatter.datetime,
+                        operate: "RANGE",
+                        searchType: "time",
+                    },
                     {
                         field: "status",
-                        title: __('Status'),
+                        title: __("Status"),
                         width: 80,
-                        searchList: {0:__('Off'),1:__('On')},
+                        searchList: { 0: __("Off"), 1: __("On") },
                         templet: bdTable.api.formatter.switch,
                     },
                     {
                         field: "istop",
-                        title: __('Istop'),
+                        title: __("Istop"),
                         width: 80,
-                        searchList: {0:__('Off'),1:__('On')},
+                        searchList: { 0: __("Off"), 1: __("On") },
                         templet: bdTable.api.formatter.switch,
                     },
                     {
                         field: "isrecommend",
-                        title: __('Isrecommend'),
+                        title: __("Isrecommend"),
                         width: 80,
-                        searchList: {0:__('Off'),1:__('On')},
+                        searchList: { 0: __("Off"), 1: __("On") },
                         templet: bdTable.api.formatter.switch,
                     },
                     {
                         field: "isheadline",
-                        title: __('Isheadline'),
+                        title: __("Isheadline"),
                         width: 80,
-                        searchList: {0:__('Off'),1:__('On')},
+                        searchList: { 0: __("Off"), 1: __("On") },
                         templet: bdTable.api.formatter.switch,
                     },
-                    { field: "visits", title: __('Visits') ,width: 80 },
-                    { title: __('Operate'), align: "center",width: 150, templet: bdTable.api.formatter.operate},
+                    { field: "visits", title: __("Visits"), width: 80 },
+                    { title: __("Operate"), align: "center", width: 150, templet: bdTable.api.formatter.operate },
                 ],
             ],
+        });
+
+        // 移动&复制
+        $(document).on("click", ".btn-move,.btn-copy", function () {
+            var that = this;
+            if ($(this).hasClass("disabled")) {
+                return false;
+            }
+            var table = bdTable.initTable;
+            var ids = bdTable.api.selectedids();
+            if (ids.length === 0) {
+                layer.msg(__("Please select at least one item"));
+                return false;
+            }
+            var idarr = [];
+            $.each(ids, function (i, v) {
+                idarr.push(v[table.config.pk]);
+            });
+            var url = $(this).attr("href") + "&ids=" + idarr.join(",");
+            var title=$(this).text()
+
+            badou.api.open(url, title, {
+                area: ["550px", "500px"],
+            });
+            return false;
         });
     });
 </script>

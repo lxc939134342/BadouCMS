@@ -75,4 +75,8 @@ return [
     'Upload'                                                => '上传',
     'Expendall'                                             => '展开全部',
     'Collapseall'                                           => '收起全部',
+    'Copy'                                                  => '复制',
+    'Move'                                                  => '移动',
+    'Copy successful'                                       => '复制成功',
+    'Move successful'                                       => '移动成功'
 ];
