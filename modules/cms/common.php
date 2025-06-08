@@ -1,5 +1,7 @@
 <?php
 
+use think\facade\Db;
+
 // 获取用户浏览器类型
 function get_user_bs($bs = null)
 {
@@ -668,6 +670,16 @@ function get_frontend_lang(): string
 function get_default_lang(): string
 {
     return Db::name('cms_area')->cache('cms_default_lang')->where('is_default', 1)->value('acode');
+}
+
+/**
+ * 设置后台语言
+ * @param string $lg
+ * @return void
+ */
+function set_backend_lang(string $lg): void
+{
+    cookie('b_lg', $lg);
 }
 
 /**

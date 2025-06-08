@@ -78,5 +78,6 @@ return [
     'Copy'                                                  => '复制',
     'Move'                                                  => '移动',
     'Copy successful'                                       => '复制成功',
-    'Move successful'                                       => '移动成功'
+    'Move successful'                                       => '移动成功',
+    'Invalid parameters'                                    => '参数错误',
 ];

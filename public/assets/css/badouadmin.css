@@ -287,6 +287,26 @@
 .layui-font-green {
     color: #1db369 !important;
 }
+.layui-border-blue {
+    border-color: var(--blue-color) !important;
+    color: var(--blue-color) !important;
+}
+.layui-border-green {
+    border-color: var(--success-color) !important;
+    color: var(--success-color) !important;
+}
+.layui-border-orange {
+    border-color: var(--warning-color) !important;
+    color: var(--warning-color) !important;
+}
+.layui-border-red {
+    border-color: var(--danger-color) !important;
+    color: var(--danger-color) !important;
+}
+.layui-border-black {
+    border-color: var(--black-color) !important;
+    color: var(--black-color) !important;
+}
 
 .layui-badge {
     font-size: 12px !important;

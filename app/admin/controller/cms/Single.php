@@ -2,20 +2,37 @@
 
 namespace app\admin\controller\cms;
 
+use Throwable;
+use think\Exception;
+
 class Single extends Base
 {
     /**
      * 模型ID
      * @var string
      */
-    protected int $mcode = 0;
+    protected $mcode = 0;
+
+    /**
+     * @var \app\admin\model\cms\Extfield
+     */
+    protected $extfieldModel;
+
+    /**
+    * Contentext模型对象
+    * @var \app\admin\model\cms\ContentExt
+    */
+    protected $contentExtModel;
 
     public function initialize(): void
     {
         parent::initialize();
         $this->model = new \app\admin\model\cms\Content();
         $this->mcode = $this->request->param('mcode') ?? 0;
+        $this->contentExtModel = new \app\admin\model\cms\ContentExt();
+        $this->extfieldModel = new \app\admin\model\cms\Extfield();
         $this->assign('mcode', $this->mcode);
+        $this->view->assign('custom_fields', $this->extfieldModel->getModelFields($this->mcode));
     }
 
     public function index()
@@ -64,5 +81,91 @@ class Single extends Base
             ->order($sort, $order)
             ->paginate($limit);
         $this->result('', $res->items(), $res->total());
+    }
+
+    public function edit()
+    {
+        $ids = $this->request->param('ids/d');
+        $row = $this->model->find($ids);
+        if (!$row) {
+            $this->error(__('Record not found'));
+        }
+
+        /* 获取扩展数据 */
+        $extRow = $this->contentExtModel->where('contentid', $row['id'])->find();
+        if ($extRow) {
+            /* 合并数据 */
+            $extRowArr = $extRow->toArray();
+            $extRowArr = $this->contentExtModel->formatValue($this->mcode, $extRowArr);
+            $row->appendData($extRowArr);
+        }
+
+        $dataLimitAdminIds = $this->getDataLimitAdminIds();
+        if ($dataLimitAdminIds && !in_array($row[$this->dataLimitField], $dataLimitAdminIds)) {
+            $this->error(__('You have no permission'));
+        }
+
+        if ($this->request->isPost()) {
+            $data = $this->getPostData('row/a');
+            $data['filename'] ?? $data['filename'] = $row['filename'];
+            $data['description'] ?? $data['description'] = $row['description'];
+            $data['ico'] ?? $data['ico'] = $row['ico'];
+            $data['scode'] ?? $data['scode'] = $row['scode'];
+            $data['title'] ?? $data['title'] = $row['title'];
+            $data['content'] = $this->request->param('content', $row['content'], 'clean_xss');
+            $data['update_user'] = $this->auth->username;
+            $result = false;
+            $this->model->startTrans();
+            try {
+                $data['id'] = $row['id'];
+                $this->modelValidateFunction($data);
+
+                if ($data['filename'] && ! preg_match('/^[a-zA-Z0-9\-_\/]+$/', $data['filename'])) {
+                    throw new Exception(__('URL name only allows letters, numbers, lines, underscores'));
+                }
+
+                // 自动提起前一百个字符为描述
+                if (! $data['description'] && isset($data['content'])) {
+                    $data['description'] = escape_string(clear_html_blank(substr_both(strip_tags($data['content']), 0, 150)));
+                }
+
+                // 无缩略图时，自动提取文章第一张图为缩略图
+                if (! $data['ico'] && preg_match('/<img\s+.*?src=\s?[\'|\"](.*?(\.gif|\.jpg|\.png|\.jpeg))[\'|\"].*?[\/]?>/i', decode_string($data['content']), $srcs) && isset($srcs[1])) {
+                    $data['ico'] = $srcs[1];
+                }
+
+                // 检查自定义URL名称
+                if ($data['filename']) {
+                    while ($this->model->checkFilename($data['filename'])) {
+                        $data['filename'] = $data['filename'] . '-' . mt_rand(1, 20);
+                    }
+                }
+
+                $result = $row->save($data);
+                /* 添加扩展数据 */
+                $extdata = $this->contentExtModel->getExtData($data);
+                $extdata['contentid'] = $row['id'];
+
+                if ($extRow) {
+                    $extRow->save($extdata);
+                } else {
+                    $this->contentExtModel->save($extdata);
+                }
+
+                $this->model->commit();
+            } catch (Throwable $e) {
+                $this->model->rollback();
+                $this->error($e->getMessage());
+            }
+            if ($result !== false) {
+                $this->success(__('Update successful'));
+            } else {
+                $this->error(__('No rows updated'));
+            }
+        }
+
+        $this->view->assign('custom_fields', $this->extfieldModel->getModelFields($this->mcode));
+        $this->assign('row', $row);
+        return $this->view->fetch();
     }
 }

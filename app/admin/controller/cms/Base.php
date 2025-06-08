@@ -12,6 +12,7 @@
 
 namespace app\admin\controller\cms;
 
+use app\admin\model\cms\Area;
 use app\common\controller\Backend;
 
 class Base extends Backend
@@ -25,8 +26,38 @@ class Base extends Backend
     public function initialize()
     {
         parent::initialize();
+        $areaModel = new Area();
+        $areaList = $areaModel->areaList();
+        $acode = get_backend_lang();
+        $this->assign('acode', $acode);
+        $this->assign('alist', $areaList);
 
-        $this->assign('acode', get_backend_lang());
+        $currentArea = array_filter($areaList, function ($item) use ($acode) {
+            return $item['acode'] == $acode;
+        });
+        $currentArea = reset($currentArea);
+        if (!$currentArea) {
+            $currentArea = $areaModel->defaultArea();
+            set_backend_lang($currentArea['acode']);
+        }
+        $this->assign('area_title', $currentArea['name']);
+        $this->assignconfig('acode', $acode);
+        $this->assignconfig('alist', $areaList);
+    }
+
+    /**
+     * 切换语言
+     */
+    public function changelang()
+    {
+        $areaModel = new Area();
+        $areaList = $areaModel->areaList();
+        $acode = $this->request->post('acode');
+        if (!in_array($acode, array_column($areaList, 'acode'))) {
+            $this->error(__('Invalid parameters'));
+        }
+        set_backend_lang($acode);
+        $this->success('切换语言成功', '', get_backend_lang());
     }
 
     /**
