@@ -80,4 +80,5 @@ return [
     'Copy successful'                                       => '复制成功',
     'Move successful'                                       => '移动成功',
     'Invalid parameters'                                    => '参数错误',
+    'Create user'                                           => '创建人'
 ];

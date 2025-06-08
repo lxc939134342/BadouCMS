@@ -21,12 +21,9 @@ class Area extends Base
 {
     /**
      * Area模型对象
-     * @var object
-     * @phpstan-var \app\admin\model\cms\Area
+     * @var \app\admin\model\cms\Area
      */
-    protected object $model;
-
-    protected array|string $preExcludeFields = ['id', 'create_time', 'update_time'];
+    protected $model;
 
     protected string|array $quickSearchField = ['id'];
 
@@ -34,20 +31,16 @@ class Area extends Base
      * 默认排序
      * @var string|array
      */
-    protected string|array $defaultSortField = ['is_default' => 'desc','id' => 'asc'];
-
-    protected array $noNeedPermission = ['get_langs'];
-
     public function initialize(): void
     {
         parent::initialize();
         $this->model = new \app\admin\model\cms\Area();
     }
 
-    public function add(): void
+    public function add()
     {
         if ($this->request->isPost()) {
-            $data = $this->getPostData();
+            $data = $this->getPostData('row/a');
 
             // 构建数据
             $default = [
@@ -71,12 +64,12 @@ class Area extends Base
                 $this->error($e->getMessage());
             }
             if ($result !== false) {
-                $this->success(__('Added successfully'));
+                $this->success(__('Added successful'));
             } else {
                 $this->error(__('No rows were added'));
             }
         }
 
-        $this->error(__('Parameter error'));
+        return $this->fetch();
     }
 }
