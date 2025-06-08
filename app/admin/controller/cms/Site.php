@@ -28,7 +28,6 @@ class Site extends Base
 
     protected array|string $preExcludeFields = ['id'];
 
-    protected string|array $quickSearchField = ['id'];
 
     public function initialize(): void
     {
@@ -44,7 +43,7 @@ class Site extends Base
         $config      = $this->model->where('acode', get_backend_lang())->find();
 
         if (!$config) {
-            $columns = TableManager::getTableColumns('cms_company', false, 'mysql');
+            $columns = TableManager::getTableColumns('cms_site', false, 'mysql');
             foreach ($columns as $key => $value) {
                 $config[$key] = '';
             }

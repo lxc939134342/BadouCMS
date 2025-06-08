@@ -287,6 +287,9 @@
 .layui-font-green {
     color: #1db369 !important;
 }
+.layui-font-bule {
+    color: var(--blue-color) !important;
+}
 .layui-border-blue {
     border-color: var(--blue-color) !important;
     color: var(--blue-color) !important;

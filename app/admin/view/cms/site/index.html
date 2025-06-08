@@ -2,163 +2,176 @@
 
 <script src="__CDN__/assets/cms/js/change_lang.js"></script>
 <style>
-    #tabsHeader .test-item {
-        display: none;
-    }
-    .layui-form-label{
+    .layui-form-label {
         width: 120px;
     }
-    .layui-input-block{
+    .layui-input-block {
         margin-left: 150px;
     }
 </style>
 <div class="layui-card">
     <div class="layui-card-body">
-        <div class="layui-btn-container" id="tabsHeader">
+        <div class="layui-btn-container">
+            <a href="javascript:;" class="layui-btn btn-refresh layui-bg-black">
+                <i class="fa fa-refresh"></i>
+            </a>
             <button class="layui-btn layui-btn-primary layui-border-black" id="changeLang">
                 <span class="lang-title">{$area_title}</span>
                 <i class="layui-icon layui-icon-down layui-font-12"></i>
             </button>
-            <button class="layui-btn layui-btn-primary">站点配置</button>
         </div>
-        <div class="layui-panel layui-padding-3" id="tabsBody">
-            <form class="layui-form" action="{:url('cms.site/edit')}" method="post">
-                {:token_field()}
-                <div class="layui-form-item">
-                    <label class="layui-form-label">站点标题</label>
-                    <div class="layui-input-block">
-                        <input
-                            type="text"
-                            name="row[title]"
-                            value="{$row.title}"
-                            placeholder="请输入站点标题"
-                            autocomplete="off"
-                            class="layui-input" />
-                    </div>
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">站点副标题</label>
-                    <div class="layui-input-block">
-                        <input
-                            type="text"
-                            name="row[subtitle]"
-                            value="{$row.subtitle}"
-                            placeholder="请输入站点副标题"
-                            autocomplete="off"
-                            class="layui-input" />
-                    </div>
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">站点地址</label>
-                    <div class="layui-input-block">
-                        <input
-                            type="text"
-                            name="row[domain]"
-                            value="{$row.domain}"
-                            placeholder="请输入站点地址"
-                            autocomplete="off"
-                            class="layui-input" />
-                    </div>
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">站点LOGO地址</label>
-                    <div class="layui-input-block">
-                        <input type="text" id="c-logo" name="row[logo]" class="layui-input" value="{$row.logo}" />
-                        <div class="layui-input-suffix" style="width: 30%">
-                            <button
-                                type="button"
-                                data-input-id="c-logo"
-                                data-preview-id="p-logo"
-                                class="layui-btn btn-bdupload">
-                                <i class="fa fa-upload"></i>
-                                上传
-                            </button>
-                            <button
-                                type="button"
-                                data-input-id="c-logo"
-                                class="layui-btn layui-bg-green btn-bdchoose">
-                                <i class="fa fa-list"></i>
-                                选择
-                            </button>
+        <div class="layui-tabs layui-tabs-card" lay-options="{index: 0}">
+            <ul class="layui-tabs-header">
+                <li class="layui-font-bule">站点配置</li>
+            </ul>
+            <div class="layui-tabs-body">
+                <div class="layui-tabs-item">
+                    <form class="layui-form" action="{:url('cms.site/edit')}" method="post">
+                        {:token_field()}
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">站点标题</label>
+                            <div class="layui-input-block">
+                                <input
+                                    type="text"
+                                    name="row[title]"
+                                    value="{$row.title}"
+                                    placeholder="请输入站点标题"
+                                    autocomplete="off"
+                                    class="layui-input" />
+                            </div>
                         </div>
-                        <div class="layui-upload-list" id="p-logo"></div>
-                    </div>
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">站点关键字</label>
-                    <div class="layui-input-block">
-                        <input
-                            type="text"
-                            name="row[keywords]"
-                            value="{$row.keywords}"
-                            placeholder="请输入站点关键字"
-                            autocomplete="off"
-                            class="layui-input" />
-                    </div>
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">站点描述</label>
-                    <div class="layui-input-block">
-                        <textarea name="row[description]" class="layui-textarea" id="c-description">{$row.description}</textarea>
-                    </div>
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">站点备案</label>
-                    <div class="layui-input-block">
-                        <input
-                            type="text"
-                            name="row[icp]"
-                            value="{$row.icp}"
-                            placeholder="请输入站点备案"
-                            autocomplete="off"
-                            class="layui-input" />
-                    </div>
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">站点主题</label>
-                    <div class="layui-input-block">
-                        <input
-                            type="text"
-                            name="row[theme]"
-                            value="{$row.theme}"
-                            placeholder="请输入站点主题"
-                            autocomplete="off"
-                            class="layui-input" />
-                    </div>
-                </div>
-                <div class="layui-form-item">
-                    <label class="layui-form-label">站点统计码</label>
-                    <div class="layui-input-block">
-                        <input
-                            type="text"
-                            name="row[statistical]"
-                            value="{$row.statistical}"
-                            placeholder="请输入站点统计码"
-                            autocomplete="off"
-                            class="layui-input" />
-                    </div>
-                </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">站点副标题</label>
+                            <div class="layui-input-block">
+                                <input
+                                    type="text"
+                                    name="row[subtitle]"
+                                    value="{$row.subtitle}"
+                                    placeholder="请输入站点副标题"
+                                    autocomplete="off"
+                                    class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">站点地址</label>
+                            <div class="layui-input-block">
+                                <input
+                                    type="text"
+                                    name="row[domain]"
+                                    value="{$row.domain}"
+                                    placeholder="请输入站点地址"
+                                    autocomplete="off"
+                                    class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">站点LOGO地址</label>
+                            <div class="layui-input-block">
+                                <input
+                                    type="text"
+                                    id="c-logo"
+                                    name="row[logo]"
+                                    class="layui-input"
+                                    value="{$row.logo}" />
+                                <div class="layui-input-suffix" style="width: 30%">
+                                    <button
+                                        type="button"
+                                        data-input-id="c-logo"
+                                        data-preview-id="p-logo"
+                                        class="layui-btn btn-bdupload">
+                                        <i class="fa fa-upload"></i>
+                                        上传
+                                    </button>
+                                    <button
+                                        type="button"
+                                        data-input-id="c-logo"
+                                        class="layui-btn layui-bg-green btn-bdchoose">
+                                        <i class="fa fa-list"></i>
+                                        选择
+                                    </button>
+                                </div>
+                                <div class="layui-upload-list" id="p-logo"></div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">站点关键字</label>
+                            <div class="layui-input-block">
+                                <input
+                                    type="text"
+                                    name="row[keywords]"
+                                    value="{$row.keywords}"
+                                    placeholder="请输入站点关键字"
+                                    autocomplete="off"
+                                    class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">站点描述</label>
+                            <div class="layui-input-block">
+                                <textarea name="row[description]" class="layui-textarea" id="c-description">
+{$row.description}</textarea
+                                >
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">站点备案</label>
+                            <div class="layui-input-block">
+                                <input
+                                    type="text"
+                                    name="row[icp]"
+                                    value="{$row.icp}"
+                                    placeholder="请输入站点备案"
+                                    autocomplete="off"
+                                    class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">站点主题</label>
+                            <div class="layui-input-block">
+                                <input
+                                    type="text"
+                                    name="row[theme]"
+                                    value="{$row.theme}"
+                                    placeholder="请输入站点主题"
+                                    autocomplete="off"
+                                    class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">站点统计码</label>
+                            <div class="layui-input-block">
+                                <input
+                                    type="text"
+                                    name="row[statistical]"
+                                    value="{$row.statistical}"
+                                    placeholder="请输入站点统计码"
+                                    autocomplete="off"
+                                    class="layui-input" />
+                            </div>
+                        </div>
 
-                <div class="layui-form-item">
-                    <label class="layui-form-label">版权信息</label>
-                    <div class="layui-input-block">
-                        <input
-                            type="text"
-                            name="row[copyright]"
-                            value="{$row.copyright}"
-                            placeholder="请输入版权信息"
-                            autocomplete="off"
-                            class="layui-input" />
-                    </div>
-                </div>
+                        <div class="layui-form-item">
+                            <label class="layui-form-label">版权信息</label>
+                            <div class="layui-input-block">
+                                <input
+                                    type="text"
+                                    name="row[copyright]"
+                                    value="{$row.copyright}"
+                                    placeholder="请输入版权信息"
+                                    autocomplete="off"
+                                    class="layui-input" />
+                            </div>
+                        </div>
 
-                <div class="layui-form-item">
-                    <div class="layui-input-block">
-                        <button class="layui-btn btn-theme-color" lay-submit>保存</button>
-                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
-                    </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <button class="layui-btn btn-theme-color" lay-submit>保存</button>
+                                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
@@ -167,16 +180,14 @@
     layui.use(["badou", "changeLang"], function () {
         var bdForm = layui.bdForm;
         var changeLang = layui.changeLang;
-        var tabs = layui.tabs;
-
-        changeLang({});
-        bdForm.api.bindevent($("form.layui-form"));
-
-        // 给任意元素绑定 Tab 功能
-        tabs.render({
-            elem: "#demoTabs3",
-            header: ["#tabsHeader", ">button"],
-            body: ["#tabsBody", ">.test-item"],
+        changeLang({
+            click: function (obj) {
+                top.$(".refresh").trigger("click");
+            },
         });
+        $(".btn-refresh").on("click", function () {
+            top.$(".refresh").trigger("click");
+        });
+        bdForm.api.bindevent($("form.layui-form"));
     });
 </script>
