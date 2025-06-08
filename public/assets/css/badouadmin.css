@@ -1,7 +1,7 @@
 :root {
     --primary-color: #ff6c02;
     --success-color: #61c032;
-    --warning-color: #e6a23c;
+    --warning-color: #ffaf00;
     --danger-color: #f56c6c;
     --info-color: #909399;
     --blue-color: #4e73df;
@@ -268,6 +268,15 @@
 }
 .layui-bg-green {
     background-color: var(--success-color) !important;
+}
+.layui-bg-blue {
+    background-color: var(--blue-color) !important;
+}
+.layui-bg-orange {
+    background-color: var(--warning-color) !important;
+}
+.layui-bg-red {
+    background-color: var(--danger-color) !important;
 }
 .layui-bg-blue {
     background-color: var(--blue-color) !important;

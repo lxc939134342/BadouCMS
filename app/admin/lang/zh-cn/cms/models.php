@@ -7,4 +7,5 @@ return [
     'Contenttpl'                     => '内容页模板',
     'System model cannot be deleted' => '系统模型不允许删除',
     'Content'                        => '内容',
+    'Field management'               => '字段管理'
 ];
