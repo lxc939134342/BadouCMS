@@ -211,12 +211,6 @@ class Content extends Base
             $this->error(__('Record not found'));
         }
 
-        if (!$this->isAjax()) {
-            $this->view->assign('custom_fields', $this->extfieldModel->getModelFields($this->mcode));
-            $this->assign('row', $row);
-            return $this->view->fetch();
-        }
-
         /* 获取扩展数据 */
         $extRow = $this->contentExtModel->where('contentid', $row['id'])->find();
         if ($extRow) {
@@ -289,6 +283,10 @@ class Content extends Base
                 $this->error(__('No rows updated'));
             }
         }
+
+        $this->view->assign('custom_fields', $this->extfieldModel->getModelFields($this->mcode));
+        $this->assign('row', $row);
+        return $this->view->fetch();
     }
 
     /**

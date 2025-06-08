@@ -256,6 +256,9 @@ layui.define(['bdHttp'], function (exports) {
                         }
                         ]
                     }
+                    if (!$(this).val()) {
+                        options.value = new Date();
+                    }
                     layui.laydate.render(options);
                 });
             }
