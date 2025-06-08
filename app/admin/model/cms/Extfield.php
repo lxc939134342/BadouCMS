@@ -36,7 +36,7 @@ class Extfield extends Model
         if (!$data['value']) {
             return [];
         }
-        $value = explode(',', $data['value']);
+        $value = preg_split('/\s*[,，\r\n]+\s*/', $data['value'], -1, PREG_SPLIT_NO_EMPTY);
         $data = [];
         foreach ($value as $item) {
             $data[$item] = $item;
@@ -48,16 +48,16 @@ class Extfield extends Model
     public function typeList(): array
     {
         $options = [
-            '1'  => ['text' => '单行文本', 'designType' => 'string', 'type' => 'string', 'limit' => 100, 'default' => ''],
-            '2'  => ['text' => '多行文本', 'designType' => 'textarea', 'type' => 'string', 'limit' => 1000, 'default' => ''],
-            '3'  => ['text' => '单选按钮', 'designType' => 'radio', 'type' => 'string', 'limit' => 255, 'default' => ''],
-            '4'  => ['text' => '多选按钮', 'designType' => 'checkbox', 'type' => 'string', 'limit' => 255, 'default' => ''],
-            '5'  => ['text' => '单图上传', 'designType' => 'image', 'type' => 'string', 'limit' => 255, 'default' => ''],
-            '10' => ['text' => '多图上传', 'designType' => 'images', 'type' => 'string', 'limit' => 1000, 'default' => ''],
-            '6'  => ['text' => '附件上传', 'designType' => 'files', 'type' => 'string', 'limit' => 255, 'default' => ''],
-            '7'  => ['text' => '日期选择', 'designType' => 'datetime', 'type' => 'datetime', 'limit' => 0, 'default' => null],
-            '8'  => ['text' => '编辑器', 'designType' => 'editor', 'type' => 'text', 'limit' => 0, 'default' => ''],
-            '9'  => ['text' => '下拉选择', 'designType' => 'select', 'type' => 'string', 'limit' => 255, 'default' => '']
+            '1'  => ['text' => '单行文本', 'inputType' => 'string', 'type' => 'string', 'limit' => 100, 'default' => ''],
+            '2'  => ['text' => '多行文本', 'inputType' => 'textarea', 'type' => 'string', 'limit' => 1000, 'default' => ''],
+            '3'  => ['text' => '单选按钮', 'inputType' => 'radio', 'type' => 'string', 'limit' => 255, 'default' => ''],
+            '4'  => ['text' => '多选按钮', 'inputType' => 'checkbox', 'type' => 'string', 'limit' => 255, 'default' => ''],
+            '5'  => ['text' => '单图上传', 'inputType' => 'image', 'type' => 'string', 'limit' => 255, 'default' => ''],
+            '10' => ['text' => '多图上传', 'inputType' => 'images', 'type' => 'string', 'limit' => 1000, 'default' => ''],
+            '6'  => ['text' => '附件上传', 'inputType' => 'files', 'type' => 'string', 'limit' => 255, 'default' => ''],
+            '7'  => ['text' => '日期选择', 'inputType' => 'datetime', 'type' => 'datetime', 'limit' => 0, 'default' => null],
+            '8'  => ['text' => '编辑器', 'inputType' => 'editor', 'type' => 'text', 'limit' => 0, 'default' => ''],
+            '9'  => ['text' => '下拉选择', 'inputType' => 'select', 'type' => 'string', 'limit' => 255, 'default' => '']
         ];
 
         return $options;
@@ -80,7 +80,7 @@ class Extfield extends Model
         $map = [];
         $list = $this->typeList();
         foreach ($list as $key => $value) {
-            $map[$key] = $value['designType'];
+            $map[$key] = $value['inputType'];
         }
         return $map;
     }

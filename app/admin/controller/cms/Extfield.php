@@ -40,14 +40,4 @@ class Extfield extends Base
         $this->assignconfig('models', $list);
         $this->assignconfig('typeText', $typeText);
     }
-
-    /**
-     * 根据模型获取字段列表
-     * @return void
-     */
-    public function getModelFields(int $mcode): void
-    {
-        $res = $this->model->getModelFields($mcode);
-        $this->success('', $res);
-    }
 }

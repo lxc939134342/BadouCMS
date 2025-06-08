@@ -24,11 +24,17 @@ class Content extends Base
     /**
      * Contentext模型对象
      * @var \app\admin\model\cms\ContentExt
-     * @phpstan-var \app\admin\model\cms\ContentExt
      */
-    protected object $contentExtModel;
+    protected $contentExtModel;
 
-    protected string|array $quickSearchField = ['id','title'];
+    /**
+     * @var \app\admin\model\cms\Extfield
+     */
+    protected $extfieldModel;
+
+    protected $weighField = 'sorting';
+
+    protected $quickSearchField = ['id','title'];
 
     /**
      * 模型ID
@@ -41,6 +47,7 @@ class Content extends Base
         parent::initialize();
         $this->model = new \app\admin\model\cms\Content();
         $this->contentExtModel = new \app\admin\model\cms\ContentExt();
+        $this->extfieldModel = new \app\admin\model\cms\Extfield();
         $this->mcode = $this->request->param('mcode') ?? 0;
         $this->assign('mcode', $this->mcode);
 
@@ -100,6 +107,7 @@ class Content extends Base
     public function add()
     {
         if (!$this->isAjax()) {
+            $this->view->assign('custom_fields', $this->extfieldModel->getModelFields($this->mcode));
             return $this->view->fetch();
         }
         $data = $this->getPostData('row/a');
@@ -204,9 +212,11 @@ class Content extends Base
         }
 
         if (!$this->isAjax()) {
+            $this->view->assign('custom_fields', $this->extfieldModel->getModelFields($this->mcode));
             $this->assign('row', $row);
             return $this->view->fetch();
         }
+
         /* 获取扩展数据 */
         $extRow = $this->contentExtModel->where('contentid', $row['id'])->find();
         if ($extRow) {
@@ -222,7 +232,7 @@ class Content extends Base
         }
 
         if ($this->request->isPost()) {
-            $post = $this->getPostData('row/a');
+            $data = $this->getPostData('row/a');
             $data['filename'] ?? $data['filename'] = $row['filename'];
             $data['description'] ?? $data['description'] = $row['description'];
             $data['ico'] ?? $data['ico'] = $row['ico'];
