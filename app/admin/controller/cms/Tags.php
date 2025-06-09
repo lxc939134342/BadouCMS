@@ -13,26 +13,26 @@
 namespace app\admin\controller\cms;
 
 /**
- * 轮播图片
+ * 文章内链
  */
-class Slide extends Base
+class Tags extends Base
 {
     /**
-     * Slide模型对象
-     * @var \app\admin\model\cms\Slide
+     * Tags模型对象
+     * @var  \app\admin\model\cms\Tags
      */
     protected $model;
-
-
-    protected string $weighField = 'sorting';
 
     public function initialize(): void
     {
         parent::initialize();
-        $this->model = new \app\admin\model\cms\Slide();
-        $this->assign('gidList', $this->model->getGidList(get_backend_lang()));
+        $this->model = new \app\admin\model\cms\Tags();
     }
 
+
+    /**
+     * 若需重写查看、编辑、删除等方法，请复制 @see \app\admin\library\traits\Backend 中对应的方法至此进行重写
+     */
     public function index()
     {
         if (!$this->request->isAjax()) {
@@ -54,36 +54,18 @@ class Slide extends Base
             ->paginate($limit);
         $this->result('', $res->items(), $res->total());
     }
-
     /**
      * 添加
      */
     public function add()
     {
         if ($this->request->isPost()) {
-            $post = $this->getPostData('row/a', true);
-            // 构建数据
-            $default = [
-               'acode' => get_backend_lang(),
-               'gid' => 0,
-               'pic' => '',
-               'link' => '',
-               'title' => '',
-               'subtitle' => '',
-               'sorting' => 255,
-               'create_user' => $this->auth->username,
-               'update_user' => $this->auth->username
-            ];
-            $post = array_merge($default, $post);
+            $post = $this->getOriginalInputData('row/a');
+            $post['acode'] = get_backend_lang();
+            $post['create_user'] = $this->auth->username;
+            $post['update_user'] = $this->auth->username;
 
-            $slideModel = $this->model;
-            if ($this->request->post('gid') == 0) {
-                $gid = $slideModel->where('acode', get_backend_lang())->order('gid', 'desc')->value('gid');
-                $post['gid'] = $gid + 1;
-            }
-            $newPost['row'] = $post;
-            $this->request->withPost($newPost);
-
+            $this->request->withPost(['row' => $post]);
             parent::add();
         }
         return $this->view->fetch();
