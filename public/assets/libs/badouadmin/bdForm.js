@@ -31,7 +31,8 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'co
                     return;
                 var submitBtn = $("[lay-submit]", layform),
                     filter = submitBtn.attr('lay-filter');
-
+                console.log(layform);
+                console.log(filter);
                 $(".layer-footer [lay-submit],.fixed-footer [lay-submit],.normal-footer [lay-submit]", layform).removeClass("disabled");
                 //验证通过提交表单
                 form.on('submit(' + filter + ')', function (data) {
