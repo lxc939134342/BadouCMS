@@ -25,12 +25,22 @@ class MemberComment extends Backend
      */
     protected $model;
 
-    protected string|array $quickSearchField = ['id'];
+
     public function initialize(): void
     {
         parent::initialize();
         $this->model = new \app\admin\model\cms\MemberComment();
-
+        $this->withJoinTable = [
+            'content' => function ($query) {
+                $query->field('title');
+            },
+            'user' => function ($query) {
+                $query->field('user.nickname');
+            },
+            'puser' => function ($query) {
+                $query->field('puser.nickname');
+            },
+        ];
     }
 
     public function index()
@@ -47,23 +57,28 @@ class MemberComment extends Backend
         $where[] = [
             'acode','=',get_backend_lang()
         ];
-        $withJoinTable = [
-            'content' => function ($query) {
-                $query->field('title');
-            },
-            'user' => function ($query) {
-                $query->field('user.nickname');
-            },
-            'puser' => function ($query) {
-                $query->field('puser.nickname');
-            },
-        ];
+
         $res = $this->model
-            ->withJoin($withJoinTable, 'LEFT')
+            ->alias($alias)
+            ->withJoin($this->withJoinTable, $this->withJoinType)
             ->where($where)
             ->order($sort, $order)
             ->paginate($limit);
         $this->result('', $res->items(), $res->total());
+    }
+
+    public function info($ids = null)
+    {
+        $row = $this->model
+            ->alias('member_comment')
+            ->withJoin($this->withJoinTable, $this->withJoinType)
+            ->where('member_comment.id', 'in', $ids)
+            ->find();
+        if (!$row) {
+            $this->error(__('Record not found'));
+        }
+        $this->view->assign('row', $row);
+        return $this->view->fetch();
     }
 
     /**

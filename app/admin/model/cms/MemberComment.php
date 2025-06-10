@@ -57,6 +57,6 @@ class MemberComment extends Model
 
     public function getStatusTextAttr($value, $data)
     {
-        return $data['status'] == 1 ? __('show') : __('hide');
+        return $data['status'] == 1 ? __('Show') : __('Hide');
     }
 }

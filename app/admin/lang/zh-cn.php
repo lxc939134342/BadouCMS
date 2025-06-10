@@ -82,4 +82,7 @@ return [
     'Invalid parameters'                                    => '参数错误',
     'Create user'                                           => '创建人',
     'Update user'                                           => '更新人',
+    'Info'                                                  => '详情',
+    'Show'                                                  => '显示',
+    'Hide'                                                  => '隐藏',
 ];

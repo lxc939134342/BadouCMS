@@ -15,7 +15,9 @@
     <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	">
         <i class="fa fa-refresh"></i>
     </a>
-    <button class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('cms.membercomment/del')?'':'hide'}" lay-event="del">
+    <button
+        class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('cms.membercomment/del')?'':'hide'}"
+        lay-event="del">
         <i class="fa fa-trash"></i>
         {:__('Del')}
     </button>
@@ -47,15 +49,27 @@
                 [
                     { type: "checkbox" },
                     { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "content.title", title: __("title")},
+                    { field: "content.title", title: __("title") },
                     {
                         field: "comment",
                         title: __("Comment"),
                         width: 250,
                     },
                     { field: "user.nickname", title: __("Nickname"), width: 250 },
-                    { field: "status", title: __("Status"), width: 180,templet: bdTable.api.formatter.switch },
-                    { title: __("Operate"), align: "center", templet: bdTable.api.formatter.operate },
+                    { field: "status", title: __("Status"), width: 180, templet: bdTable.api.formatter.switch },
+                    {
+                        title: __("Operate"),
+                        align: "center",
+                        templet: bdTable.api.formatter.operate,
+                        buttons: [
+                            {
+                                text: __("Info"),
+                                icon: "fa fa-search-plus",
+                                url: "cms.membercomment/info",
+                                classname: "layui-btn layui-btn-sm btn-dialog",
+                            },
+                        ],
+                    },
                 ],
             ],
         });
