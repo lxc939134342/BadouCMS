@@ -21,18 +21,13 @@ class FormData extends Base
 {
     /**
      * FormData模型对象
-     * @var object
-     * @phpstan-var \app\admin\model\cms\FormData
+     * @var \app\admin\model\cms\FormData
      */
-    protected object $model;
+    protected $model;
 
-    protected object $formModel;
+    protected $formModel;
 
-    protected array|string $preExcludeFields = ['id', 'create_time'];
-
-    protected string|array $quickSearchField = ['id'];
-
-    protected int $fcode;
+    protected $fcode;
 
     public function initialize(): void
     {
@@ -52,7 +47,7 @@ class FormData extends Base
             $this->select();
         }
 
-        list($where, $alias, $limit, $order) = $this->queryBuilder();
+        list($where, $alias, $limit, $order) = $this->buildparams();
         $get = $this->request->get();
         $form =  $this->formModel->where('fcode', $get['fcode'])->find();
         /* 表单不存在 */

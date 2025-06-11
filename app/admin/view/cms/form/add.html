@@ -1,39 +1,30 @@
 {layout name="layout/form" /}
+
 <form class="layui-form" method="post">
     {:token_field()}
 
     <div class="layui-form-item">
-        <label class="layui-form-label">名称</label>
+        <label class="layui-form-label">表单名称</label>
         <div class="layui-input-block">
             <input
                 type="text"
-                name="row[name]"
+                name="row[form_name]"
                 value=""
                 lay-verify="required"
-                placeholder="请输入名称"
+                placeholder="请输入表单名称"
                 autocomplete="off"
                 class="layui-input" />
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">字段类型</label>
-        <div class="layui-input-block">
-            <select name="row[type]" id="c-type">
-                {volist name="typeText" id="vo"}
-                <option value="{$key}">{$vo}</option>
-                {/volist}
-            </select>
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">字段描述</label>
+        <label class="layui-form-label">表名称</label>
         <div class="layui-input-block">
             <input
                 type="text"
-                name="row[description]"
+                name="row[table_name]"
                 value=""
                 lay-verify="required"
-                placeholder="请输入字段描述"
+                placeholder="请输入表名称"
                 autocomplete="off"
                 class="layui-input" />
         </div>

@@ -44,144 +44,46 @@ class Form extends Base
         $this->formFieldModel = new \app\admin\model\cms\FormField();
     }
 
-    /**
-     * 添加
-     * @return void
-     */
-    public function add(): void
+    public function add()
     {
-        $formModel = $this->model;
-        if ($this->request->isPost()) {
-            $post = $this->getOriginalInputData();
-
-            $post['create_user'] = $this->auth->username;
-            $post['update_user'] = $this->auth->username;
-
-            if (empty($this->request->post('fcode'))) {
-                $fcode = $formModel->order('fcode', 'desc')->value('fcode');
-                $post['fcode'] = $fcode + 1;
-            }
-            // 获取数据库配置的表前缀
-            $dbPrefix = config('database.connections.mysql.prefix').'cms_diy_';
-            $table_name = $this->request->post('table_name');
-            if (strpos($table_name, $dbPrefix) !== 0) {
-                $table_name = $dbPrefix . $table_name;
-            }
-            $post['table_name'] = $table_name;
-            $this->request->withPost($post);
-
-            $table = [
-                "name" => $table_name,
-                "comment" => $this->request->post('form_name'),
-                "isCommonModel" => 0,
-                "databaseConnection" => 'mysql',
-                "rebuild" => 'Yes',
-            ];
-            $fields  = [
-                [
-                    "name" => "id",
-                    "type" => "int",
-                    "dataType" => "int(10)",
-                    "default" => "",
-                    "defaultType" => "NONE",
-                    "null" => false,
-                    "primaryKey" => true,
-                    "unsigned" => true,
-                    "autoIncrement" => true,
-                    "comment" => "",
-                    "designType" => "pk",
-                ],
-                [
-                    "name" => "acode",
-                    "type" => "varchar",
-                    "dataType" => "varchar(20)",
-                    "default" => "",
-                    "defaultType" => "NONE",
-                    "null" => false,
-                    "primaryKey" => false,
-                    "unsigned" => false,
-                    "autoIncrement" => false,
-                    "comment" => "区域编码",
-                    "designType" => "string",
-                ],
-                [
-                    "name" => "create_time",
-                    "type" => "datetime",
-                    "dataType" => "datetime",
-                    "default" => "",
-                    "defaultType" => "NONE",
-                    "null" => false,
-                    "primaryKey" => false,
-                    "unsigned" => false,
-                    "autoIncrement" => false,
-                    "comment" => "",
-                    "designType" => "timestamp",
-                ],
-            ];
-
-            try {
-                // Helper::handleTableDesign($table, $fields);
-            } catch (Exception $e) {
-                $this->error($e->getMessage());
-            } catch (Throwable $e) {
-                $this->error($e->getMessage());
-            }
-
-            parent::add();
+        if (!$this->isAjax()) {
+            return $this->view->fetch();
+        }
+        $data = $this->request->post('row/a');
+        $data['create_user'] = $this->auth->nickname;
+        $data['update_user'] = $this->auth->nickname;
+        if (!$data) {
+            $this->error(__('Parameter %s can not be empty', ['']));
         }
 
-    }
-
-
-    /**
-     * 删除
-     * @param array $ids
-     * @throws Throwable
-     */
-    public function del(array $ids = []): void
-    {
-        if (!$this->request->isDelete() || !$ids) {
-            $this->error(__('Parameter error'));
+        $data = $this->preExcludeFields($data);
+        if ($this->dataLimit && $this->dataLimitFieldAutoFill) {
+            $data[$this->dataLimitField] = $this->auth->id;
         }
 
-        $where             = [];
-        $dataLimitAdminIds = $this->getDataLimitAdminIds();
-        if ($dataLimitAdminIds) {
-            $where[] = [$this->dataLimitField, 'in', $dataLimitAdminIds];
-        }
-
-        $pk      = $this->model->getPk();
-        $where[] = [$pk, 'in', $ids];
-
-        $count = 0;
-        $data  = $this->model->where($where)->select();
+        $result = false;
         $this->model->startTrans();
         try {
-            foreach ($data as $v) {
-
-                $count += $v->delete();
-
-                $tempLine = 'drop table '.$v['table_name'].';';
-                try {
-                    Db::execute($tempLine);
-                } catch (PDOException) {
-                    // $e->getMessage();
+            // 模型验证
+            if ($this->modelValidate) {
+                $validate = str_replace("\\model\\", "\\validate\\", get_class($this->model));
+                if (class_exists($validate)) {
+                    $validate = new $validate();
+                    if ($this->modelSceneValidate) {
+                        $validate->scene('add');
+                    }
+                    $validate->check($data);
                 }
-
-                //删除对应 表 多个字段
-                $this->formFieldModel->where('fcode', $v['fcode'])->delete();
             }
+            $result = $this->model->save($data);
             $this->model->commit();
         } catch (Throwable $e) {
             $this->model->rollback();
             $this->error($e->getMessage());
         }
-        if ($count) {
-            $this->success(__('Deleted successfully'));
-        } else {
-            $this->error(__('No rows were deleted'));
+        if ($result === false) {
+            $this->error(__('No rows were inserted'));
         }
+        $this->success(__('Add successful'));
     }
-
-
 }
