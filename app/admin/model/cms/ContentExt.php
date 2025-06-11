@@ -27,16 +27,29 @@ class ContentExt extends Model
      * @param mixed $data
      * @return array
      */
-    public function getExtData($data): array
+    public function getExtData($data, $mcode = 0): array
     {
+        $fieldsTypeMap = [];
+        if ($mcode) {
+            $fields = (new Extfield())->getModelFields($mcode);
+            foreach ($fields as $field) {
+                $fieldsTypeMap[$field['name']] = $field['component'];
+            }
+        }
+
         $extdata = [];
         foreach ($data as $key => $value) {
             if (preg_match('/^ext_[\w\-]+$/', $key)) {
-                if (is_array($value)) {
+                if (isset($fieldsTypeMap[$key]) && $fieldsTypeMap[$key] == 'editor') {
+                    $value = replaceEditorDomain(clean_xss($value), request()->domain());
+                    $extdata[$key] = $value;
+                } elseif (is_array($value)) {
                     $extdata[$key] = implode(',', $value);
-                } else {
+                } elseif (is_string($value)) {
                     /* 兼容 windows与linux */
                     $extdata[$key] = str_replace(["\r\n", "\n"], '<br>', $value);
+                } else {
+                    $extdata[$key] = $value;
                 }
             }
         }
@@ -74,6 +87,9 @@ class ContentExt extends Model
                     break;
                 case 'textarea':
                     $extdata[$key] =  str_replace('<br>', "\r\n", $value);
+                    break;
+                case 'editor':
+                    $extdata[$key] = addEditorDomain(decode_string($value), request()->domain());
                     break;
                 default:
                     $extdata[$key] = $value;

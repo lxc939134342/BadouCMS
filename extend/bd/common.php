@@ -28,19 +28,23 @@ if (!function_exists('copydirs')) {
         if (!is_dir($dest)) {
             mkdir($dest, 0755, true);
         }
+        $sourceRealPath = realpath($source);
         foreach (
             $iterator = new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS),
                 RecursiveIteratorIterator::SELF_FIRST
             ) as $item
         ) {
+            $itemRealPath = $item->getRealPath();
+            $relativePath = ltrim(substr($itemRealPath, strlen($sourceRealPath)), DIRECTORY_SEPARATOR);
+
             if ($item->isDir()) {
-                $sontDir = $dest . DS . $iterator->getSubPathName();
+                $sontDir = $dest . DIRECTORY_SEPARATOR . $relativePath;
                 if (!is_dir($sontDir)) {
                     mkdir($sontDir, 0755, true);
                 }
             } else {
-                copy($item, $dest . DS . $iterator->getSubPathName());
+                copy($itemRealPath, $dest . DIRECTORY_SEPARATOR . $relativePath);
             }
         }
     }
@@ -923,6 +927,9 @@ function replaceEditorDomain(string $content, string $newDomain = ''): string
         $content = html_entity_decode($content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     }
 
+    // 清理传入的域名，移除协议头，确保只比较主机名
+    $cleanNewDomain = preg_replace('#^(?:https?:)?//#', '', $newDomain);
+
     // 匹配所有可能的媒体标签，添加u修饰符支持UTF-8
     $patterns = [
         '/<img[\s\S]*?src=[\'"]*([^\'">]+)[\'"]*[\s\S]*?>/iu',
@@ -933,24 +940,26 @@ function replaceEditorDomain(string $content, string $newDomain = ''): string
     ];
 
     foreach ($patterns as $pattern) {
-        $content = preg_replace_callback($pattern, function ($matches) use ($newDomain) {
+        $content = preg_replace_callback($pattern, function ($matches) use ($cleanNewDomain) {
             if (empty($matches[1])) {
                 return $matches[0];
             }
 
             $originalUrl = trim($matches[1]);
+            $newUrl = $originalUrl; // 默认保持原样
 
-            // 如果URL以http://或https://开头，检查域名是否匹配
-            if (preg_match('#^(https?://[^/]+)(/.*)$#i', $originalUrl, $m)) {
-                $domain = $m[1];
-                // 只有当域名匹配时才去除域名部分
-                if ($domain === $newDomain) {
-                    $newUrl = $m[2];  // 只保留路径部分
-                } else {
-                    $newUrl = $originalUrl;  // 域名不匹配，保持原样
+            // 匹配 http, https, 和协议相对 // URL
+            if (preg_match('#^((?:https?:)?//[^/]+)(/.*)$#i', $originalUrl, $urlParts)) {
+                $fullDomain = $urlParts[1]; // e.g., http://domain.com or //domain.com
+                $path = $urlParts[2];       // e.g., /path/to/image.jpg
+
+                // 提取主机名用于比较
+                $hostname = preg_replace('#^(?:https?:)?//#', '', $fullDomain);
+
+                // 如果主机名与当前站点域名匹配，则移除域名，只保留路径
+                if ($hostname === $cleanNewDomain) {
+                    $newUrl = $path;
                 }
-            } else {
-                $newUrl = $originalUrl;  // 如果没有域名部分，保持原样
             }
 
             // 替换原始src/href的值

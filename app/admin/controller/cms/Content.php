@@ -193,7 +193,7 @@ class Content extends Base
                 $result = $this->model->save($data);
 
                 /* 添加扩展数据 */
-                $extdata = $this->contentExtModel->getExtData($data);
+                $extdata = $this->contentExtModel->getExtData($data, $this->mcode);
                 $extdata['contentid'] = $this->model->id;
 
                 $this->contentExtModel->save($extdata);
@@ -276,7 +276,7 @@ class Content extends Base
 
                 $result = $row->save($data);
                 /* 添加扩展数据 */
-                $extdata = $this->contentExtModel->getExtData($data);
+                $extdata = $this->contentExtModel->getExtData($data, $this->mcode);
                 $extdata['contentid'] = $row['id'];
 
                 if ($extRow) {
