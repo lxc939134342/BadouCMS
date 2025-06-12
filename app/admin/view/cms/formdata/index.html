@@ -33,11 +33,24 @@
         bdTable.api.init({
             table: table,
             extend: {
-                index_url: "cms.formdata/index",
+                index_url: "cms.formdata/index?fcode={$fcode}",
                 del_url: "cms.formdata/del",
                 multi_url: "cms.formdata/multi",
                 table: "cms_formdata",
             },
+        });
+        var cols=[
+            { type: "checkbox" },
+            { field: "id", title: "ID", width: 80, sort: true },
+        ];
+
+        Config.formFields.forEach(function (item) {
+            cols.push({ field: item.name, title: __(item.description) });
+        });
+
+        cols.push({   title: __("Operate"),
+            width: 300,
+            templet: bdTable.api.formatter.operate
         });
         bdTable.render({
             elem: "#formdata",
@@ -47,18 +60,7 @@
             toolbar: "#toolbar",
             page: true,
             cols: [
-                [
-                    { type: "checkbox" },
-                    { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "fcode", title: __("Fcode"), width: 90, operate: false },
-                    { field: "formdata_name", title: __("formdata name") },
-                    { field: "table_name", title: __("Table name") },
-                    {
-                        title: __("Operate"),
-                        width: 300,
-                        templet: bdTable.api.formatter.operate,
-                    },
-                ],
+                cols
             ],
         });
     });

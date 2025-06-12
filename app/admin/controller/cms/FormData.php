@@ -35,6 +35,7 @@ class FormData extends Base
         $this->model = new \app\admin\model\cms\FormData();
         $this->formModel = new \app\admin\model\cms\Form();
         $this->fcode = $this->request->param('fcode', 0);
+        $this->view->assign('fcode', $this->fcode);
     }
 
     /**
@@ -72,7 +73,7 @@ class FormData extends Base
         $formFieldsModel = new \app\admin\model\cms\FormField();
         $formFields = $formFieldsModel->where('fcode', $this->fcode)->select();
 
-        $this->view->assign('formFields', $formFields);
+        $this->assignconfig('formFields', $formFields);
 
 
         return $this->view->fetch();
