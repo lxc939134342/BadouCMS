@@ -23,7 +23,7 @@ http://www.badoucms.com/
 
 ### 演示站点
 
-http://demo.badoucms.com/
+http://demo.badoucms.com/web
 
 ### 演示后台
 
