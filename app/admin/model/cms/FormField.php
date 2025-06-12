@@ -12,6 +12,8 @@
 
 namespace app\admin\model\cms;
 
+use app\common\library\AdminAuth;
+use badou\Auth;
 use think\Model;
 use badou\TableManager;
 use think\facade\Db;
@@ -31,6 +33,10 @@ class FormField extends Model
     public static function onBeforeInsert($model)
     {
         $data = $model->getData();
+        $auth = AdminAuth::instance();
+        $model->set('create_user', $auth->nickname);
+        $model->set('update_user', $auth->nickname);
+
         $fcode = $data['fcode'];
         $field = $data['name'];
         if (!preg_match('/^[a-zA-Z0-9_]+$/', $field)) {
@@ -46,6 +52,21 @@ class FormField extends Model
         if ($count) {
             throw new \think\Exception('字段已存在');
         }
+    }
+
+    public static function onAfterInsert($model)
+    {
+        $data = $model->getData();
+        $fcode = $data['fcode'];
+        $field = $data['name'];
+        $tableManager = self::tableManager($fcode);
+        if ($tableManager->hasColumn($field)) {
+            throw new \think\Exception('字段已存在');
+        } else {
+            $tableManager->addColumn($field, 'string', ['limit' => 255, 'default' => '']);
+        }
+
+        $tableManager->update();
     }
 
     /* 更新前 */
@@ -80,6 +101,16 @@ class FormField extends Model
         }
     }
 
+    public static function onAfterDelete($model)
+    {
+        $data = $model->getData();
+        $fcode = $data['fcode'];
+        $tableManager = self::tableManager($fcode);
+        if ($tableManager->hasColumn($data['name'])) {
+            $tableManager->removeColumn($data['name']);
+            $tableManager->update();
+        }
+    }
 
     /* 表链接 */
     protected static function tableManager($fcode)

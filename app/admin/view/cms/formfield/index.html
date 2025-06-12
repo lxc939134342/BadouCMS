@@ -1,0 +1,76 @@
+{layout name="layout/default" /}
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table
+            class="layui-hide"
+            id="formfield"
+            data-operate-edit="{:$auth->check('cms.formfield/edit')}"
+            data-operate-del="{:$auth->check('cms.formfield/del')}"></table>
+    </div>
+</div>
+
+<!-- 表格左侧按钮 toolbar  -->
+<script type="text/html" id="toolbar">
+    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black">
+        <i class="fa fa-refresh"></i>
+    </a>
+    <button class="layui-btn btn-theme-color" lay-event="add">
+        <i class="fa fa-plus"></i>
+        {:__('Add')}
+    </button>
+    <button
+        class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('cms.form/edit')?'':'hide'}"
+        lay-event="edit">
+        <i class="fa fa-pencil"></i>
+        {:__('Edit')}
+    </button>
+    <button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del">
+        <i class="fa fa-trash"></i>
+        {:__('Del')}
+    </button>
+</script>
+
+<script>
+    layui.use(["badou"], function () {
+        var bdTable = layui.bdTable;
+        var table = layui.table;
+        var layer = layui.layer;
+        var dropdown = layui.dropdown;
+        var badou = layui.badou;
+        var laytpl = layui.laytpl;
+        var formfield = layui.formfield;
+
+        bdTable.api.init({
+            table: table,
+            extend: {
+                index_url: "cms.formfield/index?fcode={$fcode}",
+                add_url: "cms.formfield/add?fcode={$fcode}",
+                edit_url: "cms.formfield/edit",
+                del_url: "cms.formfield/del",
+                multi_url: "cms.formfield/multi",
+                table: "cms_formfield",
+            },
+        });
+
+        bdTable.render({
+            elem: "#formfield",
+            url: bdTable.extend.index_url,
+            pk: "id",
+            even: true,
+            toolbar: "#toolbar",
+            page: true,
+            cols: [
+                [
+                    { type: "checkbox" },
+                    { field: "id", title: "ID", width: 80, sort: true },
+                    { field: "description", title:__('Description')},
+                    { field: "name", title:__('Name')},
+                    { field: "length", title:__('Length')},
+                    { field: "required", title:__('Required'),templet: bdTable.api.formatter.switch },
+                    { field: "sorting", title:__('Sorting')},
+                    { title: __("Operate"), templet: bdTable.api.formatter.operate },
+                ],
+            ],
+        });
+    });
+</script>

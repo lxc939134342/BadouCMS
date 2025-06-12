@@ -13,6 +13,7 @@
 namespace app\admin\model\cms;
 
 use badou\TableManager;
+use think\Exception;
 use think\facade\Db;
 use think\Model;
 
@@ -126,6 +127,15 @@ class Form extends Model
         if (isset($changeData['table_name'])) {
             $tableManager->rename($table_name);
             $tableManager->update();
+        }
+    }
+
+    /* 删除前 */
+    public static function onBeforeDelete($model)
+    {
+        $data = $model->getData();
+        if ($data['fcode'] == 1) {
+            throw new Exception('在线留言不能删除');
         }
     }
 }
