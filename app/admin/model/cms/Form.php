@@ -98,17 +98,34 @@ class Form extends Model
         $changeData = $model->getChangedData();
         $originData = $model->getOrigin();
         $oldname = $originData['table_name'];
-        $field = $data['table_name'];
-        if (!preg_match('/^[a-zA-Z0-9_]+$/', $field)) {
+        $table_name = $data['table_name'];
+        $dbPrefix = config('database.connections.mysql.prefix').'cms_diy_';
+        if ($dbPrefix && strpos($table_name, $dbPrefix) !== 0) {
+            $table_name = $dbPrefix . $table_name;
+        }
+
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $table_name)) {
             throw new \think\Exception('表名称必须以包含字母、数字、下划线');
         }
         $where = [
             ['id', '<>', $data['id']],
-            ['table_name', '=',  $field]
+            ['table_name', '=',  $table_name]
         ];
         $count = Db::name($model->getName())->where($where)->count();
         if ($count) {
             throw new \think\Exception('表名称已存在');
+        }
+
+        $databaseConnection = config('database.default');
+        $tableManager = TableManager::phinxTable($oldname, [], false, $databaseConnection);
+
+        if (!$tableManager->getAdapter()->hasTable($oldname)) {
+            throw new \think\Exception('数据表不存在');
+        }
+
+        if (isset($changeData['table_name'])) {
+            $tableManager->rename($table_name);
+            $tableManager->update();
         }
     }
 }

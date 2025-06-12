@@ -74,17 +74,36 @@
                                 name: "data",
                                 text: __("Data manage"),
                                 title: __("Data manage"),
-                                classname: "layui-btn layui-btn-sm layui-bg-green",
                                 icon: "fa fa-table",
-                                url: "cms.formdata/index",
+                                extend:function (row,j) {
+                                    if(row.fcode==1){
+                                        return "title='留言信息' data-id='108'"
+                                    }
+                                    return "";
+                                },
+                                classname: function (row, j) {
+                                    if (row.fcode == 1) {
+                                        return "layui-btn layui-btn-sm layui-bg-green btn-addtab";
+                                    }
+                                    // 默认 class
+                                    return "layui-btn layui-btn-sm layui-bg-green btn-dialog";
+                                },
+                                url: function (row,j) {
+                                    var href = "cms.formdata/index?fcode={fcode}";
+                                    href=bdTable.api.replaceurl(href,row,this)
+                                    if (row.fcode == 1) {
+                                        href = "cms.message";
+                                    }
+                                    return href;
+                                },
                             },
                             {
                                 name: "fields",
                                 text: __("Field manage"),
                                 title: __("Field manage"),
-                                classname: "layui-btn layui-btn-sm layui-bg-orange",
+                                classname: "layui-btn layui-btn-sm layui-bg-orange btn-dialog",
                                 icon: "fa fa-list",
-                                url: "cms.formdata/index",
+                                url: "cms.formfield/index",
                             },
                             {
                                 name: "edit",
@@ -99,11 +118,11 @@
                                 title: __("Del"),
                                 extend: "lay-event='btn-delone'",
                                 classname: "layui-btn layui-bg-red layui-btn-sm",
-                                hidden:function(row){
-                                    if(row.id==1){
+                                hidden: function (row) {
+                                    if (row.fcode == 1) {
                                         return true;
                                     }
-                                }
+                                },
                             },
                         ],
                     },

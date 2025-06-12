@@ -13,7 +13,7 @@
 namespace app\admin\model\cms;
 
 use think\Model;
-use ba\TableManager;
+use badou\TableManager;
 use think\facade\Db;
 
 /**

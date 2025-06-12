@@ -26,16 +26,11 @@ class FormField extends Base
      * @var object
      * @phpstan-var \app\admin\model\cms\FormField
      */
-    protected object $model;
+    protected $model;
 
-    protected object $formModel;
+    protected $formModel;
+    protected $fcode;
 
-    protected array|string $preExcludeFields = ['id', 'create_time', 'update_time'];
-
-    protected string|array $quickSearchField = ['id','name'];
-    protected int $fcode;
-
-    protected array $noNeedPermission = ['getFormFieldList'];
 
     public function initialize(): void
     {

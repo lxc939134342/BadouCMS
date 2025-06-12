@@ -13,10 +13,6 @@
 namespace app\admin\controller\cms;
 
 use Throwable;
-use think\Exception;
-use think\facade\Db;
-use badou\TableManager;
-use think\db\exception\PDOException;
 
 /**
  * 自定义表单

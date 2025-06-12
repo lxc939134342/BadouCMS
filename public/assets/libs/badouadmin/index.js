@@ -53,5 +53,22 @@ layui.use(['layer', 'badou'], function () {
         }
         return false;
     });
+
+    //新窗口
+    $(document).on("click", ".btn-addtab", function (e) {
+        var that = this;
+        if ($(that).attr("disabled") || $(that).hasClass("disabled")) {
+            return false;
+        }
+        var url = $(that).attr("href");
+        var id = $(that).data("id") || $(that).attr("id") || "addtab" + Math.random();
+        var title =
+            $(that).attr("title") ||
+            $(that).data("title") ||
+            $(that).data("original-title") ||
+            $(that).text();
+        top.layui.admin.jump(id, title, url)
+        return false;
+    });
 });
 
