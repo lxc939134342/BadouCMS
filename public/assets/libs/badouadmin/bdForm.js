@@ -8,6 +8,7 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'co
     var bdUpload = layui.bdUpload;
     var colorpicker = layui.colorpicker;
     var bdTool = layui.bdTool;
+    // var jstree = layui.jstree;
     var bdForm = {
         events: {
             //绑定事件
@@ -243,6 +244,8 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'co
             bindevent: function (form, success, error, submit) {
                 //如果传入的 form 不是对象，则将其转换为 jQuery 对象。这确保了后续操作可以直接使用 jQuery 方法。
                 form = typeof form === 'object' ? form : $(form);
+                console.log('表单数据');
+                console.log(form);
                 //从 bdForm 对象中获取 events 对象，它包含了一些与表单相关的事件处理方法。
                 var events = bdForm.events;
                 //绑定表单事件,调用 events 对象中的 bindevent 方法，用于绑定表单的事件（例如图标选择器等）。
