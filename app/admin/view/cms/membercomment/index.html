@@ -1,0 +1,77 @@
+{layout name="layout/default" /}
+<script src="__CDN__/assets/cms/js/change_lang.js"></script>
+
+<!-- 表格 -->
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table
+            class="layui-hide"
+            id="membercomment"
+            data-operate-del="{:$auth->check('cms.membercomment/del')}"></table>
+    </div>
+</div>
+<!-- 表格左侧按钮 toolbar  -->
+<script type="text/html" id="toolbar">
+    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	">
+        <i class="fa fa-refresh"></i>
+    </a>
+    <button
+        class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('cms.membercomment/del')?'':'hide'}"
+        lay-event="del">
+        <i class="fa fa-trash"></i>
+        {:__('Del')}
+    </button>
+</script>
+
+<script>
+    layui.use(["badou"], function () {
+        var bdTable = layui.bdTable;
+        var table = layui.table;
+        var layer = layui.layer;
+        var dropdown = layui.dropdown;
+        bdTable.api.init({
+            table: table,
+            extend: {
+                index_url: "cms.membercomment/index",
+                del_url: "cms.membercomment/del",
+                multi_url: "cms.membercomment/multi",
+                table: "cms_member_comment",
+            },
+        });
+        bdTable.render({
+            elem: "#membercomment",
+            url: "{:url('cms.membercomment/index')}",
+            pk: "id",
+            even: true,
+            toolbar: "#toolbar",
+            page: true,
+            cols: [
+                [
+                    { type: "checkbox" },
+                    { field: "id", title: "ID", width: 80, sort: true },
+                    { field: "content.title", title: __("title") },
+                    {
+                        field: "comment",
+                        title: __("Comment"),
+                        width: 250,
+                    },
+                    { field: "user.nickname", title: __("Nickname"), width: 250 },
+                    { field: "status", title: __("Status"), width: 180, templet: bdTable.api.formatter.switch },
+                    {
+                        title: __("Operate"),
+                        align: "center",
+                        templet: bdTable.api.formatter.operate,
+                        buttons: [
+                            {
+                                text: __("Info"),
+                                icon: "fa fa-search-plus",
+                                url: "cms.membercomment/info",
+                                classname: "layui-btn layui-btn-sm btn-dialog",
+                            },
+                        ],
+                    },
+                ],
+            ],
+        });
+    });
+</script>

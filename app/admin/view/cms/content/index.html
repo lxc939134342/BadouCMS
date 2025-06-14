@@ -1,5 +1,5 @@
 {layout name="layout/default" /}
-
+<script src="__CDN__/assets/cms/js/change_lang.js"></script>
 <div class="layui-card">
     <div class="layui-card-body">
         <table
@@ -14,6 +14,10 @@
     <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black">
         <i class="fa fa-refresh"></i>
     </a>
+    <button class="layui-btn layui-btn-primary layui-border-black" id="changeLang">
+        <span class="lang-title">{$area_title}</span>
+        <i class="layui-icon layui-icon-down layui-font-12"></i>
+    </button>
     <button class="layui-btn btn-theme-color" lay-event="add">
         <i class="fa fa-plus"></i>
         {:__('Add')}
@@ -43,7 +47,7 @@
 </script>
 
 <script>
-    layui.use(["badou"], function () {
+    layui.use(["badou","changeLang"], function () {
         var bdTable = layui.bdTable;
         var table = layui.table;
         var layer = layui.layer;
@@ -51,6 +55,7 @@
         var badou = layui.badou;
         var laytpl = layui.laytpl;
         var form = layui.form;
+        var changeLang=layui.changeLang;
         badou.http.config.open.area = ["100%", "100%"];
 
         bdTable.api.init({
@@ -120,6 +125,11 @@
                     { title: __("Operate"), align: "center", width: 150, templet: bdTable.api.formatter.operate },
                 ],
             ],
+            done: function(res, curr, count){
+                changeLang({
+                    table:bdTable
+                });
+            }
         });
 
         // 移动&复制

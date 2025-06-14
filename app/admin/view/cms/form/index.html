@@ -1,0 +1,133 @@
+{layout name="layout/default" /}
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table
+            class="layui-hide"
+            id="form"
+            data-operate-edit="{:$auth->check('cms.form/edit')}"
+            data-operate-del="{:$auth->check('cms.form/del')}"></table>
+    </div>
+</div>
+
+<!-- 表格左侧按钮 toolbar  -->
+<script type="text/html" id="toolbar">
+    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black">
+        <i class="fa fa-refresh"></i>
+    </a>
+    <button class="layui-btn btn-theme-color" lay-event="add">
+        <i class="fa fa-plus"></i>
+        {:__('Add')}
+    </button>
+    <button
+        class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('cms.form/edit')?'':'hide'}"
+        lay-event="edit">
+        <i class="fa fa-pencil"></i>
+        {:__('Edit')}
+    </button>
+    <button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del">
+        <i class="fa fa-trash"></i>
+        {:__('Del')}
+    </button>
+</script>
+
+<script>
+    layui.use(["badou"], function () {
+        var bdTable = layui.bdTable;
+        var table = layui.table;
+        var layer = layui.layer;
+        var dropdown = layui.dropdown;
+        var badou = layui.badou;
+        var laytpl = layui.laytpl;
+        var form = layui.form;
+        badou.http.config.open.area = ["100%", "100%"];
+        bdTable.api.init({
+            table: table,
+            extend: {
+                index_url: "cms.form/index",
+                add_url: "cms.form/add",
+                edit_url: "cms.form/edit",
+                del_url: "cms.form/del",
+                multi_url: "cms.form/multi",
+                table: "cms_form",
+            },
+        });
+        bdTable.render({
+            elem: "#form",
+            url: bdTable.extend.index_url,
+            pk: "id",
+            even: true,
+            toolbar: "#toolbar",
+            page: true,
+            cols: [
+                [
+                    { type: "checkbox" },
+                    { field: "id", title: "ID", width: 80, sort: true },
+                    { field: "fcode", title: __("Fcode"), width: 90, operate: false },
+                    { field: "form_name", title: __("Form name") },
+                    { field: "table_name", title: __("Table name") },
+                    {
+                        title: __("Operate"),
+                        width: 300,
+                        templet: bdTable.api.formatter.operate,
+                        buttons: [
+                            {
+                                name: "data",
+                                text: __("Data manage"),
+                                title: __("Data manage"),
+                                icon: "fa fa-table",
+                                extend:function (row,j) {
+                                    if(row.fcode==1){
+                                        return "title='留言信息' data-id='108'"
+                                    }
+                                    return "";
+                                },
+                                classname: function (row, j) {
+                                    if (row.fcode == 1) {
+                                        return "layui-btn layui-btn-sm layui-bg-green btn-addtab";
+                                    }
+                                    // 默认 class
+                                    return "layui-btn layui-btn-sm layui-bg-green btn-dialog";
+                                },
+                                url: function (row,j) {
+                                    var href = "cms.formdata/index?fcode={fcode}";
+                                    href=bdTable.api.replaceurl(href,row,this)
+                                    if (row.fcode == 1) {
+                                        href = "cms.message";
+                                    }
+                                    return href;
+                                },
+                            },
+                            {
+                                name: "fields",
+                                text: __("Field manage"),
+                                title: __("Field manage"),
+                                classname: "layui-btn layui-btn-sm layui-bg-orange btn-dialog",
+                                icon: "fa fa-list",
+                                url: "cms.formfield/index?fcode={fcode}",
+                            },
+                            {
+                                name: "edit",
+                                icon: "fa fa-pencil",
+                                title: __("Edit"),
+                                extend: "lay-event='btn-editone'",
+                                classname: "layui-btn layui-btn-sm",
+                            },
+                            {
+                                name: "del",
+                                icon: "fa fa-trash",
+                                title: __("Del"),
+                                extend: "lay-event='btn-delone'",
+                                classname: "layui-btn layui-bg-red layui-btn-sm",
+                                hidden: function (row) {
+                                    if (row.fcode == 1) {
+                                        return true;
+                                    }
+                                },
+                            },
+                        ],
+                    },
+                ],
+            ],
+        });
+    });
+</script>

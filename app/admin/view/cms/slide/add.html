@@ -1,0 +1,97 @@
+{layout name="layout/form" /}
+<form class="layui-form" method="post">
+    {:token_field()}
+    <div class="layui-form-item">
+        <label class="layui-form-label">分组（gid）</label>
+        <div class="layui-input-block">
+            <select name="row[gid]" id="c-gid">
+                <option value="0">自动新增分组</option>
+                {volist name="gidList" id="vo"}
+                <option value="{$vo}">分组{$vo}</option>
+                {/volist}
+            </select>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">图片</label>
+        <div class="layui-input-block">
+            <input type="text" id="c-pic" name="row[pic]" lay-verify="required" class="layui-input" />
+            <div class="layui-input-suffix" style="width: 30%">
+                <button type="button" data-input-id="c-pic" data-preview-id="p-pic" class="layui-btn btn-bdupload">
+                    <i class="fa fa-upload"></i>
+                    上传
+                </button>
+                <button type="button" data-input-id="c-pic" class="layui-btn layui-bg-green btn-bdchoose">
+                    <i class="fa fa-list"></i>
+                    选择
+                </button>
+            </div>
+            <div class="layui-upload-list" id="p-pic"></div>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">跳转链接</label>
+        <div class="layui-input-block">
+            <input
+                type="text"
+                name="row[link]"
+                value=""
+                placeholder="请输入跳转链接"
+                autocomplete="off"
+                class="layui-input" />
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">标题</label>
+        <div class="layui-input-block">
+            <input
+                type="text"
+                name="row[title]"
+                value=""
+                placeholder="请输入标题"
+                autocomplete="off"
+                class="layui-input" />
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">副标题</label>
+        <div class="layui-input-block">
+            <input
+                type="text"
+                name="row[subtitle]"
+                value=""
+                placeholder="请输入副标题"
+                autocomplete="off"
+                class="layui-input" />
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-block">
+            <input
+                type="text"
+                name="row[sorting]"
+                value=""
+                placeholder="请输入排序"
+                autocomplete="off"
+                class="layui-input" />
+        </div>
+    </div>
+
+    <div class="layui-form-item layer-footer hide">
+        <div class="layui-input-block">
+            <button class="layui-btn btn-theme-color disabled" lay-submit>立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(["badou"], function () {
+        var bdForm = layui.bdForm;
+        bdForm.api.bindevent($("form.layui-form"));
+    });
+</script>

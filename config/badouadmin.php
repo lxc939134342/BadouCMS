@@ -16,6 +16,40 @@ return [
         'dispatch_success_tmpl' => app()->getBasePath() . '/common/view/tpl/dispatch_jump.tpl',
         'dispatch_error_tmpl'   => app()->getBasePath() . '/common/view/tpl/dispatch_jump.tpl',
     ],
+    // Token 配置
+    'token'                 => [
+        // 默认驱动方式
+        'default' => 'mysql',
+        // 加密key
+        'key'     => 'tcbDgmqLVzuAdNH39o0QnhOisvSCFZ7I',
+        // 加密方式
+        'algo'    => 'ripemd160',
+        // 驱动
+        'stores'  => [
+            'mysql' => [
+                'type'   => 'Mysql',
+                // 留空表示使用默认的 Mysql 数据库，也可以填写其他数据库连接配置的`name`
+                'name'   => '',
+                // 存储token的表名
+                'table'  => 'token',
+                // 默认 token 有效时间
+                'expire' => 2592000,
+            ],
+            'redis' => [
+                'type'       => 'Redis',
+                'host'       => '127.0.0.1',
+                'port'       => 6379,
+                'password'   => '',
+                // Db索引，非 0 以避免数据被意外清理
+                'select'     => 1,
+                'timeout'    => 0,
+                // 默认 token 有效时间
+                'expire'     => 2592000,
+                'persistent' => false,
+                'prefix'     => 'tk:',
+            ],
+        ]
+    ],
     'version' => 'v1.0.0',
     'api_url' => 'http://ldshouquan.test/',
 ];

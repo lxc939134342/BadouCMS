@@ -3,11 +3,13 @@
 namespace badou;
 
 use Throwable;
+use think\Exception;
 use think\facade\Db;
 use think\facade\Config;
 use think\migration\db\Table;
 use Phinx\Db\Adapter\AdapterFactory;
 use Phinx\Db\Adapter\AdapterInterface;
+use Phinx\Db\Adapter\MysqlAdapter;
 
 /**
  * 数据表管理类
@@ -188,4 +190,5 @@ class TableManager
             'migration_table' => $config['prefix'] . $table,
         ];
     }
+
 }

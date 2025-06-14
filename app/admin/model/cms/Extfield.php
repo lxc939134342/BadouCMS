@@ -56,7 +56,7 @@ class Extfield extends Model
             '10' => ['text' => '多图上传', 'inputType' => 'images', 'type' => 'string', 'limit' => 1000, 'default' => ''],
             '6'  => ['text' => '附件上传', 'inputType' => 'files', 'type' => 'string', 'limit' => 255, 'default' => ''],
             '7'  => ['text' => '日期选择', 'inputType' => 'datetime', 'type' => 'datetime', 'limit' => 0, 'default' => null],
-            '8'  => ['text' => '编辑器', 'inputType' => 'editor', 'type' => 'text', 'limit' => 0, 'default' => ''],
+            '8'  => ['text' => '编辑器', 'inputType' => 'editor', 'type' => 'text', 'limit' => 0, 'default' => null],
             '9'  => ['text' => '下拉选择', 'inputType' => 'select', 'type' => 'string', 'limit' => 255, 'default' => '']
         ];
 

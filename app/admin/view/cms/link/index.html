@@ -1,0 +1,93 @@
+{layout name="layout/default" /}
+<script src="__CDN__/assets/cms/js/change_lang.js"></script>
+
+<!-- 表格 -->
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table
+            class="layui-hide"
+            id="link"
+            data-operate-edit="{:$auth->check('cms.link/edit')}"
+            data-operate-del="{:$auth->check('cms.link/del')}"></table>
+    </div>
+</div>
+<!-- 表格左侧按钮 toolbar  -->
+<script type="text/html" id="toolbar">
+    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	">
+        <i class="fa fa-refresh"></i>
+    </a>
+    <button class="layui-btn layui-btn-primary layui-border-black" id="changeLang">
+        <span class="lang-title">{$area_title}</span>
+        <i class="layui-icon layui-icon-down layui-font-12"></i>
+    </button>
+    <button class="layui-btn layui-bg-green" lay-event="add">
+        <i class="fa fa-plus"></i>
+        {:__('Add')}
+    </button>
+    <button
+        class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('cms.link/edit')?'':'hide'}"
+        lay-event="edit">
+        <i class="fa fa-pencil"></i>
+        {:__('Edit')}
+    </button>
+    <button
+        class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('cms.link/del')?'':'hide'}"
+        lay-event="del">
+        <i class="fa fa-trash"></i>
+        {:__('Del')}
+    </button>
+</script>
+<script>
+    layui.use(["badou", "changeLang"], function () {
+        var bdTable = layui.bdTable;
+        var table = layui.table;
+        var layer = layui.layer;
+        var dropdown = layui.dropdown;
+        var changeLang = layui.changeLang;
+        bdTable.api.init({
+            table: table,
+            extend: {
+                index_url: "cms.link/index",
+                add_url: "cms.link/add",
+                edit_url: "cms.link/edit",
+                del_url: "cms.link/del",
+                multi_url: "cms.link/multi",
+                table: "cms_link",
+            },
+        });
+        bdTable.render({
+            elem: "#link",
+            url: "{:url('cms.link/index')}",
+            pk: "id",
+            even: true,
+            toolbar: "#toolbar",
+            page: true,
+            cols: [
+                [
+                    { type: "checkbox" },
+                    { field: "id", title: "ID", width: 80, sort: true },
+                    { field: "gid", title: __("Gid"), width: 80 },
+                    { field: "name", title: __("Name") },
+                    { field: "link", title: __("Link"), width: 250 },
+                    {
+                        field: "logo",
+                        title: __("Logo"),
+                        width: 150,
+                        templet: bdTable.api.formatter.image,
+                    },
+                    {
+                        field: "sorting",
+                        title: __("Sorting"),
+                        width: 100,
+                    },
+                    { title: __("Operate"), align: "center", templet: bdTable.api.formatter.operate },
+                ],
+            ],
+            done: function (res, curr, count) {
+                changeLang({
+                    table: bdTable,
+                });
+            },
+        });
+    });
+</script>
