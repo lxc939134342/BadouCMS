@@ -1,6 +1,7 @@
 <?php
 
 use think\facade\Db;
+use badou\Filesystem;
 
 // 获取用户浏览器类型
 function get_user_bs($bs = null)

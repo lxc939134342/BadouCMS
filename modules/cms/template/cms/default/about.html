@@ -1,0 +1,44 @@
+{extend name="base" /} {block name="main"}
+<div class="container">
+  <div class="main w1200">
+    <div class="article w1">
+      <div class="archive-top">
+        <div class="archive-title">
+          <h1 itemprop="headline">{$content.title}</h1>
+          <span></span>
+        </div>
+      </div>
+      <p>{:__('Position')}：{bd:position /}</p>
+      <div class="article-box">
+        <header class="article-top">
+          <div class="article-mt">
+            <span>
+              <i class="fa fa-list-alt"></i>
+              {bd:sort scode="$sort['scode']"}
+              <a href="{$sort.link}">{$sort.name}</a>
+              {/bd:sort}
+            </span>
+            <span>
+              <i class="fa fa-user"></i>
+              {$content.author}
+            </span>
+            <span>
+              <i class="fa fa-clock-o"></i>
+              {$content.date}
+            </span>
+            <span>
+              <i class="fa fa-eye"></i>
+              {$content.visits}
+            </span>
+          </div>
+        </header>
+        <article class="article-main">{$content.content|raw}</article>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(".header").removeClass("opaque").addClass("noOpaque");
+</script>
+{/block}

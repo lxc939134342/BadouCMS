@@ -1,0 +1,58 @@
+{layout name="layout/default" }
+<style>
+.layui-table tbody tr td:first-child{
+    background-color:#f5f7fa
+}
+</style>
+<table class="layui-table">
+  <colgroup>
+    <col width="250">
+    <col>
+  </colgroup>
+  <tbody>
+    <tr>
+      <td>文章</td>
+      <td>{$row.content.title|default='-'}</td>
+    </tr>
+    <tr>
+      <td>评论</td>
+      <td>{$row.comment}</td>
+    </tr>
+    <tr>
+      <td>状态</td>
+      <td>{$row.status_text}</td>
+    </tr>
+    <tr>
+      <td>评论人</td>
+      <td>{$row.user.nickname|default="-"}</td>
+    </tr>
+    <tr>
+      <td>被评论人</td>
+      <td>{$row.puser.nickname|default='-'}</td>
+    </tr>
+    <tr>
+      <td>点赞数</td>
+      <td>{$row.likes}</td>
+    </tr>
+    <tr>
+      <td>反对数</td>
+      <td>{$row.oppose}</td>
+    </tr>
+    <tr>
+      <td>用户IP</td>
+      <td>{$row.user_ip}</td>
+    </tr>
+    <tr>
+      <td>操作系统</td>
+      <td>{$row.user_os}</td>
+    </tr>
+    <tr>
+      <td>浏览器</td>
+      <td>{$row.user_bs}</td>
+    </tr>
+    <tr>
+      <td>创建时间</td>
+      <td>{$row.create_time}</td>
+    </tr>
+  </tbody>
+</table>

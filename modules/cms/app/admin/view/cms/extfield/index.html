@@ -1,0 +1,72 @@
+{layout name="layout/default" /}
+<!-- 表格 -->
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table
+            class="layui-hide"
+            id="models"
+            data-operate-edit="{:$auth->check('cms.extfield/edit')}"
+            data-operate-del="{:$auth->check('cms.extfield/del')}"></table>
+    </div>
+</div>
+
+<!-- 表格左侧按钮 toolbar  -->
+<script type="text/html" id="toolbar">
+    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	">
+        <i class="fa fa-refresh"></i>
+    </a>
+    <button class="layui-btn layui-bg-green" lay-event="add">
+        <i class="fa fa-plus"></i>
+        {:__('Add')}
+    </button>
+    <button
+        class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('cms.extfield/edit')?'':'hide'}"
+        lay-event="edit">
+        <i class="fa fa-pencil"></i>
+        {:__('Edit')}
+    </button>
+    <button class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('cms.extfield/del')?'':'hide'}" lay-event="del">
+        <i class="fa fa-trash"></i>
+        {:__('Del')}
+    </button>
+</script>
+<script>
+    layui.use(["badou"], function () {
+        var bdTable = layui.bdTable;
+        var table = layui.table;
+        var layer = layui.layer;
+        var dropdown = layui.dropdown;
+        bdTable.api.init({
+            table: table,
+            extend: {
+                index_url: "cms.extfield/index",
+                add_url: "cms.extfield/add",
+                edit_url: "cms.extfield/edit",
+                del_url: "cms.extfield/del",
+                multi_url: "cms.extfield/multi",
+                table: "cms_extfield",
+            },
+        });
+        console.log(Config);
+        bdTable.render({
+            elem: "#models",
+            url: "{:url('cms.extfield/index')}",
+            pk: "id",
+            even: true,
+            toolbar: "#toolbar",
+            page: true,
+            cols: [
+                [
+                    { type: "checkbox" },
+                    { field: "id", title: "ID", width: 80, sort: true },
+                    { field: "mcode", title: __("Mcode"), width: 180,templet:bdTable.api.formatter.label,searchList:Config.models },
+                    { field: "description", title: __("Description"), width: 300 },
+                    { field: "name", title: __("Name"), width: 300, operate: "LIKE" },
+                    { field: "type", title: __("Type"), width: 180,templet:bdTable.api.formatter.label,searchList:Config.typeText },
+                    { field: "sorting", title: __("Sorting"), width: 180 },
+                    { title: __("Operate"), align: "center", templet: bdTable.api.formatter.operate },
+                ],
+            ],
+        });
+    });
+</script>

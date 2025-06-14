@@ -1,0 +1,244 @@
+{if get_sys_config('commentstatus')}
+<div class="shadow-sm p-3 my-5 bg-white rounded">
+  <!-- 发表评论 -->
+  <h4>{:__('PublishComment')}</h4>
+  <form class="my-4" data-action="{:url('/comment/add')}">
+    <div class="form-group">
+      <textarea
+        name="comment"
+        id="comment"
+        class="form-control"
+        placeholder="{:__('PleaseEnterCommentContent')}"
+      ></textarea>
+    </div>
+
+    {if get_sys_config('commentcodestatus')}
+    <div class="form-group">
+      <div class="row">
+        <div class="col-6 col-md-3">
+          <input
+            type="text"
+            name="captcha"
+            required
+            id="captcha"
+            class="form-control"
+            placeholder="{:__('PleaseEnterVerificationCode')}"
+          />
+        </div>
+        <div class="col-6 col-md-3">
+          <img
+            title="{:__('ClickRefresh')}"
+            class="codeimg"
+            style="height: 33px"
+          />
+        </div>
+      </div>
+    </div>
+    {/if}
+
+    <div class="form-group">
+      <button type="button" class="btn-submit btn btn-primary mb-2">
+        <!-- 提交评论 -->
+        {:__('SubmitComment')}
+      </button>
+    </div>
+  </form>
+
+  <!-- 评论记录 -->
+  <h4>{:__('CommentRecord')}</h4>
+  <a name="comment"></a>
+  {bd:comment contentid="$content['id']"}
+  <div class="media border-bottom pb-3 pt-3">
+    <img class="mr-3" src="{$comment.avatar}" style="height: 25px" />
+    <div class="media-body">
+      <h6 class="mt-0">
+        <strong>{$comment.nickname}</strong>
+        <small style="color: #999">{$comment.date}</small>
+      </h6>
+      <p>
+        {$comment.comment}
+        <span
+          class="badge badge-light text-secondary font-weight-normal replybtn"
+          data-action="{$comment.replyaction}"
+        >
+          <!-- 回复 -->
+          {:__('Reply')}
+        </span>
+      </p>
+
+      {bd:commentsub}
+      <!-- 调用子评论 -->
+      <div class="media mt-3 border-top-dashed pt-3">
+        <img class="mr-3" src="{$commentsub.headpic}" style="height: 25px" />
+        <div class="media-body">
+          <h6 class="mt-0">
+            <strong>{$commentsub.nickname}</strong>
+            <small style="color: #999">{$commentsub.date}</small>
+          </h6>
+          <p>
+            @{$commentsub.pnickname} {$commentsub.comment}
+            <span
+              class="badge badge-light text-secondary font-weight-normal replybtn"
+              data-action="{$commentsub.replyaction}"
+            >
+              <!-- 回复 -->
+              {:__('Reply')}
+            </span>
+          </p>
+        </div>
+      </div>
+      {/bd:commentsub}
+    </div>
+  </div>
+  {/bd:comment}
+
+  <!-- 分页 -->
+  <div class="text-center pt-5">{$page.bar |raw}</div>
+</div>
+
+<!-- 评论回复弹框 -->
+<div class="modal" tabindex="-1" role="dialog" id="reply">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- 回复评论 -->
+        <h5 class="modal-title">{:__('ReplyComment')}</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <form
+        onsubmit="return submitcomment(this);"
+        data-action=""
+        id="replyform"
+      >
+        <div class="modal-body">
+          <div class="form-group">
+            <textarea
+              name="comment"
+              id="comment"
+              class="form-control"
+              placeholder="{:__('PleaseEnterCommentContent')}"
+            ></textarea>
+          </div>
+          {if get_sys_config('commentcodestatus')}
+          <div class="form-group">
+            <div class="row">
+              <div class="col-6">
+                <input
+                  type="text"
+                  name="captcha"
+                  required
+                  id="captcha"
+                  class="form-control"
+                  placeholder="{:__('PleaseEnterVerificationCode')}"
+                />
+              </div>
+              <div class="col-6">
+                <img
+                  title="{:__('ClickRefresh')}"
+                  class="codeimg"
+                  style="height: 33px"
+                />
+              </div>
+            </div>
+          </div>
+          {/if}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">
+            {:__('Close')}
+          </button>
+          <button type="button" class="btn btn-primary btn-submit">
+            {:__('SubmitComment')}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  layui.use(function () {
+    var layer = layui.layer;
+
+    //评论回复弹框
+    $(".replybtn").on("click", function () {
+      var url = $(this).data("action");
+      $("#reply").modal("show");
+      $("#replyform").data("action", url);
+    });
+
+    $(".btn-submit").on("click", function () {
+      submitcomment($(this).parents("form"));
+    });
+
+    //提交评论
+    function submitcomment(obj) {
+      var url = $(obj).data("action");
+      var comment = $(obj).find("#comment").val();
+      var captcha = $(obj).find("#captcha").val();
+      var captchaId = $(obj).find("img.codeimg").data("id");
+      var loadIndex = layer.load(0);
+      $.ajax({
+        type: "POST",
+        url: url,
+        dataType: "json",
+        data: {
+          comment: comment,
+          captcha: captcha,
+          captcha_id: captchaId,
+          contentid: "{$content.id}",
+        },
+        success: function (response, status) {
+          layer.close(loadIndex);
+          if (response.code === undefined) {
+            layer.msg(__("ReturnDataAbnormal"));
+            return false;
+          }
+
+          if (response.code == 1) {
+            layer.msg(
+              response.msg,
+              {
+                icon: 1,
+              },
+              function () {
+                $(obj)[0].reset();
+                $(".modal").modal("hide");
+                window.location.reload();
+              }
+            );
+          } else {
+            if (response.url != "") {
+              layer.confirm(
+                response.msg,
+                {
+                  icon: 2,
+                },
+                function () {
+                  location.href = response.url;
+                }
+              );
+            } else {
+              layer.msg(response.msg);
+              $(".codeimg").click(); //更新验证码
+            }
+          }
+        },
+        error: function (xhr, status, error) {
+          layer.close(loadIndex);
+          layer.msg(__("ReturnDataAbnormal"));
+        },
+      });
+      return false;
+    }
+  });
+</script>
+{/if}

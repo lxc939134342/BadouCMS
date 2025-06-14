@@ -5,7 +5,6 @@ namespace app\admin\controller;
 use badou\Server;
 use think\Exception;
 use think\facade\Db;
-use think\facade\Cache;
 use think\facade\Config;
 use badou\ModuleException;
 use app\common\controller\Backend;
@@ -44,7 +43,6 @@ class Module extends Backend
 
     /**
      * 插件详情
-     * @return void
      */
     public function info()
     {

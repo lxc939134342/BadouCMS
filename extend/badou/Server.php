@@ -911,15 +911,6 @@ class Server
     }
 
     /**
-     * 获取bootstrap.js路径
-     * @return string
-     */
-    public static function getBootstrapFile($name)
-    {
-        return MODULE_PATH . $name . DIRECTORY_SEPARATOR . 'bootstrap.js';
-    }
-
-    /**
      * 获取testdata.sql路径
      * @return string
      */
@@ -956,7 +947,7 @@ class Server
      */
     protected static function getSourceAssetsDir($name)
     {
-        return MODULE_PATH . $name . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR;
+        return MODULE_PATH . $name .DIRECTORY_SEPARATOR.'public' . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR. $name . DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -966,7 +957,7 @@ class Server
      */
     protected static function getDestAssetsDir($name)
     {
-        $assetsDir = root_path() . str_replace("/", DIRECTORY_SEPARATOR, "public/assets/modules/{$name}/");
+        $assetsDir = root_path() . str_replace("/", DIRECTORY_SEPARATOR, "public/modules/{$name}/");
         return $assetsDir;
     }
 
@@ -987,7 +978,8 @@ class Server
     {
         return [
             'app',
-            'public'
+            'public',
+            'template'
         ];
     }
 

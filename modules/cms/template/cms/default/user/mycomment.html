@@ -1,0 +1,168 @@
+{extend name="user/base" /} {block name="main"}
+<style>
+  .user-views-card .el-card__body {
+    padding-top: 0;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+
+  .table-bordered {
+    border: 1px solid #ebeef5;
+  }
+
+  .table tr:first-child {
+    background-color: #f5f7fa;
+    font-weight: bold;
+  }
+
+  .table tr:first-child td {
+    padding: 12px 8px;
+  }
+
+  .table td {
+    padding: 8px;
+    border: 1px solid #ebeef5;
+    text-align: center;
+  }
+
+  /* 隔行换色 */
+  .table tr:not(:first-child):nth-child(even) {
+    background-color: #fafafa;
+  }
+
+  .table tr:not(:first-child):hover {
+    background-color: #f5f7fa;
+  }
+
+  /* 响应式处理 */
+  @media screen and (max-width: 768px) {
+    .table td {
+      padding: 6px;
+      font-size: 12px;
+    }
+  }
+</style>
+<div id="app">
+  <el-row class="frontend-footer-brother" justify="center">
+    <el-col class="user-layouts" :span="16" :xs="24">
+      {include file="user/left" /}
+      <el-main class="layout-main">
+        <div class="user-views">
+          <el-card class="user-views-card" shadow="hover">
+            <template #header>
+              <div class="card-header">
+                <span>{:__('My comments')}</span>
+              </div>
+            </template>
+            <div v-loading="state.pageLoading" stripe style="width: 100%">
+              <table class="table table-bordered" style="margin-top: 30px">
+                <tr>
+                  <td>{:__('No')}</td>
+                  <td width="200">{:__('Article')}</td>
+                  <td width="200">{:__('Comment content')}</td>
+                  <td>{:__('Status')}</td>
+                  <td>{:__('Comment time')}</td>
+                  <td>{:__('Operation')}</td>
+                </tr>
+                <tr v-for="(item, index) in state.data" :key="item.id">
+                  <td>{{ item.id }}</td>
+                  <td>{{ item?.content?.title || '-' }}</td>
+                  <td>{{ item.comment }}</td>
+                  <td>{{ item.status_text }}</td>
+                  <td>{{ item.create_time }}</td>
+                  <td>
+                    <el-button
+                      type="danger"
+                      size="small"
+                      @click="changeDeleteComment(item.id)"
+                    >
+                      {:__('Delete')}
+                    </el-button>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div v-if="state.total > 0" class="log-footer">
+              <el-pagination
+                :currentPage="state.currentPage"
+                :page-size="state.pageSize"
+                :page-sizes="[10, 20, 50, 100]"
+                background
+                :layout="'sizes, ->, prev, pager, next, jumper'"
+                :total="state.total"
+                @size-change="onTableSizeChange"
+                @current-change="onTableCurrentChange"
+              ></el-pagination>
+            </div>
+            <el-empty v-else />
+          </el-card>
+        </div>
+      </el-main>
+    </el-col>
+  </el-row>
+</div>
+
+<script>
+  const App = {
+    setup() {
+      const { ref, reactive } = Vue;
+      const user = Config.user;
+      const formRef = ref();
+      const state = reactive({
+        data: [],
+        currentPage: 1,
+        total: 0,
+        pageSize: 10,
+        pageLoading: true,
+      });
+
+      const onTableSizeChange = (val) => {
+        state.pageSize = val;
+        loadData();
+      };
+      const onTableCurrentChange = (val) => {
+        state.currentPage = val;
+        loadData();
+      };
+
+      const loadData = () => {
+        getMyComment(state.currentPage, state.pageSize).then((res) => {
+          state.pageLoading = false;
+          state.data = res.data.list;
+          state.total = res.data.total;
+        });
+      };
+      loadData();
+
+      const changeDeleteComment = (id) => {
+        ElementPlus.ElMessageBox.confirm(
+          '{:__("Are you sure you want to delete this comment?")}'
+        ).then(() => {
+          deleteComment(id).then((res) => {
+            if (res.code == 1) {
+              ElementPlus.ElMessage.success(res.msg);
+              loadData();
+            }
+          });
+        });
+      };
+      return {
+        state,
+        onTableSizeChange,
+        onTableCurrentChange,
+        timeFormat,
+        changeDeleteComment,
+      };
+    },
+  };
+  const app = Vue.createApp(App);
+
+  app.use(ElementPlus, { locale: ElementPlusLocaleZhCn });
+  app.mount("#app");
+</script>
+
+{/block}
