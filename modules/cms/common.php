@@ -669,7 +669,8 @@ function get_frontend_lang(): string
  */
 function get_default_lang(): string
 {
-    return Db::name('cms_area')->cache('cms_default_lang')->where('is_default', 1)->value('acode');
+    $acode = Db::name('cms_area')->cache('cms_default_lang')->where('is_default', 1)->value('acode');
+    return $acode ?: 'cn';
 }
 
 /**
