@@ -3,7 +3,7 @@
 <!-- 表格 -->
 <div class="layui-card">
     <div class="layui-card-body">
-        <table class="layui-hide" id="group" data-operate-edit="{:$auth->check('auth.group/edit')}" data-operate-del="{:$auth->check('auth.group/del')}"></table>
+        <table class="layui-hide" id="admin" data-operate-edit="{:$auth->check('auth.admin/edit')}" data-operate-del="{:$auth->check('auth.admin/del')}"></table>
     </div>
 </div>
 
@@ -11,7 +11,7 @@
 <script type="text/html" id="toolbar">
 	<a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
 	<button class="layui-btn layui-bg-green" lay-event="add"><i class="fa fa-plus"></i> {:__('Add')}</button>
-	<button class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('auth.group/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
+	<button class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('auth.admin/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
 	<button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
 	<!-- <button class="layui-btn" id="expandAll"><i class="fa fa-plus"></i> {:__('Expendall')}</button> -->
 </script>
@@ -25,48 +25,26 @@
         var table = layui.table;
         var layer = layui.layer;
         // var dropdown = layui.dropdown;
-        var jstree = layui.jstree;
+        // var jstree = layui.jstree;
         var $ = layui.$;
         var form = layui.form;
 
-
-        //读取选中的条目
-        // $.jstree.core.prototype.get_all_checked = function(full) {
-        //     var obj = this.get_selected(),
-        //         i, j;
-        //     for (i = 0, j = obj.length; i < j; i++) {
-        //         obj = obj.concat(this.get_node(obj[i]).parents);
-        //     }
-        //     obj = $.grep(obj, function(v, i, a) {
-        //         return v != '#';
-        //     });
-        //     obj = obj.filter(function(itm, i, a) {
-        //         return i == a.indexOf(itm);
-        //     });
-        //     return full ? $.map(obj, $.proxy(function(i) {
-        //         return this.get_node(i);
-        //     }, this)) : obj;
-        // };
-
-
-        // var tree = layui.tree;
-        // var util = layui.util;
         //初始化表格
         bdTable.api.init({
             table:table, // layui 表格对象，支持普通table与树结构table
             extend: {
-                index_url: "auth.group/index", //获取表格数据
-                add_url: "auth.group/add", //添加数据
-                edit_url: "auth.group/edit", //编辑数据
-                del_url: "auth.group/del", //删除数据
-                multi_url: "auth.group/multi", //批量处理
-                table: "auth_group", //数据表名称
+                index_url: "auth.admin/index", //获取表格数据
+                add_url: "auth.admin/add", //添加数据
+                edit_url: "auth.admin/edit", //编辑数据
+                del_url: "auth.admin/del", //删除数据
+                multi_url: "auth.admin/multi", //批量处理
+                table: "admin", //数据表名称
             },
         });
         // 创建渲染实例
         bdTable.render({
-            elem: "#group",
-            url: "{:url('auth.group/index')}",
+            elem: "#admin",
+            url: "{:url('auth.admin/index')}",
             pk: "id",
             even: true,
             // toolbar: ['refresh', 'add'],
@@ -76,18 +54,21 @@
                 [
                     { type: "checkbox" },
                     { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "id", title: "父级", width: 80, sort: true },
-                    { field: "name", align: 'left', title: "名称" ,perate:'likeo' ,templet: function(d){
-                            return d.name.toString().replace(/(&|&amp;)nbsp;/g, '&nbsp;');
-                    }},
-                    // { field: "name", title: "规则", width: 300, searchType:'remoteSelect',extend:'data-source="auth.group/selectpage" data-field="title" data-multiple="false" data-is-tree="1"' },
-                    // { field: "icon", title: "图标", width: 150, templet: bdTable.api.formatter.icon,operate:false },
-                    // { field: "weigh", title: "权重", width: 100,operate:'BETWEEN' },
+                    { field: "username", title: "登录名", width: 150, sort: true },
+                    { field: 'groups_text',  title: '所属角色', search: false,align: 'center', templet: bdTable.api.formatter.label ,
+                        extend: 'data-source="auth.admin/get_group_list" data-field="groups_text" data-multiple="true" data-is-tree="true"',
+                    },
+
+                    { field: 'last_login_ip', title: '最后登录IP', searchOp: 'like' },
+                    { field: 'last_login_time', width: 200, title: '最后登录时间', search: 'range' },
+                    { field: 'email', width: 200, title: '邮箱', searchOp: 'like' },
+                    { field: 'mobile', width: 200, title: '手机', searchOp: 'like' },
+
                     {
                         field: "status",
                         title: "状态",
                         width: 100,
-                        searchList: { normal: "正常", hidden: "隐藏" },
+                        searchList: { normal: "正常", hidden: "禁用" },
                         custom: { normal: "green", hidden: "orange" },
                         templet: bdTable.api.formatter.status,
                     },
@@ -96,7 +77,7 @@
                     width: 190,
                     align: "center",
                     templet: function(d) {
-                                if (Config.admin.group_ids.indexOf(parseInt(d.id)) > -1) {
+                                if (d.id == Config.admin.id) {
                                     return '<a class="layui-btn layui-btn-xs layui-btn-danger layui-btn-disabled">不可操作</a>';
                                 } else {
                                     return bdTable.api.formatter.operate.call(this, d, this);
@@ -107,17 +88,6 @@
                 ],
             ],
         });
-        
-        // bdTable.addEvent("add", function() {
-        //     Controller.api.bindevent();
-        // });
-        
-        // add: function() {
-        //     Controller.api.bindevent();
-        // },
-        // edit: function() {
-        //     Controller.api.bindevent();
-        // },
         
 
 
