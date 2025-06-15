@@ -1,7 +1,6 @@
-<table
-    class="layui-hide"
-    id="module"></table>
+<table class="layui-hide" id="module"></table>
 
+{include file="module/script" /}
 
 <script id="operatetpl" type="text/html">
     {{ var labelarr = ['primary', 'success', 'info', 'danger', 'warning'] }}
@@ -12,14 +11,14 @@
         {{ if(!module){ }}
             {{ if(typeof d.releaselist !="undefined" && d.releaselist.length>1){ }}
                 <button
-                    class="layui-btn layui-btn-xs btn-dropdown btn-upgrade"
+                    class="layui-btn layui-btn-xs layui-bg-green btn-dropdown btn-install"
                     lay-options="{ customName: {
                         id: 'id',
                         title: 'version',
                     }, data: {{= JSON.stringify(d.releaselist) }} }"
                 >{:__('Install')} <i class="layui-icon layui-icon-down layui-font-12"></i></button>
             {{ }else if(typeof d.releaselist !="undefined" && d.releaselist.length>0){}}
-                <a href="javascript:;" class="layui-btn layui-btn-xs btn-primary btn-success btn-install"
+                <a href="javascript:;" class="layui-btn layui-btn-xs layui-bg-green btn-install"
                     data-type="{{= d.price<=0?'free':'price' }}"
                    data-version="{{=d.version}}"><i class="fa fa-cloud-download"></i> {:__('Install')}</a>
             {{ } }}
@@ -114,6 +113,7 @@
                 [
                     { field: "name", title: __("Name"), width: 200 },
                     { field: "title", title: __("Title"), width: 250 },
+                    { field: "images", title: __("Images"), width: 250, templet: bdTable.api.formatter.image },
                     {
                         field: "intro",
                         title: __("Intro"),
@@ -169,6 +169,33 @@
 
         $(document).on("click", ".btn-refresh", function () {
             bdTable.api.events.toolbar.refresh();
+        });
+
+        $(document).on("click", ".btn-install", function () {
+            var that = this;
+            var name = $(that).parents(".operate").data("name");
+            var version = $(that).data("version");
+            var type = $(that).data("type");
+            install(name, version, type);
+        });
+
+        $(document).on("click", ".btn-upgrade", function () {
+            var that = this;
+            var name = $(that).parents(".operate").data("name");
+            var version = $(that).data("version");
+            upgrade(name, version);
+        });
+
+        $(document).on("click", ".btn-uninstall", function () {
+            var that = this;
+            var name = $(that).parents(".operate").data("name");
+            uninstall(name);
+        });
+
+        $(document).on("click", ".btn-config", function () {
+            var that = this;
+            var name = $(that).parents(".operate").data("name");
+            config(name);
         });
     });
 </script>

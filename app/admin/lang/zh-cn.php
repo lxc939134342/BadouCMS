@@ -85,4 +85,5 @@ return [
     'Info'                                                  => '详情',
     'Show'                                                  => '显示',
     'Hide'                                                  => '隐藏',
+    'Install'                                               => '安装'
 ];

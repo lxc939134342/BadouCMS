@@ -62,48 +62,7 @@
 
     </div>
 </div>
-<script id="uninstalltpl" type="text/html">
-    <div class="">
-        <div class="">{{-__("Are you sure you want to unstall %s?", d.title)}}
-            <p class="text-danger">{:__('Delete all the module file and cannot be recovered!')} </p>
-            {if env('app_debug')}
-            <p class="text-danger"><input type="checkbox" name="droptables" id="droptables" data-name="{{=d.name}}"/> {:__('Delete all the module database and cannot be recovered!')} </p>
-            {/if}
-            <p class="text-danger">{:__('Please backup important data manually before uninstall!')}</p>
-        </div>
-    </div>
-</script>
-
-<script id="conflicttpl" type="text/html">
-    <div class="alert alert-dismissable alert-danger">
-        <button type="button" class="close" data-dismiss="alert">×</button>
-        <strong>{:__('Warning')}</strong> {:__('Conflict tips')}
-    </div>
-    <table class="table table-striped">
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>{:__('File')}</th>
-        </tr>
-        </thead>
-        <tbody>
-            {{ for(var i=0;i < d.conflictlist.length;i++) { }}
-            <tr>
-                <th scope="row">{{=i+1 }}</th>
-                <td>{{=d.conflictlist[i] }}</td>
-            </tr>
-            {{ } }}
-        </tbody>
-    </table>
-</script>
-
-<script id="upgradetpl" type="text/html">
-    <div class="">
-        <div class="">{{-__("Are you sure you want to upgrade %s?", d.title)}}
-            <p class="text-danger">{:__('Please backup important data manually before upgrading!')}</p>
-        </div>
-    </div>
-</script>
+{include file="module/script" /}
 
 <script type="text/javascript">
     layui.use(["badou","carousel", "dropdown", "layer", "form","laytpl"], function () {
@@ -112,10 +71,7 @@
         var $            = layui.$;
         var form         = layui.form;
         var badou        = layui.badou;
-        var laytpl       = layui.laytpl;
-        var Layer        = layui.layer;
-        var conflicttpl  = document.getElementById('conflicttpl').innerHTML;
-        var uninstalltpl = document.getElementById('uninstalltpl').innerHTML;
+
         var iframeRefresh = function () {
              // 获取当前iframe层的索引
              var index = parent.layer.getFrameIndex(window.name);
@@ -203,7 +159,9 @@
                 return false;
             }
 
-            install(name, version, false);
+            install(name, version, false,function(){
+                iframeRefresh();
+            });
         });
 
         // 点击卸载
@@ -243,201 +201,5 @@
             $(window).resize();
         });
 
-        var operate = function (name, action, force, success) {
-            badou.api.ajax({
-                url: 'module/state',
-                data: {name: name, action: action, force: force ? 1 : 0}
-            }, function (data, ret) {
-                var module = Config.info;
-                module.state = action === 'enable' ? 1 : 0;
-                Layer.closeAll();
-                if (typeof success === 'function') {
-                    success(data, ret);
-                }
-                return false;
-            }, function (data, ret) {
-                if (ret && ret.code === -3) {
-                    //模块目录发现影响全局的文件
-                    Layer.open({
-                        content:laytpl(conflicttpl, {tagStyle: 'modern'}).render(ret.data),
-                        shade: 0.8,
-                        area: area,
-                        title: __('Warning'),
-                        btn: [__('Continue operate'), __('Cancel')],
-                        end: function () {
-
-                        },
-                        yes: function () {
-                            operate(name, action, true, success);
-                        }
-                    });
-
-                } else {
-                    Layer.alert(ret.msg, {title: __('Warning'), icon: 0});
-                }
-                return false;
-            });
-        };
-
-        var install = function (name, version, force) {
-            var userinfo = badou.api.badouStorage.get('userinfo');
-            var uid = userinfo ? userinfo.id : 0;
-            var token = userinfo ? userinfo.token : '';
-            badou.api.ajax({
-                url: 'module/install',
-                data: {
-                    name: name,
-                    force: force ? 1 : 0,
-                    uid: uid,
-                    token: token,
-                    version: version,
-                    bdversion: Config.bdversion
-                }
-            }, function (data, ret) {
-                layer.closeAll();
-                operate(data.module.name, 'enable', false, function () {
-                    layer.alert(__('Online installed tips') + (data.module.testdata ? __('Testdata tips') : ""), {
-                        btn: data.module.testdata ? [__('Import testdata'), __('Skip testdata')] : [__('OK')],
-                        title: __('Warning'),
-                        yes: function (index) {
-                            if (data.module.testdata) {
-                                badou.api.ajax({
-                                    url: 'module/testdata',
-                                    data: {
-                                        name: name,
-                                        uid: uid,
-                                        token: token,
-                                        version: version,
-                                        bdversion: Config.bdversion
-                                    }
-                                }, function (data, ret) {
-                                    layer.close(index);
-                                });
-                            } else {
-                                layer.close(index);
-                            }
-                        },
-                        icon: 1,
-                        end: function () {
-                            iframeRefresh();
-                        }
-                    });
-
-                });
-                return false;
-            }, function (data, ret) {
-                var area = [$(window).width() > 650 ? '650px' : '95%', $(window).height() > 710 ? '710px' : '95%'];
-                if (ret && ret.code === -2) {
-                    //如果登录已经超时,重新提醒登录
-                    if (uid && uid != ret.data.uid) {
-                        badou.api.badouStorage.remove('userinfo');
-                        $(".btn-install").trigger("click");
-                        return;
-                    }
-                    console.log(ret.data.payurl);
-                    top.layer.open({
-                        content: ret.data.payurl,
-                        title: __('Pay now'),
-                        area: area,
-                        type:2,
-                        end: function () {
-                            badou.api.ajax({
-                                url: 'module/isbuy',
-                                data: {
-                                    name: name,
-                                    force: force ? 1 : 0,
-                                    uid: uid,
-                                    token: token,
-                                    version: version,
-                                    bdversion: Config.bdversion
-                                }
-                            }, function () {
-                                top.layer.alert(__('Pay successful tips'), {
-                                    btn: [__('Continue installation')],
-                                    title: __('Warning'),
-                                    icon: 1,
-                                    yes: function (index) {
-                                        top.layer.close(index);
-                                        install(name, version);
-                                    }
-                                });
-                                return false;
-                            }, function () {
-                                console.log(__('Canceled'));
-                                return false;
-                            });
-                        }
-                    })
-                } else if (ret && ret.code === -3) {
-                    //模块目录发现影响全局的文件
-                    layer.open({
-                        content: laytpl(conflicttpl, {tagStyle: 'modern'}).render(ret.data),
-                        shade: 0.8,
-                        area: area,
-                        title: __('Warning'),
-                        btn: [__('Continue install'), __('Cancel')],
-                        end: function () {
-
-                        },
-                        yes: function () {
-                            install(name, version, true);
-                        }
-                    });
-
-                } else {
-                    layer.alert(ret.msg, {title: __('Warning'), icon: 0});
-                }
-                return false;
-            });
-        };
-
-        var uninstall = function (name, force, droptables) {
-            badou.api.ajax({
-                url: 'module/uninstall',
-                data: {name: name, force: force ? 1 : 0, droptables: droptables ? 1 : 0}
-            }, function (data, ret) {
-                Layer.closeAll();
-                iframeRefresh();
-                return false;
-            }, function (data, ret) {
-                if (ret && ret.code === -3) {
-                    //模块目录发现影响全局的文件
-                    Layer.open({
-                        content: laytpl(conflicttpl, {tagStyle: 'modern'}).render(ret.data),
-                        shade: 0.8,
-                        area: area,
-                        title: __('Warning'),
-                        btn: [__('Continue uninstall'), __('Cancel')],
-                        end: function () {
-
-                        },
-                        yes: function () {
-                            uninstall(name, true, droptables);
-                        }
-                    });
-
-                } else {
-                    Layer.alert(ret.msg, {title: __('Warning'), icon: 0});
-                }
-                return false;
-            });
-        };
-
-        var upgrade = function (name, version) {
-            var userinfo = badou.api.badouStorage.get('userinfo');
-            var uid = userinfo ? userinfo.id : 0;
-            var token = userinfo ? userinfo.token : '';
-            badou.api.ajax({
-                url: 'module/upgrade',
-                data: {name: name, uid: uid, token: token, version: version, faversion: Config.faversion}
-            }, function (data, ret) {
-                Config.info = data.module;
-                Layer.closeAll();
-
-            }, function (data, ret) {
-                Layer.alert(ret.msg, {title: __('Warning')});
-                return false;
-            });
-        };
     });
 </script>
