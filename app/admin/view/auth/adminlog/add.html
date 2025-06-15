@@ -2,49 +2,60 @@
 <form class="layui-form" method="post" >
     {:token_field()}
     <div class="layui-form-item">
-        <label class="layui-form-label">父级</label>
+        <label class="layui-form-label">所属组别</label>
         <div class="layui-input-block">
-        <select name="row[parentid]" lay-verify="required" lay-filter="parentid">
-            <?php foreach ($groupdata as $key => $value): ?>
-                <option value="<?php echo $key; ?>" <?php if ($key === 0) echo 'selected'; ?>>
-                    <?php echo $value; ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
+            <input class="form-control layui-input selectpage" type="text" name="group" data-source="{:url('auth.admin/get_group_list')}" data-multiple="true" data-pagination="false" data-escape="false" value="">
         </div>
     </div>
-
     <div class="layui-form-item">
-        <label class="layui-form-label">权限组</label>
+        <label class="layui-form-label">用户名</label>
         <div class="layui-input-block">
-            <input type="text" name="row[name]" lay-verify="required" autocomplete="off" placeholder="权限组" class="layui-input" value="">
+            <input type="text" name="row[username]" lay-verify="required" autocomplete="off" placeholder="用户名" class="layui-input">
         </div>
     </div>
-
-
+    <div class="layui-form-item">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-block">
+            <input type="password" name="row[password]" lay-verify="required" autocomplete="off" placeholder="密码" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">确认密码</label>
+        <div class="layui-input-block">
+            <input type="password" name="row[password_confirm]" lay-verify="required" autocomplete="off" placeholder="确认密码" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">邮箱</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[email]" lay-verify="required|email" autocomplete="off" placeholder="邮箱" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">手机</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[mobile]" autocomplete="off" placeholder="手机" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">真实姓名</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[nickname]" autocomplete="off" placeholder="真实姓名" class="layui-input">
+        </div>
+    </div>
     <div class="layui-form-item">
         <label class="layui-form-label">状态</label>
-        <div class="layui-input-block">
+        <div class="layui-input-inline">
             <input type="radio" name="row[status]" value="normal" title="显示" checked>
-            <input type="radio" name="row[status]" value="hidden" title="隐藏">
+            <input type="radio" name="row[status]" value="hidden" title="禁止">
         </div>
     </div>
-
-    <div class="layui-form-item">
-        <label class="layui-form-label">权限</label>
-
+    <!-- <div class="layui-form-item layer-footer">
         <div class="layui-input-block">
-            <!-- <div class="layui-btn-container"> -->
-                <!-- <button type="button" class="layui-btn layui-btn-sm" lay-on="getChecked">获取选中节点数据</button>
-                <button type="button" class="layui-btn layui-btn-sm" lay-on="setChecked">勾选指定节点</button>
-                <button type="button" class="layui-btn layui-btn-sm" lay-on="reload">重载实例</button> -->
-            <!-- </div> -->
-            <input type="checkbox" name="" title="选中全部" lay-filter="checkall">
-            <input type="checkbox" name="" title="展开全部" lay-filter="expandall">
-            <div id="treeview"></div>
+            <button class="layui-btn disabled" lay-submit>立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
         </div>
-    </div>
-
+    </div> -->
 
     <div class="layui-form-item layer-footer hide">
         <div class="layui-input-block">
@@ -52,6 +63,7 @@
             <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
         </div>
     </div>
+
 
 </form>
 

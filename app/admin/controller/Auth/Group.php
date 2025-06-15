@@ -144,7 +144,7 @@ class Group extends Backend
     //编辑管理员用户组
     public function edit()
     {
-        $id = $this->request->param('id/d');
+        $id = $this->request->param('ids/d');
         if (!in_array($id, $this->childrenGroupIds)) {
             $this->error('你没有权限访问!');
         }
@@ -261,18 +261,23 @@ class Group extends Backend
      */
     public function roletree()
     {
+        // p($this->request->param));die;
 
         $model             = new AuthGroupModel();
-        $id                = $this->request->post("id");
-        $pid               = $this->request->post("parentid");
+        $id                = $this->request->param("id");
+        $pid               = $this->request->param("pid");
         $parentGroupModel  = $model->find($pid);
         $currentGroupModel = null;
+        // p($id);
+        // p($pid);
+        // p($parentGroupModel);
+        // die;
         if ($id) {
             $currentGroupModel = $model->find($id);
         }
         if (($pid || $parentGroupModel) && (!$id || $currentGroupModel)) {
             $id       = $id ? $id : null;
-            $ruleList = AuthRuleModel::order('listorder', 'desc')->order('id', 'asc')->select()->toArray();
+            $ruleList = AuthRuleModel::order('weigh', 'desc')->order('id', 'asc')->select()->toArray();
 
             //读取父类角色所有节点列表
             $parentRuleList = [];
@@ -316,11 +321,11 @@ class Group extends Backend
                     if (!$superadmin && !in_array($v['id'], $adminRuleIds)) {
                         continue;
                     }
-                    if ($v['parentid'] && !in_array($v['parentid'], $parentRuleIds)) {
+                    if ($v['pid'] && !in_array($v['pid'], $parentRuleIds)) {
                         continue;
                     }
                     $state      = ['selected' => in_array($v['id'], $currentRuleIds) && !in_array($v['id'], $hasChildrens)];
-                    $nodeList[] = ['id' => $v['id'], 'parent' => $v['parentid'] ? $v['parentid'] : '#', 'text' => $v['title'], 'type' => 'menu', 'state' => $state];
+                    $nodeList[] = ['id' => $v['id'], 'parent' => $v['pid'] ? $v['pid'] : '#', 'text' => $v['title'], 'type' => 'menu', 'state' => $state];
                 }
                 $this->success('', null, $nodeList);
             } else {
