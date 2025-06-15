@@ -5,7 +5,6 @@ namespace app\admin\controller;
 use badou\Server;
 use think\Exception;
 use think\facade\Db;
-use think\facade\Cache;
 use think\facade\Config;
 use badou\ModuleException;
 use app\common\controller\Backend;
@@ -17,7 +16,10 @@ class Module extends Backend
         if ($this->isAjax()) {
             $modules = Server::getInstalldModuleList();
             $list = [];
-            $res = Server::modules();
+            $params = [
+                'type' => $this->request->param('type')
+            ];
+            $res = Server::modules($params);
             if ($res && $res['code'] == 1) {
                 $list = $res['data'];
             }
@@ -25,7 +27,6 @@ class Module extends Backend
             foreach ($list as &$item) {
                 $module = $modules[$item['name']] ?? '';
                 if ($module) {
-                    $item['version'] = $module['version'];
                     $item['name'] = $module['name'];
                     $item['state'] = $module['state'];
                     $item['module'] = $module;
@@ -44,7 +45,6 @@ class Module extends Backend
 
     /**
      * 插件详情
-     * @return void
      */
     public function info()
     {

@@ -7,6 +7,7 @@ class Cms
     public function AppInit()
     {
         include_once __DIR__ . '/common.php';
+        bind('think\Paginator', 'modules\cms\library\Bootstrap');
         return [];
     }
 

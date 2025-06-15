@@ -2,12 +2,15 @@
 
 // 应用公共文件
 use think\Response;
+use think\facade\App;
 use think\facade\Lang;
+use think\facade\Event;
 use think\facade\Config;
 use voku\helper\AntiXSS;
+use app\admin\model\Config as configModel;
 use think\exception\HttpResponseException;
 
-// 简化写法
+// 简化目录分割线写法
 !defined('DS') && define('DS', DIRECTORY_SEPARATOR);
 
 
@@ -221,6 +224,52 @@ if (!function_exists('cdnurl')) {
     }
 }
 
+if (!function_exists('full_url')) {
+
+    /**
+     * 获取资源完整url地址；若安装了云存储或 config/badouadmin.php 配置了CdnUrl，则自动使用对应的CdnUrl
+     * @param string      $relativeUrl 资源相对地址 不传入则获取域名
+     * @param string|bool $domain      是否携带域名 或者直接传入域名
+     * @param string      $default     默认值
+     * @return string
+     */
+    function full_url(string $relativeUrl = '', string|bool $domain = true, string $default = ''): string
+    {
+        // 存储/上传资料配置
+        Event::trigger('uploadConfigInit', App::getInstance());
+
+        $cdnUrl = Config::get('badouadmin.cdn_url');
+        if (!$cdnUrl) {
+            $cdnUrl = request()->upload['cdn'] ?? '//' . request()->host();
+        }
+        if ($domain === true) {
+            $domain = $cdnUrl;
+        } elseif ($domain === false) {
+            $domain = '';
+        }
+
+        $relativeUrl = $relativeUrl ?: $default;
+        if (!$relativeUrl) {
+            return $domain;
+        }
+
+        $regex = "/^((?:[a-z]+:)?\/\/|data:image\/)(.*)/i";
+        if (preg_match('/^http(s)?:\/\//', $relativeUrl) || preg_match($regex, $relativeUrl) || $domain === false) {
+            return $relativeUrl;
+        }
+
+        $url          = $domain . $relativeUrl;
+        $cdnUrlParams = Config::get('buildadmin.cdn_url_params');
+        if ($domain === $cdnUrl && $cdnUrlParams) {
+            $separator = str_contains($url, '?') ? '&' : '?';
+            $url       .= $separator . $cdnUrlParams;
+        }
+
+        return $url;
+    }
+}
+
+
 if (!function_exists('letter_avatar')) {
     /**
      * 首字母头像
@@ -291,5 +340,106 @@ if (!function_exists('hsv2rgb')) {
             floor($g * 255),
             floor($b * 255)
         ];
+    }
+}
+
+if (!function_exists('get_sys_config')) {
+
+    /**
+     * 获取站点的系统配置，不传递参数则获取所有配置项
+     * @param string $name    变量名
+     * @param string $group   变量分组，传递此参数来获取某个分组的所有配置项
+     * @param bool   $concise 是否开启简洁模式，简洁模式下，获取多项配置时只返回配置的键值对
+     * @return mixed
+     * @throws Throwable
+     */
+    function get_sys_config(string $name = '', string $group = '', bool $concise = true): mixed
+    {
+        if ($name) {
+            // 直接使用->value('value')不能使用到模型的类型格式化
+            $config = configModel::cache($name, null, configModel::$cacheTag)->where('name', $name)->find();
+            if ($config) {
+                $config = $config['value'];
+            }
+        } else {
+            if ($group) {
+                $temp = configModel::cache('group' . $group, null, configModel::$cacheTag)->where('group', $group)->select()->toArray();
+            } else {
+                $temp = configModel::cache('sys_config_all', null, configModel::$cacheTag)->order('weigh desc')->select()->toArray();
+            }
+            if ($concise) {
+                $config = [];
+                foreach ($temp as $item) {
+                    $config[$item['name']] = $item['value'];
+                }
+            } else {
+                $config = $temp;
+            }
+        }
+        return $config;
+    }
+}
+
+if (!function_exists('str_attr_to_array')) {
+
+    /**
+     * 将字符串属性列表转为数组
+     * @param string $attr 属性，一行一个，无需引号，比如：class=input-class
+     * @return array
+     */
+    function str_attr_to_array(string $attr): array
+    {
+        if (!$attr) {
+            return [];
+        }
+        $attr     = explode("\n", trim(str_replace("\r\n", "\n", $attr)));
+        $attrTemp = [];
+        foreach ($attr as $item) {
+            $item = explode('=', $item);
+            if (isset($item[0]) && isset($item[1])) {
+                $attrVal = $item[1];
+                if ($item[1] === 'false' || $item[1] === 'true') {
+                    $attrVal = !($item[1] === 'false');
+                } elseif (is_numeric($item[1])) {
+                    $attrVal = (float)$item[1];
+                }
+                if (strpos($item[0], '.')) {
+                    $attrKey = explode('.', $item[0]);
+                    if (isset($attrKey[0]) && isset($attrKey[1])) {
+                        $attrTemp[$attrKey[0]][$attrKey[1]] = $attrVal;
+                        continue;
+                    }
+                }
+                $attrTemp[$item[0]] = $attrVal;
+            }
+        }
+        return $attrTemp;
+    }
+}
+
+
+if (!function_exists('keys_to_camel_case')) {
+
+    /**
+     * 将数组 key 的命名方式转换为小写驼峰
+     * @param array $array 被转换的数组
+     * @param array $keys  要转换的 key，默认所有
+     * @return array
+     */
+    function keys_to_camel_case(array $array, array $keys = []): array
+    {
+        $result = [];
+        foreach ($array as $key => $value) {
+            // 将键名转换为驼峰命名
+            $camelCaseKey = $keys && in_array($key, $keys) ? parse_name($key, 1, false) : $key;
+
+            if (is_array($value)) {
+                // 如果值是数组，递归转换
+                $result[$camelCaseKey] = keys_to_camel_case($value);
+            } else {
+                $result[$camelCaseKey] = $value;
+            }
+        }
+        return $result;
     }
 }

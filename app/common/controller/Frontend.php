@@ -91,7 +91,7 @@ class Frontend extends BaseController
         $lang = $this->app->lang->getLangSet();
         $lang = preg_match("/^([a-zA-Z\-_]{2,10})\$/i", $lang) ? $lang : 'zh-cn';
 
-        $site = Config::get("site");
+        $site = get_sys_config();
 
         $upload = \app\common\model\Config::upload();
 
@@ -100,7 +100,7 @@ class Frontend extends BaseController
 
         // 配置信息
         $config = [
-            'site'           => array_intersect_key($site, array_flip(['name', 'cdnurl', 'version', 'timezone', 'languages'])),
+            'site'           => array_intersect_key($site, array_flip(['site_name', 'version'])),
             'upload'         => $upload,
             'modulename'     => $modulename,
             'controllername' => $controllername,
@@ -130,6 +130,7 @@ class Frontend extends BaseController
         $name    = preg_match("/^([a-zA-Z0-9_\.\/]+)\$/i", $name) ? $name : 'index';
         $lang    = $this->app->lang->getLangSet();
         $lang    = preg_match("/^([a-zA-Z\-_]{2,10})\$/i", $lang) ? $lang : 'zh-cn';
+
         $langArr = $this->app->lang->load([
             app_path() . 'lang' . DIRECTORY_SEPARATOR . $lang . DIRECTORY_SEPARATOR . (str_replace('.', DIRECTORY_SEPARATOR, $name)) . '.php',
         ]);

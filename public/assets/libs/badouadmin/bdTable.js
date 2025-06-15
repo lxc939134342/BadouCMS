@@ -395,6 +395,9 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     // 刷新表格
                     refresh: function (id) {
                         var table = bdTable.table;
+                        if (!id) {
+                            id = bdTable.initTable.config.id;
+                        }
                         table.reload(id);
                     },
                     // 添加

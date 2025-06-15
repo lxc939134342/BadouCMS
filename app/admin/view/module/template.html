@@ -1,0 +1,116 @@
+ <div id="modules-wrapper"></div>
+
+<script type="text/html" id="cardTpl">
+    <div
+        id="{{=d.item.name}}"
+        data-name="{{=d.item.name}}"
+        class="layui-col-md{{=d.line }} ew-datagrid-item btn-item"
+        data-number="1">
+        <div class="project-list-item">
+            <img class="project-list-item-cover" src="{{=d.item.image }}" />
+            <div class="project-list-item-body">
+                <h2 class="layui-elip">{{=d.item.title }}</h2>
+                <div>{{=d.item.intro }}</div>
+                <div class="project-list-item-text layui-text">
+                    <span class="layui-badge layui-bg-black">{{=d.item.author}}</span>
+                    <span class="layui-badge layui-bg-green">{{=d.item.version}}</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span>
+                        <i class="fa fa-download"></i>
+                        0
+                    </span>
+                    {{ if(d.item.module) { }} {{ if(d.item.state==1) { }}
+                    <button class="layui-btn layui-bg-green">已安装</button>
+                    {{ } else { }}
+                    <button class="layui-btn layui-bg-orange">已禁用</button>
+                    {{ } }} {{ } else { }}
+                    <span>￥{{=d.item.price}}</span>
+                    {{ } }}
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script>
+    layui.use(["badou", "cardList", "form", "laytpl"], function () {
+        var bdTable = layui.bdTable;
+        var card = layui.cardList;
+        var form = layui.form;
+        var laytpl = layui.laytpl;
+        var badou = layui.badou;
+        var layer = layui.layer;
+        var dropdown = layui.dropdown;
+        var template = document.getElementById("cardTpl").innerHTML; // 获取模板字符
+        var cardOptions = {
+            elem: "#modules-wrapper",
+            url: "{:url('module/index')}", // 接口数据
+            data: [], // 静态数据
+            where:{
+                'type':'template'
+            },
+            page: true, // 是否分页
+            limit: 8, // 每页数量
+            linenum: 4, // 每行数量
+            itemTpl: template,
+            response: {
+                statusCode: 1,
+            },
+            done: function () {
+                dropdown.render({
+                    elem: ".btn-upgrade",
+                });
+            },
+        };
+        card.render(cardOptions);
+
+        $(document).on("click", ".btn-refresh", function () {
+            card.reload("modules-wrapper");
+        });
+
+        // 监听搜索操作
+        form.on("submit(data-search-btn)", function (data) {
+            queryJson = data.field;
+            card.reload("currentTableId", {
+                where: queryJson,
+            });
+            return false;
+        });
+
+        form.on("submit(data-checked-btn)", function () {
+            var data = card.getChecked("currentTableId");
+            layer.msg(JSON.stringify(data));
+            return false;
+        });
+        form.on("submit(data-btn)", function () {
+            var data = card.getAllData("currentTableId");
+            layer.msg(JSON.stringify(data));
+            return false;
+        });
+
+        $(document).on("click", ".btn-item", function () {
+            var name = $(this).data("name");
+            var userinfo = badou.api.badouStorage.get("userinfo");
+            if (!userinfo) {
+                $(".btn-userinfo").trigger("click");
+                return false;
+            }
+            var url =
+                "{:url('module/info')}?name=" +
+                name +
+                "&uid=" +
+                userinfo.id +
+                "&token=" +
+                userinfo.token +
+                "&bdversion=" +
+                Config.bdversion;
+            badou.api.open(url, __("Module info"), {
+                area: ["80%", "95%"],
+                end: function () {
+                    card.reload("modules-wrapper");
+                },
+            });
+        });
+    });
+</script>

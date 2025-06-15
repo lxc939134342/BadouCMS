@@ -2,12 +2,16 @@
 
 namespace app\common\library;
 
+use badou\Date;
 use badou\Random;
 use think\Exception;
 use think\facade\Db;
 use think\facade\Event;
 use think\facade\Config;
+use app\common\model\User;
+use think\facade\Validate;
 use app\common\facade\Token;
+use app\common\model\UserRule;
 
 /**
  * 前台权限类
@@ -165,7 +169,7 @@ class FrontendAuth
         ];
         $params = array_merge($data, [
             'nickname'  => preg_match("/^1[3-9]{1}\d{9}$/", $username) ? substr_replace($username, '****', 3, 4) : $username,
-            'salt'      => Random::alnum(),
+            'salt'      => Random::build(),
             'jointime'  => $time,
             'joinip'    => $ip,
             'logintime' => $time,
@@ -179,7 +183,7 @@ class FrontendAuth
         //账号注册时需要开启事务,避免出现垃圾数据
         Db::startTrans();
         try {
-            $user = User::create($params, true);
+            $user = User::create($params, []);
 
             $this->_user = User::get($user->id);
 
@@ -191,7 +195,7 @@ class FrontendAuth
             $this->_logined = true;
 
             //注册成功的事件
-            Event::trigger("user_register_successed", $this->_user, $data);
+            Event::trigger("user_register_successed", $this->_user);
             Db::commit();
         } catch (Exception $e) {
             $this->setError($e->getMessage());
@@ -274,7 +278,7 @@ class FrontendAuth
         if ($this->_user->password == $this->getEncryptPassword($oldpassword, $this->_user->salt) || $ignoreoldpassword) {
             Db::startTrans();
             try {
-                $salt = Random::alnum();
+                $salt = Random::build();
                 $newpassword = $this->getEncryptPassword($newpassword, $salt);
                 $this->_user->save(['loginfailure' => 0, 'password' => $newpassword, 'salt' => $salt]);
 
@@ -309,8 +313,8 @@ class FrontendAuth
                 $time = time();
 
                 //判断连续登录和最大连续登录
-                if ($user->logintime < \fast\Date::unixtime('day')) {
-                    $user->successions = $user->logintime < \fast\Date::unixtime('day', -1) ? 1 : $user->successions + 1;
+                if ($user->logintime < Date::unixtime('day')) {
+                    $user->successions = $user->logintime < Date::unixtime('day', -1) ? 1 : $user->successions + 1;
                     $user->maxsuccessions = max($user->successions, $user->maxsuccessions);
                 }
 
@@ -331,7 +335,7 @@ class FrontendAuth
                 $this->_logined = true;
 
                 //登录成功的事件
-                Hook::listen("user_login_successed", $this->_user);
+                Event::trigger("user_login_successed", $this->_user);
                 Db::commit();
             } catch (Exception $e) {
                 Db::rollback();
@@ -361,7 +365,8 @@ class FrontendAuth
         foreach ($ruleList as $k => $v) {
             $rules[] = $v['name'];
         }
-        $url = ($module ? $module : request()->module()) . '/' . (is_null($path) ? $this->getRequestUri() : $path);
+        $appName = app('http')->getName();
+        $url = ($module ? $module : $appName) . '/' . (is_null($path) ? $this->getRequestUri() : $path);
         $url = strtolower(str_replace('.', '/', $url));
         return in_array($url, $rules);
     }
@@ -469,9 +474,9 @@ class FrontendAuth
             // 删除会员
             User::destroy($user_id);
             // 删除会员指定的所有Token
-            Token::clear($user_id);
+            Token::clear('frontend', $user_id);
 
-            Hook::listen("user_delete_successed", $user);
+            Event::trigger("user_delete_successed", $user);
             Db::commit();
         } catch (Exception $e) {
             Db::rollback();
@@ -564,7 +569,7 @@ class FrontendAuth
      * 设置错误信息
      *
      * @param string $error 错误信息
-     * @return Auth
+     * @return FrontendAuth
      */
     public function setError($error)
     {

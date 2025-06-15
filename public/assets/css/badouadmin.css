@@ -352,3 +352,8 @@
 .layui-upload-list .layui-upload-item .btn-delete-img {
     width: 100%;
 }
+
+.layui-tabs-header .layui-this,
+.layui-tabs-header li:hover {
+    color: var(--blue-color) !important;
+}

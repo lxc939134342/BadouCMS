@@ -32,7 +32,7 @@ class Date
      * @throws Throwable
      * @example $seconds = self::offset('America/Chicago', 'GMT');
      */
-    public static function offset(string $remote, string $local = null, string|int $now = null): int
+    public static function offset(string $remote, ?string $local = null, string|int|null $now = null): int
     {
         if ($local === null) {
             // Use the default timezone
