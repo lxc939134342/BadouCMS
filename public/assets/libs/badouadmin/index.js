@@ -18,10 +18,16 @@ layui.config({
     bdForm: "bdForm",        // 表单组件
     cardList: "cardList",      // 卡片列表
     bdUpload: "bdUpload",      // 上传组件
+    // jstree: "jstree",   //  树结构
     // 组件扩展
     Sortable: {
         src: '/assets/libs/sortablejs/Sortable.min.js',
         api: 'Sortable'
+    },
+    // 组件扩展 - 树结构
+    jstree: {
+        src: '/assets/libs/jstree/jstree.min.js',
+        api: 'jstree'
     },
     bdTool: "bdTool",        // 工具组件
 });

@@ -1,54 +1,61 @@
 {layout name="layout/form" /}
-<form class="layui-form" method="post" >
+<form class="layui-form" method="post">
     {:token_field()}
     <div class="layui-form-item">
-        <label class="layui-form-label">父级</label>
+        <label class="layui-form-label">所属组别</label>
         <div class="layui-input-block">
-        <select name="row[parentid]" lay-verify="required" lay-filter="parentid">
-            <?php foreach ($groupdata as $key => $value): ?>
-                <option value="<?php echo $key; ?>" <?php if ($key === 0) echo 'selected'; ?>>
-                    <?php echo $value; ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
+            <input class="form-control layui-input selectpage" type="text" name="group" data-source="{:url('auth.admin/get_group_list')}" data-multiple="true" data-pagination="false" data-escape="false" value="{$groupids}">
         </div>
     </div>
-
     <div class="layui-form-item">
-        <label class="layui-form-label">权限组</label>
+        <label class="layui-form-label">用户名</label>
         <div class="layui-input-block">
-            <input type="text" name="row[name]" lay-verify="required" autocomplete="off" placeholder="权限组" class="layui-input" value="">
+            <input type="text" name="row[username]" lay-verify="required" autocomplete="off" placeholder="用户名" class="layui-input" value="{$data.username}">
         </div>
     </div>
-
+    <div class="layui-form-item">
+        <label class="layui-form-label">密码</label>
+        <div class="layui-input-inline">
+            <input type="password" name="row[password]" autocomplete="off" placeholder="密码" class="layui-input">
+        </div>
+        <div class="layui-form-mid layui-word-aux">不修改留空即可。</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">确认密码</label>
+        <div class="layui-input-block">
+            <input type="password" name="row[password_confirm]" autocomplete="off" placeholder="确认密码" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">邮箱</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[email]" lay-verify="required|email" autocomplete="off" placeholder="邮箱" class="layui-input" value="{$data.email}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">手机</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[mobile]" autocomplete="off" placeholder="手机" class="layui-input" value="{$data.mobile}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">真实姓名</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[nickname]" autocomplete="off" placeholder="真实姓名" class="layui-input" value="{$data.nickname}">
+        </div>
+    </div>
 
     <div class="layui-form-item">
         <label class="layui-form-label">状态</label>
-        <div class="layui-input-block">
-            <input type="radio" name="row[status]" value="normal" title="显示" checked>
-            <input type="radio" name="row[status]" value="hidden" title="隐藏">
+        <div class="layui-input-inline">
+            <input type="radio" name="row[status]" value="normal" title="正常" {if $data.status==1}checked{/if}>
+            <input type="radio" name="row[status]" value="hidden" title="禁止" {if $data.status==0}checked{/if}>
         </div>
     </div>
-
-    <div class="layui-form-item">
-        <label class="layui-form-label">权限</label>
-
-        <div class="layui-input-block">
-            <!-- <div class="layui-btn-container"> -->
-                <!-- <button type="button" class="layui-btn layui-btn-sm" lay-on="getChecked">获取选中节点数据</button>
-                <button type="button" class="layui-btn layui-btn-sm" lay-on="setChecked">勾选指定节点</button>
-                <button type="button" class="layui-btn layui-btn-sm" lay-on="reload">重载实例</button> -->
-            <!-- </div> -->
-            <input type="checkbox" name="" title="选中全部" lay-filter="checkall">
-            <input type="checkbox" name="" title="展开全部" lay-filter="expandall">
-            <div id="treeview"></div>
-        </div>
-    </div>
-
 
     <div class="layui-form-item layer-footer hide">
         <div class="layui-input-block">
-            <button class="layui-btn pear-btn-primary layui-btn-sm disabled" lay-submit lay-filter="go">立即提交</button>
+            <button class="layui-btn pear-btn-primary layui-btn-sm disabled" lay-submit>立即提交</button>
             <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
         </div>
     </div>
@@ -66,16 +73,13 @@ layui.use(['badou','jquery','form'],function () {
         var bdForm = layui.bdForm;
         var jstree = layui.jstree;
         var $ = layui.$;
-        var form = layui.form;
+        // var Form = layui.form;
         var toast = layui.toast;
         // var bdTable = layui.bdTable;
-        console.log("jstree");
-        console.log($.jstree.core.prototype);
-        // console.log()
+
 
         //读取选中的条目
         $.jstree.core.prototype.get_all_checked = function(full) {
-            console.log('get_all_checked');
             var obj = this.get_selected(),
                 i, j;
             for (i = 0, j = obj.length; i < j; i++) {
@@ -91,7 +95,6 @@ layui.use(['badou','jquery','form'],function () {
                 return this.get_node(i);
             }, this)) : obj;
         };
-        console.log($("#treeview").jstree("get_all_checked"))
 
         // var tree = layui.tree;
         // var util = layui.util;
@@ -159,53 +162,18 @@ layui.use(['badou','jquery','form'],function () {
     var Controller = {
         api: {
             bindevent: function() {
-                console.log("自定义bindevent-1");
+                console.log("自定义bindevent");
                 // alert("bindevent");
-                bdForm.api.bindevent($("form.layui-form"),null,null, function(data){
-                    console.log("自定义bindevent-2-----");
-                    // data 包含了表单的数据和元素等
-                    console.log(data.elem); // 表单元素
-                    console.log(data.field); // 获取提交的字段
-                    console.log(data.form); // 获取当前form对象
-                    
-                    console.log(data.elem) //被执行事件的元素DOM对象，一般为button对象
-                    console.log(data.form) //被执行提交的form对象，一般在存在form标签时才会返回
-                    console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
-//   return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
-
-
-                    // 阻止表单跳转
-                    return false;
-
-                });   
-                bdForm.api.bindevent($("form.layui-form"), function() {
-                    console.log("进入-sccess");
-                //     if ($("#treeview").length > 0) {
-                //         var r = $("#treeview").jstree("get_all_checked");
-                //         $("input[name='row[rules]']").val(r.join(','));
-                //     }
-                //     console.log("自定义bindevent-2");
-                //     return true;
-                });
-                //为表单绑定事件
                 bdForm.api.bindevent($("form.layui-form"), null, null, function() {
-                    console.log("进入-sccess");
                     if ($("#treeview").length > 0) {
                         var r = $("#treeview").jstree("get_all_checked");
-
                         $("input[name='row[rules]']").val(r.join(','));
                     }
                     return true;
                 });
-
-                layui.form.on('submit(go)', function(){
-                    console.log("进入-sccess");
-                });
-
                 //渲染权限节点树
                 //变更级别后需要重建节点树
                 layui.form.on('select(parentid)', function(data){
-                    console.log("变更级别后需要重建节点树");
                     console.log(data);
                     var parentid = $(data.elem).data("parentid");
                     var id = $(data.elem).data("id");
@@ -255,16 +223,6 @@ layui.use(['badou','jquery','form'],function () {
                     $("#treeview").jstree($(this).prop("checked") ? "open_all" : "close_all");
                 });
                 $("select[name='row[parentid]']").siblings("div.layui-form-select").find("dd.layui-this").click();
-
-
-                console.log("进入-sccess");
-                if ($("#treeview").length > 0) {
-                        var r = $("#treeview").jstree("get_all_checked");
-                        console.log(r);
-                        $("input[name='row[rules]']").val(r.join(','));
-                }
-
-
             },
 
             rendertree: function(content) {
@@ -301,30 +259,11 @@ layui.use(['badou','jquery','form'],function () {
 
     Controller.api.bindevent();
 
-    form.on('submit(*)', function(data){
-                    console.log("自定义bindevent-2-----");
-                    // data 包含了表单的数据和元素等
-                    console.log(data.elem); // 表单元素
-                    console.log(data.field); // 获取提交的字段
-                    console.log(data.form); // 获取当前form对象
-                    
-                    console.log(data.elem) //被执行事件的元素DOM对象，一般为button对象
-                    console.log(data.form) //被执行提交的form对象，一般在存在form标签时才会返回
-                    console.log(data.field) //当前容器的全部表单字段，名值对形式：{name: value}
-//   return false; //阻止表单跳转。如果需要表单跳转，去掉这段即可。
-
-
-                    // 阻止表单跳转
-                    return false;
-
-                });   
-
-
     // bdForm.api.authGroupBindevent($("form.layui-form"));
     bdForm.api.bindevent($("form.layui-form"));
 })
 
 </script>
 
-<script src="__CDN__/assets/libs/jstree/jstree.min.js"></script> 
+<script src="__CDN__/assets/libs/jstree/jstree.min.js"></script>
 <link rel="stylesheet" href="__CDN__/assets/libs/jstree/themes/default/style.css" />
