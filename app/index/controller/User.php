@@ -13,11 +13,13 @@
 
 namespace app\index\controller;
 
+use app\common\controller\Frontend;
 use think\Config;
 use think\Cookie;
 use think\Hook;
+use think\Validate;
 
-class User extends Base
+class User extends Frontend
 {
     protected $layout = 'default';
     protected $noNeedLogin = ['login', 'register', 'third'];
@@ -89,6 +91,51 @@ class User extends Base
     public function profile()
     {
         $this->view->assign('title', __('Profile'));
+        return $this->view->fetch();
+    }
+
+    public function changepwd()
+    {
+        if ($this->request->isPost()) {
+            $oldpassword = $this->request->post("oldpassword", '', null);
+            $newpassword = $this->request->post("newpassword", '', null);
+            $renewpassword = $this->request->post("renewpassword", '', null);
+            $token = $this->request->post('__token__');
+            $rule = [
+                'oldpassword'   => 'require|regex:\S{6,30}',
+                'newpassword'   => 'require|regex:\S{6,30}',
+                'renewpassword' => 'require|regex:\S{6,30}|confirm:newpassword',
+                '__token__'     => 'token',
+            ];
+
+            $msg = [
+                'renewpassword.confirm' => __('Password and confirm password don\'t match')
+            ];
+            $data = [
+                'oldpassword'   => $oldpassword,
+                'newpassword'   => $newpassword,
+                'renewpassword' => $renewpassword,
+                '__token__'     => $token,
+            ];
+            $field = [
+                'oldpassword'   => __('Old password'),
+                'newpassword'   => __('New password'),
+                'renewpassword' => __('Renew password')
+            ];
+            $validate = new Validate($rule, $msg, $field);
+            $result = $validate->check($data);
+            if (!$result) {
+                $this->error(__($validate->getError()), null, ['token' => $this->token()]);
+            }
+
+            $ret = $this->auth->changepwd($newpassword, $oldpassword);
+            if ($ret) {
+                $this->success(__('Reset password successful'), url('user/login'));
+            } else {
+                $this->error($this->auth->getError(), null, ['token' => $this->token()]);
+            }
+        }
+        $this->view->assign('title', __('Change password'));
         return $this->view->fetch();
     }
 }
