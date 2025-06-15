@@ -491,13 +491,10 @@ class Server
             }
         }
 
-        //模块纯净模式时将模块目录下的app、public和assets删除
-        if (config('badouadmin.module_pure_mode')) {
-            // 删除模块目录已复制到全局的文件
-            Filesystem::delDir($sourceAssetsDir);
-            foreach (self::getCheckDirs() as $k => $dir) {
-                Filesystem::delDir($moduleDir . $dir);
-            }
+        // 删除模块目录已复制到全局的文件
+        Filesystem::delDir($sourceAssetsDir);
+        foreach (self::getCheckDirs() as $k => $dir) {
+            Filesystem::delDir($moduleDir . $dir);
         }
 
         //执行启用脚本
@@ -567,9 +564,8 @@ class Server
         // 移除模块全局文件
         $list = Server::getGlobalFiles($name);
 
-        //模块纯净模式时将原有的文件复制回模块目录
         //当无法获取全局文件列表时也将列表复制回模块目录
-        if (config('badouadmin.module_pure_mode') || !$list) {
+        if (!$list) {
             if ($config && isset($config['files']) && is_array($config['files'])) {
                 foreach ($config['files'] as $index => $item) {
                     //避免切换不同服务器后导致路径不一致
@@ -947,7 +943,7 @@ class Server
      */
     protected static function getSourceAssetsDir($name)
     {
-        return MODULE_PATH . $name .DIRECTORY_SEPARATOR.'public' . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR. $name . DIRECTORY_SEPARATOR;
+        return MODULE_PATH . $name .DIRECTORY_SEPARATOR.'public' . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR. $name . DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -957,7 +953,7 @@ class Server
      */
     protected static function getDestAssetsDir($name)
     {
-        $assetsDir = root_path() . str_replace("/", DIRECTORY_SEPARATOR, "public/modules/{$name}/");
+        $assetsDir = root_path() . str_replace("/", DIRECTORY_SEPARATOR, "public/assets/{$name}/");
         return $assetsDir;
     }
 
@@ -979,7 +975,8 @@ class Server
         return [
             'app',
             'public',
-            'template'
+            'template',
+            'public/modules'
         ];
     }
 
@@ -1024,6 +1021,7 @@ class Server
             $body = $response->getBody();
             $content = $body->getContents();
             $json = (array)json_decode($content, true);
+
         } catch (TransferException $e) {
             throw new Exception(__('Network error'));
         } catch (\Exception $e) {

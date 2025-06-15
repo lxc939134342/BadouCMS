@@ -1,0 +1,174 @@
+<table
+    class="layui-hide"
+    id="module"></table>
+
+
+<script id="operatetpl" type="text/html">
+    {{ var labelarr = ['primary', 'success', 'info', 'danger', 'warning'] }}
+    {{ var label = labelarr[d.id % 5] }}
+    {{ var module = d.module }}
+
+    <span class="operate" data-id="{{=d.id}}" data-name="{{=d.name}}">
+        {{ if(!module){ }}
+            {{ if(typeof d.releaselist !="undefined" && d.releaselist.length>1){ }}
+                <button
+                    class="layui-btn layui-btn-xs btn-dropdown btn-upgrade"
+                    lay-options="{ customName: {
+                        id: 'id',
+                        title: 'version',
+                    }, data: {{= JSON.stringify(d.releaselist) }} }"
+                >{:__('Install')} <i class="layui-icon layui-icon-down layui-font-12"></i></button>
+            {{ }else if(typeof d.releaselist !="undefined" && d.releaselist.length>0){}}
+                <a href="javascript:;" class="layui-btn layui-btn-xs btn-primary btn-success btn-install"
+                    data-type="{{= d.price<=0?'free':'price' }}"
+                   data-version="{{=d.version}}"><i class="fa fa-cloud-download"></i> {:__('Install')}</a>
+            {{ } }}
+
+            {{ if(d.demourl){ }}
+                <a href="{{=d.demourl}}" class="layui-btn layui-btn-xs btn-primary btn-info btn-demo" target="_blank">
+                    <i class="fa fa-flash"></i> {:__('Demo')}
+                </a>
+            {{ } }}
+
+            {{ if(d.button){ }}
+                <a href="{{=d.url}}" class="layui-btn layui-btn-xs btn-primary btn-info" target="_blank">
+                    {{=d.button}}
+                </a>
+            {{ } }}
+        {{ } else {}}
+            {{ if(module.version!=d.version){}}
+                {{ if(typeof d.releaselist !="undefined" && d.releaselist.length>1){ }}
+                    <button
+                        class="layui-btn layui-btn-xs btn-dropdown btn-upgrade"
+                        lay-options="{ customName: {
+                            id: 'id',
+                            title: 'version',
+                        }, data: {{= JSON.stringify(d.releaselist) }} }"
+                    >升级 <i class="layui-icon layui-icon-down layui-font-12"></i></button>
+                {{ }else{}}
+                    <a href="javascript:;" class="layui-btn layui-btn-xs btn-upgrade" title="{:__('Upgrade')}" data-version="{{=d.version}}"><i
+                        class="fa fa-cloud"></i> {:__('Upgrade')}</a>
+                {{ } }}
+            {{ } }}
+            {{ if(module.config){ }}
+                <a href="javascript:;" class="layui-btn layui-btn-xs btn-config" title="{:__('Setting')}"><i class="fa fa-pencil"></i>
+                    {:__('Setting')}</a>
+            {{ } }}
+            <a href="javascript:;" class="layui-btn layui-bg-red layui-btn-xs btn-uninstall" title="{:__('Uninstall')}"><i class="fa fa-times"></i>
+                {:__('Uninstall')}</a>
+        {{ } }}
+    </span>
+</script>
+
+<script>
+    layui.use(["badou", "tabs","laytpl","dropdown"], function () {
+        var bdTable = layui.bdTable;
+        var table = layui.table;
+        var laytpl = layui.laytpl;
+        var dropdown = layui.dropdown;
+
+        var Controller = {
+            api: {
+                formatter: {
+                    switch: function (data) {
+                        var row = data;
+                        if (!row.module) {
+                            return "";
+                        }
+                        return bdTable.api.formatter.switch.call(this, data);
+                    },
+                    price: function (data) {
+                        var value = data.price;
+                        if (isNaN(value)) {
+                            return value;
+                        }
+                        return parseFloat(value) == 0
+                            ? '<span class="text-success">' + __("Free") + "</span>"
+                            : '<span class="text-danger">￥' + value + "</span>";
+                    },
+                    operate:function(data){
+                        return laytpl($("#operatetpl").html(),{
+                            tagStyle: 'modern'
+                        }).render(data);
+                    }
+                },
+            },
+        };
+
+        bdTable.api.init({
+            table: table,
+            extend: {
+                index_url: "module/index",
+                multi_url: "module/multi",
+                table: "module",
+            },
+        });
+        bdTable.render({
+            elem: "#module",
+            url: "{:url('module/index',['type'=>'module'])}",
+            pk: "id",
+            even: true,
+            toolbar: false,
+            page: true,
+            cols: [
+                [
+                    { field: "name", title: __("Name"), width: 200 },
+                    { field: "title", title: __("Title"), width: 250 },
+                    {
+                        field: "intro",
+                        title: __("Intro"),
+                        operate: "LIKE",
+                    },
+                    {
+                        field: "author",
+                        title: __("Author"),
+                        operate: "LIKE",
+                        width: 180,
+                    },
+                    {
+                        field: "price",
+                        title: __("Price"),
+                        operate: "LIKE",
+                        width:100,
+                        align: "center",
+                        templet: Controller.api.formatter.price,
+                    },
+                    {
+                        field: "downloads",
+                        title: __("Downloads"),
+                        operate: "LIKE",
+                        width: 150,
+                        align: "center",
+                    },
+                    {
+                        field: "version",
+                        title: __("Version"),
+                        operate: "LIKE",
+                        width: 80,
+                        align: "center",
+                        templet: function (data) {
+                            return data.module ? data.module.version : data.version;
+                        },
+                    },
+                    {
+                        field: "state",
+                        title: __("Status"),
+                        width: 80,
+                        templet:Controller.api.formatter.switch
+                    },
+                    { title: __("Operate"), align: "center", templet: Controller.api.formatter.operate },
+                ],
+            ],
+            done:function(){
+                dropdown.render({
+                    elem: '.btn-dropdown',
+
+                });
+            }
+        });
+
+        $(document).on("click", ".btn-refresh", function () {
+            bdTable.api.events.toolbar.refresh();
+        });
+    });
+</script>

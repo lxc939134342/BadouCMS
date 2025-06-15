@@ -22,4 +22,10 @@ return [
     'Please disable module first'                             => '请先禁用模块',
     'The version is the same, no need to update'              => '版本号相同，无需更新',
     'Pay now'                                                 => '立即支付',
+    'Author'                                                  => '作者',
+    'Price'                                                   => '价格',
+    'Version'                                                 => '版本',
+    'Downloads'                                               => '下载',
+    'Free'                                                    => '免费',
+    'Intro'                                                   => '介绍'
 ];

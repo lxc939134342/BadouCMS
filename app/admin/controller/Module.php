@@ -16,7 +16,10 @@ class Module extends Backend
         if ($this->isAjax()) {
             $modules = Server::getInstalldModuleList();
             $list = [];
-            $res = Server::modules();
+            $params = [
+                'type' => $this->request->param('type')
+            ];
+            $res = Server::modules($params);
             if ($res && $res['code'] == 1) {
                 $list = $res['data'];
             }
@@ -24,7 +27,6 @@ class Module extends Backend
             foreach ($list as &$item) {
                 $module = $modules[$item['name']] ?? '';
                 if ($module) {
-                    $item['version'] = $module['version'];
                     $item['name'] = $module['name'];
                     $item['state'] = $module['state'];
                     $item['module'] = $module;
