@@ -62,6 +62,72 @@
             <input type="radio" name="row[gender]" value="0" title="{:__('FeMale')}" {if $row.gender=='0'}checked{/if}>
         </div>
     </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Birthday')} </label>
+        <div class="layui-input-block">
+            <input lay-verify="" class="layui-input datetimepicker" name="row[birthday]" type="text" value="{$row.birthday}">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Bio')}</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[bio]" value="{$row.bio}" lay-verify="" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Money')}</label>
+        <div class="layui-input-block">
+            <input type="number" name="row[money]" value="{$row.money}" lay-verify="" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Score')}</label>
+        <div class="layui-input-block">
+            <input type="number" name="row[score]" value="{$row.score}" lay-verify="" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Successions')}</label>
+        <div class="layui-input-block">
+            <input type="number" name="row[successions]" value="{$row.successions}" lay-verify="" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Maxsuccessions')}</label>
+        <div class="layui-input-block">
+            <input type="number" name="row[maxsuccessions]" value="{$row.maxsuccessions}" lay-verify="" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Prevtime')}</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[prevtime]" value="{$row.prevtime}" lay-verify="" autocomplete="off" class="layui-input datetimepicker">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Loginip')}</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[loginip]" value="{$row.loginip}" lay-verify="" autocomplete="off" class="layui-input datetimepicker">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Loginfailure')}</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[loginfailure]" value="{$row.loginfailure}" lay-verify="" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Joinip')}</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[joinip]" value="{$row.joinip}" lay-verify="" autocomplete="off" class="layui-input">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Jointime')}</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[jointime]" value="{$row.jointime}" lay-verify="" autocomplete="off" class="layui-input datetimepicker">
+        </div>
+    </div>
 
 
     <div class="layui-form-item layer-footer hide">
@@ -75,6 +141,14 @@
 <script>
     layui.use(['badou'],function () {
         var bdForm = layui.bdForm;
+
+
+        //日期选择器
+        laydate.render({
+            elem: '.datetimepicker'
+            //,type: 'date' //默认，可不填
+        });
+
 
         bdForm.api.bindevent($("form.layui-form"));
     })
