@@ -14,7 +14,7 @@ class Module extends Backend
     public function index()
     {
         if ($this->isAjax()) {
-            $modules = Server::getInstalldModuleList();
+            $installedModules = Server::getInstalldModuleList();
             $list = [];
             $params = [
                 'type' => $this->request->param('type')
@@ -23,13 +23,18 @@ class Module extends Backend
             if ($res && $res['code'] == 1) {
                 $list = $res['data'];
             }
-
             foreach ($list as &$item) {
-                $module = $modules[$item['name']] ?? '';
-                if ($module) {
-                    $item['name'] = $module['name'];
-                    $item['state'] = $module['state'];
-                    $item['module'] = $module;
+                $installmodule = $installedModules[$item['name']] ?? [];
+                if ($item['name'] == 'badouadmin') {
+                    $installmodule['state'] = -1;
+                    $installmodule['name'] = 'badouadmin';
+                    $installmodule['version'] = '1.0.0';
+                }
+
+                if ($installmodule) {
+                    $item['name'] = $installmodule['name'];
+                    $item['state'] = $installmodule['state'];
+                    $item['module'] = $installmodule;
                 }
             }
             $this->result('ok', $list);
@@ -107,6 +112,9 @@ class Module extends Backend
         $info = [];
         try {
             $uid = $this->request->post("uid");
+            if (!$uid) {
+                throw new ModuleException("", 1);
+            }
             $token = $this->request->post("token");
             $version = $this->request->post("version");
             $bdversion = $this->request->post("bdversion");

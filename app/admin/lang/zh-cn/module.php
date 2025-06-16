@@ -27,5 +27,7 @@ return [
     'Version'                                                 => '版本',
     'Downloads'                                               => '下载',
     'Free'                                                    => '免费',
-    'Intro'                                                   => '介绍'
+    'Intro'                                                   => '介绍',
+    'Type' => '类型',
+    'Demo' => '演示'
 ];
