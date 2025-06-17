@@ -28,6 +28,8 @@ return [
     'Downloads'                                               => '下载',
     'Free'                                                    => '免费',
     'Intro'                                                   => '介绍',
-    'Type' => '类型',
-    'Demo' => '演示'
+    'Type'                                                    => '类型',
+    'Demo'                                                    => '演示',
+    'Module'                                                  => '插件',
+    'Template'                                                => '模板'
 ];

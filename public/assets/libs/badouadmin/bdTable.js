@@ -122,6 +122,14 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                 bdTable.table = options.table;
                 bdTable.extend = $.extend(bdTable.extend, options.extend)
             },
+            query(options) {
+                bdTable.table.reloadData(
+                    bdTable.initTable.config.id,
+                    {
+                        where: options,
+                    }
+                )
+            },
             //事件绑定
             bindevent: function () {
                 var id = bdTable.initTable.config.id;

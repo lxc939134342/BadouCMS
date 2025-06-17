@@ -16,9 +16,16 @@ class Module extends Backend
         if ($this->isAjax()) {
             $installedModules = Server::getInstalldModuleList();
             $list = [];
-            $params = [
-                'type' => $this->request->param('type')
-            ];
+            $params = [];
+            $type = $this->request->param('type', 'all');
+            if (in_array($type, ['template', 'module'])) {
+                $params['type'] = $type;
+            }
+            if ($type == 'installed') {
+                $names = array_keys($installedModules);
+                $params['names'] = implode(',', $names);
+            }
+
             $res = Server::modules($params);
             if ($res && $res['code'] == 1) {
                 $list = $res['data'];

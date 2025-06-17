@@ -1,5 +1,9 @@
 {layout name="layout/default" /}
-
+<style>
+    .layui-btn.active{
+       background-color: #2a50c1 !important;
+    }
+</style>
 <!-- 表格 -->
 <div class="layui-card">
     <div class="layui-card-body">
@@ -8,12 +12,20 @@
                 <i class="fa fa-refresh"></i>
             </a>
             <div class="layui-btn-group">
-                <button class="layui-btn layui-bg-blue" lay-event="add">
+                <button type="button" class="layui-btn layui-bg-blue btn-type-action active" data-type="all">
                     <i class="fa fa-list"></i>
                     {:__('All')}
                 </button>
-                <button type="button" class="layui-btn layui-bg-blue">
+                <button type="button" class="layui-btn layui-bg-blue btn-type-action" data-type="module">
+                    <i class="fa fa-cubes"></i>
+                    {:__('Module')}
+                </button>
+                <button type="button" class="layui-btn layui-bg-blue btn-type-action" data-type="template">
                     <i class="fa fa-laptop"></i>
+                    {:__('Template')}
+                </button>
+                <button type="button" class="layui-btn layui-bg-blue btn-type-action" data-type="installed">
+                    <i class="fa fa-thumb-tack"></i>
                     {:__('Installed')}
                 </button>
             </div>
@@ -37,10 +49,13 @@
             <button
                 class="layui-btn layui-btn-xs layui-bg-green btn-dropdown"
                 data-operate="install"
-                lay-options="{ customName: {
-                            id: 'id',
-                            title: 'version',
-                        }, data: {{= JSON.stringify(d.releaselist) }} }">
+                lay-options="{
+                    customName: {
+                        id: 'id',
+                        title: 'version',
+                    },
+                    data: {{= JSON.stringify(d.releaselist) }}
+                }">
                 {:__('Install')}
                 <i class="layui-icon layui-icon-down layui-font-12"></i>
             </button>
@@ -65,18 +80,20 @@
             {{ } }}
         {{ } else {}}
             {{ if(module.version!=d.version){}}
-                {{ if(typeof d.releaselist !="undefined" &&
-        d.releaselist.length>1){ }}
+                {{ if(typeof d.releaselist !="undefined" && d.releaselist.length>1){ }}
                 <button
                     class="layui-btn layui-btn-xs btn-dropdown"
-                    lay-options="{ customName: {
-                                    id: 'id',
-                                    title: 'version',
-                                }, data: {{= JSON.stringify(d.releaselist) }} }">
+                    lay-options="{
+                        customName: {
+                            id: 'id',
+                            title: 'version',
+                        },
+                        data: {{= JSON.stringify(d.releaselist) }}
+                    }">
                     升级
                     <i class="layui-icon layui-icon-down layui-font-12"></i>
                 </button>
-                {{ }else{}}
+                {{ }else{ }}
                 <a
                     href="javascript:;"
                     class="layui-btn layui-btn-xs btn-upgrade"
@@ -288,6 +305,14 @@
                     operate(that.data('module'), row.value==1 ? "disable" : "enable");
                 });
             },
+        });
+
+        $(document).on("click", ".btn-type-action", function () {
+            var that = this;
+            var type = $(that).data("type");
+            $(".btn-type-action").removeClass("active");
+            $(that).addClass("active");
+            bdTable.api.query({ type: type });
         });
 
         // 会员信息
