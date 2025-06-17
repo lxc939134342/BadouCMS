@@ -279,56 +279,6 @@ class Module extends Backend
     }
 
     /**
-     * 已装插件
-     */
-    public function downloaded()
-    {
-        $offset = (int)$this->request->get("offset");
-        $limit = (int)$this->request->get("limit");
-        $filter = $this->request->get("filter");
-        $search = $this->request->get("search");
-        $search = htmlspecialchars(strip_tags($search));
-        $onlinemodules = Server::modules();
-        $filter = (array)json_decode($filter, true);
-        $modules = Server::getInstalldModuleList();
-        $list = [];
-        foreach ($modules as $k => $v) {
-            if ($search && stripos($v['name'], $search) === false && stripos($v['title'], $search) === false && stripos($v['intro'], $search) === false) {
-                continue;
-            }
-
-            if (isset($onlinemodules[$v['name']])) {
-                $v = array_merge($v, $onlinemodules[$v['name']]);
-                $v['price'] = '-';
-            } else {
-                $v['category_id'] = 0;
-                $v['flag'] = '';
-                $v['banner'] = '';
-                $v['image'] = '';
-                $v['demourl'] = '';
-                $v['price'] = __('None');
-                $v['screenshots'] = [];
-                $v['releaselist'] = [];
-                $v['url'] = module_url($v['name']);
-                $v['url'] = str_replace($this->request->server('SCRIPT_NAME'), '', $v['url']);
-            }
-            $v['createtime'] = filemtime(MODULE_PATH . $v['name']);
-            if ($filter && isset($filter['category_id']) && is_numeric($filter['category_id']) && $filter['category_id'] != $v['category_id']) {
-                continue;
-            }
-            $list[] = $v;
-        }
-        $total = count($list);
-        if ($limit) {
-            $list = array_slice($list, $offset, $limit);
-        }
-        $result = array("total" => $total, "rows" => $list);
-
-        $callback = $this->request->get('callback') ? "jsonp" : "json";
-        return $callback($result);
-    }
-
-    /**
      * 检测
      */
     public function isbuy()

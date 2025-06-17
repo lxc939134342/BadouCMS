@@ -32,8 +32,7 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'co
                     return;
                 var submitBtn = $("[lay-submit]", layform),
                     filter = submitBtn.attr('lay-filter');
-                console.log(layform);
-                console.log(filter);
+
                 $(".layer-footer [lay-submit],.fixed-footer [lay-submit],.normal-footer [lay-submit]", layform).removeClass("disabled");
                 //验证通过提交表单
                 form.on('submit(' + filter + ')', function (data) {
@@ -242,14 +241,9 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'co
             },
             //这是一个函数，接收四个参数：form: 表单元素或表单的选择器。success: 成功回调函数。error: 错误回调函数。submit: 提交回调函数。
             bindevent: function (form, success, error, submit) {
-                // console.log("success");
-
-                
-
                 //如果传入的 form 不是对象，则将其转换为 jQuery 对象。这确保了后续操作可以直接使用 jQuery 方法。
                 form = typeof form === 'object' ? form : $(form);
-                console.log('表单数据对象-id');
-                console.log(form);
+
                 //从 bdForm 对象中获取 events 对象，它包含了一些与表单相关的事件处理方法。
                 var events = bdForm.events;
                 //绑定表单事件,调用 events 对象中的 bindevent 方法，用于绑定表单的事件（例如图标选择器等）。
