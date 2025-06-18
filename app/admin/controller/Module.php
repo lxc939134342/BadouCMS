@@ -14,22 +14,34 @@ class Module extends Backend
     public function index()
     {
         if ($this->isAjax()) {
-            $modules = Server::getInstalldModuleList();
+            $installedModules = Server::getInstalldModuleList();
             $list = [];
-            $params = [
-                'type' => $this->request->param('type')
-            ];
+            $params = [];
+            $type = $this->request->param('type', 'all');
+            if (in_array($type, ['template', 'module'])) {
+                $params['type'] = $type;
+            }
+            if ($type == 'installed') {
+                $names = array_keys($installedModules);
+                $params['names'] = implode(',', $names);
+            }
+
             $res = Server::modules($params);
             if ($res && $res['code'] == 1) {
                 $list = $res['data'];
             }
-
             foreach ($list as &$item) {
-                $module = $modules[$item['name']] ?? '';
-                if ($module) {
-                    $item['name'] = $module['name'];
-                    $item['state'] = $module['state'];
-                    $item['module'] = $module;
+                $installmodule = $installedModules[$item['name']] ?? [];
+                if ($item['name'] == 'badouadmin') {
+                    $installmodule['state'] = -1;
+                    $installmodule['name'] = 'badouadmin';
+                    $installmodule['version'] = '1.0.0';
+                }
+
+                if ($installmodule) {
+                    $item['name'] = $installmodule['name'];
+                    $item['state'] = $installmodule['state'];
+                    $item['module'] = $installmodule;
                 }
             }
             $this->result('ok', $list);
@@ -107,6 +119,9 @@ class Module extends Backend
         $info = [];
         try {
             $uid = $this->request->post("uid");
+            if (!$uid) {
+                throw new ModuleException("", 1);
+            }
             $token = $this->request->post("token");
             $version = $this->request->post("version");
             $bdversion = $this->request->post("bdversion");
@@ -261,56 +276,6 @@ class Module extends Backend
             $this->error(__($e->getMessage()), $e->getCode());
         }
         $this->success(__('Import successful'), '');
-    }
-
-    /**
-     * 已装插件
-     */
-    public function downloaded()
-    {
-        $offset = (int)$this->request->get("offset");
-        $limit = (int)$this->request->get("limit");
-        $filter = $this->request->get("filter");
-        $search = $this->request->get("search");
-        $search = htmlspecialchars(strip_tags($search));
-        $onlinemodules = Server::modules();
-        $filter = (array)json_decode($filter, true);
-        $modules = Server::getInstalldModuleList();
-        $list = [];
-        foreach ($modules as $k => $v) {
-            if ($search && stripos($v['name'], $search) === false && stripos($v['title'], $search) === false && stripos($v['intro'], $search) === false) {
-                continue;
-            }
-
-            if (isset($onlinemodules[$v['name']])) {
-                $v = array_merge($v, $onlinemodules[$v['name']]);
-                $v['price'] = '-';
-            } else {
-                $v['category_id'] = 0;
-                $v['flag'] = '';
-                $v['banner'] = '';
-                $v['image'] = '';
-                $v['demourl'] = '';
-                $v['price'] = __('None');
-                $v['screenshots'] = [];
-                $v['releaselist'] = [];
-                $v['url'] = module_url($v['name']);
-                $v['url'] = str_replace($this->request->server('SCRIPT_NAME'), '', $v['url']);
-            }
-            $v['createtime'] = filemtime(MODULE_PATH . $v['name']);
-            if ($filter && isset($filter['category_id']) && is_numeric($filter['category_id']) && $filter['category_id'] != $v['category_id']) {
-                continue;
-            }
-            $list[] = $v;
-        }
-        $total = count($list);
-        if ($limit) {
-            $list = array_slice($list, $offset, $limit);
-        }
-        $result = array("total" => $total, "rows" => $list);
-
-        $callback = $this->request->get('callback') ? "jsonp" : "json";
-        return $callback($result);
     }
 
     /**

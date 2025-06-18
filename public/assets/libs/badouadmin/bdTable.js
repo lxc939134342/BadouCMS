@@ -122,6 +122,14 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                 bdTable.table = options.table;
                 bdTable.extend = $.extend(bdTable.extend, options.extend)
             },
+            query(options) {
+                bdTable.table.reloadData(
+                    bdTable.initTable.config.id,
+                    {
+                        where: options,
+                    }
+                )
+            },
             //事件绑定
             bindevent: function () {
                 var id = bdTable.initTable.config.id;
@@ -208,9 +216,10 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     var that = this;
                     that.filter = that.filter || that.field || null;
                     that.checked = that.checked || 1;
+                    that.url = that.multi_url || bdTable.extend.multi_url;
                     var value = parseInt(bdTable.api.formatter.value.call(this, data));
                     var checked = value === that.checked ? 'checked' : '';
-                    var html = laytpl('<input type="checkbox" name="' + that.field + '" value="' + data.id + '" lay-skin="switch" data-field="' + that.field + '" lay-filter="' + that.filter + '" ' + checked + ' >').render(data);
+                    var html = laytpl('<input type="checkbox" data-url="' + that.url + '" name="' + that.field + '" value="' + data.id + '" lay-skin="switch" data-field="' + that.field + '" lay-filter="' + that.filter + '" ' + checked + ' >').render(data);
 
                     // 监听表格开关切换
                     bdTable.api.events.switch(that.filter);
@@ -277,7 +286,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     if (typeof this.customField !== 'undefined') {
                         var customValue = this.customField.split('.').reduce(function (obj, key) {
                             return obj === null || obj === undefined ? '' : obj[key];
-                        }, row);
+                        }, data);
                         value = http.api.escape(customValue);
                         field = this.customField;
                     }

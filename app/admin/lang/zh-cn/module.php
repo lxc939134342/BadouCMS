@@ -27,5 +27,10 @@ return [
     'Version'                                                 => '版本',
     'Downloads'                                               => '下载',
     'Free'                                                    => '免费',
-    'Intro'                                                   => '介绍'
+    'Intro'                                                   => '介绍',
+    'Type'                                                    => '类型',
+    'Demo'                                                    => '演示',
+    'Module'                                                  => '插件',
+    'Template'                                                => '模板',
+    'Unable to open the zip file'                             => '无法打开zip文件',
 ];
