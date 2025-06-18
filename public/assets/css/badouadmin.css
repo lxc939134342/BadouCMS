@@ -363,3 +363,16 @@
 .layui-tabs-header li:hover {
     color: var(--blue-color) !important;
 }
+
+.fieldlist dd ins {
+    min-width: 100px;
+    display: inline-block;
+    text-decoration: none;
+    padding: 9px 0;
+    margin-right: 10px;
+    color: #666;
+    font-weight: 400;
+}
+.fieldlist dd input {
+    min-width: 100px;
+}

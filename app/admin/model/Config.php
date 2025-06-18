@@ -5,6 +5,7 @@ namespace app\admin\model;
 use Throwable;
 use think\Model;
 use think\facade\Cache;
+use InvalidArgumentException;
 
 /**
  * 系统配置模型
@@ -18,13 +19,13 @@ class Config extends Model
     public static string $cacheTag = 'sys_config';
 
     protected $append = [
-        'value',
-        'content',
+        // 'value',
+        // 'content',
         'extend',
         'oldextend'
     ];
 
-    protected array $jsonDecodeType = ['checkbox', 'array', 'selects'];
+    protected array $jsonDecodeType = ['checkbox', 'selects'];
     protected array $needContent    = ['radio', 'checkbox', 'select', 'selects'];
 
     protected $typeList = [
@@ -75,8 +76,12 @@ class Config extends Model
 
     public static function onBeforeWrite(Config $model): void
     {
-        if (!preg_match('/^[a-zA-Z0-9_]+$/', $model->getData('name'))) {
-            throw new \think\Exception('配置名称只能包含字母、数字、下划线');
+        try {
+            $name = $model->getData('name');
+            if (!preg_match('/^[a-zA-Z0-9_]+$/', $name)) {
+                throw new \think\Exception('配置名称只能包含字母、数字、下划线');
+            }
+        } catch (InvalidArgumentException $e) {
         }
     }
 
@@ -133,18 +138,18 @@ class Config extends Model
         return $value;
     }
 
-    public function getContentAttr($value, $row)
-    {
-        if (!isset($row['type'])) {
-            return '';
-        }
-        if (in_array($row['type'], $this->needContent)) {
-            $arr = json_decode($value, true);
-            return $arr ?: [];
-        } else {
-            return '';
-        }
-    }
+    // public function getContentAttr($value, $row)
+    // {
+    //     if (!isset($row['type'])) {
+    //         return '';
+    //     }
+    //     if (in_array($row['type'], $this->needContent)) {
+    //         $arr = json_decode($value, true);
+    //         return $arr ?: [];
+    //     } else {
+    //         return '';
+    //     }
+    // }
 
     public function getExtendAttr($value)
     {

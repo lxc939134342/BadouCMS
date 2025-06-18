@@ -16,21 +16,28 @@ class Config extends Backend
      */
     protected $model = null;
     protected $modelValidate = true;
+    protected $configGroup = [];
 
     public function initialize()
     {
         parent::initialize();
         $this->model = new ConfigModel();
+        $configGroup = get_sys_config('config_group');
+        if (!is_array($configGroup)) {
+            $configGroup = json_decode($configGroup, true);
+        }
+        $this->configGroup = $configGroup;
     }
 
     public function index()
     {
-        $configGroup = get_sys_config('config_group');
+
         $config      = $this->model->order('weigh desc')->select()->toArray();
 
         $list           = [];
         $newConfigGroup = [];
-        foreach ($configGroup as $item) {
+
+        foreach ($this->configGroup as $item) {
             $list[$item['key']]['name']   = $item['key'];
             $list[$item['key']]['title']  = __($item['value']);
             $newConfigGroup[$item['key']] = $list[$item['key']]['title'];

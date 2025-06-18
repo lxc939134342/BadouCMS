@@ -88,5 +88,8 @@ return [
     'Install'                                               => '安装',
     'Please select %s'                                      => '请选择%s',
     'Please enter %s'                                       => '请输入%s',
-    'No rows were deleted'                                  => '未删除任何行'
+    'No rows were deleted'                                  => '未删除任何行',
+    'Append'                                                => '追加',
+    'Array Key'                                             => '数组键',
+    'Array Value'                                           => '数组值',
 ];

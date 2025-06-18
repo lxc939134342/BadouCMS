@@ -1,5 +1,5 @@
 
-layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'colorpicker', 'bdTool'], function (exports) {
+layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'colorpicker', 'bdTool', 'laytpl', 'Sortable'], function (exports) {
     var $ = layui.jquery;
     var http = layui.bdHttp;
     var form = layui.form;
@@ -8,8 +8,11 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'co
     var bdUpload = layui.bdUpload;
     var colorpicker = layui.colorpicker;
     var bdTool = layui.bdTool;
-    // var jstree = layui.jstree;
+    var laytpl = layui.laytpl;
     var bdForm = {
+        config: {
+            fieldlisttpl: '<dd class="layui-inline"><input type="text" name="{{=d.name}}[{{=d.index}}][key]" class="layui-input" value="{{=d.key}}" size="10" /> <input type="text" name="{{=d.name}}[{{=d.index}}][value]" class="layui-input" value="{{=d.value}}"  /> <span class="layui-btn layui-bg-red btn-remove"><i class="fa fa-times"></i></span><span class="layui-btn btn-dragsort"><i class="fa fa-arrows"></i></span></dd>'
+        },
         events: {
             //绑定事件
             bindevent: function (layform) {
@@ -25,6 +28,8 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'co
                 bdTool.remoteSelect();
                 // 绑定时间选择器
                 bdTool.laydate();
+                //绑定fieldlist
+                bdForm.events.fieldlist(layform);
             },
             //表单校验事件
             validator: function (layform, success, error, submit) {
@@ -167,6 +172,164 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'co
                         });
                         return false;
                     });
+                }
+            },
+
+            fieldlist: function (form) {
+                //绑定fieldlist
+                if ($(".fieldlist", form).length > 0) {
+                    //刷新隐藏textarea的值
+                    var refresh = function (container) {
+                        var data = {};
+                        var name = container.data("name");
+                        var textarea = $("textarea[name='" + name + "']", form);
+                        var template = container.data("template");
+                        console.log(template);
+                        $.each($("input,select,textarea", container).serializeArray(), function (i, j) {
+                            var reg = /\[(\w+)\]\[(\w+)\]$/g;
+                            var match = reg.exec(j.name);
+                            if (!match)
+                                return true;
+                            match[1] = "x" + parseInt(match[1]);
+                            if (typeof data[match[1]] == 'undefined') {
+                                data[match[1]] = {};
+                            }
+                            data[match[1]][match[2]] = j.value;
+                        });
+                        //使用数组保存
+                        var usearray = container.data("usearray") || false;
+                        //保留空数据
+                        var keepempty = container.data("keepempty") || false;
+
+                        var result = template || usearray ? [] : {};
+                        var keys = Object.keys(Object.values(data)[0] || {});
+
+                        var isassociative = !usearray && keys.indexOf("value") > -1 && (keys.length === 1 || (keys.length === 2 && keys.indexOf("key") > -1));
+                        if (isassociative && keys.length === 2) {
+                            result = {};
+                        }
+                        $.each(data, function (i, j) {
+                            if (j) {
+                                if (isassociative) {
+                                    if (keys.length === 2) {
+                                        if (j.key != '' || keepempty) {
+                                            result['__PLACEHOLDKEY__' + j.key] = j.value;
+                                        }
+                                        console.log(result);
+                                    } else {
+                                        //一维数组
+                                        result.push(j.value);
+                                    }
+                                } else {
+                                    result.push(j);
+                                }
+                            }
+                        });
+                        textarea.val(JSON.stringify(result).replace(/__PLACEHOLDKEY__/g, ''));
+                    };
+
+                    //追加一行数据
+                    var append = function (container, row, initial) {
+                        var tagName = container.data("tag") || (container.is("table") ? "tr" : "dd");
+                        var index = container.data("index");
+                        var name = container.data("name");
+                        var template = container.data("template");
+                        var data = container.data();
+                        index = index ? parseInt(index) : 0;
+                        container.data("index", index + 1);
+                        row = row ? row : {};
+                        row = typeof row.key === 'undefined' || typeof row.value === 'undefined' ? { key: '', value: row } : row;
+                        var options = container.data("fieldlist-options") || {};
+                        var vars = { index: index, name: name, data: data, options: options, key: row.key, value: row.value, row: row.value };
+
+                        if (template) {
+                            template = document.getElementById(template).innerHTML;
+                        }
+
+                        var html = template ? laytpl(template, { tagStyle: 'modern' }).render(vars) : laytpl(bdForm.config.fieldlisttpl, { tagStyle: 'modern' }).render(vars);
+                        var obj = $(html);
+                        if ((options.deleteBtn === false || options.removeBtn === false) && initial)
+                            obj.find(".btn-remove").remove();
+                        if (options.dragsortBtn === false && initial)
+                            obj.find(".btn-dragsort").remove();
+                        if ((options.readonlyKey === true || options.disableKey === true) && initial) {
+                            obj.find("input[name$='[key]']").prop("readonly", true);
+                        }
+                        obj.attr("fieldlist-item", true);
+                        obj.insertAfter($(tagName + "[fieldlist-item]", container).length > 0 ? $(tagName + "[fieldlist-item]:last", container) : $(tagName + ":first", container));
+                        if ($(".btn-append,.append", container).length > 0) {
+                            //兼容旧版本事件
+                            $(".btn-append,.append", container).trigger("badou.event.appendfieldlist", obj);
+                        } else {
+                            //新版本事件
+                            container.trigger("badou.event.appendfieldlist", obj);
+                        }
+                        return obj;
+                    };
+                    var fieldlist = $(".fieldlist", form);
+                    //表单重置
+                    form.on("reset", function () {
+                        setTimeout(function () {
+                            fieldlist.trigger("badou.event.refreshfieldlist");
+                        });
+                    });
+                    //监听文本框改变事件
+                    $(document).on('change keyup changed', ".fieldlist input,.fieldlist textarea,.fieldlist select", function () {
+                        var container = $(this).closest(".fieldlist");
+                        refresh(container);
+                    });
+                    //追加控制(点击按钮)
+                    fieldlist.on("click", ".btn-append,.append", function (e, row) {
+                        var container = $(this).closest(".fieldlist");
+                        append(container, row);
+                        refresh(container);
+                    });
+                    //移除控制(点击按钮)
+                    fieldlist.on("click", ".btn-remove", function () {
+                        var container = $(this).closest(".fieldlist");
+                        var tagName = container.data("tag") || (container.is("table") ? "tr" : "dd");
+                        $(this).closest(tagName).remove();
+                        refresh(container);
+                    });
+                    //追加控制(通过事件)
+                    fieldlist.on("badou.event.appendtofieldlist", function (e, row) {
+                        var container = $(this);
+                        append(container, row);
+                        refresh(container);
+                    });
+                    //根据textarea内容重新渲染
+                    fieldlist.on("badou.event.refreshfieldlist", function () {
+                        var container = $(this);
+                        var textarea = $("textarea[name='" + container.data("name") + "']", form);
+                        //先清空已有的数据
+                        $("[fieldlist-item]", container).remove();
+                        var json = {};
+                        try {
+                            var val = textarea.val().replace(/"(\d+)"\:/g, "\"__PLACEHOLDERKEY__$1\":");
+                            json = JSON.parse(val);
+                        } catch (e) {
+                        }
+
+                        $.each(json, function (i, j) {
+                            append(container, { key: i.toString().replace("__PLACEHOLDERKEY__", ""), value: j }, true);
+                        });
+                    });
+                    //拖拽排序
+                    new Sortable(fieldlist[0], {
+                        animation: 150,
+                        ghostClass: 'btn-dragsort', // 拖动时的样式类名
+                        onEnd: function (evt) {
+                            refresh($(evt.target));
+                        }
+                    });
+
+                    fieldlist.each(function () {
+                        var container = $(this);
+                        if (typeof container.data("options") === 'object' && container.data("options").appendBtn === false) {
+                            $(".btn-append,.append", container).hide();
+                        }
+                    });
+                    fieldlist.trigger("badou.event.refreshfieldlist");
                 }
             },
         },

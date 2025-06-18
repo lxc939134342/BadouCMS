@@ -3,6 +3,7 @@
     .layui-form-label {
         width: 120px;
     }
+
     .layui-input-block {
         margin-left: 150px;
     }
@@ -33,15 +34,14 @@
                                 {// 文本框 }
                                 {case value="string"}
                                 <input type="text" id="c-{$field.name}" name="row[{$field.name}]"
-                                    placeholder="请输入{$field.title}" value="{$field.value}"
-                                    class="layui-input" />
+                                    placeholder="请输入{$field.title}" value="{$field.value}" class="layui-input" />
                                 {/case}
 
                                 {// 开关 }
                                 {case value="switch"}
                                 <input type="hidden" name="row[{$field.name}]" value="0">
-                                <input type="checkbox" id="c-{$field.name}" name="row[{$field.name}]"
-                                    lay-skin="switch" value="{$field.value}" {if $field.value==1}checked{/if}>
+                                <input type="checkbox" id="c-{$field.name}" name="row[{$field.name}]" lay-skin="switch"
+                                    value="{$field.value}" {if $field.value==1}checked{/if}>
                                 {/case}
 
                                 {// 多选框 }
@@ -68,15 +68,14 @@
                                     <input type="text" id="c-{$field.name}" name="row[{$field.name}]"
                                         class="layui-input" value="{$field.value}" />
                                     <div class="layui-input-suffix" style="width: 30%">
-                                        <button type="button" data-input-id="c-{$field.name}" {if
-                                            $field.type=='images' }data-multiple="true" {/if}
-                                            data-preview-id="p-{$field.name}" class="layui-btn btn-bdupload">
+                                        <button type="button" data-input-id="c-{$field.name}" {if $field.type=='images'
+                                            }data-multiple="true" {/if} data-preview-id="p-{$field.name}"
+                                            class="layui-btn btn-bdupload">
                                             <i class="fa fa-upload"></i>
                                             上传
                                         </button>
-                                        <button type="button" data-input-id="c-{$field.name}" {if
-                                            $field.type=='images' }data-multiple="true" {/if}
-                                            class="layui-btn layui-bg-green btn-bdchoose">
+                                        <button type="button" data-input-id="c-{$field.name}" {if $field.type=='images'
+                                            }data-multiple="true" {/if} class="layui-btn layui-bg-green btn-bdchoose">
                                             <i class="fa fa-list"></i>
                                             选择
                                         </button>
@@ -97,9 +96,8 @@
                                             <i class="fa fa-upload"></i>
                                             上传
                                         </button>
-                                        <button type="button" data-input-id="c-{$field.name}" {if
-                                            $field.type=='files' }data-multiple="true" {/if}
-                                            class="layui-btn layui-bg-green btn-bdchoose">
+                                        <button type="button" data-input-id="c-{$field.name}" {if $field.type=='files'
+                                            }data-multiple="true" {/if} class="layui-btn layui-bg-green btn-bdchoose">
                                             <i class="fa fa-list"></i>
                                             选择
                                         </button>
@@ -135,6 +133,37 @@
                                 </select>
                                 {/case}
 
+                                {// 数组 }
+                                {case value="array"}
+                                <dl class="fieldlist" data-name="row[{$field.name|htmlentities}]"
+                                    data-template="arraytpl" data-usearray="true">
+                                    <dd>
+                                        <ins>{:__('Array key')}</ins>
+                                        <ins>{:__('Array value')}</ins>
+                                    </dd>
+                                    <dd>
+                                        <a href="javascript:;" class="layui-btn btn-append"><i
+                                                class="fa fa-plus"></i> {:__('Append')}</a>
+                                    </dd>
+                                    <textarea name="row[{$field.name|htmlentities}]" class="form-control hide" cols="30"
+                                        rows="5">{$field.value}</textarea>
+                                </dl>
+                                <script type="text/html" id="arraytpl">
+                                    <dd>
+                                        <div class="layui-inline">
+                                            <input type="text" name="{{=d.name}}[{{=d.index}}][key]" class="layui-input" value="{{=d.row.key}}" size="10">
+                                        </div>
+                                         <div class="layui-inline">
+                                            <input type="text" name="{{=d.name}}[{{=d.index}}][value]" class="layui-input" value="{{=d.row.value}}" >
+                                        </div>
+                                        <div class="layui-inline">
+                                          <span class="layui-btn layui-bg-red btn-remove"><i class="fa fa-times"></i></span>
+                                          <span class="layui-btn btn-dragsort"><i class="fa fa-arrows"></i></span>
+                                        </div>
+                                    </dd>
+                                </script>
+                                {/case}
+
                                 {/switch}
                             </div>
                         </div>
@@ -167,19 +196,19 @@
     layui.use(["badou", "tabs"], function () {
         var bdForm = layui.bdForm;
         var tabs = layui.tabs;
-        var layer =layui.layer;
-        var badou=layui.badou;
+        var layer = layui.layer;
+        var badou = layui.badou;
         bdForm.api.bindevent($("form.layui-form"));
 
         $(document).on("click", ".testmail", function () {
-                var that = this;
-                layer.prompt({title: __('Please input your email'), formType: 0}, function (value, index) {
-                    badou.api.ajax({
-                        url: "general.config/sendTestMail",
-                        data: $(that).closest("form").serialize() + "&row[test_email]=" + value
-                    });
+            var that = this;
+            layer.prompt({ title: __('Please input your email'), formType: 0 }, function (value, index) {
+                badou.api.ajax({
+                    url: "general.config/sendTestMail",
+                    data: $(that).closest("form").serialize() + "&row[test_email]=" + value
                 });
-
             });
+
+        });
     });
 </script>
