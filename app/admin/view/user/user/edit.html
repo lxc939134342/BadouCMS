@@ -44,8 +44,20 @@
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Avatar')}</label>
         <div class="layui-input-block">
-            <input type="text" name="row[avatar]" value="{$row.avatar}" lay-verify="" autocomplete="off" placeholder="{:__('Avatar')}" class="layui-input">
+            <input type="text" id="c-avatar" name="row[avatar]" lay-verify="" class="layui-input" value="{$row.avatar}" autocomplete="off" placeholder="{:__('Avatar')}" />
+            <div class="layui-input-suffix" style="width: 30%;">
+                <button type="button" data-input-id="c-avatar" data-preview-id="p-avatar" class="layui-btn btn-bdupload">
+                    <i class="fa fa-upload"></i>
+                    上传
+                </button>
+                <button type="button" data-input-id="c-avatar" class="layui-btn layui-bg-green btn-bdchoose">
+                    <i class="fa fa-list"></i>
+                    选择
+                </button>
+            </div>
+            <div class="layui-upload-list" id="p-avatar"></div>
         </div>
+
     </div>
 
     <div class="layui-form-item">
@@ -65,7 +77,13 @@
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Birthday')} </label>
         <div class="layui-input-block">
-            <input lay-verify="" class="layui-input datetimepicker" name="row[birthday]" type="text" value="{$row.birthday}">
+            <input
+                    type="text"
+                    name="row[birthday]"
+                    value="{$row.birthday|default=time()|date='Y-m-d H:i:s'|}"
+                    readonly
+                    placeholder="{:__('Birthday')}"
+                    class="layui-input laydate" />
         </div>
     </div>
     <div class="layui-form-item">
@@ -101,7 +119,13 @@
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Prevtime')}</label>
         <div class="layui-input-block">
-            <input type="text" name="row[prevtime]" value="{$row.prevtime}" lay-verify="" autocomplete="off" class="layui-input datetimepicker">
+            <input
+                    type="text"
+                    name="row[prevtime]"
+                    value="{$row.prevtime|default=time()|date='Y-m-d H:i:s'|}"
+                    readonly
+                    placeholder="{:__('Prevtime')}"
+                    class="layui-input laydate" />
         </div>
     </div>
     <div class="layui-form-item">
@@ -125,7 +149,13 @@
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Jointime')}</label>
         <div class="layui-input-block">
-            <input type="text" name="row[jointime]" value="{$row.jointime}" lay-verify="" autocomplete="off" class="layui-input datetimepicker">
+            <input
+                    type="text"
+                    name="row[jointime]"
+                    value="{$row.jointime|default=time()|date='Y-m-d H:i:s'|}"
+                    readonly
+                    placeholder="{:__('Jointime')}"
+                    class="layui-input laydate" />
         </div>
     </div>
 
@@ -141,14 +171,6 @@
 <script>
     layui.use(['badou'],function () {
         var bdForm = layui.bdForm;
-
-
-        //日期选择器
-        laydate.render({
-            elem: '.datetimepicker'
-            //,type: 'date' //默认，可不填
-        });
-
 
         bdForm.api.bindevent($("form.layui-form"));
     })
