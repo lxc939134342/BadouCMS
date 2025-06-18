@@ -310,6 +310,12 @@
     border-color: var(--black-color) !important;
     color: var(--black-color) !important;
 }
+.layui-font-blue {
+    color: var(--blue-color) !important;
+}
+.layui-font-green {
+    color: var(--success-color) !important;
+}
 
 .layui-badge {
     font-size: 12px !important;

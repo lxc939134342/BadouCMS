@@ -9,13 +9,18 @@
 </style>
 <div class="layui-card">
     <div class="layui-card-body">
+        <div class="layui-btn-container">
+            <a href="general.config/setting" class="layui-btn btn-dialog" data-area='["80%","80%"]'>
+                <i class="fa fa-list"></i> 配置列表
+            </a>
+        </div>
         <div class="layui-tabs layui-tabs-card" lay-options="{index: 0}">
             <ul class="layui-tabs-header">
                 {foreach $config_group as $index=>$vo}
                 <li>{$vo}</li>
                 {/foreach}
             </ul>
-            <form class="layui-form" action="{:url('general.config/edit')}" method="post">
+            <form class="layui-form" action="{:url('general.config/saveConfig')}" method="post">
                 {:token_field()}
                 <div class="layui-tabs-body">
                     {foreach $list as $index=>$vo}
@@ -64,13 +69,13 @@
                                         class="layui-input" value="{$field.value}" />
                                     <div class="layui-input-suffix" style="width: 30%">
                                         <button type="button" data-input-id="c-{$field.name}" {if
-                                            $field.component=='images' }data-multiple="true" {/if}
+                                            $field.type=='images' }data-multiple="true" {/if}
                                             data-preview-id="p-{$field.name}" class="layui-btn btn-bdupload">
                                             <i class="fa fa-upload"></i>
                                             上传
                                         </button>
                                         <button type="button" data-input-id="c-{$field.name}" {if
-                                            $field.component=='images' }data-multiple="true" {/if}
+                                            $field.type=='images' }data-multiple="true" {/if}
                                             class="layui-btn layui-bg-green btn-bdchoose">
                                             <i class="fa fa-list"></i>
                                             选择
@@ -87,13 +92,13 @@
                                     <input type="text" id="c-{$field.name}" name="row[{$field.name}]"
                                         class="layui-input" value="{$field.value}" />
                                     <div class="layui-input-suffix" style="width: 30%">
-                                        <button type="button" {if $field.component=='images' }data-multiple="true" {/if}
+                                        <button type="button" {if $field.type=='images' }data-multiple="true" {/if}
                                             data-input-id="c-{$field.name}" class="layui-btn btn-bdupload">
                                             <i class="fa fa-upload"></i>
                                             上传
                                         </button>
                                         <button type="button" data-input-id="c-{$field.name}" {if
-                                            $field.component=='files' }data-multiple="true" {/if}
+                                            $field.type=='files' }data-multiple="true" {/if}
                                             class="layui-btn layui-bg-green btn-bdchoose">
                                             <i class="fa fa-list"></i>
                                             选择

@@ -21,4 +21,10 @@ return [
     'The mail service has been configured correctly' => '恭喜您，收到此邮件代表您的邮件服务已配置正确；这是邮件主体 <b>在主体中可以使用Html!</b>',
     'Config group'                                   => '配置分组',
     'Please input your email'                        => '请输入您的邮箱',
+    'Group'                                          => '分组',
+    'Type'                                           => '类型',
+    'Weigh'                                          => '权重',
+    'Tip'                                            => '提示信息',
+    'This configuration item cannot be modified'     => '该配置项不允许修改',
+    'Extend'                                         => '扩展属性'
 ];

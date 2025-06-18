@@ -87,7 +87,11 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     };
                 }
             }
-
+            var where = {
+                sort: options.sortName || options.pk,
+                order: options.sortOrder || 'desc',
+            }
+            options.where = $.extend(options.where, where);
             bdTable.initTable = bdTable.table.render(options);
             bdTable.table_elem = options.elem;
 
@@ -101,10 +105,11 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
             // 监听搜索表单提交
             tableSearch.set({
                 onSearch: function (value, item) {
+                    where = $.extend(where, value);
                     bdTable.table.reloadData(
                         bdTable.initTable.config.id,
                         {
-                            where: value,
+                            where: where,
                         }
                     )
                 }

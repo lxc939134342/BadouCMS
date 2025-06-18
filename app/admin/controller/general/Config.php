@@ -15,7 +15,7 @@ class Config extends Backend
      * @var ConfigModel
      */
     protected $model = null;
-    protected $noNeedRight = ['check', 'rulelist', 'selectpage', 'get_fields_list'];
+    protected $modelValidate = true;
 
     public function initialize()
     {
@@ -52,7 +52,7 @@ class Config extends Backend
      * 编辑
      * @throws Throwable
      */
-    public function edit(): void
+    public function saveConfig(): void
     {
         $all = $this->model->select();
         foreach ($all as $item) {
@@ -107,6 +107,166 @@ class Config extends Backend
             }
         }
     }
+
+    public function setting()
+    {
+        if (!$this->isAjax()) {
+            return $this->view->fetch();
+        }
+
+        if (!$this->model) {
+            $this->error(__('Please configure the model first'));
+        }
+
+        if ($this->request->param('select')) {
+            $this->select();
+        }
+
+        [$where, $sort, $order, $offset, $limit] = $this->buildparams();
+
+        $res = $this->model
+            ->where($where)
+            ->order($sort, $order)
+            ->paginate($limit);
+
+        $this->result('', $res->items(), $res->total());
+    }
+
+    public function add()
+    {
+        if ($this->request->isPost()) {
+            $data = $this->request->post('row/a', '', 'trim');
+            if (!$data) {
+                $this->error(__('Parameter %s can not be empty', ['']));
+            }
+
+            $data   = $this->preExcludeFields($data);
+            $result = false;
+            $this->model->startTrans();
+            try {
+                // 模型验证
+                if ($this->modelValidate) {
+                    $validate = str_replace("\\model\\", "\\validate\\", get_class($this->model));
+                    if (class_exists($validate)) {
+                        $validate = new $validate();
+                        if ($this->modelSceneValidate) {
+                            $validate->scene('add');
+                        }
+                        $validate->check($data);
+                    }
+                }
+                $result = $this->model->save($data);
+                $this->model->commit();
+            } catch (Throwable $e) {
+                $this->model->rollback();
+                $this->error($e->getMessage());
+            }
+            if ($result !== false) {
+                $this->success(__('Added successfully'));
+            } else {
+                $this->error(__('No rows were added'));
+            }
+        }
+        $configGroup = get_sys_config('config_group');
+        $this->assign('config_group', $configGroup);
+        $this->assign('type_list', $this->model->getTypeList());
+        return $this->view->fetch();
+    }
+
+    /**
+     * 编辑
+     * @throws Throwable
+     */
+    public function edit()
+    {
+        $id  = $this->request->param('ids');
+        $row = $this->model->where($this->pk, 'in', $id)->find();
+        if (!$row) {
+            $this->error(__('Record not found'));
+        }
+
+        if ($row->allow_del == 0) {
+            $this->error(__('This configuration item cannot be modified'));
+        }
+
+        $adminIds = $this->getDataLimitAdminIds();
+        if (is_array($adminIds) && !in_array($row[$this->dataLimitField], $adminIds)) {
+            $this->error(__('You have no permission'));
+        }
+
+        if ($this->request->isPost()) {
+            $data = $this->request->post('row/a');
+            if (!$data) {
+                $this->error(__('Parameter %s can not be empty', ['']));
+            }
+
+            $data   = $this->preExcludeFields($data);
+            $result = false;
+            $this->model->startTrans();
+            try {
+                // 模型验证
+                if ($this->modelValidate) {
+                    $validate = str_replace("\\model\\", "\\validate\\", get_class($this->model));
+                    if (class_exists($validate)) {
+                        $validate = new $validate();
+                        if ($this->modelSceneValidate) {
+                            $validate->scene('edit');
+                        }
+                        $validate->check($data);
+                    }
+                }
+                $result = $row->save($data);
+                $this->model->commit();
+            } catch (Throwable $e) {
+                $this->model->rollback();
+                $this->error($e->getMessage());
+            }
+            if ($result !== false) {
+                $this->success(__('Update successful'));
+            } else {
+                $this->error(__('No rows updated'));
+            }
+        }
+        $this->view->assign('row', $row);
+        $configGroup = get_sys_config('config_group');
+        $this->assign('config_group', $configGroup);
+        $this->assign('type_list', $this->model->getTypeList());
+        return $this->view->fetch();
+    }
+
+    public function del()
+    {
+        $where             = [];
+        $dataLimitAdminIds = $this->getDataLimitAdminIds();
+        if ($dataLimitAdminIds) {
+            $where[] = [$this->dataLimitField, 'in', $dataLimitAdminIds];
+        }
+
+        $ids     = $this->request->param('ids');
+        $where[] = [$this->pk, 'in', $ids];
+        $data    = $this->model->where($where)->select();
+
+        $count = 0;
+        $this->model->startTrans();
+        try {
+            foreach ($data as $v) {
+                if ($v->allow_del == 0) {
+                    continue;
+                }
+                $count += $v->delete();
+            }
+            $this->model->commit();
+        } catch (Throwable $e) {
+            $this->model->rollback();
+            $this->error($e->getMessage());
+        }
+        if ($count) {
+            $this->success(__('Delete successful'));
+        } else {
+            $this->error(__('No rows were deleted'));
+        }
+    }
+
 
 
     /**

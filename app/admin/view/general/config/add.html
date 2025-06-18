@@ -1,0 +1,95 @@
+{layout name="layout/form" /}
+<form class="layui-form" method="POST">
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Group')}</label>
+        <div class="layui-input-block">
+            <select name="row[group]" id="c-group"   lay-verify="required">
+                {foreach name="$config_group" item="vo"}
+                <option value="{$vo.key}">{:__($vo['value'])}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+     <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Name')}</label>
+        <div class="layui-input-block">
+            <input
+                type="text"
+                name="row[name]"
+                lay-verify="required"
+                class="layui-input"
+                placeholder="{:__('Please enter %s',[__('Name')])}" />
+        </div>
+    </div>
+     <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Title')}</label>
+        <div class="layui-input-block">
+            <input
+                type="text"
+                name="row[title]"
+                lay-verify="required"
+                class="layui-input"
+                placeholder="{:__('Please enter %s',[__('Title')])}" />
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Type')}</label>
+        <div class="layui-input-block">
+             <select name="row[type]" id="c-type"   lay-verify="required">
+                {foreach name="$type_list" item="vo"}
+                <option value="{$key}">{:__($vo)}</option>
+                {/foreach}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Tip')}</label>
+        <div class="layui-input-block">
+            <input
+                type="text"
+                name="row[tip]"
+                class="layui-input"
+                placeholder="{:__('Please enter %s',[__('Tip')])}" />
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Extend')}</label>
+        <div class="layui-input-block">
+            <input
+                type="text"
+                name="row[extend]"
+                class="layui-input"
+                placeholder="{:__('Please enter %s',[__('Extend')])}" />
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Weigh')}</label>
+        <div class="layui-input-block">
+            <input
+                type="text"
+                name="row[weigh]"
+                value="0"
+                class="layui-input"
+                placeholder="{:__('Please enter %s',[__('Weigh')])}" />
+        </div>
+    </div>
+
+
+    <div class="layui-form-item layer-footer hide">
+        <div class="layui-input-block">
+            <button class="layui-btn btn-theme-color disabled" lay-submit>立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    layui.use(["form", "badou"], function () {
+        var form = layui.form;
+        var bdForm = layui.bdForm;
+        bdForm.api.bindevent($("form.layui-form"));
+    });
+</script>

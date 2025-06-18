@@ -21,11 +21,31 @@ class Config extends Model
         'value',
         'content',
         'extend',
-        'input_extend',
+        'oldextend'
     ];
 
     protected array $jsonDecodeType = ['checkbox', 'array', 'selects'];
     protected array $needContent    = ['radio', 'checkbox', 'select', 'selects'];
+
+    protected $typeList = [
+        'string' => 'string',
+        'textarea'   => 'textarea',
+        'editor' => 'editor',
+        'file' => 'file',
+        'files' => 'files',
+        'datetime'   => 'datetime',
+        'image'   => 'image',
+        'images' => 'images',
+        'checkbox' => 'checkbox',
+        'radio'    => 'radio',
+        'select'   => 'select',
+    ];
+
+    public function getTypeList()
+    {
+        return $this->typeList;
+    }
+
 
     /**
      * 入库前
@@ -33,6 +53,9 @@ class Config extends Model
      */
     public static function onBeforeInsert(Config $model): void
     {
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $model->getData('name'))) {
+            throw new \think\Exception('配置名称只能包含字母、数字、下划线');
+        }
         if (!in_array($model->getData('type'), $model->needContent)) {
             $model->content = null;
         } else {
@@ -41,17 +64,20 @@ class Config extends Model
         if (is_array($model->rule)) {
             $model->rule = implode(',', $model->rule);
         }
-        if ($model->getData('extend') || $model->getData('inputExtend')) {
+        if ($model->getData('extend')) {
             $extend      = str_attr_to_array($model->getData('extend'));
-            $inputExtend = str_attr_to_array($model->getData('inputExtend'));
-            if ($inputExtend) {
-                $extend['baInputExtend'] = $inputExtend;
-            }
             if ($extend) {
                 $model->extend = json_encode($extend);
             }
         }
         $model->allow_del = 1;
+    }
+
+    public static function onBeforeWrite(Config $model): void
+    {
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $model->getData('name'))) {
+            throw new \think\Exception('配置名称只能包含字母、数字、下划线');
+        }
     }
 
     /**
@@ -125,21 +151,14 @@ class Config extends Model
         if ($value) {
             $arr = json_decode($value, true);
             if ($arr) {
-                unset($arr['baInputExtend']);
                 return $arr;
             }
         }
         return [];
     }
 
-    public function getInputExtendAttr($value, $row)
+    public function getOldextendAttr($value, $row)
     {
-        if ($row && $row['extend']) {
-            $arr = json_decode($row['extend'], true);
-            if ($arr && isset($arr['baInputExtend'])) {
-                return $arr['baInputExtend'];
-            }
-        }
-        return [];
+        return $row['extend'];
     }
 }
