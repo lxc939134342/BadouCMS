@@ -3,26 +3,43 @@
 <!-- 表格 -->
 <div class="layui-card">
     <div class="layui-card-body">
-        <table class="layui-hide" id="rule" data-operate-edit="{:$auth->check('user.group/edit')}" data-operate-del="{:$auth->check('user.group/del')}"></table>
+        <table
+            class="layui-hide"
+            id="user_group"
+            data-operate-edit="{:$auth->check('user.group/edit')}"
+            data-operate-del="{:$auth->check('user.group/del')}"></table>
     </div>
 </div>
 
 <!-- 表格左侧按钮 toolbar  -->
 <script type="text/html" id="toolbar">
-	<a href="javascript:;" lay-event="refresh" class="layui-btn  btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
-	<button class="layui-btn  layui-bg-green" lay-event="add"><i class="fa fa-plus"></i> {:__('Add')}</button>
-	<button class="layui-btn  layui-bg-blue btn-disabled disabled {:$auth->check('user.group/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
-	<button class="layui-btn  layui-bg-red btn-disabled disabled" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
+    <a href="javascript:;" lay-event="refresh" class="layui-btn  btn-refresh layui-bg-black	">
+        <i class="fa fa-refresh"></i>
+    </a>
+    <button class="layui-btn  layui-bg-green" lay-event="add">
+        <i class="fa fa-plus"></i>
+        {:__('Add')}
+    </button>
+    <button
+        class="layui-btn  layui-bg-blue btn-disabled disabled {:$auth->check('user.group/edit')?'':'hide'}"
+        lay-event="edit">
+        <i class="fa fa-pencil"></i>
+        {:__('Edit')}
+    </button>
+    <button class="layui-btn  layui-bg-red btn-disabled disabled" lay-event="del">
+        <i class="fa fa-trash"></i>
+        {:__('Del')}
+    </button>
 </script>
 
 <script>
     layui.use(["badou"], function () {
         var bdTable = layui.bdTable;
-        var treeTable = layui.treeTable;
+        var table = layui.table;
         var layer = layui.layer;
         var dropdown = layui.dropdown;
         bdTable.api.init({
-            table: treeTable,
+            table: table,
             extend: {
                 index_url: "user.group/index",
                 add_url: "user.group/add",
@@ -33,7 +50,7 @@
             },
         });
         bdTable.render({
-            elem: "#rule",
+            elem: "#user_group",
             url: "{:url('user.group/index')}",
             pk: "id",
             even: true,
@@ -42,9 +59,21 @@
                 [
                     { type: "checkbox" },
                     { field: "id", title: "ID", width: 80, sort: true },
-					{field: 'name', title: __('Name')},
-					{field: 'createtime', title: __('Createtime'), formatter: bdTable.api.formatter.datetime, operate: 'RANGE', addclass: 'datetimerange', sortable: true},
-					{field: 'updatetime', title: __('Updatetime'), formatter: bdTable.api.formatter.datetime, operate: 'RANGE', addclass: 'datetimerange', sortable: true},
+                    { field: "name", title: __("Name") },
+                    {
+                        field: "create_time",
+                        title: __("Createtime"),
+                        templet: bdTable.api.formatter.datetime,
+                        operate: "RANGE",
+                        searchType: "time",
+                    },
+                    {
+                        field: "update_time",
+                        title: __("Updatetime"),
+                        templet: bdTable.api.formatter.datetime,
+                        operate: "RANGE",
+                        searchType: "time",
+                    },
                     {
                         field: "status",
                         title: "状态",
@@ -53,23 +82,9 @@
                         custom: { normal: "green", hidden: "orange" },
                         templet: bdTable.api.formatter.status,
                     },
-                    { title: "操作", width: 190, align: "center", templet: bdTable.api.formatter.operate},
+                    { title: "操作", width: 190, align: "center", templet: bdTable.api.formatter.operate },
                 ],
             ],
-        });
-        // 展开全部
-        $(document).on("click", "#expandAll", function () {
-            var btn = $(this);
-            var isExpanded = btn.hasClass("expanded");
-            if (isExpanded) {
-                treeTable.expandAll("rule", false);
-                btn.removeClass("expanded");
-                btn.html('<i class="fa fa-plus"></i> {:__("Expendall")}');
-            } else {
-                treeTable.expandAll("rule", true);
-                btn.addClass("expanded");
-                btn.html('<i class="fa fa-minus"></i> {:__("Collapseall")}');
-            }
         });
     });
 </script>

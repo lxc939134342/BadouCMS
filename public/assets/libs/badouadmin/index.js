@@ -10,7 +10,6 @@ layui.config({
     version: "1.0.0"
 }).extend({
     lang: "lang",
-
     badou: "badou",
     bdHttp: "bdHttp",
     tableSearch: "tableSearch",   // 通用搜索
@@ -18,16 +17,15 @@ layui.config({
     bdForm: "bdForm",        // 表单组件
     cardList: "cardList",      // 卡片列表
     bdUpload: "bdUpload",      // 上传组件
-    // jstree: "jstree",   //  树结构
-    // 组件扩展
+    // 拖拽组件
     Sortable: {
         src: '/assets/libs/sortablejs/Sortable.min.js',
         api: 'Sortable'
     },
-    // 组件扩展 - 树结构
-    jstree: {
-        src: '/assets/libs/jstree/jstree.min.js',
-        api: 'jstree'
+    // 下拉组件
+    xmSelect: {
+        src: '/assets/libs/xm-select/xm-select.js',
+        api: 'xmSelect'
     },
     bdTool: "bdTool",        // 工具组件
 });

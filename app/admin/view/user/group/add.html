@@ -1,243 +1,121 @@
 {layout name="layout/form" /}
 <form class="layui-form" method="post">
-
     <div class="layui-form-item">
         <label class="layui-form-label">权限组</label>
         <div class="layui-input-block">
-            <input type="text" name="row[title]" lay-verify="required" autocomplete="off" placeholder="权限组" class="layui-input" value="">
+            <input
+                type="text"
+                name="row[name]"
+                lay-verify="required"
+                autocomplete="off"
+                placeholder="权限组"
+                class="layui-input"
+                value="" />
         </div>
     </div>
-
 
     <div class="layui-form-item">
         <label class="layui-form-label">状态</label>
         <div class="layui-input-block">
-            <input type="radio" name="row[status]" value="1" title="正常" checked>
-            <input type="radio" name="row[status]" value="0" title="禁用">
+            <input type="radio" name="row[status]" value="normal" title="正常" checked />
+            <input type="radio" name="row[status]" value="hidden" title="禁用" />
         </div>
     </div>
 
     <div class="layui-form-item">
         <label class="layui-form-label">权限</label>
         <div class="layui-input-block">
-            <input type="checkbox" name="" title="选中全部" lay-filter="checkall">
-            <input type="checkbox" name="" title="展开全部" lay-filter="expandall">
+             <input type="hidden" name="row[rules]" />
+            <input type="checkbox" name="" title="选中全部" lay-filter="checkall" />
+            <input type="checkbox" name="" title="展开全部" lay-filter="expandall" />
             <div id="treeview"></div>
         </div>
     </div>
 
-
-
-
     <div class="layui-form-item layer-footer hide">
         <div class="layui-input-block">
-            <button class="pear-btn pear-btn-primary pear-btn-md disabled" lay-submit>立即提交</button>
-            <button type="reset" class="pear-btn pear-btn-md">重置</button>
+            <button class="layui-btn pear-btn-primary layui-btn-sm disabled" lay-submit>立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
         </div>
     </div>
 </form>
-<script src="__CDN__/assets/libs/jstree/jstree.min.js"></script>
 <script>
-// 后续使用 jstree 模块
-// layui.use(['jstree'], function() {
-//     var jstree = layui.jstree;
-//     // 使用 jstree 功能
-// });
-
-layui.use(['badou','jquery'],function () {
+    layui.use(["badou", "jquery", "toast", "form"], function () {
         var bdForm = layui.bdForm;
-        var jstree = layui.jstree;
         var $ = layui.$;
-
-
+        var badou = layui.badou;
+        var toast = layui.toast;
+        var form = layui.form;
         //读取选中的条目
-        $.jstree.core.prototype.get_all_checked = function(full) {
+        $.jstree.core.prototype.get_all_checked = function (full) {
             var obj = this.get_selected(),
-                i, j;
+                i,
+                j;
             for (i = 0, j = obj.length; i < j; i++) {
                 obj = obj.concat(this.get_node(obj[i]).parents);
             }
-            obj = $.grep(obj, function(v, i, a) {
-                return v != '#';
+            obj = $.grep(obj, function (v, i, a) {
+                return v != "#";
             });
-            obj = obj.filter(function(itm, i, a) {
+            obj = obj.filter(function (itm, i, a) {
                 return i == a.indexOf(itm);
             });
-            return full ? $.map(obj, $.proxy(function(i) {
-                return this.get_node(i);
-            }, this)) : obj;
+            return full
+                ? $.map(
+                      obj,
+                      $.proxy(function (i) {
+                          return this.get_node(i);
+                      }, this)
+                  )
+                : obj;
         };
-
-
-
-
-
-
-
-        bdForm.api.authGroupBindevent($("form.layui-form"));
-})
-</script>
-
-
-
-<!-- <script>
-
-// layui.define(['jquery', 'table', 'form', 'jstree'], function($, Table, Form, undefined) {
-layui.use(['jstree', 'jquery','table', 'form'], function(){
-var jstree = layui.jstree;
-var $ = layui.$;
-var Form = layui.form;
-var Table = layui.table;
-
-//读取选中的条目
-$.jstree.core.prototype.get_all_checked = function(full) {
-    var obj = this.get_selected(),
-        i, j;
-    for (i = 0, j = obj.length; i < j; i++) {
-        obj = obj.concat(this.get_node(obj[i]).parents);
-    }
-    obj = $.grep(obj, function(v, i, a) {
-        return v != '#';
-    });
-    obj = obj.filter(function(itm, i, a) {
-        return i == a.indexOf(itm);
-    });
-    return full ? $.map(obj, $.proxy(function(i) {
-        return this.get_node(i);
-    }, this)) : obj;
-};
-
-var Controller = {
-    index: function() {
-        Table.init = {
-            table_elem: '#currentTable',
-            table_render_id: 'currentTable',
-            add_url: "auth.group/add",
-            edit_url: "auth.group/edit",
-            delete_url: "auth.group/del",
-        };
-
-        // 使用 table 渲染逻辑
-        Table.render({
-            init: Table.init,
-            toolbar: ['refresh', 'add'],
-            url: 'auth.group/index',
-            search: false,
-            cols: [
-                [
-                    { field: 'id', width: 80, title: 'ID' },
-                    { field: 'title', width: 200, align: 'left', title: '权限组',templet: function(d){
-                        return d.title.toString().replace(/(&|&amp;)nbsp;/g, '&nbsp;');
-                    }},
-                    { field: 'description', title: '描述' },
-                    { field: 'status', width: 80, title: '状态', templet: Table.formatter.status, selectList: { 0: '禁用', 1: '正常' }, search: false },
-                    {
-                        width: 100,
-                        title: '操作',
-                        templet: function(d) {
-                            if (Config.admin.group_ids.indexOf(parseInt(d.id)) > -1) {
-                                return '<a class="layui-btn layui-btn-xs layui-btn-danger layui-btn-disabled">不可操作</a>';
-                            } else {
-                                return Table.formatter.tool.call(this, d, this);
-                            }
-                        },
-                        operat: ['edit', 'delete']
-                    }
-                ]
-            ],
-        });
-
-        Table.api.bindevent();
-    },
-    add: function() {
-        Controller.api.bindevent();
-    },
-    edit: function() {
-        Controller.api.bindevent();
-    },
-    api: {
-        bindevent: function() {
-            Form.api.bindevent($("form.layui-form"), null, null, function() {
-                if ($("#treeview").length > 0) {
-                    var r = $("#treeview").jstree("get_all_checked");
-                    $("input[name='row[rules]']").val(r.join(','));
-                }
-                return true;
-            });
-            //渲染权限节点树
-            //变更级别后需要重建节点树
-            layui.form.on('select(parentid)', function(data){
-                var parentid = $(data.elem).data("parentid");
-                var id = $(data.elem).data("id");
-                var val = data.value;
-
-                if (val == id) {
-                    $("option[value='" + parentid + "']", this).prop("selected", true).change();
-                    Backend.api.toastr.error('父级不能是它自己');
-                    return false;
-                }
-                $.ajax({
-                    url: "auth.group/roletree",
-                    type: 'post',
-                    dataType: 'json',
-                    data: { id: id, parentid: val },
-                    success: function(ret) {
-                        if (ret.hasOwnProperty("code")) {
-                            var data = ret.hasOwnProperty("data") && ret.data != "" ? ret.data : "";
-                            if (ret.code === 1) {
-                                //销毁已有的节点树
-                                $("#treeview").jstree("destroy");
-                                Controller.api.rendertree(data);
-                            } else {
-                                Backend.api.toastr.error(ret.msg);
-                            }
-                        }
-                    },
-                    error: function(e) {
-                        Backend.api.toastr.error(e.message);
-                    }
-                });
-            });
-
-            //全选和展开
-            layui.form.on('checkbox(checkall)', function(data){
-                $("#treeview").jstree($(this).prop("checked") ? "check_all" : "uncheck_all");
-            });
-            layui.form.on('checkbox(expandall)', function(data){
-                $("#treeview").jstree($(this).prop("checked") ? "open_all" : "close_all");
-            });
-            $("select[name='row[parentid]']").siblings("div.layui-form-select").find("dd.layui-this").click();
-        },
-        rendertree: function(content) {
+        var rendertree = function (content) {
             $("#treeview")
-                .on('redraw.jstree', function(e) {
+                .on("redraw.jstree", function (e) {
                     $(".layer-footer").attr("domrefresh", Math.random());
                 })
                 .jstree({
-                    "themes": { "stripes": true },
-                    "checkbox": {
-                        "keep_selected_style": false,
+                    themes: { stripes: true },
+                    checkbox: {
+                        keep_selected_style: false,
                     },
-                    "types": {
-                        "root": {
-                            "icon": "fa fa-folder-open",
+                    types: {
+                        root: {
+                            icon: "fa fa-folder-open",
                         },
-                        "menu": {
-                            "icon": "fa fa-folder-open",
+                        menu: {
+                            icon: "fa fa-folder-open",
                         },
-                        "file": {
-                            "icon": "fa fa-file-o",
-                        }
+                        file: {
+                            icon: "fa fa-file-o",
+                        },
                     },
-                    "plugins": ["checkbox", "types"],
-                    "core": {
-                        'check_callback': true,
-                        "data": content
-                    }
+                    plugins: ["checkbox", "types"],
+                    core: {
+                        check_callback: true,
+                        data: content,
+                    },
                 });
-        }
-    }
-};
-return Controller;
-});
-</script>  -->
+        };
+        //销毁已有的节点树
+        $("#treeview").jstree("destroy");
+        rendertree(Config.nodeList);
+        //全选和展开
+        form.on("checkbox(checkall)", function (data) {
+            $("#treeview").jstree($(this).prop("checked") ? "check_all" : "uncheck_all");
+        });
+        form.on("checkbox(expandall)", function (data) {
+            $("#treeview").jstree($(this).prop("checked") ? "open_all" : "close_all");
+        });
+
+        $("select[name='row[pid]']").trigger("change");
+
+        bdForm.api.bindevent($("form.layui-form"),null,null,function(){
+            if ($("#treeview").length > 0) {
+                var r = $("#treeview").jstree("get_all_checked");
+                $("input[name='row[rules]']").val(r.join(','));
+            }
+            return true;
+        });
+    });
+</script>

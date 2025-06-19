@@ -1,96 +1,121 @@
 {layout name="layout/form" /}
 <form class="layui-form" method="post">
-    {:token_field()}
-    <div class="layui-form-item">
-        <label class="layui-form-label">父级</label>
-        <div class="layui-input-block">
-            {:Form::select('row[parentid]',$groupdata,0,["lay-verify"=>"required","lay-filter"=>"parentid"])}
-        </div>
-    </div>
     <div class="layui-form-item">
         <label class="layui-form-label">权限组</label>
         <div class="layui-input-block">
-            <input type="text" name="row[title]" lay-verify="required" autocomplete="off" placeholder="权限组" class="layui-input" value="">
+            <input
+                type="text"
+                name="row[name]"
+                lay-verify="required"
+                autocomplete="off"
+                placeholder="权限组"
+                class="layui-input"
+                value="{$row.name}" />
         </div>
     </div>
 
-    
     <div class="layui-form-item">
-        <label class="layui-form-label">规则</label>
+        <label class="layui-form-label">状态</label>
         <div class="layui-input-block">
-            <input type="text" name="row[name]"  value="{$row.name}" lay-verify="required" autocomplete="off"  placeholder="控制器/方法名,如果有目录请使用 目录名.控制器名/方法名" class="layui-input">
+            <input type="radio" name="row[status]" value="normal" title="正常" {if $row['status']=='normal'} checked {/if} />
+            <input type="radio" name="row[status]" value="hidden" title="禁用" {if $row['status']=='hidden'} checked {/if} />
         </div>
     </div>
+
     <div class="layui-form-item">
-        <label class="layui-form-label">标题</label>
+        <label class="layui-form-label">权限</label>
         <div class="layui-input-block">
-            <input type="text" name="row[title]" value="{$row.title}" lay-verify="required" autocomplete="off" placeholder="标题" class="layui-input">
+            <input type="hidden" name="row[rules]" value="{$row.rules|htmlentities}" />
+            <input type="checkbox" name="" title="选中全部" lay-filter="checkall" />
+            <input type="checkbox" name="" title="展开全部" lay-filter="expandall" />
+            <div id="treeview"></div>
         </div>
     </div>
-    <div class="layui-form-item" data-type="menu">
-        <label class="layui-form-label">URL</label>
-        <div class="layui-input-block">
-            <input type="text" name="row[url]" value="{$row.url}" autocomplete="off" placeholder="一般情况下留空即可,如果是外部链接或相对链接请输入" class="layui-input">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">图标</label>
-        <div class="layui-input-block">
-            <input type="text" class="icon-select" lay-filter="iconPicker" class="layui-hide" name="row[icon]" value="{$row.icon}" class="layui-input">
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">规则条件</label>
-        <div class="layui-input-block">
-            <textarea name="row[condition]" placeholder="规则条件" class="layui-textarea">{$row.condition}</textarea>
-        </div>
-    </div>
-    </div>
-    <div class="layui-form-item" data-type="menu">
-        <label class="layui-form-label">菜单类型</label>
-        <div class="layui-input-block">
-            <input type="radio" name="row[menutype]" value="_iframe" title="选项卡(默认)" {if $row.menutype=='_iframe'}checked{/if} >
-            <input type="radio" name="row[menutype]" value="_blank" title="链接"  {if $row.menutype=='_blank'}checked{/if}>
-        </div>
-    </div>
-    <div class="layui-form-item" data-type="menu">
-        <label class="layui-form-label">扩展属性</label>
-        <div class="layui-input-block">
-            <textarea name="row[extend]" placeholder="扩展属性" class="layui-textarea">{$row.extend}</textarea>
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">备注</label>
-        <div class="layui-input-block">
-            <textarea name="row[remark]" placeholder="备注" class="layui-textarea">{$row.remark}</textarea>
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">权重</label>
-        <div class="layui-input-block">
-            <input type="text" name="row[weigh]" autocomplete="off" placeholder="权重" class="layui-input" value="{$row.weigh}" >
-        </div>
-    </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">状态 </label>
-        <div class="layui-input-block">
-            <input type="radio" name="row[status]" value="normal" title="正常" {if $row.status=='normal'}checked{/if}>
-            <input type="radio" name="row[status]" value="hidden" title="隐藏" {if $row.status=='hidden'}checked{/if}>
-        </div>
-    </div>
+
     <div class="layui-form-item layer-footer hide">
         <div class="layui-input-block">
-            <input type="hidden" name="id" value="{$row.id}">
-
-            <button class="pear-btn pear-btn-primary pear-btn-md disabled" lay-submit>立即提交</button>
-            <button type="reset" class="pear-btn pear-btn-md">重置</button>
+            <button class="layui-btn pear-btn-primary layui-btn-sm disabled" lay-submit>立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
         </div>
     </div>
 </form>
-
 <script>
-    layui.use(['badou'],function () {
+    layui.use(["badou", "jquery", "toast", "form"], function () {
         var bdForm = layui.bdForm;
-        bdForm.api.bindevent($("form.layui-form"));
-    })
+        var $ = layui.$;
+        var badou = layui.badou;
+        var toast = layui.toast;
+        var form = layui.form;
+        //读取选中的条目
+        $.jstree.core.prototype.get_all_checked = function (full) {
+            var obj = this.get_selected(),
+                i,
+                j;
+            for (i = 0, j = obj.length; i < j; i++) {
+                obj = obj.concat(this.get_node(obj[i]).parents);
+            }
+            obj = $.grep(obj, function (v, i, a) {
+                return v != "#";
+            });
+            obj = obj.filter(function (itm, i, a) {
+                return i == a.indexOf(itm);
+            });
+            return full
+                ? $.map(
+                      obj,
+                      $.proxy(function (i) {
+                          return this.get_node(i);
+                      }, this)
+                  )
+                : obj;
+        };
+        var rendertree = function (content) {
+            $("#treeview")
+                .on("redraw.jstree", function (e) {
+                    $(".layer-footer").attr("domrefresh", Math.random());
+                })
+                .jstree({
+                    themes: { stripes: true },
+                    checkbox: {
+                        keep_selected_style: false,
+                    },
+                    types: {
+                        root: {
+                            icon: "fa fa-folder-open",
+                        },
+                        menu: {
+                            icon: "fa fa-folder-open",
+                        },
+                        file: {
+                            icon: "fa fa-file-o",
+                        },
+                    },
+                    plugins: ["checkbox", "types"],
+                    core: {
+                        check_callback: true,
+                        data: content,
+                    },
+                });
+        };
+        //销毁已有的节点树
+        $("#treeview").jstree("destroy");
+        rendertree(Config.nodeList);
+        //全选和展开
+        form.on("checkbox(checkall)", function (data) {
+            $("#treeview").jstree($(this).prop("checked") ? "check_all" : "uncheck_all");
+        });
+        form.on("checkbox(expandall)", function (data) {
+            $("#treeview").jstree($(this).prop("checked") ? "open_all" : "close_all");
+        });
+
+        $("select[name='row[pid]']").trigger("change");
+
+        bdForm.api.bindevent($("form.layui-form"),null,null,function(){
+            if ($("#treeview").length > 0) {
+                var r = $("#treeview").jstree("get_all_checked");
+                $("input[name='row[rules]']").val(r.join(','));
+            }
+            return true;
+        });
+    });
 </script>

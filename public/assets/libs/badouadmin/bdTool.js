@@ -1,6 +1,7 @@
-layui.define(['bdHttp'], function (exports) {
+layui.define(['bdHttp', 'xmSelect'], function (exports) {
     "use strict";
     var http = layui.bdHttp;
+    var xmSelect = layui.xmSelect;
     var bdTool = {
         // 远程下拉选择框
         remoteSelect: function () {
@@ -8,7 +9,6 @@ layui.define(['bdHttp'], function (exports) {
             var dark = localStorage.getItem("dark");
             if ($('.remoteSelect').length > 0) {
                 $(document).on('click', '.remoteSelectClearAll', function () {
-                    console.log(111);
                     xmSelect.batch(null, 'setValue', []);
                 });
 
@@ -176,11 +176,12 @@ layui.define(['bdHttp'], function (exports) {
                 $('.laydate').each(function (i) {
                     var type = $(this).data('type') || 'datetime';
                     var range = $(this).data('range') || false;
+                    var isIntValue = $(this).data('is-init-value') ?? true;
 
                     var options = {
                         elem: this,
                         type: type,
-                        isInitValue: true,
+                        isInitValue: isIntValue,
                         trigger: 'click'
                     };
                     if (range) {

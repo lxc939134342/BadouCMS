@@ -109,7 +109,7 @@ layui.define(['jquery', 'form', 'bdHttp', 'bdTool'], function (exports) {
                     else if (col.searchType == 'time') {
                         col.operate = 'RANGE';
                         html.push('<input type="hidden" class="badouadmin-commonsearch-operate" data-name="' + col.field + '" id="' + col.field + '" name="' + col.field + '-opearate" value="' + col.operate + '">');
-                        html.push('<input type="' + type + '" name="' + col.field + '" value="' + defaultValue + '" placeholder="' + placeholder + '" class="layui-input laydate" autocomplete="off" data-range="true">');
+                        html.push('<input type="' + type + '" name="' + col.field + '" value="" placeholder="' + placeholder + '" class="layui-input laydate" autocomplete="off" data-is-init-value="false" data-range="true">');
                     }
                     else {
                         html.push(hiddenOperateHtml);
