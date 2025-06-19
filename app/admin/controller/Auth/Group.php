@@ -49,8 +49,6 @@ class Group extends Backend
 
         $groupList = AuthGroupModel::where('id', 'in', $this->childrenGroupIds)->select()->toArray();
 
-        // p($groupList);
-
         Tree::instance()->init($groupList);
         $groupList = [];
         if ($this->auth->isSuperAdmin()) {
@@ -77,8 +75,6 @@ class Group extends Backend
         $this->groupdata = $groupName;
         $this->assignconfig("admin", ['id' => $this->auth->id, 'group_ids' => $this->auth->getGroupIds()]);
         $this->assign('groupdata', $this->groupdata);
-        // View::assign( $this->groupdata);
-
     }
 
     /**
@@ -86,24 +82,9 @@ class Group extends Backend
      */
     public function index()
     {
-        // if ($this->isAjax()) {
-        //     $res = $this->model
-        //             ->withoutField('type,condition,remark,create_time,update_time')
-        //             ->order('weigh DESC,id ASC')
-        //             ->select()->toArray();
-        //     $total = count($res);
-        //     foreach ($res as &$v) {
-        //         $v['title'] = __($v['title']);
-        //     }
-        //     $treeLib = Tree::instance();
-        //     $list = $treeLib->init($res)->getTreeArray(0);
-        //     $this->result('ok', $list, $total);
-        // }
         if ($this->request->isAjax()) {
             $list   = $this->grouplist;
             $total  = count($list);
-            // $result = ["code" => 0, "count" => $total, "data" => $list];
-            // return json($result);
             $this->result('ok', $list, $total);
         } else {
             return $this->view->fetch();
@@ -116,25 +97,32 @@ class Group extends Backend
     public function add()
     {
         if ($this->request->isPost()) {
-            $this->token();
             $params = $this->request->post("row/a", [], 'strip_tags');
-            try {
-                $this->validate($params, 'app\admin\validate\AuthGroup');
-            } catch (ValidateException $e) {
-                $this->error($e->getMessage());
+            $params['rules'] = explode(',', $params['rules']);
+            if (!in_array($params['pid'], $this->childrenGroupIds)) {
+                $this->error(__('The parent group exceeds permission limit'));
             }
-            if (!in_array($params['parentid'], $this->childrenGroupIds)) {
-                $this->error('父组别超出权限范围');
-            }
-            $parentmodel = AuthGroupModel::find($params['parentid']);
+            $parentmodel = AuthGroupModel::find($params['pid']);
             if (!$parentmodel) {
-                $this->error('父组别未找到');
+                $this->error(__('The parent group can not found'));
             }
+            // 父级别的规则节点
+            $parentrules = explode(',', $parentmodel->rules);
+            // 当前组别的规则节点
+            $currentrules = $this->auth->getRuleIds();
+            $rules = $params['rules'];
+
+            // 如果父组不是超级管理员则需要过滤规则节点,不能超过父组别的权限
+            $rules = in_array('*', $parentrules) ? $rules : array_intersect($parentrules, $rules);
+
+            // 如果当前组别不是超级管理员则需要过滤规则节点,不能超当前组别的权限
+            $rules = in_array('*', $currentrules) ? $rules : array_intersect($currentrules, $rules);
+            $params['rules'] = implode(',', $rules);
             if ($params) {
                 $this->model->create($params);
-                $this->success('新增成功');
+                $this->success();
             }
-            $this->error('参数不能为空');
+            $this->error();
         }
         return $this->fetch();
 
@@ -142,65 +130,74 @@ class Group extends Backend
 
 
     //编辑管理员用户组
-    public function edit()
+    public function edit($ids = null)
     {
-        $id = $this->request->param('ids/d');
-        if (!in_array($id, $this->childrenGroupIds)) {
-            $this->error('你没有权限访问!');
+        if (!in_array($ids, $this->childrenGroupIds)) {
+            $this->error(__('You have no permission'));
         }
-        $row = $this->model->find($id);
+        $row = $this->model->find(['id' => $ids]);
         if (!$row) {
-            $this->error('记录未找到');
+            $this->error(__('No Results were found'));
         }
         if ($this->request->isPost()) {
             $this->token();
+            $AuthGroupModel = new AuthGroupModel();
             $params = $this->request->post("row/a", [], 'strip_tags');
             //父节点不能是非权限内节点
-            if (!in_array($params['parentid'], $this->childrenGroupIds)) {
-                $this->error('父组别超出权限范围');
+            if (!in_array($params['pid'], $this->childrenGroupIds)) {
+                $this->error(__('The parent group exceeds permission limit'));
             }
             // 父节点不能是它自身的子节点或自己本身
-            if (in_array($params['parentid'], Tree::instance()->getChildrenIds($row->id, true))) {
-                $this->error('父角色不能是自身！');
+            if (in_array($params['pid'], Tree::instance()->getChildrenIds($row->id, true))) {
+                $this->error(__('The parent group can not be its own child or itself'));
             }
             $params['rules'] = explode(',', $params['rules']);
 
-            $parentmodel = AuthGroupModel::find($params['parentid']);
+            $parentmodel = $AuthGroupModel::where('id', $params['pid'])->find();
             if (!$parentmodel) {
-                $this->error('父组别未找到');
+                $this->error(__('The parent group can not found'));
             }
-
             // 父级别的规则节点
             $parentrules = explode(',', $parentmodel->rules);
             // 当前组别的规则节点
             $currentrules = $this->auth->getRuleIds();
-            $rules        = $params['rules'];
+            $rules = $params['rules'];
+
             // 如果父组不是超级管理员则需要过滤规则节点,不能超过父组别的权限
             $rules = in_array('*', $parentrules) ? $rules : array_intersect($parentrules, $rules);
+
             // 如果当前组别不是超级管理员则需要过滤规则节点,不能超当前组别的权限
-            $rules           = in_array('*', $currentrules) ? $rules : array_intersect($currentrules, $rules);
+            $rules = in_array('*', $currentrules) ? $rules : array_intersect($currentrules, $rules);
+
             $params['rules'] = implode(',', $rules);
+
             if ($params) {
                 Db::startTrans();
                 try {
                     $row->save($params);
-                    $children_auth_groups = $this->model->whereIn('id', implode(',', (Tree::instance()->getChildrenIds($row->id))))->select();
-                    $childparams          = [];
+                    $ids = Tree::instance()->getChildrenIds($row->id);
+
+                    $children_auth_groups = AuthGroupModel::where('id', 'in', $ids)->select();
+
+
+                    $childparams = [];
                     foreach ($children_auth_groups as $key => $children_auth_group) {
-                        $childparams[$key]['id']    = $children_auth_group->id;
+                        $childparams[$key]['id'] = $children_auth_group->id;
                         $childparams[$key]['rules'] = implode(',', array_intersect(explode(',', $children_auth_group->rules), $rules));
                     }
-                    $this->model->saveAll($childparams);
+                    $AuthGroupModel->saveAll($childparams);
                     Db::commit();
                 } catch (Exception $e) {
                     Db::rollback();
                     $this->error($e->getMessage());
                 }
-                $this->success('编辑成功');
+
+                $this->success();
             }
-            $this->error('参数不能为空');
+            $this->error();
+            return;
         }
-        $this->assign("data", $row);
+        $this->view->assign("row", $row);
         return $this->fetch();
     }
 
@@ -261,23 +258,21 @@ class Group extends Backend
      */
     public function roletree()
     {
-        // p($this->request->param));die;
+        $this->loadlang('auth/group', $this->app->lang->getLangSet());
 
-        $model             = new AuthGroupModel();
-        $id                = $this->request->param("id");
-        $pid               = $this->request->param("pid");
-        $parentGroupModel  = $model->find($pid);
+        $model = new AuthGroupModel();
+        $id = $this->request->post("id");
+        $pid = $this->request->post("pid");
+        $parentGroupModel = $model->find($pid);
         $currentGroupModel = null;
-        // p($id);
-        // p($pid);
-        // p($parentGroupModel);
-        // die;
         if ($id) {
             $currentGroupModel = $model->find($id);
         }
         if (($pid || $parentGroupModel) && (!$id || $currentGroupModel)) {
-            $id       = $id ? $id : null;
-            $ruleList = AuthRuleModel::order('weigh', 'desc')->order('id', 'asc')->select()->toArray();
+            $id = $id ? $id : null;
+            $ruleList = AuthRuleModel::order('weigh', 'desc')
+                ->order('id', 'asc')
+                ->select()->toArray();
 
             //读取父类角色所有节点列表
             $parentRuleList = [];
@@ -291,12 +286,13 @@ class Group extends Backend
                     }
                 }
             }
-            $ruleTree  = new Tree();
+
+            $ruleTree = new Tree();
             $groupTree = new Tree();
             //当前所有正常规则列表
             $ruleTree->init($parentRuleList);
             //角色组列表
-            $groupTree->init(AuthGroupModel::where('id', 'in', $this->childrenGroupIds)->select()->toArray());
+            $groupTree->init($model->where('id', 'in', $this->childrenGroupIds)->select()->toArray());
 
             //读取当前角色下规则ID集合
             $adminRuleIds = $this->auth->getRuleIds();
@@ -307,7 +303,7 @@ class Group extends Backend
 
             if (!$id || !in_array($pid, $this->childrenGroupIds) || !in_array($pid, $groupTree->getChildrenIds($id, true))) {
                 $parentRuleList = $ruleTree->getTreeList($ruleTree->getTreeArray(0), 'name');
-                $hasChildrens   = [];
+                $hasChildrens = [];
                 foreach ($parentRuleList as $k => $v) {
                     if ($v['haschild']) {
                         $hasChildrens[] = $v['id'];
@@ -324,567 +320,17 @@ class Group extends Backend
                     if ($v['pid'] && !in_array($v['pid'], $parentRuleIds)) {
                         continue;
                     }
-                    $state      = ['selected' => in_array($v['id'], $currentRuleIds) && !in_array($v['id'], $hasChildrens)];
-                    $nodeList[] = ['id' => $v['id'], 'parent' => $v['pid'] ? $v['pid'] : '#', 'text' => $v['title'], 'type' => 'menu', 'state' => $state];
+                    $state = array('selected' => in_array($v['id'], $currentRuleIds) && !in_array($v['id'], $hasChildrens));
+                    $nodeList[] = array('id' => $v['id'], 'parent' => $v['pid'] ? $v['pid'] : '#', 'text' => __($v['title']), 'type' => 'menu', 'state' => $state);
                 }
                 $this->success('', null, $nodeList);
             } else {
-                $this->error('父组别不能是它的子组别');
+                $this->error(__('Can not change the parent to child'));
             }
         } else {
-            $this->error('组别未找到');
+            $this->error(__('Group not found'));
         }
     }
-
-    public function roletrees()
-    {
-        $nodeList = [
-            [
-                "id" => 1,
-                "parent" => "#",
-                "text" => "常规管理",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 10,
-                "parent" => 1,
-                "text" => "配置管理",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 23,
-                "parent" => 10,
-                "text" => "新增",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 24,
-                "parent" => 10,
-                "text" => "编辑",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 25,
-                "parent" => 10,
-                "text" => "删除",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 26,
-                "parent" => 10,
-                "text" => "批量更新",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 27,
-                "parent" => 10,
-                "text" => "查看",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 11,
-                "parent" => 1,
-                "text" => "网站设置",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 13,
-                "parent" => 1,
-                "text" => "附件管理",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 14,
-                "parent" => 13,
-                "text" => "查看",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 15,
-                "parent" => 13,
-                "text" => "删除",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 16,
-                "parent" => 13,
-                "text" => "图片本地化",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 17,
-                "parent" => 13,
-                "text" => "图片选择",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 4,
-                "parent" => 1,
-                "text" => "个人资料",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 5,
-                "parent" => 4,
-                "text" => "查看",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 6,
-                "parent" => 4,
-                "text" => "资料更新",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 28,
-                "parent" => "#",
-                "text" => "权限管理",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 29,
-                "parent" => 28,
-                "text" => "管理员管理",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 30,
-                "parent" => 29,
-                "text" => "查看",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 31,
-                "parent" => 29,
-                "text" => "编辑",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 32,
-                "parent" => 29,
-                "text" => "删除",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 33,
-                "parent" => 29,
-                "text" => "新增",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 34,
-                "parent" => 28,
-                "text" => "管理日志",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 35,
-                "parent" => 34,
-                "text" => "查看",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 36,
-                "parent" => 34,
-                "text" => "删除",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 37,
-                "parent" => 34,
-                "text" => "详情",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 38,
-                "parent" => 28,
-                "text" => "角色管理",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 41,
-                "parent" => 38,
-                "text" => "查看",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 42,
-                "parent" => 38,
-                "text" => "新增",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 43,
-                "parent" => 38,
-                "text" => "编辑",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 44,
-                "parent" => 38,
-                "text" => "删除",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 12,
-                "parent" => 28,
-                "text" => "菜单管理",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 18,
-                "parent" => 12,
-                "text" => "查看",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 19,
-                "parent" => 12,
-                "text" => "新增",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 20,
-                "parent" => 12,
-                "text" => "编辑",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 21,
-                "parent" => 12,
-                "text" => "删除",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 22,
-                "parent" => 12,
-                "text" => "批量更新",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 50,
-                "parent" => "#",
-                "text" => "会员管理",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 51,
-                "parent" => 50,
-                "text" => "会员管理",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 52,
-                "parent" => 51,
-                "text" => "查看",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 53,
-                "parent" => 51,
-                "text" => "新增",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 54,
-                "parent" => 51,
-                "text" => "编辑",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 55,
-                "parent" => 51,
-                "text" => "删除",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 56,
-                "parent" => 51,
-                "text" => "审核",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 57,
-                "parent" => 50,
-                "text" => "审核会员",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 58,
-                "parent" => 50,
-                "text" => "会员组管理",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 59,
-                "parent" => 58,
-                "text" => "查看",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 60,
-                "parent" => 58,
-                "text" => "新增",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 61,
-                "parent" => 58,
-                "text" => "编辑",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 62,
-                "parent" => 58,
-                "text" => "删除",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 63,
-                "parent" => 50,
-                "text" => "VIP等级管理",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 64,
-                "parent" => 63,
-                "text" => "查看",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 65,
-                "parent" => 63,
-                "text" => "新增",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 66,
-                "parent" => 63,
-                "text" => "编辑",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 67,
-                "parent" => 63,
-                "text" => "删除",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 68,
-                "parent" => 63,
-                "text" => "批量更新",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 2,
-                "parent" => "#",
-                "text" => "插件管理",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 45,
-                "parent" => 2,
-                "text" => "查看",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 46,
-                "parent" => 2,
-                "text" => "配置",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ],
-            [
-                "id" => 49,
-                "parent" => 2,
-                "text" => "禁用启用",
-                "type" => "menu",
-                "state" => [
-                    "selected" => false
-                ]
-            ]
-        ];
-        $this->success('', null, $nodeList);
-
-    }
-
-
 
     //批量更新
     public function multi()
@@ -892,24 +338,4 @@ class Group extends Backend
         // 管理员禁止批量操作
         $this->error();
     }
-
-
-
-
-
-
-    // public function add()
-    // {
-    //     if ($this->isAjax()) {
-    //         parent::add();
-    //     }
-    //     return $this->view->fetch();
-    // }
-
-    // public function selectpage()
-    // {
-    //     return parent::selectpage();
-    // }
-
-
 }
