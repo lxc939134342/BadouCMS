@@ -3,12 +3,10 @@
 namespace app\admin\controller\User;
 
 use app\common\controller\Backend;
-use badou\Tree;
 use think\facade\Db;
 
 class User extends Backend
 {
-
     protected $model = null;
     protected $groupList = [];
 
@@ -20,13 +18,11 @@ class User extends Backend
         // 必须将结果集转换为数组
         $groupList = Db::name("user_group")
             ->order('id ASC')
-            ->column('name','id');
-
-        //数组合并
-        $groupList = array_merge([0 => __('None')],$groupList);
+            ->column('name', 'id');
 
         $this->view->assign('groupdata', $groupList);
     }
+
     public function index()
     {
         //设置过滤方法
@@ -37,28 +33,17 @@ class User extends Backend
                 return $this->selectpage();
             }
 
+            list($where, $sort, $order, $offset, $limit) = $this->buildparams();
             $where = [];
             $list = $this->model
                 ->with(['user_group'])
                 ->where($where)
-                ->order('id ASC')
-                ->paginate(15);
-
-//            $result = array("total" => $list->total(), "rows" => $list->items());
+                ->order($sort, $order)
+                ->paginate($limit);
 
             $this->result('ok', $list->items(), $list->total());
-//            $this->success('ok', null, $result);
         }
         return $this->view->fetch();
-    }
-
-
-    public function add()
-    {
-        if ($this->request->isPost()) {
-            $this->token();
-        }
-        return parent::add();
     }
 
 }

@@ -4,7 +4,7 @@
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Group')}</label>
         <div class="layui-input-block">
-            <select name="row[pid]" lay-verify="required">
+            <select name="row[group_id]" lay-verify="required">
                 {foreach name="$groupdata"  item="vo"}
                 <option value="{$key}">{$vo}</option>
                 {/foreach}
@@ -158,7 +158,13 @@
                     class="layui-input laydate" />
         </div>
     </div>
-
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Status')} </label>
+        <div class="layui-input-block">
+            <input type="radio" name="row[status]" value="normal" title="{:__('Normal')}" {if $row.status=='normal'}checked{/if}>
+            <input type="radio" name="row[status]" value="hidden" title="{:__('Hidden')}" {if $row.status=='hidden'}checked{/if}>
+        </div>
+    </div>
 
     <div class="layui-form-item layer-footer hide">
         <div class="layui-input-block">
