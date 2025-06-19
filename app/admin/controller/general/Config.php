@@ -174,8 +174,7 @@ class Config extends Backend
                 $this->error(__('No rows were added'));
             }
         }
-        $configGroup = get_sys_config('config_group');
-        $this->assign('config_group', $configGroup);
+        $this->assign('config_group', $this->configGroup);
         $this->assign('type_list', $this->model->getTypeList());
         return $this->view->fetch();
     }
@@ -235,8 +234,7 @@ class Config extends Backend
             }
         }
         $this->view->assign('row', $row);
-        $configGroup = get_sys_config('config_group');
-        $this->assign('config_group', $configGroup);
+        $this->assign('config_group', $this->configGroup);
         $this->assign('type_list', $this->model->getTypeList());
         return $this->view->fetch();
     }

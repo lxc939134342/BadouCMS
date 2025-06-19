@@ -288,6 +288,7 @@ class Auth
             ->order('weigh desc,id asc')
             ->select()
             ->toArray();
+
         $app       = app();
         $lang      = $app->lang->getLangSet();
         $lang      = preg_match("/^([a-zA-Z\-_]{2,10})\$/i", $lang) ? $lang : 'zh-cn';

@@ -39,6 +39,7 @@ class Config extends Model
         'images' => 'images',
         'checkbox' => 'checkbox',
         'radio'    => 'radio',
+        'switch'   => 'switch',
         'select'   => 'select',
     ];
 
