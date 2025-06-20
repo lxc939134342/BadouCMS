@@ -1,43 +1,67 @@
 {layout name="layout/default"}
 <style type="text/css">
-.admin-info {padding: 35px 20px ; }
-.admin-info .profile-avatar-container { width: 112px; height: 112px; margin: 0 auto; position: relative;}
-.profile-avatar-container .profile-avatar-text {
-    display: none;
-}
-.profile-user-img {
-    margin: 0 auto;
-    width: 100px;
-    height: 100px;
-    padding: 3px;
-    border: 3px solid #d2d6de;
-    border-radius: 50%;
-}
-.profile-avatar-container button {
-    cursor: pointer;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 112px;
-    height: 112px;
-    opacity: 0;
-}
-.profile-avatar-container:hover .profile-avatar-text {
-    display: block;
-    position: absolute;
-    height: 112px;
-    width: 112px;
-    background: #444;
-    opacity: .6;
-    color: #fff;
-    top: 0;
-    left: 0;
-    line-height: 112px;
-    text-align: center;
-    border-radius: 50%;
-}
-.layui-user {display: block; width: 100%; height: 30px; line-height: 30px; text-align: center; padding-top: 15px; color: #333; font-size: 16px; }
-.login-time {display: block; width: 100%; height: 30px; line-height: 30px; text-align: center; font-size: 14px; color: #666777; }
+    .admin-info {
+        padding: 35px 20px;
+    }
+    .admin-info .profile-avatar-container {
+        width: 112px;
+        height: 112px;
+        margin: 0 auto;
+        position: relative;
+    }
+    .profile-avatar-container .profile-avatar-text {
+        display: none;
+    }
+    .profile-user-img {
+        margin: 0 auto;
+        width: 100px;
+        height: 100px;
+        padding: 3px;
+        border: 3px solid #d2d6de;
+        border-radius: 50%;
+    }
+    .profile-avatar-container button {
+        cursor: pointer;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 112px;
+        height: 112px;
+        opacity: 0;
+    }
+    .profile-avatar-container:hover .profile-avatar-text {
+        display: block;
+        position: absolute;
+        height: 112px;
+        width: 112px;
+        background: #444;
+        opacity: 0.6;
+        color: #fff;
+        top: 0;
+        left: 0;
+        line-height: 112px;
+        text-align: center;
+        border-radius: 50%;
+    }
+    .layui-user {
+        display: block;
+        width: 100%;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+        padding-top: 15px;
+        color: #333;
+        font-size: 16px;
+    }
+    .login-time {
+        display: block;
+        width: 100%;
+        height: 30px;
+        line-height: 30px;
+        text-align: center;
+        font-size: 14px;
+        color: #666777;
+    }
 </style>
 <div class="layui-row layui-col-space10">
     <div class="layui-col-md4">
@@ -131,19 +155,29 @@
     </div>
     <div class="layui-col-md8">
         <div class="layui-card">
-            <div class="layui-card-body">用户日志</div>
+            <div class="layui-card-header">用户日志</div>
+            <div class="layui-card-body">
+                <table class="layui-hide" id="adminlog"></table>
+            </div>
         </div>
     </div>
 </div>
-
+<script type="text/html" id="toolbar">
+    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	">
+        <i class="fa fa-refresh"></i>
+    </a>
+</script>
 <script>
-    layui.use(['badou','form', 'upload'], function () {
+    layui.use(["badou", "form", "upload"], function () {
         var form = layui.form;
         var badou = layui.badou;
         var upload = layui.upload;
         var bdForm = layui.bdForm;
+        var bdTable =layui.bdTable
+        var table = layui.table;
+        var layer = layui.layer;
         var $ = layui.$;
-        form.on('submit(*)', function (data) {
+        form.on("submit(*)", function (data) {
             $.post(data.form.action, data.field, function (res) {
                 if (res.code == 1) {
                     layer.msg(res.msg, { icon: 1, time: 1000 }, function () {
@@ -156,18 +190,47 @@
             return false;
         });
         upload.render({
-            elem: '#upload-avatar',
+            elem: "#upload-avatar",
             url: "{:url('ajax/upload')}?thumb=0",
             done: function (res) {
                 if (res.code == 1) {
-                    $('#c-avatar').val(res.data.url);
-                    $('.profile-user-img').attr('src', res.data.fullurl);
+                    $("#c-avatar").val(res.data.url);
+                    $(".profile-user-img").attr("src", res.data.fullurl);
                 } else {
                     layer.msg(res.msg, { icon: 2, time: 1000 });
                 }
-            }
+            },
         });
 
         bdForm.api.bindevent($("form.layui-form"));
+
+
+        //初始化表格
+        bdTable.api.init({
+            table: table, // layui 表格对象，支持普通table与树结构table
+            extend: {
+                index_url: "auth.adminlog/index", //获取表格数据
+                del_url: "auth.adminlog/del", //删除数据
+                table: "adminlog", //数据表名称
+            },
+        });
+        // 创建渲染实例
+        bdTable.render({
+            elem: "#adminlog",
+            url: "{:url('auth.adminlog/index')}",
+            pk: "id",
+            even: true,
+            toolbar: "#toolbar",
+            cols: [
+                [
+                    { field: "id", title: "ID", width: 80, sort: true },
+                    { field: "title", title: "标题", searchOp: "like" },
+                    { field: "url", title: "操作URL" },
+                    { field: "ip", width: 120, title: "IP" },
+                    { field: "create_time", width: 180, title: "时间", search: "range" },
+
+                ],
+            ],
+        });
     });
 </script>
