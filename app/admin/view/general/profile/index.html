@@ -1,0 +1,173 @@
+{layout name="layout/default"}
+<style type="text/css">
+.admin-info {padding: 35px 20px ; }
+.admin-info .profile-avatar-container { width: 112px; height: 112px; margin: 0 auto; position: relative;}
+.profile-avatar-container .profile-avatar-text {
+    display: none;
+}
+.profile-user-img {
+    margin: 0 auto;
+    width: 100px;
+    height: 100px;
+    padding: 3px;
+    border: 3px solid #d2d6de;
+    border-radius: 50%;
+}
+.profile-avatar-container button {
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 112px;
+    height: 112px;
+    opacity: 0;
+}
+.profile-avatar-container:hover .profile-avatar-text {
+    display: block;
+    position: absolute;
+    height: 112px;
+    width: 112px;
+    background: #444;
+    opacity: .6;
+    color: #fff;
+    top: 0;
+    left: 0;
+    line-height: 112px;
+    text-align: center;
+    border-radius: 50%;
+}
+.layui-user {display: block; width: 100%; height: 30px; line-height: 30px; text-align: center; padding-top: 15px; color: #333; font-size: 16px; }
+.login-time {display: block; width: 100%; height: 30px; line-height: 30px; text-align: center; font-size: 14px; color: #666777; }
+</style>
+<div class="layui-row layui-col-space10">
+    <div class="layui-col-md4">
+        <div class="layui-card">
+            <div class="layui-card-header">个人资料</div>
+            <div class="layui-card-body">
+                <form id="profile" class="layui-form" method="post" action="{:url('edit',['ids'=>$admin.id])}">
+                    {:token_field()}
+                    <div class="admin-info">
+                        <div class="profile-avatar-container">
+                            <img class="profile-user-img" src="{$admin.avatar|cdnurl}" />
+                            <div class="profile-avatar-text">点击编辑</div>
+                            <button type="button" id="upload-avatar" class="upload" data-input-id="c-avatar">
+                                上传
+                            </button>
+                        </div>
+                        <h3 class="layui-user">{$admin.nickname}</h3>
+                    </div>
+
+                    <input type="hidden" id="c-avatar" name="row[avatar]" value="{$admin.avatar}" />
+                    <div class="layui-form-item">
+                        <label class="mb-1 d-inline-block">用户名</label>
+                        <div>
+                            <input
+                                type="text"
+                                autocomplete="off"
+                                placeholder="用户名"
+                                class="layui-input layui-disabled"
+                                value="{$admin.username}"
+                                disabled />
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="mb-1 d-inline-block">密码</label>
+                        <div>
+                            <input
+                                type="password"
+                                name="row[password]"
+                                autocomplete="off"
+                                placeholder="不修改留空即可"
+                                class="layui-input" />
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="mb-1 d-inline-block">邮箱</label>
+                        <div>
+                            <input
+                                type="text"
+                                name="row[email]"
+                                lay-verify="required|email"
+                                autocomplete="off"
+                                placeholder="邮箱"
+                                class="layui-input"
+                                value="{$admin.email}" />
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="mb-1 d-inline-block">手机</label>
+                        <div>
+                            <input
+                                type="text"
+                                name="row[mobile]"
+                                autocomplete="off"
+                                placeholder="手机"
+                                class="layui-input"
+                                value="{$admin.mobile}" />
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
+                        <label class="mb-1 d-inline-block">昵称</label>
+                        <div>
+                            <input
+                                type="text"
+                                name="row[nickname]"
+                                autocomplete="off"
+                                placeholder="昵称"
+                                class="layui-input"
+                                value="{$admin.nickname}" />
+                        </div>
+                    </div>
+                    <div class="layui-form-item layer-footer">
+                        <div>
+                            <input type="hidden" name="row[id]" value="{$admin.id}" />
+                            <button class="layui-btn disabled" lay-submit>立即提交</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="layui-col-md8">
+        <div class="layui-card">
+            <div class="layui-card-body">用户日志</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    layui.use(['badou','form', 'upload'], function () {
+        var form = layui.form;
+        var badou = layui.badou;
+        var upload = layui.upload;
+        var bdForm = layui.bdForm;
+        var $ = layui.$;
+        form.on('submit(*)', function (data) {
+            $.post(data.form.action, data.field, function (res) {
+                if (res.code == 1) {
+                    layer.msg(res.msg, { icon: 1, time: 1000 }, function () {
+                        location.reload();
+                    });
+                } else {
+                    layer.msg(res.msg, { icon: 2, time: 1000 });
+                }
+            });
+            return false;
+        });
+        upload.render({
+            elem: '#upload-avatar',
+            url: "{:url('ajax/upload')}?thumb=0",
+            done: function (res) {
+                if (res.code == 1) {
+                    $('#c-avatar').val(res.data.url);
+                    $('.profile-user-img').attr('src', res.data.fullurl);
+                } else {
+                    layer.msg(res.msg, { icon: 2, time: 1000 });
+                }
+            }
+        });
+
+        bdForm.api.bindevent($("form.layui-form"));
+    });
+</script>

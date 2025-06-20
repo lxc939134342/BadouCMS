@@ -151,7 +151,7 @@ class Admin extends Backend
                 $this->validate($params, 'AdminUser.update');
                 //密码为空，表示不修改密码
                 if (isset($params['password']) && $params['password']) {
-                    $params['password'] = password_hash('password', PASSWORD_DEFAULT);
+                    $params['password'] = $this->auth->getEncryptPassword($params['password']);
 
                 } else {
                     unset($params['password']);
