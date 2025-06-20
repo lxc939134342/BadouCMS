@@ -10,12 +10,7 @@
 <!-- 表格左侧按钮 toolbar  -->
 <script type="text/html" id="toolbar">
 	<a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
-	<!-- <button class="layui-btn layui-bg-green" lay-event="add"><i class="fa fa-plus"></i> {:__('Add')}</button> -->
-	<!-- <button class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('auth.adminlog/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button> -->
-    <!-- 删除一个月前日志 -->
-    <!-- <button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button> -->
     <button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
-	<!-- <button class="layui-btn" id="expandAll"><i class="fa fa-plus"></i> {:__('Expendall')}</button> -->
 </script>
 
 <script>
@@ -23,8 +18,6 @@
         var bdTable = layui.bdTable;
         var table = layui.table;
         var layer = layui.layer;
-        // var dropdown = layui.dropdown;
-        // var jstree = layui.jstree;
         var $ = layui.$;
         var form = layui.form;
 
@@ -46,9 +39,7 @@
             url: "{:url('auth.adminlog/index')}",
             pk: "id",
             even: true,
-            // toolbar: ['refresh', 'add'],
             toolbar: "#toolbar",
-            searchFormVisible: true,
             cols: [
                 [
                     { type: "checkbox" },
@@ -75,7 +66,6 @@
                         custom: { normal: "green", hidden: "orange" },
                         templet: bdTable.api.formatter.status,
                     },
-                    // { field: "ismenu", title: "菜单", width: 100, templet: bdTable.api.formatter.switch },
                     { title: "操作",
                     width: 190,
                     align: "center",
@@ -91,24 +81,7 @@
                 ],
             ],
         });
-        
 
-
-        
-        // 展开全部
-        // $(document).on("click", "#expandAll", function () {
-        //     var btn = $(this);
-        //     var isExpanded = btn.hasClass("expanded");
-        //     if (isExpanded) {
-        //         treeTable.expandAll("rule", false);
-        //         btn.removeClass("expanded");
-        //         btn.html('<i class="fa fa-plus"></i> {:__("Expendall")}');
-        //     } else {
-        //         treeTable.expandAll("rule", true);
-        //         btn.addClass("expanded");
-        //         btn.html('<i class="fa fa-minus"></i> {:__("Collapseall")}');
-        //     }
-        // });
     });
 </script>
 

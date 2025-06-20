@@ -6,7 +6,7 @@
         <div class="layui-input-block">
             <select name="row[pid]" lay-verify="required" data-id="{$row.id}" data-pid="{$row.pid}" lay-filter="pid">
                 {foreach $groupdata as $key=> $value}
-                <option value="{$key}" {if $key==$row.pid} selected {/if}>{$value}</option>
+                <option value="{$key}" {if $key==$row.pid} selected {/if}>{$value|raw}</option>
                 {/foreach}
             </select>
         </div>
@@ -136,11 +136,11 @@
                             $("#treeview").jstree("destroy");
                             rendertree(data);
                         } else {
-                            toast.error(ret.msg);
+                             toast.error({message:ret.msg});
                         }
                     }
                 }, error: function (e) {
-                    toast.error(e.message);
+                      toast.error({message:e.message});
                 }
             });
         }
@@ -152,7 +152,7 @@
             var id = selectdata.id;
             if (data.value == id) {
                 $("option[value='" + pid + "']", this).prop("selected", true).change();
-                toast.error(__('Can not change the parent to self'));
+                 toast.error({message:__('Can not change the parent to self')});
                 return false;
             }
             getroletree(id,data.value)

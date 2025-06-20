@@ -79,7 +79,7 @@ class Admin extends Backend
             $list = $this->model
                 ->where($where)
                 ->where('id', 'in', $this->childrenAdminIds)
-                ->withoutField('password', 'salt', 'token')
+                ->withoutField(['password', 'salt', 'token'])
                 ->order($sort, $order)
                 ->paginate($limit);
 
@@ -89,8 +89,6 @@ class Admin extends Backend
                 $v['groups_text'] = implode(',', array_values($groups));
             }
             unset($v);
-            // $result = ["code" => 1, 'count' => $list->total(), "data" => $list->items()];
-            // return json($result);
             $this->result('ok', $list->items(), $list->total());
         }
         return $this->fetch();

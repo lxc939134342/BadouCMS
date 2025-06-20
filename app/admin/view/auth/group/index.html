@@ -13,44 +13,17 @@
 	<button class="layui-btn layui-bg-green" lay-event="add"><i class="fa fa-plus"></i> {:__('Add')}</button>
 	<button class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('auth.group/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
 	<button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
-	<!-- <button class="layui-btn" id="expandAll"><i class="fa fa-plus"></i> {:__('Expendall')}</button> -->
 </script>
-
-<!-- <script src="__CDN__/assets/libs/jstree/jstree.min.js"></script> -->
-
 
 <script>
     layui.use(["badou","table","form"], function () {
         var bdTable = layui.bdTable;
         var table = layui.table;
         var layer = layui.layer;
-        // var dropdown = layui.dropdown;
         var jstree = layui.jstree;
         var $ = layui.$;
         var form = layui.form;
 
-
-        //读取选中的条目
-        // $.jstree.core.prototype.get_all_checked = function(full) {
-        //     var obj = this.get_selected(),
-        //         i, j;
-        //     for (i = 0, j = obj.length; i < j; i++) {
-        //         obj = obj.concat(this.get_node(obj[i]).parents);
-        //     }
-        //     obj = $.grep(obj, function(v, i, a) {
-        //         return v != '#';
-        //     });
-        //     obj = obj.filter(function(itm, i, a) {
-        //         return i == a.indexOf(itm);
-        //     });
-        //     return full ? $.map(obj, $.proxy(function(i) {
-        //         return this.get_node(i);
-        //     }, this)) : obj;
-        // };
-
-
-        // var tree = layui.tree;
-        // var util = layui.util;
         //初始化表格
         bdTable.api.init({
             table:table, // layui 表格对象，支持普通table与树结构table
@@ -69,20 +42,15 @@
             url: "{:url('auth.group/index')}",
             pk: "id",
             even: true,
-            // toolbar: ['refresh', 'add'],
             toolbar: "#toolbar",
-            searchFormVisible: true,
             cols: [
                 [
                     { type: "checkbox" },
                     { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "id", title: "父级", width: 80, sort: true },
+                    { field: "pid", title: "父级", width: 80, sort: true },
                     { field: "name", align: 'left', title: "名称" ,perate:'likeo' ,templet: function(d){
                             return d.name.toString().replace(/(&|&amp;)nbsp;/g, '&nbsp;');
                     }},
-                    // { field: "name", title: "规则", width: 300, searchType:'remoteSelect',extend:'data-source="auth.group/selectpage" data-field="title" data-multiple="false" data-is-tree="1"' },
-                    // { field: "icon", title: "图标", width: 150, templet: bdTable.api.formatter.icon,operate:false },
-                    // { field: "weigh", title: "权重", width: 100,operate:'BETWEEN' },
                     {
                         field: "status",
                         title: "状态",
@@ -91,51 +59,20 @@
                         custom: { normal: "green", hidden: "orange" },
                         templet: bdTable.api.formatter.status,
                     },
-                    // { field: "ismenu", title: "菜单", width: 100, templet: bdTable.api.formatter.switch },
                     { title: "操作",
                     width: 190,
                     align: "center",
                     templet: function(d) {
-                                if (Config.admin.group_ids.indexOf(parseInt(d.id)) > -1) {
-                                    return '<a class="layui-btn layui-btn-xs layui-btn-danger layui-btn-disabled">不可操作</a>';
-                                } else {
-                                    return bdTable.api.formatter.operate.call(this, d, this);
-                                    // return table.formatter.tool.call(this, d, this);
-                                }
+                        if (Config.admin.group_ids.indexOf(parseInt(d.id)) > -1) {
+                            return '<a class="layui-btn layui-btn-xs layui-btn-danger layui-btn-disabled">不可操作</a>';
+                        } else {
+                            return bdTable.api.formatter.operate.call(this, d, this);
+                        }
                     },
                     operat: ['edit', 'delete']},
                 ],
             ],
         });
-        
-        // bdTable.addEvent("add", function() {
-        //     Controller.api.bindevent();
-        // });
-        
-        // add: function() {
-        //     Controller.api.bindevent();
-        // },
-        // edit: function() {
-        //     Controller.api.bindevent();
-        // },
-        
-
-
-        
-        // 展开全部
-        // $(document).on("click", "#expandAll", function () {
-        //     var btn = $(this);
-        //     var isExpanded = btn.hasClass("expanded");
-        //     if (isExpanded) {
-        //         treeTable.expandAll("rule", false);
-        //         btn.removeClass("expanded");
-        //         btn.html('<i class="fa fa-plus"></i> {:__("Expendall")}');
-        //     } else {
-        //         treeTable.expandAll("rule", true);
-        //         btn.addClass("expanded");
-        //         btn.html('<i class="fa fa-minus"></i> {:__("Collapseall")}');
-        //     }
-        // });
     });
 </script>
 
