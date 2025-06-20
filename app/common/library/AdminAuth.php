@@ -339,7 +339,6 @@ class AdminAuth extends Auth
         // 调用 getGroups 方法获取分组信息
         $groups = $this->getGroups();
         // 打印分组信息，方便调试
-        // p($groups);
         // 检查 $groups 是否为 think\Collection 实例，如果是则转换为数组
         if ($groups instanceof \think\Collection) {
             $groups = $groups->toArray();

@@ -2,5 +2,6 @@
 
 return [
     // 多语言加载
-     \think\middleware\LoadLangPack::class,
+    \app\admin\middleware\AdminLog::class,
+    \think\middleware\LoadLangPack::class,
 ];

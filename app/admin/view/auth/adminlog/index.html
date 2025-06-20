@@ -3,18 +3,26 @@
 <!-- 表格 -->
 <div class="layui-card">
     <div class="layui-card-body">
-        <table class="layui-hide" id="adminlog" data-operate-edit="{:$auth->check('auth.adminlog/edit')}" data-operate-del="{:$auth->check('auth.admin/del')}"></table>
+        <table
+            class="layui-hide"
+            id="adminlog"
+            data-operate-del="{:$auth->check('auth.admin/del')}"></table>
     </div>
 </div>
 
 <!-- 表格左侧按钮 toolbar  -->
 <script type="text/html" id="toolbar">
-	<a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
-    <button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
+    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	">
+        <i class="fa fa-refresh"></i>
+    </a>
+    <button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del">
+        <i class="fa fa-trash"></i>
+        {:__('Del')}
+    </button>
 </script>
 
 <script>
-    layui.use(["badou","table","form"], function () {
+    layui.use(["badou", "table", "form"], function () {
         var bdTable = layui.bdTable;
         var table = layui.table;
         var layer = layui.layer;
@@ -23,13 +31,10 @@
 
         //初始化表格
         bdTable.api.init({
-            table:table, // layui 表格对象，支持普通table与树结构table
+            table: table, // layui 表格对象，支持普通table与树结构table
             extend: {
                 index_url: "auth.adminlog/index", //获取表格数据
-                add_url: "auth.adminlog/add", //添加数据
-                edit_url: "auth.adminlog/edit", //编辑数据
                 del_url: "auth.adminlog/del", //删除数据
-                multi_url: "auth.adminlog/multi", //批量处理
                 table: "adminlog", //数据表名称
             },
         });
@@ -44,44 +49,27 @@
                 [
                     { type: "checkbox" },
                     { field: "id", title: "ID", width: 80, sort: true },
-                    { field: 'username', width: 120, title: '用户名' },
-                    { field: 'title', title: '标题', searchOp: 'like' },
-                    { field: 'url', title: '操作URL' },
-                    { field: 'ip', width: 120, title: 'IP' },
+                    { field: "username", width: 120, title: "用户名" },
+                    { field: "title", title: "标题", searchOp: "like" },
+                    { field: "url", title: "操作URL" },
+                    { field: "ip", width: 120, title: "IP" },
                     {
-                        field: 'useragent',
-                        width: 120,
-                        title: 'Browser',
-                        templet: function(d) {
-                            return '<span>' + layui.util.escape(d.useragent.split(" ")[0]) + '</span>';
-                        }
+                        field: "useragent",
+                        title: __('Useragent'),
+                        templet: function (d) {
+                            return "<span>" + layui.util.escape(d.useragent.split(" ")[0]) + "</span>";
+                        },
                     },
-                    { field: 'create_time', width: 180, title: '时间', search: 'range' },
+                    { field: "create_time", width: 180, title: "时间", search: "range" },
 
-                    {
-                        field: "status",
-                        title: "状态",
-                        width: 100,
-                        searchList: { normal: "正常", hidden: "禁用" },
-                        custom: { normal: "green", hidden: "orange" },
-                        templet: bdTable.api.formatter.status,
-                    },
-                    { title: "操作",
-                    width: 190,
-                    align: "center",
-                    templet: function(d) {
-                                if (d.id == Config.admin.id) {
-                                    return '<a class="layui-btn layui-btn-xs layui-btn-danger layui-btn-disabled">不可操作</a>';
-                                } else {
-                                    return bdTable.api.formatter.operate.call(this, d, this);
-                                    // return table.formatter.tool.call(this, d, this);
-                                }
-                    },
-                    operat: ['edit', 'delete']},
+                    { title: "操作", width: 150, align: "center",templet:bdTable.api.formatter.operate,buttons:[{
+                        text: "详情",
+                        icon:'fa fa-file-text-o',
+                        url: "auth.adminlog/detail?id={id}",
+                        classname: "btn-dialog layui-btn layui-btn-sm",
+                    }] },
                 ],
             ],
         });
-
     });
 </script>
-

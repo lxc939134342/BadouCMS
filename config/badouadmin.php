@@ -11,6 +11,8 @@ return [
     'admin_keep_time' => 86400,
     //登录验证码
     'admin_login_captcha' => true,
+    //是否自动写入管理员日志
+    'auto_write_admin_log' => true,
     //跳转页面模版
     'jump' => [
         'dispatch_success_tmpl' => app()->getBasePath() . '/common/view/tpl/dispatch_jump.tpl',
