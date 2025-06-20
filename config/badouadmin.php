@@ -18,6 +18,8 @@ return [
         'dispatch_success_tmpl' => app()->getBasePath() . '/common/view/tpl/dispatch_jump.tpl',
         'dispatch_error_tmpl'   => app()->getBasePath() . '/common/view/tpl/dispatch_jump.tpl',
     ],
+    //会员中心
+    'usercenter' => true,
     // Token 配置
     'token'                 => [
         // 默认驱动方式
@@ -52,6 +54,6 @@ return [
             ],
         ]
     ],
-    'version' => 'v1.0.0',
+    'version' => 'v2.0.0-beta',
     'api_url' => 'http://ldshouquan.test/',
 ];

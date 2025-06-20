@@ -98,33 +98,7 @@ class User extends Base
         ]);
     }
 
-    /**
-     * 登录
-     * @return string
-     */
-    public function login(): string
-    {
-        $openMemberCenter = Config::get('buildadmin.open_member_center');
-        if (!$openMemberCenter) {
-            $this->error(__('Member center disabled'));
-        }
 
-        $url = $this->request->request('url', '', 'url_clean');
-        if ($this->auth->id) {
-            $this->success(__('You\'ve logged in, do not login again'), $url ?: url('/user/index'));
-        }
-
-
-        //判断来源
-        $referer = $this->request->server('HTTP_REFERER', '', 'url_clean');
-        if (!$url && $referer && !preg_match("/(user\/login|user\/register|user\/logout)/i", $referer)) {
-            $url = $referer;
-        }
-        $this->view->assign('url', $url);
-        $this->view->assign('title', __('Login'));
-        $this->view->assign('uuid', Random::uuid());
-        return $this->view->fetch('user/login');
-    }
 
     /**
      * 会员签入(登录和注册)

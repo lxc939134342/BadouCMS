@@ -44,4 +44,8 @@ return [
     'Reset'                                                                               => '重置',
     'Save'                                                                                => '保存',
     'Cancel'                                                                              => '取消',
+    'User center already closed'                                                          => '会员中心已关闭！',
+    'User center'                                                                         => '会员中心',
+    'Profile'                                                                             => '个人资料',
+    'Logout'                                                                              => '退出登录',
 ];

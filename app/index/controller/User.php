@@ -14,11 +14,10 @@
 
 namespace app\index\controller;
 
-use app\common\controller\Frontend;
-use think\Config;
-use think\Cookie;
-use think\Hook;
+use badou\Random;
 use think\Validate;
+use think\facade\Config;
+use app\common\controller\Frontend;
 
 class User extends Frontend
 {
@@ -31,7 +30,7 @@ class User extends Frontend
         parent::initialize();
         $auth = $this->auth;
 
-        if (!Config::get('fastadmin.usercenter')) {
+        if (!Config::get('badouadmin.usercenter')) {
             $this->error(__('User center already closed'), '/');
         }
 
@@ -59,6 +58,28 @@ class User extends Frontend
     {
         $this->view->assign('title', __('User center'));
         return $this->view->fetch();
+    }
+
+    /**
+     * 登录
+     * @return string
+     */
+    public function login(): string
+    {
+        $url = $this->request->request('url', '', 'url_clean');
+        if ($this->auth->id) {
+            $this->success(__('You\'ve logged in, do not login again'), $url ?: url('/user/index'));
+        }
+
+        //判断来源
+        $referer = $this->request->server('HTTP_REFERER', '', 'url_clean');
+        if (!$url && $referer && !preg_match("/(user\/login|user\/register|user\/logout)/i", $referer)) {
+            $url = $referer;
+        }
+        $this->view->assign('url', $url);
+        $this->view->assign('title', __('Login'));
+        $this->view->assign('uuid', Random::uuid());
+        return $this->view->fetch('user/login');
     }
 
     /**
