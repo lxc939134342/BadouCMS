@@ -92,4 +92,5 @@ return [
     'Append'                                                => '追加',
     'Array Key'                                             => '数组键',
     'Array Value'                                           => '数组值',
+    'Admin group'                                           => '超级管理组'
 ];

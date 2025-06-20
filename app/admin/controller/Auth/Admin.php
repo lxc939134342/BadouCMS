@@ -33,7 +33,7 @@ class Admin extends Backend
     protected $childrenGroupIds = [];
     protected $childrenAdminIds = [];
     //无需要权限判断的方法
-    protected $noNeedRight = ['get_group_list'];
+    protected $noNeedRight = ['getGroupList'];
 
 
     public function initialize()
@@ -105,10 +105,7 @@ class Admin extends Backend
             Db::startTrans();
             try {
                 $this->validate($params, 'AdminUser.insert');
-
-                $passwordinfo       = encrypt_string($params['password']); //对密码进行处理
-                $params['password'] = $passwordinfo['password'];
-                $params['encrypt']  = $passwordinfo['encrypt'];
+                $params['password'] = password_hash('password', PASSWORD_DEFAULT);
                 $params['avatar']   = '/assets/img/avatar.png'; //设置新管理员默认头像。
                 $this->model->save($params);
 
@@ -116,7 +113,7 @@ class Admin extends Backend
                 //过滤不允许的组别,避免越权
                 $group = array_intersect($this->childrenGroupIds, $group);
                 if (!$group) {
-                    throw new \Exception('父组别超出权限范围');
+                    throw new Exception('父组别超出权限范围');
                 }
                 $dataset = [];
                 foreach ($group as $value) {
@@ -124,7 +121,7 @@ class Admin extends Backend
                 }
                 (new AuthGroupAccess())->saveAll($dataset);
                 Db::commit();
-            } catch (ValidateException | \Exception $e) {
+            } catch (ValidateException | Exception $e) {
                 Db::rollback();
                 $this->error($e->getMessage());
             }
@@ -154,12 +151,10 @@ class Admin extends Backend
                 $this->validate($params, 'AdminUser.update');
                 //密码为空，表示不修改密码
                 if (isset($params['password']) && $params['password']) {
-                    $passwordinfo       = encrypt_string($params['password']); //对密码进行处理
-                    $params['encrypt']  = $passwordinfo['encrypt'];
-                    $params['password'] = $passwordinfo['password'];
+                    $params['password'] = password_hash('password', PASSWORD_DEFAULT);
 
                 } else {
-                    unset($params['password'], $params['encrypt']);
+                    unset($params['password']);
                 }
                 $row->save($params);
 
@@ -171,7 +166,7 @@ class Admin extends Backend
                 // 过滤不允许的组别,避免越权
                 $group = array_intersect($this->childrenGroupIds, $group);
                 if (!$group) {
-                    throw new \Exception('父组别超出权限范围');
+                    throw new Exception('父组别超出权限范围');
                 }
 
                 $dataset = [];
@@ -180,7 +175,7 @@ class Admin extends Backend
                 }
                 (new AuthGroupAccess())->saveAll($dataset);
                 Db::commit();
-            } catch (ValidateException | \Exception $e) {
+            } catch (ValidateException | Exception $e) {
                 Db::rollback();
                 $this->error($e->getMessage());
             }
@@ -188,7 +183,7 @@ class Admin extends Backend
         }
 
         $groupIds = $this->auth->getGroupIds($row['id']);
-        $this->assign("data", $row);
+        $this->assign("row", $row);
         $this->view->assign("groupids", implode(',', $groupIds));
         return $this->fetch();
     }
@@ -223,7 +218,7 @@ class Admin extends Backend
                     $this->model->destroy($deleteIds);
                     AuthGroupAccess::where('uid', 'in', $deleteIds)->delete();
                     Db::commit();
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     Db::rollback();
                     $this->error($e->getMessage());
                 }
@@ -243,7 +238,7 @@ class Admin extends Backend
     }
 
 
-    public function get_group_list()
+    public function getGroupList()
     {
         $keyValue = $this->request->param('keyValue');
         if ($keyValue) {
@@ -251,7 +246,7 @@ class Admin extends Backend
             foreach ($groupList as $k => $v) {
                 $groupdata[] = ['id' => $v['id'], 'name' => $v['name']];
             }
-            return ['count' => count($groupdata), 'data' => $groupdata];
+            $this->result('ok', ['count' => count($groupdata), 'list' => $groupdata]);
         }
         $groupList = AuthGroupModel::where('id', 'in', $this->childrenGroupIds)->select()->toArray();
         Tree::instance()->init($groupList);
@@ -270,8 +265,6 @@ class Admin extends Backend
                 }
             }
         }
-        return ['count' => count($groupdata), 'data' => $groupdata];
+        $this->result('ok', ['count' => count($groupdata), 'list' => $groupdata]);
     }
-
-
 }
