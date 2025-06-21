@@ -8,3 +8,13 @@ body {
     background-color: #fff; /* 白色导航栏背景 */
     border-bottom: 1px solid #e7e7e7;
 }
+
+.user-left-box {
+    .user-avatar {
+        display: block;
+        width: 100px;
+        border-radius: 50%;
+        border: 1px solid #e7e7e7;
+        margin: 0 auto;
+    }
+}

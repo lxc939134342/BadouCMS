@@ -2,64 +2,58 @@
 <html lang="en">
     {include file="user/common/head" /}
     <style>
-
         .login-container {
-            flex-grow: 1; /* 允许容器增长，将内容推到中间 */
+            flex-grow: 1;
             display: flex;
-            align-items: center; /* 垂直居中 */
-            justify-content: center; /* 水平居中 */
+            align-items: center;
+            justify-content: center;
             padding: 20px;
         }
         .login-card {
             width: 100%;
-            max-width: 440px; /* 限制卡片最大宽度 */
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1); /* 柔和的阴影 */
-            border: none; /* 移除卡片边框 */
+            max-width: 440px;
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+            border: none;
             padding: 20px;
-            background-color: #fff; /* 卡片背景色 */
-            border-radius: 5px; /* 增加卡片圆角 */
+            background-color: #fff;
+            border-radius: 5px;
         }
 
         .card-header {
-            background-color: #fff; /* 卡片头部背景色 */
-            border-bottom: none; /* 移除卡片头部底部边框 */
-            padding-top: 2rem; /* 增加顶部内边距 */
-            padding-bottom: 0; /* 移除底部内边距 */
+            background-color: #fff;
+            border-bottom: none;
+            padding-top: 2rem;
+            padding-bottom: 0;
         }
         .card-header h5 {
-            /* 调整会员登录标题字号 */
-            font-size: 1.1rem; /* 约17.6px */
+            font-size: 1.1rem;
         }
         .card-body {
-            padding-top: 0; /* 移除卡片内容顶部内边距 */
-            padding-bottom: 2rem; /* 增加底部内边距 */
+            padding-top: 0;
+            padding-bottom: 2rem;
         }
 
-        /* Layui 表单项间距调整 */
         .layui-form-item {
-            margin-bottom: 15px; /* 调整Layui表单项的底部间距 */
+            margin-bottom: 15px;
         }
-        /* 调整输入框样式 */
         .layui-input {
-            height: 40px; /* 调整输入框高度 */
+            height: 40px;
             line-height: 40px;
-            border-radius: 5px; /* 调整输入框圆角 */
-            border: 1px solid #e6e6e6; /* 调整输入框边框颜色 */
+            border-radius: 5px;
+            border: 1px solid #e6e6e6;
         }
-        /* 调整placeholder颜色和字号 */
         .layui-input::placeholder {
-            color: #a9abb3 !important; /* 强制颜色生效 */
-            font-size: 14px !important; /* 调整字号为14px */
-            opacity: 1 !important; /* 强制透明度生效 */
+            color: #a9abb3 !important;
+            font-size: 14px !important;
+            opacity: 1 !important;
         }
 
-        /* 自定义按钮样式 */
         .btn-orange {
             background-color: #ff6900;
             border-color: #ff6900;
             color: #fff;
-            font-size: 15px; /* 字体调整为15px */
-            border-radius: 30px; /* 增加圆角 */
+            font-size: 15px;
+            border-radius: 30px;
         }
         .btn-orange:hover {
             background-color: #ff6900;
@@ -70,25 +64,23 @@
             background-color: #f0f0f0;
             border-color: #e0e0e0;
             color: #6c757d;
-            font-size: 14px; /* 字体调整为14px */
-            border-radius: 30px; /* 增加圆角 */
+            font-size: 14px;
+            border-radius: 30px;
         }
         .btn-light-gray:hover {
             background-color: #e0e0e0;
             border-color: #d0d0d0;
         }
 
-        /* 调整记住我/忘记密码的字号和布局 */
         .layui-form-checkbox span {
-            font-size: 0.875rem; /* 约14px */
+            font-size: 0.875rem;
         }
         .login-container .card-body .forget-pass {
-            /* 调整忘记密码链接样式 */
-            font-size: 0.875rem; /* 约14px */
-            color: #555; /* 调整颜色 */
+            font-size: 0.875rem;
+            color: #555;
         }
         .login-container .card-body .forget-pass:hover {
-            text-decoration: underline; /* 鼠标悬停时显示下划线 */
+            text-decoration: underline;
         }
         .layui-form-checkbox {
             margin-right: 0;
@@ -118,10 +110,8 @@
         }
     </style>
     <body>
-        <!-- 导航栏 -->
         {include file="user/common/nav" /}
 
-        <!-- 登录/注册容器 -->
         <div class="login-container">
             <div class="card login-card">
                 <div class="card-header text-center">
@@ -139,6 +129,7 @@
                                     name="username"
                                     placeholder="邮箱/手机号/用户名"
                                     autocomplete="off"
+                                    lay-verify="required"
                                     class="layui-input" />
                             </div>
                         </div>
@@ -150,6 +141,7 @@
                                 <input
                                     type="password"
                                     name="password"
+                                    lay-verify="required"
                                     value=""
                                     placeholder="密码"
                                     autocomplete="off"
@@ -157,7 +149,6 @@
                                     lay-affix="eye" />
                             </div>
                         </div>
-                        <!--@CaptchaBegin-->
                         {if config('badouadmin.user_login_captcha')}
                         <div class="tab-log-verification">
                             <div class="verification-text">
@@ -169,6 +160,7 @@
                                         name="captcha"
                                         value=""
                                         placeholder="验证码"
+                                        lay-verify="required"
                                         autocomplete="off"
                                         class="layui-input" />
                                 </div>
@@ -176,7 +168,6 @@
                             <img src="{:url('index/captcha')}?imageW=99" alt="captcha" class="verification-img" />
                         </div>
                         {/if}
-                        <!--@CaptchaEnd-->
                         <div class="layui-form-item mt-4 mb-5">
                             <div class="d-flex justify-content-between align-items-center">
                                 <input
@@ -207,7 +198,6 @@
             </div>
         </div>
 
-        <!-- 底部 -->
         {include file="user/common/foot" /}
 
         <script>
@@ -216,16 +206,13 @@
                 var toast = layui.toast;
                 var badou = layui.badou;
 
-                // 刷新验证码函数
                 function refreshCaptcha() {
                     $(".verification-img").attr("src", "{:url('index/captcha')}?r=" + Math.random());
                 }
 
-                // 点击验证码刷新
                 $(".verification-img").click(function () {
                     refreshCaptcha();
                 });
-                // 添加回车键事件监听
                 $(document).keydown(function (event) {
                     if (event.keyCode === 13) {
                         $("button[lay-filter='login']").click();
@@ -249,8 +236,24 @@
                                     },
                                 });
                             } else {
-                                // 登录失败时刷新验证码
                                 refreshCaptcha();
+                            }
+                            return false;
+                        },
+                        function (data) {
+                            refreshCaptcha();
+                            if (data.token) {
+                                $("#token").val(data.token);
+                            }
+                        }
+                    );
+
+                    return false;
+                });
+            });
+        </script>
+    </body>
+</html>
                             }
                             return false;
                         },

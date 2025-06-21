@@ -2,160 +2,103 @@
 
 {block name="main"}
 <style>
-    /* Custom styles for user index page */
     body {
-        background-color: #f8f8f8; /* Overall page background */
+        background-color: #f8f8f8;
     }
     .user-dashboard-container {
-        padding-top: 30px; /* Adjust top padding for content below navbar */
-        padding-bottom: 30px; /* Adjust bottom padding */
+        padding-top: 30px;
+        padding-bottom: 30px;
     }
     .card {
-        border: none; /* Remove default card border */
-        border-radius: 8px; /* Slightly rounded corners for cards */
-        box-shadow: 0 4px 8px rgba(0,0,0,.05); /* Soft shadow */
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0,0,0,.05);
     }
     .card-header {
-        background-color: #fff; /* White header background */
-        border-bottom: 1px solid #eee; /* Light border at bottom of header */
+        background-color: #fff;
+        border-bottom: 1px solid #eee;
         font-weight: 600;
-        padding: 1rem 1.5rem; /* Padding for card headers */
+        padding: 1rem 1.5rem;
     }
-    .card-header h6 { /* 调整卡片头部标题字号 */
-        font-size: 1rem; /* 约16px */
+    .card-header h6 {
+        font-size: 1rem;
     }
     .card-body {
-        padding: 1.5rem; /* Padding for card body */
+        padding: 1.5rem;
     }
 
-    /* Sidebar specific styles */
     .sidebar-card .card-body {
         padding-top: 2rem;
         padding-bottom: 1rem;
     }
-    .sidebar-card h5 { /* 调整侧边栏用户名字号 */
-        font-size: 1.1rem; /* 约17.6px */
+    .sidebar-card h5 {
+        font-size: 1.1rem;
     }
     .sidebar-card .list-group-item {
         border-left: 0;
         border-right: 0;
-        padding: 0; /* Remove default list-group-item padding */
+        padding: 0;
     }
     .sidebar-card .nav-link {
-        padding: 12px 20px; /* Custom padding for nav links */
+        padding: 12px 20px;
         color: #333;
-        font-size: 14px; /* 调整为14px */
+        font-size: 14px;
         transition: all 0.2s ease-in-out;
     }
     .sidebar-card .nav-link:hover {
         background-color: #f5f5f5;
-        color: #ff6c02; /* Hover color */
+        color: #ff6c02;
     }
     .sidebar-card .nav-link.active {
-        background-color: #f0f0f0; /* Active background */
-        color: #ff6c02; /* Active text color */
-        border-left: 3px solid #ff6c02; /* Active border */
+        background-color: #f0f0f0;
+        color: #ff6c02;
+        border-left: 3px solid #ff6c02;
         font-weight: 600;
     }
     .sidebar-card .layui-icon {
-        font-size: 17px; /* 调整为17px */
+        font-size: 17px;
         vertical-align: middle;
         margin-right: 8px;
     }
     .sidebar-card .badge {
-        font-size: 12px; /* 调整为12px */
-        padding: 5px 10px; /* 调整内边距 */
-        background-color: #f0f0f0 !important; /* Light background for badges */
+        font-size: 12px;
+        padding: 5px 10px;
+        background-color: #f0f0f0 !important;
         color: #555 !important;
     }
 
-    /* Account Info Card specific styles */
     .account-info-detail p {
         margin-bottom: 0.5rem;
-        font-size: 13px; /* 调整为13px */
+        font-size: 13px;
     }
     .account-info-detail .fw-bold {
-        font-size: 15px; /* 调整为15px */
+        font-size: 15px;
         color: #333;
     }
     .account-info-detail .text-orange {
-        color: #ff6c02 !important; /* Orange color for score/balance */
+        color: #ff6c02 !important;
     }
     .account-info-detail .text-muted {
         color: #888 !important;
     }
 
-    /* Custom responsive column widths */
-    @media (min-width: 992px) { /* Small devices (landscape phones, 576px and up) */
+    @media (min-width: 992px) {
         .col-lg-custom-sidebar {
-            flex: 0 0 auto; /* Prevent shrinking/growing */
-            width: 20%; /* Custom width for sidebar (e.g., 20%) */
+            flex: 0 0 auto;
+            width: 20%;
         }
         .col-lg-custom-main-content {
-            flex: 0 0 auto; /* Prevent shrinking/growing */
-            width: 80%; /* Remaining width for main content (e.g., 80%) */
+            flex: 0 0 auto;
+            width: 80%;
         }
     }
 </style>
 
 <div class="container user-dashboard-container">
     <div class="row">
-        <!-- Left Sidebar -->
-        <div class="col-12 col-lg-custom-sidebar">
-            <div class="card sidebar-card shadow-sm mb-4">
-                <div class="card-body text-center">
-                    <div class="mb-3">
-                        <i class="layui-icon layui-icon-user" style="font-size: 60px; color: #ccc;"></i> <!-- Placeholder for avatar -->
-                    </div>
-                    <h5 class="mb-3">Test</h5>
-                    <div class="d-flex justify-content-center mb-4">
-                        <span class="badge me-2">积分 10</span>
-                        <span class="badge">余额 9900</span>
-                    </div>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item">
-                        <a href="#" class="nav-link active">
-                            <i class="layui-icon layui-icon-home"></i> 账户概览
-                        </a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" class="nav-link">
-                            <i class="layui-icon layui-icon-username"></i> 个人资料
-                        </a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" class="nav-link">
-                            <i class="layui-icon layui-icon-password"></i> 修改密码
-                        </a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" class="nav-link">
-                            <i class="layui-icon layui-icon-diamond"></i> 积分记录
-                        </a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" class="nav-link">
-                            <i class="layui-icon layui-icon-rmb"></i> 余额记录
-                        </a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" class="nav-link">
-                            <i class="layui-icon layui-icon-dialogue"></i> 评论记录
-                        </a>
-                    </li>
-                    <li class="list-group-item">
-                        <a href="#" class="nav-link">
-                            <i class="layui-icon layui-icon-logout"></i> 退出
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+        {include file="user/common/left" /}
 
-        <!-- Right Main Content -->
         <div class="col-12 col-lg-custom-main-content">
-            <!-- Account Information Card -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="mb-0">账户信息</h6>
@@ -163,7 +106,7 @@
                 </div>
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-4">
-                        <img src="https://via.placeholder.com/60" class="rounded-circle me-3" alt="User Avatar" style="width: 60px; height: 60px;">
+                        <img src="{:full_url($user.avatar ? $user.avatar : '/static/images/avatar.png')}" class="rounded-circle me-3" alt="User Avatar" style="width: 60px; height: 60px;">
                         <div>
                             <h5 class="mb-0">Test</h5>
                         </div>
@@ -171,31 +114,29 @@
                     <div class="row row-cols-1 row-cols-md-2 g-3 account-info-detail">
                         <div class="col">
                             <p class="text-muted">积分</p>
-                            <p class="fw-bold text-orange">10</p>
+                            <p class="fw-bold text-orange">{$user.score}</p>
                         </div>
                         <div class="col">
                             <p class="text-muted">余额</p>
-                            <p class="fw-bold text-orange">9900</p>
+                            <p class="fw-bold text-orange">{$user.money}</p>
                         </div>
                         <div class="col">
                             <p class="text-muted">最后登录</p>
-                            <p class="fw-bold">2025-06-21 20:55:43</p>
+                            <p class="fw-bold"> {$user.logintime |date="Y-m-d H:i:s"}</p>
                         </div>
                         <div class="col">
                             <p class="text-muted">最后登录IP</p>
-                            <p class="fw-bold">127.0.0.1</p>
+                            <p class="fw-bold">{$user.loginip}</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Growth Statistics Card -->
             <div class="card shadow-sm">
                 <div class="card-header">
                     <h6 class="mb-0">增长统计</h6>
                 </div>
                 <div class="card-body">
-                    <!-- Chart Placeholder -->
                     <div style="height: 300px; background-color: #f8f8f8; display: flex; align-items: center; justify-content: center; color: #999; border-radius: 5px;">
                         图表区域 (例如 ECharts 或 Layui 图表)
                     </div>
