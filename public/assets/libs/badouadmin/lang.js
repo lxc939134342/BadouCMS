@@ -61,5 +61,5 @@ layui.define(function (exports) {
     };
     window.__ = __;
     // 导出模块
-    exports('lang',{__,load});
+    exports('lang', { __, load });
 });

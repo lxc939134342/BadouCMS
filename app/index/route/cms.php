@@ -43,7 +43,6 @@ $route_arr = [
     'ajax/:action$' => 'ajax/:action',
     'do/:action$' => 'cms.index/:action',
     'upload$' => 'cms.base/upload',
-    'captcha$' => 'cms.base/captcha',
     'message$' => 'cms.message/index',
     'message/submit_form$' => 'cms.message/submitForm',
     'comment/:action$' => 'cms.comment/:action',
@@ -72,9 +71,3 @@ if ($cms_domain) {
         }
     })->append($param);
 }
-
-
-/* 无法匹配 */
-Route::miss(function () {
-    abort(404, '404 Not Found');
-});

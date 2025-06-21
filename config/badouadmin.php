@@ -20,6 +20,8 @@ return [
     ],
     //会员中心
     'usercenter' => true,
+    //用户登录验证码
+    'user_login_captcha' => true,
     // Token 配置
     'token'                 => [
         // 默认驱动方式
@@ -54,6 +56,6 @@ return [
             ],
         ]
     ],
-    'version' => 'v2.0.0-beta',
+    'version' => 'v2.0.0-Alpha',
     'api_url' => 'http://ldshouquan.test/',
 ];

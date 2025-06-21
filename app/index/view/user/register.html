@@ -2,7 +2,16 @@
 <html lang="en">
     {include file="user/common/head" /}
     <style>
-
+        body {
+            background-color: #f0f0f0; /* 浅灰色背景 */
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* 确保body占据整个视口高度 */
+        }
+        .navbar {
+            background-color: #fff; /* 白色导航栏背景 */
+            border-bottom: 1px solid #e7e7e7;
+        }
         .login-container {
             flex-grow: 1; /* 允许容器增长，将内容推到中间 */
             display: flex;
@@ -125,10 +134,10 @@
         <div class="login-container">
             <div class="card login-card">
                 <div class="card-header text-center">
-                    <h5 class="mb-4">会员登录</h5>
+                    <h5 class="mb-4">会员注册</h5>
                 </div>
                 <div class="card-body">
-                    <form class="layui-form" action="{:url('index/user/login')}" method="post">
+                    <form class="layui-form" action="{:url('index/user/register')}" method="post">
                         {:token_field()}
                         <div class="layui-form-item">
                             <div class="layui-input-wrap">
@@ -193,13 +202,13 @@
                                 type="button"
                                 class="layui-btn layui-btn-fluid btn-orange"
                                 lay-submit
-                                lay-filter="login">
-                                登录
+                                lay-filter="register">
+                                注册
                             </button>
                         </div>
                         <div class="layui-form-item">
-                            <a href="{:url('user/register')}" class="layui-btn layui-btn-fluid layui-btn-primary btn-light-gray">
-                                还没有账号? 点击注册
+                            <a href="{:url('user/login')}" class="layui-btn layui-btn-fluid layui-btn-primary btn-light-gray">
+                                已有账号? 返回登录
                             </a>
                         </div>
                     </form>
@@ -241,6 +250,7 @@
                         },
                         function (ret, res) {
                             if (res.code == 1) {
+                                btn.stop();
                                 toast.success({
                                     message: res.msg,
                                     timeout: 500,
