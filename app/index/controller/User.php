@@ -44,7 +44,7 @@ class User extends Frontend
             Cookie::set('token', $auth->getToken(), $expire);
         });
         Event::listen('user_register_successed', function ($user) use ($auth) {
-            Cookie::set('uid', $user->id);
+            Cookie::set('uid', $user['id']);
             Cookie::set('token', $auth->getToken());
         });
         Event::listen('user_delete_successed', function ($user) use ($auth) {
@@ -118,13 +118,21 @@ class User extends Frontend
             $this->success(__('You\'ve logged in, do not login again'), $url ? $url : url('user/index'));
         }
         if ($this->request->isPost()) {
-            $params = $this->request->post(['email', 'mobile', 'username', 'password', 'keeplogin', 'captcha']);
-            $res = $this->auth->register($params['username'], $params['password'], $params['mobile'], $params['email']);
+            $params = $this->request->post(['email', 'mobile', 'username', 'password', 'captcha']);
+
+            $validate = new UserValidate();
+            try {
+                $validate->scene('register')->check($params);
+            } catch (Throwable $e) {
+                $this->error($e->getMessage());
+            }
+
+            $res = $this->auth->register($params['username'], $params['password'], $params['email'], $params['mobile']);
 
             if (isset($res) && $res === true) {
                 Event::trigger('user_register_successed', $this->auth->getUserInfo());
 
-                $this->success(__('Sign up successfu!'), '', [
+                $this->success(__('Sign up successful'), '', [
                     'userInfo'  => $this->auth->getUserInfo(),
                 ]);
             } else {

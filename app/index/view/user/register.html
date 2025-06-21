@@ -142,11 +142,25 @@
                         <div class="layui-form-item">
                             <div class="layui-input-wrap">
                                 <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-email"></i>
+                                </div>
+                                <input
+                                    name="email"
+                                    lay-verify="required|email"
+                                    placeholder="邮箱"
+                                    autocomplete="off"
+                                    class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-wrap">
+                                <div class="layui-input-prefix">
                                     <i class="layui-icon layui-icon-username"></i>
                                 </div>
                                 <input
                                     name="username"
-                                    placeholder="邮箱/手机号/用户名"
+                                    lay-verify="required|username"
+                                    placeholder="用户名 英文字母开头的3-16个字符"
                                     autocomplete="off"
                                     class="layui-input" />
                             </div>
@@ -159,11 +173,24 @@
                                 <input
                                     type="password"
                                     name="password"
-                                    value=""
-                                    placeholder="密码"
+                                    lay-verify="required|password"
+                                    placeholder="密码 6-32个字符"
                                     autocomplete="off"
                                     class="layui-input"
                                     lay-affix="eye" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-wrap">
+                                <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-cellphone"></i>
+                                </div>
+                                <input
+                                    name="mobile"
+                                    lay-verify="required|phone"
+                                    placeholder="手机号"
+                                    autocomplete="off"
+                                    class="layui-input" />
                             </div>
                         </div>
                         <!--@CaptchaBegin-->
@@ -177,6 +204,7 @@
                                     <input
                                         name="captcha"
                                         value=""
+                                        lay-verify="required"
                                         placeholder="验证码"
                                         autocomplete="off"
                                         class="layui-input" />
@@ -186,18 +214,8 @@
                         </div>
                         {/if}
                         <!--@CaptchaEnd-->
-                        <div class="layui-form-item mt-4 mb-5">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <input
-                                    type="checkbox"
-                                    name="keeplogin"
-                                    lay-skin="primary"
-                                    title="记住我"
-                                    id="rememberMeLayui" />
-                                <a href="#" class="forget-pass">忘记密码?</a>
-                            </div>
-                        </div>
-                        <div class="layui-form-item">
+
+                        <div class="layui-form-item mt-5">
                             <button
                                 type="button"
                                 class="layui-btn layui-btn-fluid btn-orange"
@@ -225,6 +243,21 @@
                 var toast = layui.toast;
                 var badou = layui.badou;
 
+                // 自定义验证规则
+                form.verify({
+                    username: function(value, item){ //value：表单的值、item：表单的DOM对象
+                        // 新的用户名验证规则：以字母开头，后面跟2-15个字母、数字或下划线，总长度3-16
+                        if(!new RegExp("^[a-zA-Z][a-zA-Z0-9_]{2,15}$").test(value)){
+                            return '用户名必须以字母开头，且只能包含字母、数字、下划线，长度为3-16个字符';
+                        }
+                    },
+                    password: function(value, item){
+                        if(value.length < 6 || value.length > 32){
+                            return '密码必须为6到32个字符';
+                        }
+                    }
+                });
+
                 // 刷新验证码函数
                 function refreshCaptcha() {
                     $(".verification-img").attr("src", "{:url('index/captcha')}?r=" + Math.random());
@@ -242,7 +275,7 @@
                     }
                 });
 
-                form.on("submit(login)", function (data) {
+                form.on("submit(register)", function (data) { // 注意这里是 lay-filter="register"
                     badou.api.ajax(
                         {
                             url: location.href,
@@ -250,7 +283,6 @@
                         },
                         function (ret, res) {
                             if (res.code == 1) {
-                                btn.stop();
                                 toast.success({
                                     message: res.msg,
                                     timeout: 500,
@@ -259,18 +291,26 @@
                                     },
                                 });
                             } else {
-                                // 登录失败时刷新验证码
+                                // 注册失败时刷新验证码
                                 refreshCaptcha();
                             }
                             return false;
                         },
                         function (data) {
-                            // 登录失败时刷新验证码
+                            // 注册失败时刷新验证码
                             refreshCaptcha();
                             if (data.token) {
                                 $("#token").val(data.token);
                             }
                         }
+                    );
+
+                    return false;
+                });
+            });
+        </script>
+    </body>
+</html>
                     );
 
                     return false;
