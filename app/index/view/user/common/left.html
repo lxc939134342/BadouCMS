@@ -16,17 +16,17 @@
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">
-                <a href="#" class="nav-link active">
+                <a href="{:url('user/index')}" class="nav-link {:check_nav_active('user/index')}">
                     <i class="layui-icon layui-icon-home"></i> 账户概览
                 </a>
             </li>
             <li class="list-group-item">
-                <a href="#" class="nav-link">
+                <a href="{:url('user/profile')}" class="nav-link {:check_nav_active('user/profile')}">
                     <i class="layui-icon layui-icon-username"></i> 个人资料
                 </a>
             </li>
             <li class="list-group-item">
-                <a href="#" class="nav-link">
+                <a href="{:url('user/changepwd')}" class="nav-link {:check_nav_active('user/changepwd')}">
                     <i class="layui-icon layui-icon-password"></i> 修改密码
                 </a>
             </li>

@@ -275,7 +275,7 @@ class FrontendAuth
         }
 
         //判断旧密码是否正确
-        if ($this->verifyPassword($newpassword, $this->_user->password) || $ignoreoldpassword) {
+        if ($this->verifyPassword($oldpassword, $this->_user->password) || $ignoreoldpassword) {
             Db::startTrans();
             try {
                 $newpassword = $this->getEncryptPassword($newpassword);

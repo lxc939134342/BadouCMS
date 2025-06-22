@@ -263,9 +263,11 @@ class User extends Frontend
                 'renewpassword' => __('Renew password')
             ];
             $validate = new Validate($rule, $msg, $field);
-            $result = $validate->check($data);
+
+            $result = $validate::rule($field,$rule)->message($msg)->check($data);
+            halt($validate::getError());
             if (!$result) {
-                $this->error(__($validate->getError()), null, ['token' => $this->token()]);
+                $this->error(__($validate::getError()), null, ['token' => $this->token()]);
             }
 
             $ret = $this->auth->changepwd($newpassword, $oldpassword);
