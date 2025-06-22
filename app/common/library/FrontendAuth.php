@@ -102,7 +102,7 @@ class FrontendAuth
         }
         $user_id = intval($data['user_id']);
         if ($user_id > 0) {
-            $user = User::get($user_id);
+            $user = User::find($user_id);
             if (!$user) {
                 $this->setError('Account not exist');
                 return false;
@@ -185,11 +185,11 @@ class FrontendAuth
         try {
             $user = User::create($params, []);
 
-            $this->_user = User::get($user->id);
+            $this->_user = User::find($user->id);
 
             //设置Token
             $this->_token = Random::uuid();
-            Token::set($this->_token, $user->id, $this->keeptime);
+            Token::set($this->_token, 'frontend', $user->id, $this->keeptime);
 
             //设置登录状态
             $this->_logined = true;
@@ -215,7 +215,7 @@ class FrontendAuth
     public function login($account, $password)
     {
         $field = Validate::is($account, 'email') ? 'email' : (Validate::regex($account, '/^1\d{10}$/') ? 'mobile' : 'username');
-        $user = User::get([$field => $account]);
+        $user = User::where($field, $account)->find();
         if (!$user) {
             $this->setError('Account is incorrect');
             return false;
@@ -230,8 +230,7 @@ class FrontendAuth
             $this->setError('Please try again after 1 day');
             return false;
         }
-
-        if ($user->password != $this->getEncryptPassword($password, $user->salt)) {
+        if (!$this->verifyPassword($password, $user->password)) {
             $user->save(['loginfailure' => $user->loginfailure + 1, 'loginfailuretime' => time()]);
             $this->setError('Password is incorrect');
             return false;
@@ -275,11 +274,11 @@ class FrontendAuth
             return false;
         }
         //判断旧密码是否正确
-        if ($this->_user->password == $this->getEncryptPassword($oldpassword, $this->_user->salt) || $ignoreoldpassword) {
+        if ($this->_user->password == $this->getEncryptPassword($oldpassword) || $ignoreoldpassword) {
             Db::startTrans();
             try {
                 $salt = Random::build();
-                $newpassword = $this->getEncryptPassword($newpassword, $salt);
+                $newpassword = $this->getEncryptPassword($newpassword);
                 $this->_user->save(['loginfailure' => 0, 'password' => $newpassword, 'salt' => $salt]);
 
                 Token::delete($this->_token);
@@ -305,7 +304,7 @@ class FrontendAuth
      */
     public function direct($user_id)
     {
-        $user = User::get($user_id);
+        $user = User::find($user_id);
         if ($user) {
             Db::startTrans();
             try {
@@ -330,7 +329,7 @@ class FrontendAuth
                 $this->_user = $user;
 
                 $this->_token = Random::uuid();
-                Token::set($this->_token, $user->id, $this->keeptime);
+                Token::set($this->_token, 'frontend', $user->id, $this->keeptime);
 
                 $this->_logined = true;
 
@@ -465,7 +464,7 @@ class FrontendAuth
      */
     public function delete($user_id)
     {
-        $user = User::get($user_id);
+        $user = User::find($user_id);
         if (!$user) {
             return false;
         }
@@ -492,9 +491,20 @@ class FrontendAuth
      * @param string $salt     密码盐
      * @return string
      */
-    public function getEncryptPassword($password, $salt = '')
+    public function getEncryptPassword($password)
     {
-        return md5(md5($password) . $salt);
+        return password_hash($password, PASSWORD_DEFAULT);
+    }
+
+    /**
+     * 验证密码是否正确
+     * @param string $password 密码
+     * @param string $hash     密码hash
+     * @return boolean
+     */
+    public function verifyPassword($password, $hash)
+    {
+        return password_verify($password, $hash);
     }
 
     /**

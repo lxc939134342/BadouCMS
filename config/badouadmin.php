@@ -11,11 +11,17 @@ return [
     'admin_keep_time' => 86400,
     //登录验证码
     'admin_login_captcha' => true,
+    //是否自动写入管理员日志
+    'auto_write_admin_log' => true,
     //跳转页面模版
     'jump' => [
         'dispatch_success_tmpl' => app()->getBasePath() . '/common/view/tpl/dispatch_jump.tpl',
         'dispatch_error_tmpl'   => app()->getBasePath() . '/common/view/tpl/dispatch_jump.tpl',
     ],
+    //会员中心
+    'usercenter' => true,
+    //用户登录验证码
+    'user_login_captcha' => true,
     // Token 配置
     'token'                 => [
         // 默认驱动方式
@@ -50,6 +56,6 @@ return [
             ],
         ]
     ],
-    'version' => 'v1.0.0',
+    'version' => 'v2.0.0-Alpha',
     'api_url' => 'http://ldshouquan.test/',
 ];

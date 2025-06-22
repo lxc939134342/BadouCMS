@@ -14,15 +14,13 @@ class User extends Validate
         'mobile'      => 'mobile|unique:user',
         'password'    => 'require|regex:^(?!.*[&<>"\'\n\r]).{6,32}$',
         'captcha'     => 'require',
-        'captchaId'   => 'require',
-        'captchaInfo' => 'require',
     ];
 
     /**
      * 验证场景
      */
     protected $scene = [
-        'login'    => ['password', 'captchaId', 'captchaInfo'],
+        'login'    => ['password'],
         'register' => ['email', 'username', 'password', 'mobile', 'captcha'],
     ];
 
@@ -34,8 +32,6 @@ class User extends Validate
             'mobile'      => __('mobile'),
             'password'    => __('password'),
             'captcha'     => __('captcha'),
-            'captchaId'   => __('captchaId'),
-            'captchaInfo' => __('captcha'),
         ];
         $this->message = array_merge($this->message, [
             'username.regex' => __('Please input correct username'),

@@ -1,6 +1,7 @@
-layui.define(['bdHttp'], function (exports) {
+layui.define(['bdHttp', 'xmSelect'], function (exports) {
     "use strict";
     var http = layui.bdHttp;
+    var xmSelect = layui.xmSelect;
     var bdTool = {
         // 远程下拉选择框
         remoteSelect: function () {
@@ -8,7 +9,6 @@ layui.define(['bdHttp'], function (exports) {
             var dark = localStorage.getItem("dark");
             if ($('.remoteSelect').length > 0) {
                 $(document).on('click', '.remoteSelectClearAll', function () {
-                    console.log(111);
                     xmSelect.batch(null, 'setValue', []);
                 });
 
@@ -60,6 +60,31 @@ layui.define(['bdHttp'], function (exports) {
                         theme: {
                             color: themeColor
                         },
+                        tree: {
+                            //是否显示树状结构
+                            show: true,
+                            //是否展示三角图标
+                            showFolderIcon: true,
+                            //是否显示虚线
+                            showLine: false,
+                            //间距
+                            indent: 20,
+                            //默认展开节点的数组, 为 true 时, 展开所有节点
+                            expandedKeys: true,
+                            //是否严格遵守父子模式
+                            strict: false,
+                        },
+                        model: {
+                            icon: 'show',
+                            label: {
+                                type: 'block',
+                                block: {
+                                    template: function (item, sels) {
+                                        return item.name;
+                                    },
+                                },
+                            }
+                        },
                         on: function (data) {
                             //arr:  当前多选已选中的数据
                             var arr = data.arr;
@@ -80,12 +105,9 @@ layui.define(['bdHttp'], function (exports) {
                     if (!multiple) {
                         options.radio = true;
                         options.clickClose = true;
-                        options.model = {
-                            label: {
-                                type: 'text',
-                            }
-                        };
+                        options.model.icon = 'hidden';
                     }
+
                     // 多选的最大数量
                     if (maxSelectLimit) {
                         options.maxSelectLimit = maxSelectLimit;
@@ -116,6 +138,10 @@ layui.define(['bdHttp'], function (exports) {
                             remoteSelect.update({
                                 data: ret.list
                             });
+                            if (isTree) {
+                                remoteSelect.changeExpandedKeys(true)
+                            }
+
                             return false;
                         }, function (ret) {
                             return false;
@@ -176,11 +202,12 @@ layui.define(['bdHttp'], function (exports) {
                 $('.laydate').each(function (i) {
                     var type = $(this).data('type') || 'datetime';
                     var range = $(this).data('range') || false;
+                    var isIntValue = $(this).data('is-init-value') ?? true;
 
                     var options = {
                         elem: this,
                         type: type,
-                        isInitValue: true,
+                        isInitValue: isIntValue,
                         trigger: 'click'
                     };
                     if (range) {

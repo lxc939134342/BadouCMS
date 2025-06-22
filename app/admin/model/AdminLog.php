@@ -3,8 +3,13 @@
 namespace app\admin\model;
 
 use app\common\library\AdminAuth;
+use Throwable;
 use think\Model;
+use think\model\relation\BelongsTo;
 
+/**
+ * AdminLog模型
+ */
 class AdminLog extends Model
 {
     protected $autoWriteTimestamp = true;
@@ -109,13 +114,13 @@ class AdminLog extends Model
      * @param string|array|null $data
      * @throws Throwable
      */
-    public function record(string $title = '', string|array $data = null): void
+    public function record(string $title = '', string|array|null $data = null): void
     {
-        $auth     = AdminAuth::instance();
+        $auth     = new AdminAuth();
         $adminId  = $auth->isLogin() ? $auth->id : 0;
         $username = $auth->isLogin() ? $auth->username : request()->param('username', __('Unknown'));
 
-        $controller = str_replace('.', '/', request()->controller(true));
+        $controller = request()->controller(true);
         $action     = request()->action(true);
         $path       = $controller . '/' . $action;
         if ($this->urlIgnoreRegex) {
@@ -146,5 +151,10 @@ class AdminLog extends Model
             'ip'        => request()->ip(),
             'useragent' => substr(request()->server('HTTP_USER_AGENT'), 0, 255),
         ]);
+    }
+
+    public function admin(): BelongsTo
+    {
+        return $this->belongsTo(Admin::class);
     }
 }

@@ -31,6 +31,4 @@ class Admin extends Model
             $row->token = '';
         }
     }
-
-
 }

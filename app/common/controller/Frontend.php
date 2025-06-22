@@ -107,7 +107,8 @@ class Frontend extends BaseController
             'actionname'     => $actionname,
             'jsname'         => 'frontend/' . str_replace('.', '/', $controllername),
             'moduleurl'      => rtrim(url("/{$modulename}", [], false), '/'),
-            'language'       => $lang
+            'language'       => $lang,
+            'app_url'        => $this->request->root(true),
         ];
         $config = array_merge($config, Config::get("view_replace_str"));
 
@@ -125,10 +126,13 @@ class Frontend extends BaseController
      * 加载语言文件
      * @param string $name
      */
-    protected function loadlang($name)
+    protected function loadlang($name, $lang = null)
     {
         $name    = preg_match("/^([a-zA-Z0-9_\.\/]+)\$/i", $name) ? $name : 'index';
-        $lang    = $this->app->lang->getLangSet();
+        if (!$lang) {
+            $lang    = $this->app->lang->getLangSet();
+        }
+
         $lang    = preg_match("/^([a-zA-Z\-_]{2,10})\$/i", $lang) ? $lang : 'zh-cn';
 
         $langArr = $this->app->lang->load([

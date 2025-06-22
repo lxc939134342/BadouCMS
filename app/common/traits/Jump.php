@@ -31,7 +31,7 @@ trait Jump
             'code' => 1,
             'msg'  => $msg,
             'data' => $data,
-            'url'  => $url,
+            'url'  => (string)$url,
             'wait' => $wait,
         ];
 
@@ -70,7 +70,7 @@ trait Jump
             'code' => 0,
             'msg'  => $msg,
             'data' => $data,
-            'url'  => $url,
+            'url'  => (string)$url,
             'wait' => $wait,
         ];
         if ('html' == strtolower($type)) {

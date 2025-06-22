@@ -3,19 +3,25 @@
     .layui-form-label {
         width: 120px;
     }
+
     .layui-input-block {
         margin-left: 150px;
     }
 </style>
 <div class="layui-card">
     <div class="layui-card-body">
+        <div class="layui-btn-container">
+            <a href="general.config/setting" class="layui-btn btn-dialog" data-area='["80%","80%"]'>
+                <i class="fa fa-list"></i> 配置列表
+            </a>
+        </div>
         <div class="layui-tabs layui-tabs-card" lay-options="{index: 0}">
             <ul class="layui-tabs-header">
                 {foreach $config_group as $index=>$vo}
                 <li>{$vo}</li>
                 {/foreach}
             </ul>
-            <form class="layui-form" action="{:url('general.config/edit')}" method="post">
+            <form class="layui-form" action="{:url('general.config/saveConfig')}" method="post">
                 {:token_field()}
                 <div class="layui-tabs-body">
                     {foreach $list as $index=>$vo}
@@ -28,14 +34,14 @@
                                 {// 文本框 }
                                 {case value="string"}
                                 <input type="text" id="c-{$field.name}" name="row[{$field.name}]"
-                                    placeholder="请输入{$field.title}" value="{$row[$field.name]|default=''}"
-                                    class="layui-input" />
+                                    placeholder="请输入{$field.title}" value="{$field.value}" class="layui-input" />
                                 {/case}
 
                                 {// 开关 }
                                 {case value="switch"}
-                                <input type="checkbox" id="c-{$field.name}" name="row[{$field.name}]"
-                                    lay-skin="switch" value="1" {if $field.value==1}checked{/if}>
+                                <input type="hidden" name="row[{$field.name}]" value="0">
+                                <input type="checkbox" id="c-{$field.name}" name="row[{$field.name}]" lay-skin="switch"
+                                    value="{$field.value}" {if $field.value==1}checked{/if}>
                                 {/case}
 
                                 {// 多选框 }
@@ -60,17 +66,16 @@
                                 {case images}
                                 <div class="layui-input-group" style="width: 100%">
                                     <input type="text" id="c-{$field.name}" name="row[{$field.name}]"
-                                        class="layui-input" value="{$row[$field.name]|default=''}" />
+                                        class="layui-input" value="{$field.value}" />
                                     <div class="layui-input-suffix" style="width: 30%">
-                                        <button type="button" data-input-id="c-{$field.name}" {if
-                                            $field.component=='images' }data-multiple="true" {/if}
-                                            data-preview-id="p-{$field.name}" class="layui-btn btn-bdupload">
+                                        <button type="button" data-input-id="c-{$field.name}" {if $field.type=='images'
+                                            }data-multiple="true" {/if} data-preview-id="p-{$field.name}"
+                                            class="layui-btn btn-bdupload">
                                             <i class="fa fa-upload"></i>
                                             上传
                                         </button>
-                                        <button type="button" data-input-id="c-{$field.name}" {if
-                                            $field.component=='images' }data-multiple="true" {/if}
-                                            class="layui-btn layui-bg-green btn-bdchoose">
+                                        <button type="button" data-input-id="c-{$field.name}" {if $field.type=='images'
+                                            }data-multiple="true" {/if} class="layui-btn layui-bg-green btn-bdchoose">
                                             <i class="fa fa-list"></i>
                                             选择
                                         </button>
@@ -84,16 +89,15 @@
                                 {case files}
                                 <div class="layui-input-group" style="width: 100%">
                                     <input type="text" id="c-{$field.name}" name="row[{$field.name}]"
-                                        class="layui-input" value="{$row[$field.name]|default=''}" />
+                                        class="layui-input" value="{$field.value}" />
                                     <div class="layui-input-suffix" style="width: 30%">
-                                        <button type="button" {if $field.component=='images' }data-multiple="true" {/if}
+                                        <button type="button" {if $field.type=='images' }data-multiple="true" {/if}
                                             data-input-id="c-{$field.name}" class="layui-btn btn-bdupload">
                                             <i class="fa fa-upload"></i>
                                             上传
                                         </button>
-                                        <button type="button" data-input-id="c-{$field.name}" {if
-                                            $field.component=='files' }data-multiple="true" {/if}
-                                            class="layui-btn layui-bg-green btn-bdchoose">
+                                        <button type="button" data-input-id="c-{$field.name}" {if $field.type=='files'
+                                            }data-multiple="true" {/if} class="layui-btn layui-bg-green btn-bdchoose">
                                             <i class="fa fa-list"></i>
                                             选择
                                         </button>
@@ -104,19 +108,19 @@
                                 {// 多行文本框 }
                                 {case textarea}
                                 <textarea class="layui-textarea" name="row[{$field.name}]"
-                                    rows="5">{$row[$field.name]|default=''}</textarea>
+                                    rows="5">{$field.value}</textarea>
                                 {/case}
 
                                 {// 富文本 }
                                 {case value="editor"}
                                 <textarea class="layui-textarea editor" name="row[{$field.name}]"
-                                    rows="5">{$row[$field.name]|default=''}</textarea>
+                                    rows="5">{$field.value}</textarea>
                                 {/case}
 
                                 {// 日期 }
                                 {case value="datetime"}
                                 <input type="text" id="c-{$field.name}" name="row[{$field.name}]"
-                                    class="layui-input laydate" value="{$row[$field.name]|default=''}" />
+                                    class="layui-input laydate" value="{$field.value}" />
                                 {/case}
 
                                 {// 下拉选择 }
@@ -129,10 +133,51 @@
                                 </select>
                                 {/case}
 
+                                {// 数组 }
+                                {case value="array"}
+                                <dl class="fieldlist" data-name="row[{$field.name|htmlentities}]"
+                                    data-template="arraytpl" data-usearray="true">
+                                    <dd>
+                                        <ins>{:__('Array key')}</ins>
+                                        <ins>{:__('Array value')}</ins>
+                                    </dd>
+                                    <dd>
+                                        <a href="javascript:;" class="layui-btn btn-append"><i
+                                                class="fa fa-plus"></i> {:__('Append')}</a>
+                                    </dd>
+                                    <textarea name="row[{$field.name|htmlentities}]" class="form-control hide" cols="30"
+                                        rows="5">{$field.value}</textarea>
+                                </dl>
+                                <script type="text/html" id="arraytpl">
+                                    <dd>
+                                        <div class="layui-inline">
+                                            <input type="text" name="{{=d.name}}[{{=d.index}}][key]" class="layui-input" value="{{=d.row.key}}" size="10">
+                                        </div>
+                                         <div class="layui-inline">
+                                            <input type="text" name="{{=d.name}}[{{=d.index}}][value]" class="layui-input" value="{{=d.row.value}}" >
+                                        </div>
+                                        <div class="layui-inline">
+                                          <span class="layui-btn layui-bg-red btn-remove"><i class="fa fa-times"></i></span>
+                                          <span class="layui-btn btn-dragsort"><i class="fa fa-arrows"></i></span>
+                                        </div>
+                                    </dd>
+                                </script>
+                                {/case}
+
                                 {/switch}
                             </div>
                         </div>
                         {/foreach}
+                        {if $vo.name=='mail'}
+                        <div class="layui-form-item">
+                            <label class="layui-form-label"></label>
+                            <div class="layui-input-block">
+                                <div class="send-test-mail">
+                                    <button type="button" class="layui-btn testmail">发送测试邮件</button>
+                                </div>
+                            </div>
+                        </div>
+                        {/if}
                     </div>
                     {/foreach}
                 </div>
@@ -151,6 +196,19 @@
     layui.use(["badou", "tabs"], function () {
         var bdForm = layui.bdForm;
         var tabs = layui.tabs;
+        var layer = layui.layer;
+        var badou = layui.badou;
         bdForm.api.bindevent($("form.layui-form"));
+
+        $(document).on("click", ".testmail", function () {
+            var that = this;
+            layer.prompt({ title: __('Please input your email'), formType: 0 }, function (value, index) {
+                badou.api.ajax({
+                    url: "general.config/sendTestMail",
+                    data: $(that).closest("form").serialize() + "&row[test_email]=" + value
+                });
+            });
+
+        });
     });
 </script>

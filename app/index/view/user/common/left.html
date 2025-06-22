@@ -1,0 +1,40 @@
+<div class="col-12 col-lg-custom-sidebar user-left-box">
+    <div class="card sidebar-card shadow-sm mb-4">
+        <div class="card-body text-center">
+            <div class="mb-3">
+                 <img
+        class="user-avatar"
+        src="{:full_url($user.avatar ? $user.avatar : '/static/images/avatar.png')}"
+        alt=""
+      />
+            </div>
+            <h5 class="mb-3">{$user.nickname}</h5>
+            <div class="d-flex justify-content-center mb-4">
+                <span class="badge me-2">积分 {$user.score}</span>
+                <span class="badge">余额 {$user.money}</span>
+            </div>
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">
+                <a href="#" class="nav-link active">
+                    <i class="layui-icon layui-icon-home"></i> 账户概览
+                </a>
+            </li>
+            <li class="list-group-item">
+                <a href="#" class="nav-link">
+                    <i class="layui-icon layui-icon-username"></i> 个人资料
+                </a>
+            </li>
+            <li class="list-group-item">
+                <a href="#" class="nav-link">
+                    <i class="layui-icon layui-icon-password"></i> 修改密码
+                </a>
+            </li>
+            <li class="list-group-item">
+                <a href="{:url('user/logout')}" class="nav-link">
+                    <i class="layui-icon layui-icon-logout"></i> 退出
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

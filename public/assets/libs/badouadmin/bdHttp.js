@@ -183,7 +183,6 @@ layui.define(['toast'], function (exports) {
                         success.call(this, layero, index);
                     }
                 }, options ? options : {});
-                console.log(options);
                 if ($(window).width() < 480 || (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)) {
                     options.area = [$(window).width() + "px", $(window).height() + "px"];
                     options.offset = ["0px", "0px"];

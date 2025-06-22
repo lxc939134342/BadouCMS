@@ -1,0 +1,108 @@
+{layout name="layout/default" /}
+
+<!-- 表格 -->
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table
+            class="layui-hide"
+            id="config"
+            data-operate-edit="{:$auth->check('general.config/edit')}"
+            data-operate-del="{:$auth->check('general.config/del')}"></table>
+    </div>
+</div>
+<!-- 表格左侧按钮 toolbar  -->
+<script type="text/html" id="toolbar">
+    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	">
+        <i class="fa fa-refresh"></i>
+    </a>
+    <button class="layui-btn layui-bg-green" lay-event="add">
+        <i class="fa fa-plus"></i>
+        {:__('Add')}
+    </button>
+</script>
+<script>
+    layui.use(["badou"], function () {
+        var bdTable = layui.bdTable;
+        var table = layui.table;
+        var layer = layui.layer;
+        var dropdown = layui.dropdown;
+        bdTable.api.init({
+            table: table,
+            extend: {
+                index_url: "general.config/setting",
+                add_url: "general.config/add",
+                edit_url: "general.config/edit",
+                del_url: "general.config/del",
+                multi_url: "general.config/multi",
+                table: "config",
+            },
+        });
+        bdTable.render({
+            elem: "#config",
+            url: bdTable.extend.index_url,
+            pk: "id",
+            sortName: "weigh",
+            even: true,
+            toolbar: "#toolbar",
+            page: true,
+            cols: [
+                [
+                    { field: "id", title: "ID", width: 80, sort: true },
+                    { field: "name", title: __("Name"), width: 250 },
+                    {
+                        field: "group",
+                        title: __("Group"),
+                        width: 150,
+                    },
+                    {
+                        field: "title",
+                        title: __("Title"),
+                        templet: function (d) {
+                            return __(d.title);
+                        },
+                        width: 250,
+                    },
+                    { field: "type", title: __("Type"), width: 150 },
+                    {
+                        field: "weigh",
+                        title: __("Weigh"),
+                        width: 100,
+                    },
+                    {
+                        title: __("Operate"),
+                        align: "center",
+                        templet: bdTable.api.formatter.operate,
+                        buttons: [
+                            {
+                                name: "edit",
+                                icon: "fa fa-pencil",
+                                title: __("Edit"),
+                                extend: "lay-event='btn-editone'",
+                                classname: "layui-btn layui-btn-sm",
+                                visible: function (row) {
+                                    if (row.allow_del == 1) {
+                                        return true;
+                                    }
+                                    return false;
+                                },
+                            },
+                            {
+                                name: "del",
+                                icon: "fa fa-trash",
+                                title: __("Del"),
+                                extend: "lay-event='btn-delone'",
+                                classname: "layui-btn layui-bg-red layui-btn-sm",
+                                visible: function (row) {
+                                    if (row.allow_del == 1) {
+                                        return true;
+                                    }
+                                    return false;
+                                },
+                            },
+                        ],
+                    },
+                ],
+            ],
+        });
+    });
+</script>

@@ -1,4 +1,5 @@
 <?php
+
 /*
 ** +----------------------------------------------------------------------
 ** | Wusn
@@ -13,45 +14,47 @@
 
 namespace app\index\controller;
 
-use app\common\controller\Frontend;
-use think\Config;
-use think\Cookie;
-use think\Hook;
+use Throwable;
+use badou\Random;
 use think\Validate;
+use think\facade\Event;
+use think\facade\Config;
+use think\facade\Cookie;
+use app\common\controller\Frontend;
+use app\index\validate\User as UserValidate;
 
 class User extends Frontend
 {
-    protected $layout = 'default';
     protected $noNeedLogin = ['login', 'register', 'third'];
     protected $noNeedRight = ['*'];
 
-    public function _initialize()
+    public function initialize()
     {
-        parent::_initialize();
+        parent::initialize();
         $auth = $this->auth;
 
-        if (!Config::get('fastadmin.usercenter')) {
+        if (!Config::get('badouadmin.usercenter')) {
             $this->error(__('User center already closed'), '/');
         }
 
-//        //监听注册登录退出的事件
-//        Hook::add('user_login_successed', function ($user) use ($auth) {
-//            $expire = input('post.keeplogin') ? 30 * 86400 : 0;
-//            Cookie::set('uid', $user->id, $expire);
-//            Cookie::set('token', $auth->getToken(), $expire);
-//        });
-//        Hook::add('user_register_successed', function ($user) use ($auth) {
-//            Cookie::set('uid', $user->id);
-//            Cookie::set('token', $auth->getToken());
-//        });
-//        Hook::add('user_delete_successed', function ($user) use ($auth) {
-//            Cookie::delete('uid');
-//            Cookie::delete('token');
-//        });
-//        Hook::add('user_logout_successed', function ($user) use ($auth) {
-//            Cookie::delete('uid');
-//            Cookie::delete('token');
-//        });
+        //监听注册登录退出的事件
+        Event::listen('user_login_successed', function ($user) use ($auth) {
+            $expire = input('post.keeplogin') ? 30 * 86400 : 0;
+            Cookie::set('uid', $user['id'], $expire);
+            Cookie::set('token', $auth->getToken(), $expire);
+        });
+        Event::listen('user_register_successed', function ($user) use ($auth) {
+            Cookie::set('uid', $user['id']);
+            Cookie::set('token', $auth->getToken());
+        });
+        Event::listen('user_delete_successed', function ($user) use ($auth) {
+            Cookie::delete('uid');
+            Cookie::delete('token');
+        });
+        Event::listen('user_logout_successed', function ($user) use ($auth) {
+            Cookie::delete('uid');
+            Cookie::delete('token');
+        });
     }
 
     public function index()
@@ -120,6 +123,94 @@ class User extends Frontend
     }
 
     /**
+     * 登录
+     * @return string
+     */
+    public function login(): string
+    {
+        $url = $this->request->request('url', '', 'url_clean');
+
+        if ($this->auth->isLogin()) {
+            $this->success(__('You\'ve logged in, do not login again'), $url ?: url('/user/index'));
+        }
+
+        if ($this->request->isPost()) {
+            $params = $this->request->post(['email', 'mobile', 'username', 'password', 'keeplogin', 'captcha']);
+
+            $validate = new UserValidate();
+            try {
+                $validate->scene('login')->check($params);
+            } catch (Throwable $e) {
+                $this->error($e->getMessage());
+            }
+
+            $res = $this->auth->login($params['username'], $params['password']);
+
+            if (isset($res) && $res === true) {
+                /* 增加登录成功事件 */
+                Event::trigger('user_login_successed', $this->auth->getUserInfo());
+                $this->success(__('Logged in successful'), $url ? $url : url('user/index'));
+            } else {
+                $msg = $this->auth->getError();
+                $this->error($msg);
+            }
+        }
+
+        //判断来源
+        $referer = $this->request->server('HTTP_REFERER', '');
+        if (!$url && $referer && !preg_match("/(user\/login|user\/register|user\/logout)/i", $referer)) {
+            $url = $referer;
+        }
+        $this->view->assign('url', $url);
+        $this->view->assign('title', __('Login'));
+        return $this->view->fetch('user/login');
+    }
+
+    /**
+     * 注册
+     * @return string
+     */
+    public function register()
+    {
+        $url = $this->request->request('url', '', 'url_clean');
+        if ($this->auth->id) {
+            $this->success(__('You\'ve logged in, do not login again'), $url ? $url : url('user/index'));
+        }
+        if ($this->request->isPost()) {
+            $params = $this->request->post(['email', 'mobile', 'username', 'password', 'captcha']);
+
+            $validate = new UserValidate();
+            try {
+                $validate->scene('register')->check($params);
+            } catch (Throwable $e) {
+                $this->error($e->getMessage());
+            }
+
+            $res = $this->auth->register($params['username'], $params['password'], $params['email'], $params['mobile']);
+
+            if (isset($res) && $res === true) {
+                Event::trigger('user_register_successed', $this->auth->getUserInfo());
+
+                $this->success(__('Sign up successful'), '', [
+                    'userInfo'  => $this->auth->getUserInfo(),
+                ]);
+            } else {
+                $msg = $this->auth->getError();
+                $this->error($msg);
+            }
+        }
+        //判断来源
+        $referer = $this->request->server('HTTP_REFERER', '');
+        if (!$url && $referer && !preg_match("/(user\/login|user\/register|user\/logout)/i", $referer)) {
+            $url = $referer;
+        }
+        $this->view->assign('captchaType', config('badouadmin.user_register_captcha'));
+        $this->view->assign('url', $url);
+        $this->view->assign('title', __('Register'));
+        return $this->view->fetch();
+    }
+
+    /**
      ** 退出登录
      ** | Author: Wusn <958342972@qq.com>
      ** | @return string
@@ -128,16 +219,8 @@ class User extends Frontend
      */
     public function logout()
     {
-        if ($this->request->isPost()) {
-            $this->token();
-            //退出本站
-            $this->auth->logout();
-            $this->success(__('Logout successful'), url('user/index'));
-        }
-        $html = "<form id='logout_submit' name='logout_submit' action='' method='post'>" . token() . "<input type='submit' value='ok' style='display:none;'></form>";
-        $html .= "<script>document.forms['logout_submit'].submit();</script>";
-
-        return $html;
+        $this->auth->logout();
+        $this->success(__('Logout successful'), url("user/login"));
     }
 
     /**

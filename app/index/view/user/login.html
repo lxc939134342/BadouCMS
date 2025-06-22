@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+    {include file="user/common/head" /}
+    <style>
+        .login-container {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-card {
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.1);
+            border: none;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+        }
+
+        .card-header {
+            background-color: #fff;
+            border-bottom: none;
+            padding-top: 2rem;
+            padding-bottom: 0;
+        }
+        .card-header h5 {
+            font-size: 1.1rem;
+        }
+        .card-body {
+            padding-top: 0;
+            padding-bottom: 2rem;
+        }
+
+        .layui-form-item {
+            margin-bottom: 15px;
+        }
+        .layui-input {
+            height: 40px;
+            line-height: 40px;
+            border-radius: 5px;
+            border: 1px solid #e6e6e6;
+        }
+        .layui-input::placeholder {
+            color: #a9abb3 !important;
+            font-size: 14px !important;
+            opacity: 1 !important;
+        }
+
+        .btn-orange {
+            background-color: #ff6900;
+            border-color: #ff6900;
+            color: #fff;
+            font-size: 15px;
+            border-radius: 30px;
+        }
+        .btn-orange:hover {
+            background-color: #ff6900;
+            border-color: #ff6900;
+            color: #fff;
+        }
+        .btn-light-gray {
+            background-color: #f0f0f0;
+            border-color: #e0e0e0;
+            color: #6c757d;
+            font-size: 14px;
+            border-radius: 30px;
+        }
+        .btn-light-gray:hover {
+            background-color: #e0e0e0;
+            border-color: #d0d0d0;
+        }
+
+        .layui-form-checkbox span {
+            font-size: 0.875rem;
+        }
+        .login-container .card-body .forget-pass {
+            font-size: 0.875rem;
+            color: #555;
+        }
+        .login-container .card-body .forget-pass:hover {
+            text-decoration: underline;
+        }
+        .layui-form-checkbox {
+            margin-right: 0;
+            margin-top: 0 !important;
+        }
+
+        .tab-log-verification {
+            width: 100%;
+            display: flex;
+        }
+
+        .verification-text {
+            flex: 2;
+            box-sizing: border-box;
+            margin-right: 15px;
+        }
+
+        .verification-img {
+            flex: 1;
+            box-sizing: border-box;
+            border: 1px solid #eeeeee;
+            border-radius: 4px;
+            height: 40px;
+            width: 129px;
+            overflow: hidden;
+            text-align: center;
+        }
+    </style>
+    <body>
+        {include file="user/common/nav" /}
+
+        <div class="login-container">
+            <div class="card login-card">
+                <div class="card-header text-center">
+                    <h5 class="mb-4">会员登录</h5>
+                </div>
+                <div class="card-body">
+                    <form class="layui-form" action="{:url('index/user/login')}" method="post">
+                        {:token_field()}
+                        <div class="layui-form-item">
+                            <div class="layui-input-wrap">
+                                <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-username"></i>
+                                </div>
+                                <input
+                                    name="username"
+                                    placeholder="邮箱/手机号/用户名"
+                                    autocomplete="off"
+                                    lay-verify="required"
+                                    class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-wrap">
+                                <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-password"></i>
+                                </div>
+                                <input
+                                    type="password"
+                                    name="password"
+                                    lay-verify="required"
+                                    value=""
+                                    placeholder="密码"
+                                    autocomplete="off"
+                                    class="layui-input"
+                                    lay-affix="eye" />
+                            </div>
+                        </div>
+                        {if config('badouadmin.user_login_captcha')}
+                        <div class="tab-log-verification">
+                            <div class="verification-text">
+                                <div class="layui-input-wrap">
+                                    <div class="layui-input-prefix">
+                                        <i class="layui-icon layui-icon-auz"></i>
+                                    </div>
+                                    <input
+                                        name="captcha"
+                                        value=""
+                                        placeholder="验证码"
+                                        lay-verify="required"
+                                        autocomplete="off"
+                                        class="layui-input" />
+                                </div>
+                            </div>
+                            <img src="{:url('index/captcha')}?imageW=99" alt="captcha" class="verification-img" />
+                        </div>
+                        {/if}
+                        <div class="layui-form-item mt-4 mb-5">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <input
+                                    type="checkbox"
+                                    name="keeplogin"
+                                    lay-skin="primary"
+                                    title="记住我"
+                                    id="rememberMeLayui" />
+                                <a href="#" class="forget-pass">忘记密码?</a>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <button
+                                type="button"
+                                class="layui-btn layui-btn-fluid btn-orange"
+                                lay-submit
+                                lay-filter="login">
+                                登录
+                            </button>
+                        </div>
+                        <div class="layui-form-item">
+                            <a href="{:url('user/register')}" class="layui-btn layui-btn-fluid layui-btn-primary btn-light-gray">
+                                还没有账号? 点击注册
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {include file="user/common/foot" /}
+
+        <script>
+            layui.use(["form", "badou", "toast"], function () {
+                var form = layui.form;
+                var toast = layui.toast;
+                var badou = layui.badou;
+
+                function refreshCaptcha() {
+                    $(".verification-img").attr("src", "{:url('index/captcha')}?r=" + Math.random());
+                }
+
+                $(".verification-img").click(function () {
+                    refreshCaptcha();
+                });
+                $(document).keydown(function (event) {
+                    if (event.keyCode === 13) {
+                        $("button[lay-filter='login']").click();
+                        return false;
+                    }
+                });
+
+                form.on("submit(login)", function (data) {
+                    badou.api.ajax(
+                        {
+                            url: location.href,
+                            data: data.field,
+                        },
+                        function (ret, res) {
+                            if (res.code == 1) {
+                                toast.success({
+                                    message: res.msg,
+                                    timeout: 500,
+                                    onClosing: function () {
+                                        window.location.href = res.url;
+                                    },
+                                });
+                            } else {
+                                refreshCaptcha();
+                            }
+                            return false;
+                        },
+                        function (data) {
+                            refreshCaptcha();
+                            if (data.token) {
+                                $("#token").val(data.token);
+                            }
+                        }
+                    );
+
+                    return false;
+                });
+            });
+        </script>
+    </body>
+</html>
+                            }
+                            return false;
+                        },
+                        function (data) {
+                            // 登录失败时刷新验证码
+                            refreshCaptcha();
+                            if (data.token) {
+                                $("#token").val(data.token);
+                            }
+                        }
+                    );
+
+                    return false;
+                });
+            });
+        </script>
+    </body>
+</html>

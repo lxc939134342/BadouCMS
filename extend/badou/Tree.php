@@ -11,9 +11,7 @@ class Tree
      * @var ?Tree
      */
     protected static ?Tree $instance = null;
-    //配置
-    protected array $config = [];
-    public array $options = [];
+
     /**
      * 生成树型结构所需要的2维数组
      * @var array
@@ -28,13 +26,15 @@ class Tree
     public string $pidname = 'pid';
     public string $pk = 'id';
     public string $nbsp = "&nbsp;";
+    public string $childname = 'childlist';
 
     public function __construct($options = [])
     {
-        if ($config = Config::get('tree')) {
-            $this->options = array_merge($this->config, $config);
-        }
-        $this->options = array_merge($this->config, $options);
+        isset($options['pidname']) && $this->pidname = $options['pidname'];
+        isset($options['icon']) && $this->icon = $options['icon'];
+        isset($options['childname']) && $this->childname = $options['childname'];
+        isset($options['pk']) && $this->pk = $options['pk'];
+        isset($options['nbsp']) && $this->nbsp = $options['nbsp'];
     }
 
     /**
@@ -66,7 +66,7 @@ class Tree
     * @param string $nbsp    空格占位符
     * @return Tree
     */
-    public function init($arr = [], $pidname = null, $nbsp = null, $pk = null)
+    public function init($arr = [], $pidname = null, $nbsp = null, $pk = null, $childname = null)
     {
         $this->arr = $arr;
 
@@ -78,6 +78,9 @@ class Tree
         }
         if (!is_null($pk)) {
             $this->pk = $pk;
+        }
+        if (!is_null($childname)) {
+            $this->childname = $childname;
         }
         return $this;
     }
@@ -241,7 +244,7 @@ class Tree
                 $spacer = $itemprefix ? $itemprefix . $j : '';
                 $value['spacer'] = $spacer;
                 $data[$n] = $value;
-                $data[$n]['childlist'] = $this->getTreeArray($id, $itemprefix . $k . $this->nbsp);
+                $data[$n][$this->childname] = $this->getTreeArray($id, $itemprefix . $k . $this->nbsp);
                 $n++;
                 $number++;
             }
@@ -259,8 +262,8 @@ class Tree
     {
         $arr = [];
         foreach ($data as $k => $v) {
-            $childlist = $v['childlist'] ?? [];
-            unset($v['childlist']);
+            $childlist = $v[$this->childname] ?? [];
+            unset($v[$this->childname]);
             $v[$field] = $v['spacer'] . ' ' . $v[$field];
             $v['haschild'] = $childlist ? 1 : 0;
             if ($v[$this->pk]) {

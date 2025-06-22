@@ -34,16 +34,15 @@ $param = [
 $route_arr = [
     '/' => 'cms.index/index', // 首页访问路由
     'search$' => 'cms.search/index', // 搜索路由
-    'user$' => 'cms.user/index', // 用户中心
-    'user/:action$' => 'cms.user/:action', // 用户中心
-    'account/:action$' => 'cms.account/:action',  // 账户中心
+    'user$' => 'user/index', // 用户中心
+    'user/:action$' => 'user/:action', // 用户中心
+    'account/:action$' => 'account/:action',  // 账户中心
     'sitemap.xml$' => 'cms.sitemap/index', // sitemap路由
     'sitemap.txt$' => 'cms.sitemap/txt', // sitemap路由
     'tag/:tag$' => 'cms.tag/index',// tag路由
     'ajax/:action$' => 'ajax/:action',
     'do/:action$' => 'cms.index/:action',
     'upload$' => 'cms.base/upload',
-    'captcha$' => 'cms.base/captcha',
     'message$' => 'cms.message/index',
     'message/submit_form$' => 'cms.message/submitForm',
     'comment/:action$' => 'cms.comment/:action',
@@ -72,9 +71,3 @@ if ($cms_domain) {
         }
     })->append($param);
 }
-
-
-/* 无法匹配 */
-Route::miss(function () {
-    abort(404, '404 Not Found');
-});

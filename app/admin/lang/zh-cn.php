@@ -85,5 +85,13 @@ return [
     'Info'                                                  => '详情',
     'Show'                                                  => '显示',
     'Hide'                                                  => '隐藏',
-    'Install'                                               => '安装'
+    'Install'                                               => '安装',
+    'Please select %s'                                      => '请选择%s',
+    'Please enter %s'                                       => '请输入%s',
+    'No rows were deleted'                                  => '未删除任何行',
+    'Append'                                                => '追加',
+    'Array Key'                                             => '数组键',
+    'Array Value'                                           => '数组值',
+    'Admin group'                                           => '超级管理组',
+    'Username'                                              => '用户名',
 ];

@@ -3,6 +3,7 @@
 namespace app\admin\model;
 
 use think\Model;
+use badou\Tree;
 
 class UserRule extends Model
 {
@@ -13,4 +14,23 @@ class UserRule extends Model
         'status_text'
     ];
 
+
+    public static function getTreeList($selected = [])
+    {
+        $ruleList = self::where('status', 'normal')->order('weigh desc,id desc')->select()->toArray();
+        $nodeList = [];
+        Tree::instance()->init($ruleList);
+        $ruleList = Tree::instance()->getTreeList(Tree::instance()->getTreeArray(0), 'name');
+        $hasChildrens = [];
+        foreach ($ruleList as $k => $v) {
+            if ($v['haschild']) {
+                $hasChildrens[] = $v['id'];
+            }
+        }
+        foreach ($ruleList as $k => $v) {
+            $state = array('selected' => in_array($v['id'], $selected) && !in_array($v['id'], $hasChildrens));
+            $nodeList[] = array('id' => $v['id'], 'parent' => $v['pid'] ? $v['pid'] : '#', 'text' => __($v['title']), 'type' => 'menu', 'state' => $state);
+        }
+        return $nodeList;
+    }
 }

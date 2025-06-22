@@ -21,12 +21,13 @@ class User extends Model
         'token',
     ];
 
-    public static function onBeforeUpdate($row){
+    public static function onBeforeUpdate($row)
+    {
         //如果有密码修改
         if (isset($row->password)) {
             if ($row->password) {
                 $row->password = password_hash($row->password, PASSWORD_DEFAULT);
-            }else{
+            } else {
                 unset($row->password);
             }
         }
@@ -85,6 +86,6 @@ class User extends Model
 
     public function userGroup(): BelongsTo
     {
-        return $this->belongsTo('UserGroup', 'group_id', 'id');
+        return $this->belongsTo(UserGroup::class, 'group_id', 'id');
     }
 }

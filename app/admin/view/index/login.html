@@ -28,7 +28,12 @@
                                             <div class="layui-input-prefix">
                                                 <i class="layui-icon layui-icon-username"></i>
                                             </div>
-                                            <input lay-verify="required" name="username" placeholder="账户" autocomplete="off" class="layui-input" />
+                                            <input
+                                                lay-verify="required"
+                                                name="username"
+                                                placeholder="账户"
+                                                autocomplete="off"
+                                                class="layui-input" />
                                         </div>
                                     </div>
                                     <div class="layui-form-item">
@@ -36,7 +41,15 @@
                                             <div class="layui-input-prefix">
                                                 <i class="layui-icon layui-icon-password"></i>
                                             </div>
-                                            <input lay-verify="required" type="password" name="password" value="" placeholder="密码" autocomplete="off" class="layui-input" lay-affix="eye" />
+                                            <input
+                                                lay-verify="required"
+                                                type="password"
+                                                name="password"
+                                                value=""
+                                                placeholder="密码"
+                                                autocomplete="off"
+                                                class="layui-input"
+                                                lay-affix="eye" />
                                         </div>
                                     </div>
                                     <div class="tab-log-verification">
@@ -45,7 +58,13 @@
                                                 <div class="layui-input-prefix">
                                                     <i class="layui-icon layui-icon-auz"></i>
                                                 </div>
-                                                <input lay-verify="required" name="captcha" value="" placeholder="验证码" autocomplete="off" class="layui-input" />
+                                                <input
+                                                    lay-verify="required"
+                                                    name="captcha"
+                                                    value=""
+                                                    placeholder="验证码"
+                                                    autocomplete="off"
+                                                    class="layui-input" />
                                             </div>
                                         </div>
                                         <img src="{:captcha_src()}?imageW=99" alt="captcha" class="verification-img" />
@@ -53,13 +72,19 @@
                                     <div class="layui-form-item">
                                         <div class="remember-passsword">
                                             <div class="remember-cehcked">
-                                                <input type="checkbox" name="keeplogin" lay-skin="primary" title="自动登录" />
+                                                <input
+                                                    type="checkbox"
+                                                    name="keeplogin"
+                                                    lay-skin="primary"
+                                                    title="自动登录" />
                                             </div>
                                         </div>
                                     </div>
                                     <div class="login-btn">
                                         <input type="hidden" name="__token__" id="token" value="{:token()}" />
-                                        <button type="button" lay-submit lay-filter="login" class="layui-btn login">登 录</button>
+                                        <button type="button" lay-submit lay-filter="login" class="layui-btn login">
+                                            登 录
+                                        </button>
                                     </div>
                                 </div>
                             </div>

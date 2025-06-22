@@ -42,7 +42,7 @@ class AdminAuth extends Auth
      */
     public function login($username, $password, $keeptime = 0)
     {
-        $admin = Admin::where('username',$username)->find();
+        $admin = Admin::where('username', $username)->find();
         if (!$admin) {
             $this->setError('Username is incorrect');
             return false;
@@ -53,9 +53,9 @@ class AdminAuth extends Auth
         }
         $admin_failure_retry = Config::get('badouadmin.admin_failure_retry');
         $admin_failure_look_time  = Config::get('badouadmin.admin_failure_lock_time');
-        $update_time=$admin->getOrigin('update_time');
+        $update_time = $admin->getOrigin('update_time');
         if ($admin->loginfailure >= $admin_failure_retry && time() - $update_time < $admin_failure_look_time) {
-            $this->setError(__('Please try again after %s',[Date::human($admin_failure_look_time,0)]));
+            $this->setError(__('Please try again after %s', [Date::human($admin_failure_look_time, 0)]));
             return false;
         }
         if (!password_verify($password, $admin->password)) {
@@ -88,7 +88,7 @@ class AdminAuth extends Auth
         $this->logined = false; //重置登录状态
         Session::delete("admin");
         Cookie::delete("keeplogin");
-        $app_name=app('http')->getName();
+        $app_name = app('http')->getName();
         setcookie('fastadmin_userinfo', '', $_SERVER['REQUEST_TIME'] - 3600, rtrim((string)url("/" . $app_name, [], false), '/'));
         return true;
     }
@@ -304,10 +304,10 @@ class AdminAuth extends Auth
         return parent::getRuleIds($uid);
     }
 
-     /**
-     * 检查当前用户是否超级管理员
-     * @return bool
-     */
+    /**
+    * 检查当前用户是否超级管理员
+    * @return bool
+    */
     public function isSuperAdmin()
     {
         return in_array('*', $this->getRuleIds()) ? true : false;
@@ -339,7 +339,6 @@ class AdminAuth extends Auth
         // 调用 getGroups 方法获取分组信息
         $groups = $this->getGroups();
         // 打印分组信息，方便调试
-        // p($groups);
         // 检查 $groups 是否为 think\Collection 实例，如果是则转换为数组
         if ($groups instanceof \think\Collection) {
             $groups = $groups->toArray();
@@ -438,70 +437,6 @@ class AdminAuth extends Auth
     public function getMenus(int $uid = 0): array
     {
         return parent::getMenus($uid ?: $this->id);
-    }
-
-    /**
-     * 获取左侧和顶部菜单栏
-     *
-     * @param array  $params    URL对应的badge数据
-     * @param string $fixedPage 默认页
-     * @return array
-     */
-    public function getSidebar($params = [], $fixedPage = 'dashboard')
-    {
-        // 边栏开始
-        Event::trigger('admin_sidebar_begin',$params);
-        $badgeList = [];
-        $module = app('http')->getName();
-        // 读取管理员当前拥有的权限节点
-        $userRule = $this->getRuleList();
-        $selected = $referer = [];
-        $refererUrl = Session::get('referer');
-        // 必须将结果集转换为数组
-        $ruleList= AdminRule::where('status','normal')
-            ->where('ismenu', 1)
-            ->order('weigh', 'desc')
-            ->cache("__menu__")
-            ->select()->toArray();
-        $indexRuleList = AdminRule::where('status', 'normal')
-            ->where('ismenu', 0)
-            ->where('name', 'like', '%/index')
-            ->column('name,pid');
-        $pidArr = array_unique(array_filter(array_column($ruleList, 'pid')));
-        foreach ($ruleList as $k => &$v) {
-            if (!in_array(strtolower($v['name']), $userRule)) {
-                unset($ruleList[$k]);
-                continue;
-            }
-            $indexRuleName = $v['name'] . '/index';
-            if (isset($indexRuleList[$indexRuleName]) && !in_array($indexRuleName, $userRule)) {
-                unset($ruleList[$k]);
-                continue;
-            }
-            $v['icon'] = $v['icon'] . ' fa-fw';
-            $v['url'] = isset($v['url']) && $v['url'] ? $v['url'] : '/' . $module . '/' . $v['name'];
-            $v['title'] = __($v['title']);
-            $v['url'] = preg_match("/^((?:[a-z]+:)?\/\/|data:image\/)(.*)/i", $v['url']) ? $v['url'] :(string)url($v['url']);
-            $v['menuclass'] = in_array($v['menutype'], ['dialog', 'ajax']) ? 'btn-' . $v['menutype'] : '';
-            $v['type']=$v['ismenu']==1?0:1;
-            $selected = $v['name'] == $fixedPage ? $v : $selected;
-            $referer = $v['url'] == $refererUrl ? $v : $referer;
-        }
-        $lastArr = array_unique(array_filter(array_column($ruleList, 'pid')));
-        $pidDiffArr = array_diff($pidArr, $lastArr);
-        foreach ($ruleList as $index => $item) {
-            if (in_array($item['id'], $pidDiffArr)) {
-                unset($ruleList[$index]);
-            }
-        }
-        if ($selected == $referer) {
-            $referer = [];
-        }
-
-        $select_id = $referer ? $referer['id'] : ($selected ? $selected['id'] : 0);
-        $menu = $nav = $ruleList;
-        $showSubmenu = config('fastadmin.show_submenu');
-        return [$menu, $nav, $selected, $referer];
     }
 
     /**

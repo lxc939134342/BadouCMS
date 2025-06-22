@@ -9,9 +9,9 @@
 
 <!-- 表格左侧按钮 toolbar  -->
 <script type="text/html" id="toolbar">
-	<a href="javascript:;" lay-event="refresh" class="layui-btn layui-btn-sm btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
-	<button class="layui-btn layui-btn-sm layui-bg-blue btn-disabled disabled {:$auth->check('user.user/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
-	<button class="layui-btn layui-btn-sm layui-bg-red btn-disabled disabled" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
+	<a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
+	<button class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('user.user/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
+	<button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
 </script>
 
 <script>
@@ -37,26 +37,23 @@
             pk: "id",
             even: true,
             toolbar: "#toolbar",
-            searchFormVisible: true,
             cols: [
                 [
                     { type: "checkbox" },
                     { field: "id", title: "ID", width: 80, sort: true },
-					{field: 'group.name', title: __('Group')},
+					{field: 'user_group.name', title: __('Group')},
                     { field: "username", title: "用户名" ,operate:'like' },
-
 					{field: 'nickname', title: __('Nickname'), operate: 'LIKE'},
 					{field: 'email', title: __('Email'), operate: 'LIKE'},
 					{field: 'mobile', title: __('Mobile'), operate: 'LIKE'},
-					{field: 'avatar', title: __('Avatar'), events: bdTable.api.events.image, formatter: bdTable.api.formatter.image, operate: false},
+					{field: 'avatar', title: __('Avatar'), templet: bdTable.api.formatter.image, operate: false},
 					{field: 'level', title: __('Level'), operate: 'BETWEEN', sortable: true},
 					{field: 'gender', title: __('Gender'), visible: false, searchList: {1: __('Male'), 0: __('Female')}},
 					{field: 'score', title: __('Score'), operate: 'BETWEEN', sortable: true},
-					{field: 'logintime_text', title: __('Logintime'), formatter: bdTable.api.formatter.datetime, operate: 'RANGE', addclass: 'datetimerange', sortable: true},
-					{field: 'loginip', title: __('Loginip'), formatter: bdTable.api.formatter.search},
-					{field: 'jointime_text', title: __('Jointime'), formatter: bdTable.api.formatter.datetime, operate: 'RANGE', addclass: 'datetimerange', sortable: true},
-					{field: 'joinip', title: __('Joinip'), formatter: bdTable.api.formatter.search},
-
+					{field: 'logintime_text', title: __('Logintime'), templet: bdTable.api.formatter.datetime,searchType:'time'},
+					{field: 'loginip', title: __('Loginip')},
+					{field: 'jointime_text', title: __('Jointime'), templet: bdTable.api.formatter.datetime, searchType:'time'},
+					{field: 'joinip', title: __('Joinip')},
                     {
                         field: "status",
                         title: "状态",
@@ -65,7 +62,7 @@
                         custom: { normal: "green", hidden: "orange" },
                         templet: bdTable.api.formatter.status,
                     },
-                    { title: "操作", width: 190, align: "center", templet: bdTable.api.formatter.operate},
+                    { title: "操作", width: 130, align: "center", templet: bdTable.api.formatter.operate},
                 ],
             ],
         });
