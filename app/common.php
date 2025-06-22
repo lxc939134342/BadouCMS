@@ -443,3 +443,16 @@ if (!function_exists('keys_to_camel_case')) {
         return $result;
     }
 }
+
+if (!function_exists('check_nav_active')) {
+    /**
+     * 检测会员中心导航是否高亮
+     */
+    function check_nav_active($url, $classname = 'active')
+    {
+        $auth = \app\common\library\FrontendAuth::instance();
+        $requestUrl = $auth->getRequestUri();
+        $url = ltrim($url, '/');
+        return $requestUrl === str_replace(".", "/", $url) ? $classname : '';
+    }
+}
