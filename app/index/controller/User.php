@@ -16,16 +16,18 @@ namespace app\index\controller;
 
 use Throwable;
 use badou\Random;
-use think\Validate;
 use think\facade\Event;
 use think\facade\Config;
 use think\facade\Cookie;
+use think\facade\Validate;
+use app\common\library\Ems;
+use app\common\library\Sms;
 use app\common\controller\Frontend;
 use app\index\validate\User as UserValidate;
 
 class User extends Frontend
 {
-    protected $noNeedLogin = ['login', 'register', 'third'];
+    protected $noNeedLogin = ['login', 'register', 'forgetpass'];
     protected $noNeedRight = ['*'];
 
     public function initialize()
@@ -162,6 +164,62 @@ class User extends Frontend
     {
         $this->auth->logout();
         $this->success(__('Logout successful'), url("user/login"));
+    }
+
+    // 找回密码
+    public function forgetpass()
+    {
+        $type = $this->request->post("type", "email");
+        $mobile = $this->request->post("mobile");
+        $email = $this->request->post("email");
+        $newpassword = $this->request->post("newpassword");
+        $captcha = $this->request->post("captcha");
+        if (!$newpassword || !$captcha) {
+            $this->error(__('Invalid parameters'));
+        }
+
+        $validate = new UserValidate();
+        try {
+            $validate->scene('forgetpass')->check(['password' => $newpassword]);
+        } catch (Throwable $e) {
+            $this->error($e->getMessage());
+        }
+
+        if ($type == 'mobile') {
+            if (!Validate::regex($mobile, "^1\d{10}$")) {
+                $this->error(__('Mobile is incorrect'));
+            }
+            $user = \app\common\model\User::getByMobile($mobile);
+            if (!$user) {
+                $this->error(__('User not found'));
+            }
+            $ret = Sms::check($mobile, $captcha, 'forgetpass');
+            if (!$ret) {
+                $this->error(__('Captcha is incorrect'));
+            }
+            Sms::flush($mobile, 'forgetpass');
+        } else {
+            if (!Validate::is($email, "email")) {
+                $this->error(__('Email is incorrect'));
+            }
+            $user = \app\common\model\User::getByEmail($email);
+            if (!$user) {
+                $this->error(__('User not found'));
+            }
+            $ret = Ems::check($email, $captcha, 'forgetpass');
+            if (!$ret) {
+                $this->error(__('Captcha is incorrect'));
+            }
+            Ems::flush($email, 'forgetpass');
+        }
+        //模拟一次登录
+        $this->auth->direct($user->id);
+        $ret = $this->auth->changepwd($newpassword, '', true);
+        if ($ret) {
+            $this->success(__('Reset password successful'));
+        } else {
+            $this->error($this->auth->getError());
+        }
     }
 
     /**
