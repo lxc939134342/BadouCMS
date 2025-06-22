@@ -273,13 +273,13 @@ class FrontendAuth
             $this->setError('You are not logged in');
             return false;
         }
+
         //判断旧密码是否正确
-        if ($this->_user->password == $this->getEncryptPassword($oldpassword) || $ignoreoldpassword) {
+        if ($this->verifyPassword($newpassword, $this->_user->password) || $ignoreoldpassword) {
             Db::startTrans();
             try {
-                $salt = Random::build();
                 $newpassword = $this->getEncryptPassword($newpassword);
-                $this->_user->save(['loginfailure' => 0, 'password' => $newpassword, 'salt' => $salt]);
+                $this->_user->save(['loginfailure' => 0, 'password' => $newpassword]);
 
                 Token::delete($this->_token);
                 //修改密码成功的事件

@@ -126,7 +126,7 @@
                                 {// 下拉选择 }
                                 {case value="select"}
                                 <select name="row[{$field.name}]" class="layui-select">
-                                    {volist name="$field.content" id="item" key="k" }
+                                    {volist name="$field.content_arr" id="item" key="k" }
                                     <option value="{$key}" {if
                                         isset($row[$field.name])&&$row[$field.name]==$key}selected{/if}>{$item}</option>
                                     {/volist}

@@ -39,7 +39,9 @@ class Email extends PHPMailer
 
         parent::__construct($this->options['debug']);
         $langSet = Lang::getLangSet();
-        if ($langSet == 'zh-cn' || !$langSet) $langSet = 'zh_cn';
+        if ($langSet == 'zh-cn' || !$langSet) {
+            $langSet = 'zh_cn';
+        }
         $this->options['lang'] = $this->options['lang'] ?: $langSet;
 
         $this->setLanguage($this->options['lang'], root_path() . 'vendor' . DIRECTORY_SEPARATOR . 'phpmailer' . DIRECTORY_SEPARATOR . 'phpmailer' . DIRECTORY_SEPARATOR . 'language' . DIRECTORY_SEPARATOR);
@@ -62,6 +64,19 @@ class Email extends PHPMailer
 
             $this->setFrom($sysMailConfig['smtp_sender_mail'], $sysMailConfig['smtp_user']);
         }
+    }
+
+    /**
+     * 设置邮件正文
+     * @param string  $body   邮件下方
+     * @param boolean $ishtml 是否HTML格式
+     * @return $this
+     */
+    public function message($body, $ishtml = true)
+    {
+        $this->isHTML($ishtml);
+        $this->Body = $body;
+        return $this;
     }
 
     public function setSubject($subject): void

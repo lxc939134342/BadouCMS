@@ -20,7 +20,7 @@ class Config extends Model
 
     protected $append = [
         // 'value',
-        // 'content',
+        'content_arr',
         'extend',
         'oldextend'
     ];
@@ -139,18 +139,18 @@ class Config extends Model
         return $value;
     }
 
-    // public function getContentAttr($value, $row)
-    // {
-    //     if (!isset($row['type'])) {
-    //         return '';
-    //     }
-    //     if (in_array($row['type'], $this->needContent)) {
-    //         $arr = json_decode($value, true);
-    //         return $arr ?: [];
-    //     } else {
-    //         return '';
-    //     }
-    // }
+    public function getContentArrAttr($value, $row)
+    {
+        if (!isset($row['type'])) {
+            return '';
+        }
+        if (in_array($row['type'], $this->needContent)) {
+            $arr = json_decode($row['content'], true);
+            return $arr ?: [];
+        } else {
+            return '';
+        }
+    }
 
     public function getExtendAttr($value)
     {

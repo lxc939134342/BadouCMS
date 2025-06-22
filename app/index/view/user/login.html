@@ -60,6 +60,15 @@
             border-color: #ff6900;
             color: #fff;
         }
+        .btn-orange-border {
+            border-color: #ff6900;
+            color: #ff6900;
+        }
+        .btn-orange-border:hover {
+            background-color: #ff6900;
+            border-color: #ff6900;
+            color: #fff;
+        }
         .btn-light-gray {
             background-color: #f0f0f0;
             border-color: #e0e0e0;
@@ -176,7 +185,7 @@
                                     lay-skin="primary"
                                     title="记住我"
                                     id="rememberMeLayui" />
-                                <a href="#" class="forget-pass">忘记密码?</a>
+                                <a href="javascript:;" class="forget-pass">忘记密码?</a>
                             </div>
                         </div>
                         <div class="layui-form-item">
@@ -189,7 +198,9 @@
                             </button>
                         </div>
                         <div class="layui-form-item">
-                            <a href="{:url('user/register')}" class="layui-btn layui-btn-fluid layui-btn-primary btn-light-gray">
+                            <a
+                                href="{:url('user/register')}"
+                                class="layui-btn layui-btn-fluid layui-btn-primary btn-light-gray">
                                 还没有账号? 点击注册
                             </a>
                         </div>
@@ -200,11 +211,113 @@
 
         {include file="user/common/foot" /}
 
+        <script type="text/html" id="forgetpasstpl">
+            <form class="layui-form" action="{:url('user/forgetpass')}" method="post" style="padding: 25px;">
+                <div class="layui-form-item">
+                    <input
+                        type="radio"
+                        name="type"
+                        value="email"
+                        title="通过邮箱"
+                        checked
+                        lay-filter="type"
+                        data-send-url="{:url('api/ems/send')}" />
+                    <input
+                        type="radio"
+                        name="type"
+                        value="mobile"
+                        disabled
+                        title="通过手机重置"
+                        lay-filter="type"
+                        data-send-url="{:url('api/sms/send')}" />
+                </div>
+                <div class="layui-form-item" data-type="email">
+                    <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                            <label class="layui-icon layui-icon-email"></label>
+                        </div>
+                        <input
+                            type="text"
+                            name="email"
+                            lay-verify="email|required"
+                            autocomplete="off"
+                            placeholder="邮箱"
+                            class="layui-input" />
+                    </div>
+                </div>
+                <div class="layui-form-item layui-hide" data-type="mobile">
+                    <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                            <label class="layui-icon layui-icon-cellphone" for="phone"></label>
+                        </div>
+                        <input
+                            type="text"
+                            name="mobile"
+                            lay-verify=""
+                            autocomplete="off"
+                            placeholder="手机号"
+                            class="layui-input" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-row">
+                        <div class="layui-col-xs7">
+                            <div class="layui-input-wrap">
+                                <div class="layui-input-prefix">
+                                    <label class="layui-icon layui-icon-vercode"></label>
+                                </div>
+                                <input
+                                    type="text"
+                                    name="captcha"
+                                    lay-verify="required"
+                                    autocomplete="off"
+                                    placeholder="验证码"
+                                    class="layui-input" />
+                            </div>
+                        </div>
+                        <div class="layui-col-xs5">
+                            <div style="margin-left: 11px;">
+                                <button
+                                    class="layui-btn btn-captcha layui-btn-primary  btn-orange-border layui-btn-fluid"
+                                    type="button"
+                                    data-event="forgetpass"
+                                    data-type="email"
+                                    data-url="{:url('api/ems/send')}">
+                                    获取验证码
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-wrap">
+                        <div class="layui-input-prefix">
+                            <label class="layui-icon layui-icon-password"></label>
+                        </div>
+                        <input
+                            type="password"
+                            name="newpassword"
+                            lay-verify="required"
+                            autocomplete="off"
+                            placeholder="新密码"
+                            class="layui-input"
+                            lay-affix="eye" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <button class="layui-btn layui-btn-fluid btn-orange" lay-filter="forget-pass" lay-submit>
+                        确定
+                    </button>
+                </div>
+            </form>
+        </script>
         <script>
-            layui.use(["form", "badou", "toast"], function () {
+            layui.use(["form", "badou", "toast", "layer", "laytpl"], function () {
                 var form = layui.form;
                 var toast = layui.toast;
                 var badou = layui.badou;
+                var layer = layui.layer;
+                var laytpl = layui.laytpl;
 
                 function refreshCaptcha() {
                     $(".verification-img").attr("src", "{:url('index/captcha')}?r=" + Math.random());
@@ -250,23 +363,56 @@
 
                     return false;
                 });
-            });
-        </script>
-    </body>
-</html>
-                            }
-                            return false;
-                        },
-                        function (data) {
-                            // 登录失败时刷新验证码
-                            refreshCaptcha();
-                            if (data.token) {
-                                $("#token").val(data.token);
-                            }
-                        }
-                    );
 
-                    return false;
+                $(".forget-pass").on("click", function () {
+                    var html = document.getElementById("forgetpasstpl").innerHTML;
+                    var content = laytpl(html).render({});
+                    layer.open({
+                        type: 1,
+                        title: __("Reset password"),
+                        area: [$(window).width() < 450 ? $(window).width() - 10 + "px" : "450px", "385px"],
+                        content: content,
+                        success: function (layero) {
+                            form.render();
+
+                            var rule = $("#resetpwd-form input[name='captcha']").data("rule");
+                            form.on("radio(type)", function (data) {
+                                var type = data.value;
+                                if (type == "email") {
+                                    $("input[name='mobile']").attr("lay-verify", "");
+                                    $("input[name='email']").attr("lay-verify", "email|required");
+                                }
+                                if (type == "mobile") {
+                                    $("input[name='email']").attr("lay-verify", "");
+                                    $("input[name='mobile']").attr("lay-verify", "phone|required");
+                                }
+                                $("div.layui-form-item[data-type]").addClass("layui-hide");
+                                $("div.layui-form-item[data-type='" + type + "']").removeClass("layui-hide");
+                                $(".btn-captcha").data("url", $(this).data("send-url")).data("type", type);
+                            });
+
+                            form.on("submit(forget-pass)", function (data) {
+                                badou.api.ajax(
+                                    {
+                                        url: data.form.action,
+                                        data: data.field,
+                                    },
+                                    function (res) {
+                                        layer.closeAll();
+                                        toast.success({
+                                            message: res.msg,
+                                            timeout: 500,
+                                            onClosing: function () {
+                                                window.location.href = res.url;
+                                            },
+                                        });
+                                        return false;
+                                    }
+                                );
+                                return false;
+                            });
+                        },
+                    });
                 });
             });
         </script>
