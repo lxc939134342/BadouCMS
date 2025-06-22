@@ -2,7 +2,6 @@
 
 namespace app\api\controller;
 
-use think\Hook;
 use app\common\model\User;
 use think\facade\Validate;
 use app\common\controller\Api;

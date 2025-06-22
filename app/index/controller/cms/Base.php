@@ -95,11 +95,7 @@ class Base extends Frontend
             'taglib_pre_load' => Bd::class
         ]);
 
-        $user = new User();
-        $userInfo = $user->getUserInfo($this->auth->id);
-        $this->view->assign('user', $userInfo);
         $this->assignBd();
-        $this->assignconfig('user', $userInfo);
         // 会员验权和登录标签位
         Event::trigger('cmsInit', $this->auth);
         $this->getSort();
@@ -214,27 +210,6 @@ class Base extends Frontend
         $this->view->config = array_merge($this->view->config ? $this->view->config : [], is_array($name) ? $name : [$name => $value]);
     }
 
-    public function upload(): void
-    {
-        $file   = $this->request->file('file');
-        $driver = $this->request->param('driver', 'local');
-        $topic  = $this->request->param('topic', 'default');
-        try {
-            $upload     = new Upload();
-            $attachment = $upload
-                ->setFile($file)
-                ->setDriver($driver)
-                ->setTopic($topic)
-                ->upload(null, 0, $this->auth->id);
-            unset($attachment['create_time'], $attachment['quote']);
-        } catch (Throwable $e) {
-            $this->result([], 0, $e->getMessage(), 'json');
-        }
-        $this->result([
-            'file' => $attachment ?? []
-        ], 1, 'ok', 'json');
-    }
-
     /**
      * 检查页面权限
      * @param $gcode //权限编码
@@ -284,49 +259,6 @@ class Base extends Frontend
                 $gnote = $gnote ?: 'Permission denied';
                 $this->error(__($gnote));
             }
-        }
-    }
-
-    /**
-     * 用户初始化
-     * @return void
-     */
-    public function userInitialize(): void
-    {
-        if ($this->auth->isLogin()) {
-            $menus = [];
-            $rules     = [];
-            $userMenus = $this->auth->getMenus();
-
-            // 首页加载的规则，验权，但过滤掉会员中心菜单
-            foreach ($userMenus as $item) {
-                if ($item['type'] == 'menu_dir') {
-                    foreach ($item['children'] as &$child) {
-                        $child['path'] = '/'.$child['path'];
-                    }
-                    unset($child);
-                    $menus[] = $item;
-
-                } elseif ($item['type'] != 'menu') {
-                    $rules[] = $item;
-                }
-            }
-            $rules = array_values($rules);
-            if (!$this->contentSort['scode']) {
-                $this->view->assign('sort', []);
-            }
-            $this->view->assign([
-                'site'             => [
-                    'siteName'     => get_sys_config('site_name'),
-                    'recordNumber' => get_sys_config('record_number'),
-                    'version'      => get_sys_config('version'),
-                    'cdnUrl'       => '',
-                    'upload'       => keys_to_camel_case(get_upload_config(), ['max_size', 'save_name', 'allowed_suffixes', 'allowed_mime_types']),
-                ],
-                'openMemberCenter' => Config::get('buildadmin.open_member_center'),
-                'rules'            => $rules,
-                'menus'            => $menus,
-            ]);
         }
     }
 

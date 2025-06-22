@@ -3,13 +3,10 @@
 namespace app\common\controller;
 
 use think\Response;
-use think\facade\View;
 use app\BaseController;
 use think\facade\Event;
 use think\facade\Config;
 use think\facade\Cookie;
-use app\common\traits\Jump;
-use app\common\traits\View as ViewTrait;
 use think\exception\HttpResponseException;
 use app\common\library\FrontendAuth as Auth;
 

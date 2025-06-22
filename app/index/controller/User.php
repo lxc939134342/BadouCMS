@@ -15,7 +15,6 @@
 namespace app\index\controller;
 
 use Throwable;
-use badou\Random;
 use think\facade\Event;
 use think\facade\Config;
 use think\facade\Cookie;
