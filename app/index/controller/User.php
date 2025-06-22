@@ -241,33 +241,19 @@ class User extends Frontend
             $newpassword = $this->request->post("newpassword", '', null);
             $renewpassword = $this->request->post("renewpassword", '', null);
             $token = $this->request->post('__token__');
-            $rule = [
-                'oldpassword'   => 'require|regex:\S{6,30}',
-                'newpassword'   => 'require|regex:\S{6,30}',
-                'renewpassword' => 'require|regex:\S{6,30}|confirm:newpassword',
-                '__token__'     => 'token',
-            ];
+            $validate = new UserValidate();
+            if ($oldpassword == $newpassword) {
+                $this->error(__('The new password cannot be the same as the old password'));
+            }
 
-            $msg = [
-                'renewpassword.confirm' => __('Password and confirm password don\'t match')
-            ];
-            $data = [
-                'oldpassword'   => $oldpassword,
-                'newpassword'   => $newpassword,
-                'renewpassword' => $renewpassword,
-                '__token__'     => $token,
-            ];
-            $field = [
-                'oldpassword'   => __('Old password'),
-                'newpassword'   => __('New password'),
-                'renewpassword' => __('Renew password')
-            ];
-            $validate = new Validate($rule, $msg, $field);
+            if ($newpassword != $renewpassword) {
+                $this->error(__('Password and confirm password don\'t match'));
+            }
 
-            $result = $validate::rule($field,$rule)->message($msg)->check($data);
-            halt($validate::getError());
-            if (!$result) {
-                $this->error(__($validate::getError()), null, ['token' => $this->token()]);
+            try {
+                $validate->scene('forgetpass')->check(['password' => $newpassword]);
+            } catch (Throwable $e) {
+                $this->error($e->getMessage());
             }
 
             $ret = $this->auth->changepwd($newpassword, $oldpassword);

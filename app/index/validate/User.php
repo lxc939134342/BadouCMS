@@ -35,8 +35,8 @@ class User extends Validate
             'captcha'     => __('captcha'),
         ];
         $this->message = array_merge($this->message, [
-            'username.regex' => __('Please input correct username'),
-            'password.regex' => __('Please input correct password')
+            'username.regex' => __('Username must be 3 to 16 characters'),
+            'password.regex' => __('Password must be 6 to 32 characters')
         ]);
         parent::__construct();
     }
