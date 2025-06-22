@@ -2,6 +2,7 @@
 
 namespace app\admin\model;
 
+use app\common\library\AdminAuth;
 use think\Model;
 
 class Admin extends Model
@@ -22,7 +23,6 @@ class Admin extends Model
         return date('Y-m-d H:i:s', $value);
     }
 
-
     public static function onBeforeWrite($row)
     {
         $changed = $row->getChangedData();
@@ -30,5 +30,18 @@ class Admin extends Model
         if (isset($changed['username']) || isset($changed['password']) || isset($changed['salt'])) {
             $row->token = '';
         }
+    }
+
+    /**
+     * 重置用户密码
+     * @param int|string $uid         管理员ID
+     * @param string     $newPassword 新密码
+     * @return int|Admin
+     */
+    public function resetPassword(int|string $uid, string $newPassword): int|Admin
+    {
+        $auth = new AdminAuth();
+        $passwd = $auth->getEncryptPassword($newPassword);
+        return $this->where(['id' => $uid])->update(['password' => $passwd]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace app\admin\model;
 
+use app\common\library\FrontendAuth;
 use think\Model;
 use think\model\relation\BelongsTo;
 
@@ -80,5 +81,18 @@ class User extends Model
     public function userGroup(): BelongsTo
     {
         return $this->belongsTo(UserGroup::class, 'group_id', 'id');
+    }
+
+
+    /**
+     * 重置用户密码
+     * @param int|string $uid         管理员ID
+     * @param string     $newPassword 新密码
+     */
+    public function resetPassword(int|string $uid, string $newPassword)
+    {
+        $auth = new FrontendAuth();
+        $passwd = $auth->getEncryptPassword($newPassword);
+        return $this->where(['id' => $uid])->update(['password' => $passwd]);
     }
 }

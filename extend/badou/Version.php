@@ -1,0 +1,87 @@
+<?php
+
+namespace badou;
+
+/**
+ * 版本类
+ */
+class Version
+{
+    /**
+     * 比较两个版本号
+     * @param $v1 string 要求的版本号
+     * @param $v2 bool | string 被比较版本号
+     * @return bool 是否达到要求的版本号
+     */
+    public static function compare(string $v1, bool|string $v2): bool
+    {
+        if (!$v2) {
+            return false;
+        }
+
+        // 删除开头的 V
+        if (strtolower($v1[0]) == 'v') {
+            $v1 = substr($v1, 1);
+        }
+        if (strtolower($v2[0]) == 'v') {
+            $v2 = substr($v2, 1);
+        }
+
+        if ($v1 == "*" || $v1 == $v2) {
+            return true;
+        }
+
+        // 丢弃'-'后面的内容
+        if (str_contains($v1, '-')) {
+            $v1 = explode('-', $v1)[0];
+        }
+        if (str_contains($v2, '-')) {
+            $v2 = explode('-', $v2)[0];
+        }
+
+        $v1 = explode('.', $v1);
+        $v2 = explode('.', $v2);
+
+        // 将号码逐个进行比较
+        for ($i = 0; $i < count($v1); $i++) {
+            if (!isset($v2[$i])) {
+                break;
+            }
+            if ($v1[$i] == $v2[$i]) {
+                continue;
+            }
+            if ($v1[$i] > $v2[$i]) {
+                return false;
+            }
+            if ($v1[$i] < $v2[$i]) {
+                return true;
+            }
+        }
+        if (count($v1) != count($v2)) {
+            return !(count($v1) > count($v2));
+        }
+        return false;
+    }
+
+    /**
+     * 是否是一个数字版本号
+     * @param $version
+     * @return bool
+     */
+    public static function checkDigitalVersion($version): bool
+    {
+        if (!$version) {
+            return false;
+        }
+        if (strtolower($version[0]) == 'v') {
+            $version = substr($version, 1);
+        }
+
+        $rule1 = '/\.{2,10}/'; // 是否有两个的`.`
+        $rule2 = '/^\d+(\.\d+){0,10}$/';
+        if (!preg_match($rule1, (string)$version)) {
+            return !!preg_match($rule2, (string)$version);
+        }
+        return false;
+    }
+}
