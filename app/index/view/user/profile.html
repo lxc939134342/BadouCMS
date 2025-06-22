@@ -1,6 +1,4 @@
-{extend name="user/common/base" /}
-
-{block name="main"}
+{extend name="user/common/base" /} {block name="main"}
 <style>
     body {
         background-color: #f8f8f8;
@@ -12,7 +10,7 @@
     .card {
         border: none;
         border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0,0,0,.05);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     }
     .card-header {
         background-color: #fff;
@@ -94,34 +92,38 @@
     }
 
     .profile-avatar-container {
-        position:relative;
-        width:100px;
+        position: relative;
+        width: 100px;
     }
-    .profile-avatar-container .profile-user-img{
-        width:100px;
-        height:100px;
+    .profile-avatar-container .profile-user-img {
+        width: 100px;
+        height: 100px;
     }
     .profile-avatar-container .profile-avatar-text {
-        display:none;
+        display: none;
     }
     .profile-avatar-container:hover .profile-avatar-text {
-        display:block;
-        position:absolute;
-        height:100px;
-        width:100px;
-        background:#444;
-        opacity: .6;
+        display: block;
+        position: absolute;
+        height: 100px;
+        width: 100px;
+        background: #444;
+        opacity: 0.6;
         color: #fff;
-        top:0;
-        left:0;
+        top: 0;
+        left: 0;
         line-height: 100px;
         text-align: center;
     }
-    .profile-avatar-container button{
-        position:absolute;
-        top:0;left:0;width:100px;height:100px;opacity: 0 !important;
+    .profile-avatar-container button {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100px;
+        height: 100px;
+        opacity: 0 !important;
     }
-    .layui-input-group>.layui-input-prefix{
+    .layui-input-group > .layui-input-prefix {
         width: 120px;
     }
 </style>
@@ -131,95 +133,126 @@
         {include file="user/common/left" /}
 
         <div class="col-12 col-lg-custom-main-content">
-
-
             <div class="card shadow-sm mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h6 class="mb-0">{:__('Profile')}</h6>
                 </div>
                 <div class="card-body">
-
-                    <form id="profile-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="{:url('api/user/profile')}">
+                    <form
+                        id="profile-form"
+                        class="form-horizontal"
+                        role="form"
+                        data-toggle="validator"
+                        method="POST"
+                        action="{:url('api/user/profile')}">
                         {:token_field()}
-                        <div class="form-group">
-                            <div class="col-xs-12 col-sm-4">
-
-                                <div class="layui-input-block">
-                                    <input type="hidden" name="avatar" id="c-avatar" value="{:$user->getData('avatar')}" />
-                                    <div class="layui-input-suffix profile-avatar-container" style="width: 30%;">
-                                        <img class="profile-user-img img-responsive img-circle" src="{$user.avatar|htmlentities|cdnurl}" alt="">
-                                        <button type="button" data-input-id="c-avatar" data-preview-id="p-avatar" class="layui-btn btn-bdupload">
-                                            <i class="fa fa-upload"></i>
-                                            上传
-                                        </button>
-                                    </div>
-                                    <div class="layui-upload-list" id="p-avatar"></div>
+                        <div class="layui-form-item">
+                            <div class="layui-input-block">
+                                <div class="profile-avatar-container">
+                                    <img class="profile-user-img" src="{$user.avatar|cdnurl}" />
+                                    <div class="profile-avatar-text">点击编辑</div>
+                                    <button type="button" id="upload-avatar" class="upload" data-input-id="c-avatar">
+                                        上传
+                                    </button>
+                                    <input type="hidden" id="c-avatar" name="avatar" value="{$user.avatar}" />
                                 </div>
-
-
                             </div>
                         </div>
 
                         <div class="layui-form-item">
                             <div class="layui-input-group">
-                                <div class="layui-input-prefix">
-                                    {:__('Username')}:
-                                </div>
-                                <input type="text" class="layui-input" id="username" name="username" value="{$user.username|htmlentities}" data-rule="required;username;remote({:url('api/validate/check_username_available')}, id={$user.id})" placeholder="">
+                                <div class="layui-input-prefix">{:__('Username')}:</div>
+                                <input
+                                    type="text"
+                                    class="layui-input"
+                                    id="username"
+                                    name="username"
+                                    value="{$user.username|htmlentities}"
+                                    data-rule="required;username;remote({:url('api/validate/check_username_available')}, id={$user.id})"
+                                    placeholder="" />
                             </div>
                         </div>
                         <div class="layui-form-item">
                             <div class="layui-input-group">
-                                <div class="layui-input-prefix">
-                                    {:__('Nickname')}:
-                                </div>
-                                <input type="text" class="layui-input" id="nickname" name="nickname" value="{$user.nickname|htmlentities}" data-rule="required;remote({:url('api/validate/check_nickname_available')}, id={$user.id})" placeholder="">
+                                <div class="layui-input-prefix">{:__('Nickname')}:</div>
+                                <input
+                                    type="text"
+                                    class="layui-input"
+                                    id="nickname"
+                                    name="nickname"
+                                    value="{$user.nickname|htmlentities}"
+                                    data-rule="required;remote({:url('api/validate/check_nickname_available')}, id={$user.id})"
+                                    placeholder="" />
                             </div>
                         </div>
                         <div class="layui-form-item">
                             <div class="layui-input-group">
-                                <div class="layui-input-prefix">
-                                    {:__('Intro')}:
-                                </div>
-                                <input id="c-bio" data-rule="" data-tip="一句话介绍一下你自己" class="layui-input" name="bio" type="text" value="{$user.bio|htmlentities}">
+                                <div class="layui-input-prefix">{:__('Intro')}:</div>
+                                <input
+                                    id="c-bio"
+                                    data-rule=""
+                                    data-tip="一句话介绍一下你自己"
+                                    class="layui-input"
+                                    name="bio"
+                                    type="text"
+                                    value="{$user.bio|htmlentities}" />
                             </div>
                         </div>
                         <div class="layui-form-item">
                             <div class="layui-input-group">
-                                <div class="layui-input-prefix">
-                                    {:__('Email')}:
-                                </div>
-                                <input type="text" class="layui-input" id="c-email" name="email" value="{$user.email|htmlentities}" disabled placeholder="">
+                                <div class="layui-input-prefix">{:__('Email')}:</div>
+                                <input
+                                    type="text"
+                                    class="layui-input"
+                                    id="c-email"
+                                    name="email"
+                                    value="{$user.email|htmlentities}"
+                                    disabled
+                                    placeholder="" />
                                 <div class="layui-input-suffix">
-                                    <a href="javascript:;" class="layui-btn layui-btn-primary btn-change" data-type="email">{:__('Change')}</a>
+                                    <a
+                                        href="javascript:;"
+                                        class="layui-btn layui-btn-primary btn-change"
+                                        data-type="email">
+                                        {:__('Change')}
+                                    </a>
                                 </div>
                             </div>
                         </div>
                         <div class="layui-form-item">
                             <div class="layui-input-group">
-                                <div class="layui-input-prefix">
-                                    {:__('Mobile')}:
-                                </div>
-                                <input type="text" class="layui-input" id="c-mobile" name="mobile" value="{$user.mobile|htmlentities}" disabled placeholder="">
+                                <div class="layui-input-prefix">{:__('Mobile')}:</div>
+                                <input
+                                    type="text"
+                                    class="layui-input"
+                                    id="c-mobile"
+                                    name="mobile"
+                                    value="{$user.mobile|htmlentities}"
+                                    disabled
+                                    placeholder="" />
                                 <div class="layui-input-suffix">
-                                    <a href="javascript:;" class="layui-btn layui-btn-primary btn-change" data-type="mobile">{:__('Change')}</a>
+                                    <a
+                                        href="javascript:;"
+                                        class="layui-btn layui-btn-primary btn-change"
+                                        data-type="mobile">
+                                        {:__('Change')}
+                                    </a>
                                 </div>
                             </div>
                         </div>
-
-
 
                         <div class="layui-input-group normal-footer">
                             <label class="layui-input-prefix col-xs-12 col-sm-2"></label>
                             <div class="col-xs-12 col-sm-8">
-                                <button type="submit" class="layui-btn layui-btn-primary layui-border-green disabled">{:__('Ok')}</button>
-                                <button type="reset" class="layui-btn ">{:__('Reset')}</button>
+                                <button type="submit" class="layui-btn layui-btn-primary layui-border-green disabled">
+                                    {:__('Ok')}
+                                </button>
+                                <button type="reset" class="layui-btn">{:__('Reset')}</button>
                             </div>
                         </div>
                     </form>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -231,7 +264,14 @@
             <div class="form-group">
                 <label class="control-label col-xs-12 col-sm-3">{:__('New Email')}:</label>
                 <div class="col-xs-12 col-sm-8">
-                    <input type="text" class="form-control" id="email" name="email" value="" data-rule="required;email;remote({:url('api/validate/check_email_available')}, event=changeemail, id={$user.id})" placeholder="{:__('New email')}">
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="email"
+                        name="email"
+                        value=""
+                        data-rule="required;email;remote({:url('api/validate/check_email_available')}, event=changeemail, id={$user.id})"
+                        placeholder="{:__('New email')}" />
                     <span class="msg-box"></span>
                 </div>
             </div>
@@ -239,9 +279,21 @@
                 <label class="control-label col-xs-12 col-sm-3">{:__('Captcha')}:</label>
                 <div class="col-xs-12 col-sm-8">
                     <div class="input-group">
-                        <input type="text" name="captcha" id="email-captcha" class="form-control" data-rule="required;length({$Think.config.captcha.length});digits;remote({:url('api/validate/check_ems_correct')}, event=changeemail, email:#email)" />
+                        <input
+                            type="text"
+                            name="captcha"
+                            id="email-captcha"
+                            class="form-control"
+                            data-rule="required;length({$Think.config.captcha.length});digits;remote({:url('api/validate/check_ems_correct')}, event=changeemail, email:#email)" />
                         <span class="input-group-btn" style="padding:0;border:none;">
-                            <a href="javascript:;" class="btn btn-info btn-captcha" data-url="{:url('api/ems/send')}" data-type="email" data-event="changeemail">获取验证码</a>
+                            <a
+                                href="javascript:;"
+                                class="btn btn-info btn-captcha"
+                                data-url="{:url('api/ems/send')}"
+                                data-type="email"
+                                data-event="changeemail">
+                                获取验证码
+                            </a>
                         </span>
                     </div>
                     <span class="msg-box"></span>
@@ -264,7 +316,14 @@
             <div class="form-group">
                 <label for="c-mobile" class="control-label col-xs-12 col-sm-3">{:__('New mobile')}:</label>
                 <div class="col-xs-12 col-sm-8">
-                    <input type="text" class="form-control" id="mobile" name="mobile" value="" data-rule="required;mobile;remote({:url('api/validate/check_mobile_available')}, event=changemobile, id={$user.id})" placeholder="{:__('New mobile')}">
+                    <input
+                        type="text"
+                        class="form-control"
+                        id="mobile"
+                        name="mobile"
+                        value=""
+                        data-rule="required;mobile;remote({:url('api/validate/check_mobile_available')}, event=changemobile, id={$user.id})"
+                        placeholder="{:__('New mobile')}" />
                     <span class="msg-box"></span>
                 </div>
             </div>
@@ -272,9 +331,21 @@
                 <label for="mobile-captcha" class="control-label col-xs-12 col-sm-3">{:__('Captcha')}:</label>
                 <div class="col-xs-12 col-sm-8">
                     <div class="input-group">
-                        <input type="text" name="captcha" id="mobile-captcha" class="form-control" data-rule="required;length({$Think.config.captcha.length});digits;remote({:url('api/validate/check_sms_correct')}, event=changemobile, mobile:#mobile)" />
+                        <input
+                            type="text"
+                            name="captcha"
+                            id="mobile-captcha"
+                            class="form-control"
+                            data-rule="required;length({$Think.config.captcha.length});digits;remote({:url('api/validate/check_sms_correct')}, event=changemobile, mobile:#mobile)" />
                         <span class="input-group-btn" style="padding:0;border:none;">
-                            <a href="javascript:;" class="btn btn-info btn-captcha" data-url="{:url('api/sms/send')}" data-type="mobile" data-event="changemobile">获取验证码</a>
+                            <a
+                                href="javascript:;"
+                                class="btn btn-info btn-captcha"
+                                data-url="{:url('api/sms/send')}"
+                                data-type="mobile"
+                                data-event="changemobile">
+                                获取验证码
+                            </a>
                         </span>
                     </div>
                     <span class="msg-box"></span>
@@ -291,58 +362,74 @@
     </form>
 </script>
 <style>
-    .form-layer {height:100%;min-height:150px;min-width:300px;}
+    .form-layer {
+        height: 100%;
+        min-height: 150px;
+        min-width: 300px;
+    }
     .form-body {
-        width:100%;
-        overflow:auto;
-        top:0;
-        position:absolute;
-        z-index:10;
-        bottom:50px;
-        padding:15px;
+        width: 100%;
+        overflow: auto;
+        top: 0;
+        position: absolute;
+        z-index: 10;
+        bottom: 50px;
+        padding: 15px;
     }
     .form-layer .form-footer {
-        height:50px;
-        line-height:50px;
+        height: 50px;
+        line-height: 50px;
         background-color: #ecf0f1;
-        width:100%;
-        position:absolute;
-        z-index:200;
-        bottom:0;
-        margin:0;
+        width: 100%;
+        position: absolute;
+        z-index: 200;
+        bottom: 0;
+        margin: 0;
     }
-    .form-footer .form-group{
-        margin-left:0;
-        margin-right:0;
+    .form-footer .form-group {
+        margin-left: 0;
+        margin-right: 0;
     }
 </style>
 
 <script>
-    layui.use(["badou"], function () {
+    layui.use(["badou", "upload"], function () {
         var bdForm = layui.bdForm;
         var $ = layui.$;
         var badou = layui.badou;
         var toast = layui.toast;
         var form = layui.form;
+        var upload = layui.upload;
 
-
-
-        bdForm.api.bindevent("click", ".btn-change", function (e, ins) {
+        $(document).on("click", ".btn-change", function (e, ins) {
             var type = $(this).data("type");
-            console.log(type)
+            console.log(type);
             switch (type) {
                 case "email":
-                    bdForm.api.open({
+                    badou.api.open({
                         title: "修改邮箱",
                         area: ["600px", "400px"],
                         content: $("#emailtpl").html(),
                         callback: function (layero, index) {
                             bdForm.api.form(layero, index);
-                        }
+                        },
                     });
             }
         });
+
+        upload.render({
+            elem: "#upload-avatar",
+            url: "{:url('api/ajax/upload')}",
+            done: function (res) {
+                if (res.code == 1) {
+                    $("#c-avatar").val(res.data.url);
+                    $(".profile-user-img").attr("src", res.data.fullurl);
+                } else {
+                    layer.msg(res.msg, { icon: 2, time: 1000 });
+                }
+            },
+        });
         bdForm.api.bindevent($("form.layui-form"));
-    })
+    });
 </script>
 {/block}

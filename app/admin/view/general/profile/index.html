@@ -191,7 +191,7 @@
         });
         upload.render({
             elem: "#upload-avatar",
-            url: "{:url('ajax/upload')}?thumb=0",
+            url: "{:url('ajax/upload')}",
             done: function (res) {
                 if (res.code == 1) {
                     $("#c-avatar").val(res.data.url);
