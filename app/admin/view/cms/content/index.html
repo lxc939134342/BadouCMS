@@ -74,6 +74,7 @@
             url: bdTable.extend.index_url,
             pk: "id",
             even: true,
+            sortName:'sorting asc,id desc',
             searchFormVisible: true,
             toolbar: "#toolbar",
             page: true,
@@ -92,6 +93,11 @@
                         templet: bdTable.api.formatter.datetime,
                         operate: "RANGE",
                         searchType: "time",
+                    },
+                    {
+                        field: "sorting",
+                        title: __("Sorting"),
+                        width: 80,
                     },
                     {
                         field: "status",

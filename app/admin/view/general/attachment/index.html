@@ -2,14 +2,31 @@
 <!-- 表格 -->
 <div class="layui-card">
     <div class="layui-card-body">
-        <table class="layui-hide" id="rule" data-operate-edit="{:$auth->check('general.attachment/edit')}" data-operate-del="{:$auth->check('general.attachment/del')}"></table>
+        <table
+            class="layui-hide"
+            id="rule"
+            data-operate-edit="{:$auth->check('general.attachment/edit')}"
+            data-operate-del="{:$auth->check('general.attachment/del')}"></table>
     </div>
 </div>
 <script type="text/html" id="toolbar">
-	<a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black"><i class="fa fa-refresh"></i></a>
-	<button class="layui-btn layui-bg-green btn-bdupload"><i class="fa fa-upload"></i> {:__('Upload')}</button>
-    <button class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('auth.rule/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
-    <button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
+    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black">
+        <i class="fa fa-refresh"></i>
+    </a>
+    <button class="layui-btn layui-bg-green btn-bdupload">
+        <i class="fa fa-upload"></i>
+        {:__('Upload')}
+    </button>
+    <button
+        class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('auth.rule/edit')?'':'hide'}"
+        lay-event="edit">
+        <i class="fa fa-pencil"></i>
+        {:__('Edit')}
+    </button>
+    <button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del">
+        <i class="fa fa-trash"></i>
+        {:__('Del')}
+    </button>
 </script>
 <script>
     layui.use(["badou"], function () {
@@ -22,20 +39,45 @@
             thumb: function (row) {
                 var html = "";
                 if (row.mimetype.indexOf("image") > -1) {
-                    html = '<a href="' + row.fullurl + '" target="_blank"><img src="' + row.fullurl + row.thumb_style + '" alt="" style="max-height:30px;max-width:120px"></a>';
+                    html =
+                        '<a href="' +
+                        row.fullurl +
+                        '" target="_blank"><img src="' +
+                        row.fullurl +
+                        row.thumb_style +
+                        '" alt="" style="max-height:30px;max-width:120px"></a>';
                 } else {
-                    html = '<a href="' + row.fullurl + '" target="_blank"><img src="' + badou.api.fixurl("ajax/icon") + "?suffix=" + row.imagetype + '" alt="" style="max-height:30px;max-width:120px"></a>';
+                    html =
+                        '<a href="' +
+                        row.fullurl +
+                        '" target="_blank"><img src="' +
+                        badou.api.fixurl("ajax/icon") +
+                        "?suffix=" +
+                        row.imagetype +
+                        '" alt="" style="max-height:30px;max-width:120px"></a>';
                 }
-                return '<div style="width:120px;margin:0 auto;text-align:center;overflow:hidden;white-space: nowrap;text-overflow: ellipsis;">' + html + "</div>";
+                return (
+                    '<div style="width:120px;margin:0 auto;text-align:center;overflow:hidden;white-space: nowrap;text-overflow: ellipsis;">' +
+                    html +
+                    "</div>"
+                );
             },
             url: function (value, row, index) {
                 return '<a href="' + row.fullurl + '" target="_blank" class="label bg-green">' + row.url + "</a>";
             },
             filename: function (value, row, index) {
-                return '<div style="width:150px;margin:0 auto;text-align:center;overflow:hidden;white-space: nowrap;text-overflow: ellipsis;">' + Table.api.formatter.search.call(this, value, row, index) + "</div>";
+                return (
+                    '<div style="width:150px;margin:0 auto;text-align:center;overflow:hidden;white-space: nowrap;text-overflow: ellipsis;">' +
+                    Table.api.formatter.search.call(this, value, row, index) +
+                    "</div>"
+                );
             },
             mimetype: function (value, row, index) {
-                return '<div style="width:80px;margin:0 auto;text-align:center;overflow:hidden;white-space: nowrap;text-overflow: ellipsis;">' + Table.api.formatter.search.call(this, value, row, index) + "</div>";
+                return (
+                    '<div style="width:80px;margin:0 auto;text-align:center;overflow:hidden;white-space: nowrap;text-overflow: ellipsis;">' +
+                    Table.api.formatter.search.call(this, value, row, index) +
+                    "</div>"
+                );
             },
         };
 
@@ -57,14 +99,40 @@
             even: true,
             toolbar: "#toolbar",
             page: true,
+            limit: 30,
             cols: [
                 [
                     { type: "checkbox" },
                     { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "admin_id", title: __("Admin_id"), hide: true, searchType: "remoteSelect", extend: "data-source='auth.admin/index' data-field='nickname'" },
-                    { field: "user_id", title: __("User_id"), hide: true,searchType: "remoteSelect", extend: "data-source='user.user/index' data-field='nickname'" },
-                    { field: "preview", width: 150, align:'center', title: __("Preview"), templet: formatter.thumb, operate: false },
-                    { field: "filename", title: __("Filename"), sortable: true, templet: bdTable.api.formatter.filename, operate: "like" },
+                    {
+                        field: "admin_id",
+                        title: __("Admin_id"),
+                        hide: true,
+                        searchType: "remoteSelect",
+                        extend: "data-source='auth.admin/index' data-field='nickname'",
+                    },
+                    {
+                        field: "user_id",
+                        title: __("User_id"),
+                        hide: true,
+                        searchType: "remoteSelect",
+                        extend: "data-source='user.user/index' data-field='nickname'",
+                    },
+                    {
+                        field: "preview",
+                        width: 150,
+                        align: "center",
+                        title: __("Preview"),
+                        templet: formatter.thumb,
+                        operate: false,
+                    },
+                    {
+                        field: "filename",
+                        title: __("Filename"),
+                        sortable: true,
+                        templet: bdTable.api.formatter.filename,
+                        operate: "like",
+                    },
                     {
                         field: "filesize",
                         title: __("Filesize"),
@@ -74,32 +142,58 @@
                         templet: function (row) {
                             var size = parseFloat(row.filesize);
                             var i = Math.floor(Math.log(size) / Math.log(1024));
-                            return (size / Math.pow(1024, i)).toFixed(i < 2 ? 0 : 2) * 1 + " " + ["B", "KB", "MB", "GB", "TB"][i];
+                            return (
+                                (size / Math.pow(1024, i)).toFixed(i < 2 ? 0 : 2) * 1 +
+                                " " +
+                                ["B", "KB", "MB", "GB", "TB"][i]
+                            );
                         },
                     },
-                    { field: "imagewidth", width:100, title: __("Imagewidth"), sortable: true },
-                    { field: "imageheight",width:100, title: __("Imageheight"), sortable: true },
-                    { field: "imagetype", width:100, title: __("Imagetype"), sortable: true, templet: bdTable.api.formatter.search, operate: "like" },
-                    { field: "storage", width:100, title: __("Storage"), templet: bdTable.api.formatter.search, operate: "like" },
-                    { field: "mimetype",width:100, title: __("Mimetype"), templet: bdTable.api.formatter.mimetype },
+                    { field: "imagewidth", width: 100, title: __("Imagewidth"), sortable: true },
+                    { field: "imageheight", width: 100, title: __("Imageheight"), sortable: true },
+                    {
+                        field: "imagetype",
+                        width: 100,
+                        title: __("Imagetype"),
+                        sortable: true,
+                        templet: bdTable.api.formatter.search,
+                        operate: "like",
+                    },
+                    {
+                        field: "storage",
+                        width: 100,
+                        title: __("Storage"),
+                        templet: bdTable.api.formatter.search,
+                        operate: "like",
+                    },
+                    { field: "mimetype", width: 100, title: __("Mimetype"), templet: bdTable.api.formatter.mimetype },
                     {
                         field: "create_time",
                         title: __("Create time"),
                         templet: bdTable.api.formatter.datetime,
                         operate: "RANGE",
-                        searchType:'time',
+                        searchType: "time",
                         width: 150,
                     },
-                    { field: "operate",width: 150, title: __("Operate"), align: "center", templet: bdTable.api.formatter.operate, operate: true, fixed: "right" },
+                    {
+                        field: "operate",
+                        width: 150,
+                        title: __("Operate"),
+                        align: "center",
+                        templet: bdTable.api.formatter.operate,
+                        operate: true,
+                        fixed: "right",
+                    },
                 ],
             ],
+            done: function () {
+                // 绑定上传按钮
+                badou.bdUpload.render({
+                    success: function (data, options) {
+                        $(".btn-refresh").trigger("click");
+                    },
+                });
+            },
         });
-
-         // 绑定上传按钮
-        badou.bdUpload.render({
-            success:function(data,options){
-                 $(".btn-refresh").trigger("click");
-            }
-        })
     });
 </script>

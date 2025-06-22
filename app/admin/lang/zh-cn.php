@@ -94,4 +94,5 @@ return [
     'Array Value'                                           => '数组值',
     'Admin group'                                           => '超级管理组',
     'Username'                                              => '用户名',
+    'Sorting'                                               => '排序'
 ];

@@ -50,7 +50,16 @@ class Label extends Base
     public function content()
     {
         if ($this->request->isPost()) {
-            $data = $this->getPostData('row/a');
+            $postData = $this->getPostData('row/a');
+            $list = $this->model->column('id,name');
+            $data = [];
+
+            foreach ($list as $key => $value) {
+                $data[$key]['id'] = $value['id'];
+                $data[$key]['name'] = $value['name'];
+                $data[$key]['value'] = $postData[$value['name']];
+            }
+
             // 处理POST数据
             // 如果值是数组则转换为逗号分隔的字符串
             // 如果是文本则将换行符替换为<br>标签
