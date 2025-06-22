@@ -133,14 +133,8 @@
     function submitcomment(obj) {
       var url = $(obj).attr("action");
       var content = $(obj).find("#content").val();
-      var captcha = $(obj).find("#captcha").val();
-      var captchaId = $(obj).find("img.codeimg").data("id");
       var loadIndex = layer.load(0);
       var formData = $(obj).serializeArray();
-      formData.push({
-        name: "captcha_id",
-        value: captchaId,
-      });
 
       $.ajax({
         type: "POST",

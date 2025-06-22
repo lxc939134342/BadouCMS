@@ -64,7 +64,7 @@ class Config extends Backend
         $all = $this->model->select();
         foreach ($all as $item) {
             if ($item['type'] == 'editor') {
-                $this->request->filter('clean_xss');
+                $this->request->filter('xss_clean');
                 break;
             }
         }

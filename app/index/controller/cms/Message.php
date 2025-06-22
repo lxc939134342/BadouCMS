@@ -12,8 +12,7 @@
 
 namespace app\index\controller\cms;
 
-use ba\Captcha;
-use app\common\library\Email;
+use badou\Email;
 use app\index\model\cms\Form;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
@@ -35,7 +34,8 @@ class Message extends Base
 
     protected function createFormData(int $fcode, array $data)
     {
-        $this->request->filter('clean_xss');
+
+        $this->request->filter('xss_clean');
         $post = $this->request->post();
         // 留言 或 表单
         $formTypeText = $fcode == 1 ? __('message') : __('form');
@@ -68,7 +68,7 @@ class Message extends Base
 
         if ($this->model->addTableData($fcode, $data)) {
             session('lastsub', time()); // 记录最后提交时间
-            trace($formTypeText.'提交成功！', 'log');
+
             if (get_sys_config('message_send_mail') && get_sys_config('message_send_to')) {
                 $mail   = new Email();
                 if (!$mail->configured) {
@@ -114,14 +114,11 @@ class Message extends Base
 
         // 验证码验证
         if (get_sys_config('message_check_code')) {
-            // 验证码验证
-            // 接受验证码和验证码ID
-            $data['captcha']   = $this->request->post('captcha');
-            $data['captchaId'] = $this->request->post('captcha_id');
-
-            $captchaObj = new Captcha();
-            if (!$captchaObj->check($data['captcha'], $data['captchaId'])) {
-                // 验证码错误！
+            $captcha = $this->request->param('captcha');
+            if (empty($captcha)) {
+                $this->error(__('CaptchaError'));
+            }
+            if (!captcha_check($captcha)) {
                 $this->error(__('CaptchaError'));
             }
         }
@@ -140,7 +137,6 @@ class Message extends Base
         $data['uid'] = $this->auth->id ?? '';
         $data['create_time'] = date('Y-m-d H:i:s');
         $data['update_time'] = date('Y-m-d H:i:s');
-
         $this->createFormData(1, $data);
     }
 
@@ -168,6 +164,4 @@ class Message extends Base
 
         $this->createFormData($fcode, $data);
     }
-
-
 }

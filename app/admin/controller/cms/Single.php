@@ -112,7 +112,7 @@ class Single extends Base
             $data['ico'] ?? $data['ico'] = $row['ico'];
             $data['scode'] ?? $data['scode'] = $row['scode'];
             $data['title'] ?? $data['title'] = $row['title'];
-            $data['content'] = $this->request->param('content', $row['content'], 'clean_xss');
+            $data['content'] = $this->request->param('content', $row['content'], 'xss_clean');
             $data['update_user'] = $this->auth->username;
             $result = false;
             $this->model->startTrans();

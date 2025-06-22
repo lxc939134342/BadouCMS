@@ -10,7 +10,6 @@ class User extends Model
     protected $autoWriteTimestamp = true;
 
     protected $append = [
-        'avatar_txt',
         'prevtime_text',
         'logintime_text',
         'jointime_text'
@@ -41,12 +40,6 @@ class User extends Model
     public function getStatusList()
     {
         return ['normal' => __('Normal'), 'hidden' => __('Hidden')];
-    }
-
-    public function getAvatarTxtAttr($value, $data)
-    {
-        $value = $value ? $value : $data['avatar'];
-        return $value ? cdnurl($value, true) : letter_avatar($data['nickname']);
     }
 
     public function setBirthdayAttr($value)

@@ -12,13 +12,14 @@
 
 namespace app\index\controller\cms;
 
-use ba\Captcha;
-use app\common\library\Email;
+use badou\Email;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 use app\index\model\cms\MemberComment as MemberCommentModel;
 
 class Comment extends Base
 {
+    protected $noNeedRight = ['*'];
+
     /**
      * 评论模型
      * @var MemberCommentModel
@@ -28,7 +29,6 @@ class Comment extends Base
     {
         parent::initialize();
         $this->model = new MemberCommentModel();
-        $this->userInitialize();
     }
 
     /**
@@ -49,18 +49,11 @@ class Comment extends Base
                 $this->error(__('SubmitTooFrequent'));
             }
 
-
-            // 验证码验证
-            // 接受验证码和验证码ID
-            $data['captcha']   = $this->request->post('captcha');
-            $data['captchaId'] = $this->request->post('captcha_id');
-            if (!$data['captchaId']) {
-                $data['captchaId'] = session('captchaId');
+            $captcha = $this->request->param('captcha');
+            if (empty($captcha)) {
+                $this->error(__('CaptchaError'));
             }
-
-            $captchaObj = new Captcha();
-            if (!$captchaObj->check($data['captcha'], $data['captchaId'])) {
-                // 验证码错误！
+            if (!captcha_check($captcha)) {
                 $this->error(__('CaptchaError'));
             }
 
@@ -93,7 +86,6 @@ class Comment extends Base
                 'user_bs' => get_user_bs(),
                 'update_user' => '',
             );
-
 
             if ($this->model->save($data)) {
                 session('lastsub', time()); // 记录最后提交时间
