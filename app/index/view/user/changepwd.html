@@ -174,7 +174,7 @@
             <div class="layui-input-group normal-footer">
               <label class="layui-input-prefix col-xs-12 col-sm-2"></label>
               <div class="col-xs-12 col-sm-8">
-                <button type="submit" class="layui-btn layui-btn-primary layui-border-green disabled">{:__('Ok')}</button>
+                <button type="submit" class="layui-btn layui-btn-primary layui-border-green disabled"  lay-submit lay-filter="changepwd">{:__('Ok')}</button>
                 <button type="reset" class="layui-btn ">{:__('Reset')}</button>
               </div>
             </div>
@@ -289,21 +289,35 @@
 
 
 
-    bdForm.api.bindevent("click", ".btn-change", function (e, ins) {
-      var type = $(this).data("type");
-      console.log(type)
-      switch (type) {
-        case "email":
-          bdForm.api.open({
-            title: "修改邮箱",
-            area: ["600px", "400px"],
-            content: $("#emailtpl").html(),
-            callback: function (layero, index) {
-              bdForm.api.form(layero, index);
-            }
-          });
-      }
+    form.on("submit(changepwd)", function (data) {
+      badou.api.ajax(
+              {
+                url: location.href,
+                data: data.field,
+              },
+              function (ret, res) {
+                if (res.code == 1) {
+                  toast.success({
+                    message: res.msg,
+                    timeout: 500,
+                    onClosing: function () {
+                      window.location.href = res.url;
+                    },
+                  });
+                } else {
+                }
+                return false;
+              },
+              function (data) {
+                if (data.token) {
+                  $("#token").val(data.token);
+                }
+              }
+      );
+
+      return false;
     });
+
     bdForm.api.bindevent($("form.layui-form"));
   })
 </script>
