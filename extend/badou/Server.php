@@ -1128,7 +1128,7 @@ class Server
                 $bootstrapArr[] = file_get_contents($bootstrapFile);
             }
         }
-        $moduleFile = app_path(). str_replace("/", DS, "view/commonmodules.html");
+        $moduleFile = app_path(). str_replace("/", DS, "view/common/modules.html");
         if ($handle = fopen($moduleFile, 'w')) {
             fwrite($handle, implode("\n", $bootstrapArr));
             fclose($handle);
