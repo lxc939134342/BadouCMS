@@ -1,0 +1,6 @@
+<!-- nkeditor start -->
+<link rel="stylesheet" href="__CDN__/modules/nkeditor/themes/black/editor.min.css" />
+<script src="__CDN__/modules/nkeditor/NKeditor-all-min.js"></script>
+<script src="__CDN__/modules/nkeditor/lang/zh-CN.js"></script>
+<script src="__CDN__/modules/nkeditor/index.js"></script>
+<!-- nkeditor end -->

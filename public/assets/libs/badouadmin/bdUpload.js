@@ -11,6 +11,7 @@ layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer', 'Sortabl
         config: {
             container: document.body,
             elem: '.btn-bdupload',
+            accept: 'file',
             previewtpl: `
                 <div class="layui-col-xs3 layui-upload-item"  >
                     <img src="{{=d.fullurl}}" data-url="{{=d.url}}" class="layui-upload-img" />
@@ -23,6 +24,7 @@ layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer', 'Sortabl
         render: function (options) {
             options = $.extend({}, this.config, options || {});
             $(options.elem, options.container).each(function () {
+
                 var that = this;
                 //填充ID
                 var input_id = $(that).data("input-id") ? $(that).data("input-id") : "";
@@ -34,7 +36,7 @@ layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer', 'Sortabl
                 upload.render({
                     elem: that, // 绑定多个元素
                     url: url, // 此处配置你自己的上传接口即可
-                    accept: 'images', // 普通文件
+                    accept: options.accept, // 普通文件
                     done: function (res, index, upload) {
                         if (res.code == 1) {
                             bdUpload.events.onUploadSuccess.call(that, res.data, options);
@@ -144,7 +146,7 @@ layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer', 'Sortabl
                     result.push(j);
                 });
                 textarea.val(JSON.stringify(result));
-            }
+            },
         },
         events: {
             onUploadSuccess: function (data, options) {

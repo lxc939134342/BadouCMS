@@ -58,6 +58,6 @@ return [
             ],
         ]
     ],
-    'version' => 'v2.0.0-Alpha',
-    'api_url' => 'http://ldshouquan.test/',
+    'version' => 'v1.0.0-Alpha',
+    'api_url' => 'https://sq.badoucms.com/api/',
 ];

@@ -23,7 +23,7 @@ class Server
     public static function modules($params = [])
     {
         $params['domain'] = request()->host(true);
-        return self::sendRequest('/module/index', $params, 'GET');
+        return self::sendRequest('module/index', $params, 'GET');
     }
 
     /**
@@ -70,7 +70,7 @@ class Server
     public static function isBuy($name, $extend = [])
     {
         $params = array_merge(['name' => $name, 'domain' => request()->host(true)], $extend);
-        return self::sendRequest('/module/isbuy', $params, 'POST');
+        return self::sendRequest('module/isbuy', $params, 'POST');
     }
 
     /**
@@ -102,7 +102,7 @@ class Server
     public static function moduleInfo($name, $extend = [])
     {
         $params = array_merge(['name' => $name, 'domain' => request()->host(true)], $extend);
-        $info = self::sendRequest('/module/info', $params, 'GET');
+        $info = self::sendRequest('module/info', $params, 'GET');
         if ($info['code'] != 1) {
             throw new Exception($info['msg']);
         }
@@ -123,7 +123,7 @@ class Server
 
         try {
             $client = self::getClient();
-            $response = $client->get('/module/download', ['query' => array_merge(['name' => $name], $extend)]);
+            $response = $client->get('module/download', ['query' => array_merge(['name' => $name], $extend)]);
             $body = $response->getBody();
             $content = $body->getContents();
             if (substr($content, 0, 1) === '{') {
@@ -199,7 +199,7 @@ class Server
      */
     public static function valid($params = [])
     {
-        $json = self::sendRequest('/module/valid', $params, 'POST');
+        $json = self::sendRequest('module/valid', $params, 'POST');
         if ($json && isset($json['code'])) {
             if ($json['code']) {
                 return true;
@@ -515,6 +515,8 @@ class Server
         unset($info['url']);
         self::setModuleInfo($name, $info);
 
+        // 刷新
+        self::refresh();
         return true;
     }
 
@@ -624,6 +626,8 @@ class Server
             throw new Exception($e->getMessage());
         }
 
+        // 刷新
+        self::refresh();
         return true;
     }
 
@@ -795,7 +799,7 @@ class Server
             'domain'    => $domain,
             'modules'    => $modules
         ]);
-        $result = self::sendRequest('/module/authorization', $params, 'POST');
+        $result = self::sendRequest('module/authorization', $params, 'POST');
         if (isset($result['code']) && $result['code'] == 1) {
             $json = $result['data']['modules'] ?? [];
             foreach ($moduleList as $name => $item) {
@@ -879,7 +883,6 @@ class Server
         return class_exists($namespace) ? $namespace : '';
     }
 
-
     /**
      * 获取插件创建的表
      * @param string $name 插件名
@@ -904,6 +907,15 @@ class Server
             }
         }
         return $tables;
+    }
+
+    /**
+     * 获取bootstrap.js路径
+     * @return string
+     */
+    public static function getBootstrapFile($name)
+    {
+        return MODULE_PATH . $name . DIRECTORY_SEPARATOR . 'bootstrap.stub';
     }
 
     /**
@@ -976,10 +988,14 @@ class Server
             'app',
             'public',
             'template',
-            'public/modules'
+            'publicmodules'
         ];
     }
 
+    /**
+     * 获取请求对象
+     * @return Client
+     */
     /**
      * 获取请求对象
      * @return Client
@@ -995,7 +1011,7 @@ class Server
             'headers'         => [
                 'X-REQUESTED-WITH' => 'XMLHttpRequest',
                 'Referer'          => dirname(request()->root(true)),
-                'User-Agent'       => 'FastModule',
+                'User-Agent'       => 'BuildAdminClient',
             ]
         ];
         static $client;
@@ -1017,11 +1033,11 @@ class Server
         try {
             $client = self::getClient();
             $options = strtoupper($method) == 'POST' ? ['form_params' => $params] : ['query' => $params];
+
             $response = $client->request($method, $url, $options);
             $body = $response->getBody();
             $content = $body->getContents();
             $json = (array)json_decode($content, true);
-
         } catch (TransferException $e) {
             throw new Exception(__('Network error'));
         } catch (\Exception $e) {
@@ -1096,4 +1112,30 @@ class Server
         return true;
     }
 
+    /**
+     * 刷新插件缓存文件
+     *
+     * @return  boolean
+     * @throws  Exception
+     */
+    public static function refresh()
+    {
+        $modules = self::getInstalldModuleList();
+        $bootstrapArr = [];
+        foreach ($modules as $name => $module) {
+            $bootstrapFile = self::getBootstrapFile($name);
+            if ($module['state'] && is_file($bootstrapFile)) {
+                $bootstrapArr[] = file_get_contents($bootstrapFile);
+            }
+        }
+        $moduleFile = app_path(). str_replace("/", DS, "view/commonmodules.html");
+        if ($handle = fopen($moduleFile, 'w')) {
+            fwrite($handle, implode("\n", $bootstrapArr));
+            fclose($handle);
+        } else {
+            throw new Exception(__("Unable to open file '%s' for writing", ["modules.html"]));
+        }
+
+        return true;
+    }
 }

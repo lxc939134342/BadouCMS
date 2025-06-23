@@ -10,6 +10,7 @@ use think\facade\Event;
 use app\common\controller\Backend;
 use app\common\library\Upload;
 use app\common\exception\UploadException;
+use think\facade\Config;
 
 class Ajax extends Backend
 {
@@ -99,6 +100,7 @@ class Ajax extends Backend
 
     public function upload()
     {
+
         $upload = \app\common\model\Config::upload();
 
         $attachment = null;
@@ -110,7 +112,6 @@ class Ajax extends Backend
         } catch (UploadException $e) {
             $this->error($e->getMessage());
         }
-
-        $this->success(__('Uploaded successful'), '', ['url' => $attachment->url, 'fullurl' => cdnurl($attachment->url, true)]);
+        $this->result(__('Uploaded successful'), ['url' => $attachment->url, 'fullurl' => cdnurl($attachment->url, true)]);
     }
 }

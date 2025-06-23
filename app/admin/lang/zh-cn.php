@@ -94,5 +94,14 @@ return [
     'Array Value'                                           => '数组值',
     'Admin group'                                           => '超级管理组',
     'Username'                                              => '用户名',
-    'Sorting'                                               => '排序'
+    'Sorting'                                               => '排序',
+    'No file upload or server upload limit exceeded'        => '未上传文件或超出服务器上传限制',
+    'Uploaded file format is limited'                       => '上传文件格式受限制',
+    'Uploaded file is not a valid image'                    => '上传文件不是有效的图片文件',
+    'Are you sure you want to cancel this upload?'          => '确定取消上传？',
+    'Remove file'                                           => '移除文件',
+    'You can only upload a maximum of %s files'             => '你最多允许上传 %s 个文件',
+    'You can\'t upload files of this type'                  => '不允许上传的文件类型',
+    'Server responded with %s code'                         => '服务端响应(Code:%s)',
+    'File is too big (%sMiB), Max filesize: %sMiB'          => '当前上传(%sM)，最大允许上传文件大小:%sM',
 ];
