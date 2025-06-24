@@ -141,7 +141,7 @@ class Upload
         $size = (int)($size * pow(1024, $typeDict[$type] ?? 0));
         if ($this->fileInfo['size'] > $size) {
             throw new UploadException(__(
-                'File is too big (%sMiB), Max filesize: %sMiB.',
+                'File is too big (%sMiB), Max filesize: %sMiB',
                 [round($this->fileInfo['size'] / pow(1024, 2), 2),
                 round($size / pow(1024, 2), 2)]
             ));

@@ -33,4 +33,5 @@ return [
     'Module'                                                  => '插件',
     'Template'                                                => '模板',
     'Unable to open the zip file'                             => '无法打开zip文件',
+    'Upgrade'                                                 => '升级'
 ];

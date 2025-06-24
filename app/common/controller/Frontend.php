@@ -168,8 +168,7 @@ class Frontend extends BaseController
     }
 
     /**
-     * 判断是否为ajax请求 一定要用此方法判断
-     * layui加载页面使用的是ajax形式，会导致request->ajax不精准
+     * 判断是否为ajax请求
      */
     protected function isAjax()
     {
