@@ -59,5 +59,6 @@ return [
         ]
     ],
     'version' => 'v1.0.0-Alpha',
-    'api_url' => 'https://sq.badoucms.com/api/',
+    // 'api_url' => 'https://sq.badoucms.com/api/',
+    'api_url' => 'http://ldshouquan.test/api/',
 ];

@@ -22,7 +22,6 @@ use app\admin\model\AdminGroupAccess as AuthGroupAccess;
 use app\admin\model\AdminGroup as AuthGroupModel;
 use app\admin\model\AdminRule as AuthRuleModel;
 use app\common\controller\Backend;
-use think\exception\ValidateException;
 use badou\Tree;
 use Exception;
 use think\facade\Db;
