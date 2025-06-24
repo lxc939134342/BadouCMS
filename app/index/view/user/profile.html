@@ -126,6 +126,14 @@
     .layui-input-group > .layui-input-prefix {
         width: 120px;
     }
+
+    .layui-btn-default{
+        background-color: #ff6c02;
+    }
+    .layui-border-orange{
+        border-color: #ff6c02 !important;
+        color: #ff6c02 !important;
+    }
 </style>
 
 <div class="container user-dashboard-container">
@@ -140,7 +148,7 @@
                 <div class="card-body">
                     <form
                         id="profile-form"
-                        class="form-horizontal"
+                        class="form-horizontal layui-form"
                         role="form"
                         data-toggle="validator"
                         method="POST"
@@ -212,7 +220,7 @@
                                 <div class="layui-input-suffix">
                                     <a
                                         href="javascript:;"
-                                        class="layui-btn layui-btn-primary btn-change"
+                                        class="layui-btn layui-btn-primary layui-border-orange btn-change"
                                         data-type="email">
                                         {:__('Change')}
                                     </a>
@@ -233,7 +241,7 @@
                                 <div class="layui-input-suffix">
                                     <a
                                         href="javascript:;"
-                                        class="layui-btn layui-btn-primary btn-change"
+                                        class="layui-btn layui-btn-primary layui-border-orange btn-change"
                                         data-type="mobile">
                                         {:__('Change')}
                                     </a>
@@ -244,10 +252,10 @@
                         <div class="layui-input-group normal-footer">
                             <label class="layui-input-prefix col-xs-12 col-sm-2"></label>
                             <div class="col-xs-12 col-sm-8">
-                                <button type="submit" class="layui-btn layui-btn-primary layui-border-green disabled">
+                                <button type="submit" class="layui-btn layui-btn-primary layui-border-orange disabled">
                                     {:__('Ok')}
                                 </button>
-                                <button type="reset" class="layui-btn">{:__('Reset')}</button>
+                                <button type="reset" class="layui-btn layui-btn-default">{:__('Reset')}</button>
                             </div>
                         </div>
                     </form>
@@ -258,7 +266,7 @@
 </div>
 
 <script type="text/html" id="emailtpl">
-    <form id="email-form" class="form-horizontal form-layer" method="POST" action="{:url('api/user/changeemail')}">
+    <form id="email-form" class="form-horizontal form-layer " method="POST" action="{:url('api/user/changeemail')}">
         <div class="form-body">
             <input type="hidden" name="action" value="changeemail" />
             <div class="form-group">
@@ -393,28 +401,32 @@
 </style>
 
 <script>
-    layui.use(["badou", "upload"], function () {
+    layui.use(["badou", "upload",'laytpl'], function () {
         var bdForm = layui.bdForm;
         var $ = layui.$;
         var badou = layui.badou;
         var toast = layui.toast;
         var form = layui.form;
         var upload = layui.upload;
+        var laytpl = layui.laytpl;
 
-        $(document).on("click", ".btn-change", function (e, ins) {
-            var type = $(this).data("type");
-            console.log(type);
-            switch (type) {
-                case "email":
-                    badou.api.open({
-                        title: "修改邮箱",
-                        area: ["600px", "400px"],
-                        content: $("#emailtpl").html(),
-                        callback: function (layero, index) {
-                            bdForm.api.form(layero, index);
-                        },
+        $(document).on("click", ".btn-change", function () {
+            var that = this;
+            var id = $(this).data("type") + "tpl";
+            var content = laytpl(id, {});
+            layer.open({
+                type: 1,
+                title: "修改",
+                area: [$(window).width() < 450 ? ($(window).width() - 10) + "px" : "450px", "355px"],
+                content: content,
+                success: function (layero) {
+                    var form = $("form", layero);
+                    bdForm.api.bindevent(form, function (data) {
+                        location.reload();
+                        layer.closeAll();
                     });
-            }
+                }
+            });
         });
 
         upload.render({
@@ -429,6 +441,8 @@
                 }
             },
         });
+
+
         bdForm.api.bindevent($("form.layui-form"));
     });
 </script>
