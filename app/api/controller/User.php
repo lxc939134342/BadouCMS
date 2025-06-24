@@ -1,4 +1,5 @@
 <?php
+
 /*
 ** +----------------------------------------------------------------------
 ** | Wusn
@@ -20,17 +21,17 @@ use think\facade\Validate;
 use app\common\library\Ems;
 use app\common\library\Sms;
 
-class User  extends Api
+class User extends Api
 {
     protected $noNeedLogin = ['login', 'mobilelogin', 'register', 'resetpwd', 'changeemail', 'changemobile', 'third'];
     protected $noNeedRight = '*';
 
-    public function _initialize()
+    public function initialize()
     {
-        parent::_initialize();
-        if (!Config::get('user')) {
-            $this->error(__('User center already closed'));
-        }
+        parent::initialize();
+        // if (!Config::get('user')) {
+        //     $this->error(__('User center already closed'));
+        // }
     }
 
     /**
@@ -191,13 +192,6 @@ class User  extends Api
         $this->success();
     }
 
-    /**
-     * 修改邮箱
-     *
-     * @ApiMethod (POST)
-     * @ApiParams (name="email", type="string", required=true, description="邮箱")
-     * @ApiParams (name="captcha", type="string", required=true, description="验证码")
-     */
     public function changeemail()
     {
         $user = $this->auth->getUser();

@@ -1,265 +1,114 @@
-{extend name="user/common/base" /}
-
-{block name="main"}
-<style>
-  body {
-    background-color: #f8f8f8;
-  }
-  .user-dashboard-container {
-    padding-top: 30px;
-    padding-bottom: 30px;
-  }
-  .card {
-    border: none;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,.05);
-  }
-  .card-header {
-    background-color: #fff;
-    border-bottom: 1px solid #eee;
-    font-weight: 600;
-    padding: 1rem 1.5rem;
-  }
-  .card-header h6 {
-    font-size: 1rem;
-  }
-  .card-body {
-    padding: 1.5rem;
-  }
-
-  .sidebar-card .card-body {
-    padding-top: 2rem;
-    padding-bottom: 1rem;
-  }
-  .sidebar-card h5 {
-    font-size: 1.1rem;
-  }
-  .sidebar-card .list-group-item {
-    border-left: 0;
-    border-right: 0;
-    padding: 0;
-  }
-  .sidebar-card .nav-link {
-    padding: 12px 20px;
-    color: #333;
-    font-size: 14px;
-    transition: all 0.2s ease-in-out;
-  }
-  .sidebar-card .nav-link:hover {
-    background-color: #f5f5f5;
-    color: #ff6c02;
-  }
-  .sidebar-card .nav-link.active {
-    background-color: #f0f0f0;
-    color: #ff6c02;
-    border-left: 3px solid #ff6c02;
-    font-weight: 600;
-  }
-  .sidebar-card .layui-icon {
-    font-size: 17px;
-    vertical-align: middle;
-    margin-right: 8px;
-  }
-  .sidebar-card .badge {
-    font-size: 12px;
-    padding: 5px 10px;
-    background-color: #f0f0f0 !important;
-    color: #555 !important;
-  }
-
-  .account-info-detail p {
-    margin-bottom: 0.5rem;
-    font-size: 13px;
-  }
-  .account-info-detail .fw-bold {
-    font-size: 15px;
-    color: #333;
-  }
-  .account-info-detail .text-orange {
-    color: #ff6c02 !important;
-  }
-  .account-info-detail .text-muted {
-    color: #888 !important;
-  }
-
-  @media (min-width: 992px) {
-    .col-lg-custom-sidebar {
-      flex: 0 0 auto;
-      width: 20%;
-    }
-    .col-lg-custom-main-content {
-      flex: 0 0 auto;
-      width: 80%;
-    }
-  }
-
-  .profile-avatar-container {
-    position:relative;
-    width:100px;
-  }
-  .profile-avatar-container .profile-user-img{
-    width:100px;
-    height:100px;
-  }
-  .profile-avatar-container .profile-avatar-text {
-    display:none;
-  }
-  .profile-avatar-container:hover .profile-avatar-text {
-    display:block;
-    position:absolute;
-    height:100px;
-    width:100px;
-    background:#444;
-    opacity: .6;
-    color: #fff;
-    top:0;
-    left:0;
-    line-height: 100px;
-    text-align: center;
-  }
-  .profile-avatar-container button{
-    position:absolute;
-    top:0;left:0;width:100px;height:100px;opacity: 0 !important;
-  }
-  .layui-input-group>.layui-input-prefix{
-    width: 120px;
-  }
-
-  .layui-btn-default{
-    background-color: #ff6c02;
-  }
-  .layui-border-green{
-    border-color: #ff6c02 !important;
-    color: #ff6c02 !important;
-  }
-</style>
-
+{extend name="user/common/base" /} {block name="main"}
 <div class="container user-dashboard-container">
-  <div class="row">
-    {include file="user/common/left" /}
+    <div class="row">
+        {include file="user/common/left" /}
 
-    <div class="col-12 col-lg-custom-main-content">
+        <div class="col-12 col-lg-custom-main-content">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">{:__('Change password')}</h6>
+                </div>
+                <div class="card-body">
+                    <div class="col-lg-8 col-xl-6">
+                        <form id="profile-form" class="layui-form" method="POST" action="">
+                            {:token_field()}
 
+                            <div class="layui-form-item">
+                                <div class="layui-form-label">{:__('Old password')}:</div>
+                                <div class="layui-input-block">
+                                    <input
+                                        type="password"
+                                        class="layui-input"
+                                        id="oldpassword"
+                                        name="oldpassword"
+                                        value=""
+                                        lay-verify="required"
+                                        placeholder="{:__('Old password')}" />
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-form-label">{:__('New password')}:</div>
+                                <div class="layui-input-block">
+                                    <input
+                                        type="password"
+                                        class="layui-input"
+                                        id="newpassword"
+                                        name="newpassword"
+                                        value=""
+                                        lay-verify="required"
+                                        placeholder="{:__('New password')}" />
+                                </div>
+                            </div>
+                            <div class="layui-form-item">
+                                <div class="layui-form-label">{:__('Renew password')}:</div>
+                                <div class="layui-input-block">
+                                    <input
+                                        type="password"
+                                        class="layui-input"
+                                        id="renewpassword"
+                                        name="renewpassword"
+                                        value=""
+                                        lay-verify="required"
+                                        placeholder="{:__('Renew password')}" />
+                                </div>
+                            </div>
 
-      <div class="card shadow-sm mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-          <h6 class="mb-0">{:__('Profile')}</h6>
+                            <div class="layui-form-item normal-footer">
+                                <div class="layui-input-block">
+                                    <button type="submit" lay-submit class="layui-btn layui-btn-default disabled">
+                                        {:__('Ok')}
+                                    </button>
+                                    <button type="reset" class="layui-btn layui-btn-primary layui-border-orange">
+                                        {:__('Reset')}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="card-body">
-
-          <form id="profile-form" class="form-horizontal" role="form" data-toggle="validator" method="POST" action="">
-            {:token_field()}
-
-            <div class="layui-form-item">
-              <div class="layui-input-group">
-                <div class="layui-input-prefix">
-                  {:__('Old password')}:
-                </div>
-                <input type="password" class="layui-input" id="oldpassword" name="oldpassword" value="" data-rule="required;password" placeholder="{:__('Old password')}">
-              </div>
-            </div>
-            <div class="layui-form-item">
-              <div class="layui-input-group">
-                <div class="layui-input-prefix">
-                  {:__('New password')}:
-                </div>
-                <input type="password" class="layui-input" id="newpassword" name="newpassword" value="" data-rule="required;password" placeholder="{:__('New password')}">
-              </div>
-            </div>
-            <div class="layui-form-item">
-              <div class="layui-input-group">
-                <div class="layui-input-prefix">
-                  {:__('Renew password')}:
-                </div>
-                <input type="password" class="layui-input" id="renewpassword" name="renewpassword" value="" data-rule="required;password" placeholder="{:__('Renew password')}">
-              </div>
-            </div>
-
-
-
-
-            <div class="layui-input-group normal-footer">
-              <label class="layui-input-prefix col-xs-12 col-sm-2"></label>
-              <div class="col-xs-12 col-sm-8">
-                <button type="submit" class="layui-btn layui-btn-primary layui-border-green disabled"  lay-submit lay-filter="changepwd">{:__('Ok')}</button>
-                <button type="reset" class="layui-btn layui-btn-default">{:__('Reset')}</button>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
-
     </div>
-  </div>
 </div>
 
-<style>
-  .form-layer {height:100%;min-height:150px;min-width:300px;}
-  .form-body {
-    width:100%;
-    overflow:auto;
-    top:0;
-    position:absolute;
-    z-index:10;
-    bottom:50px;
-    padding:15px;
-  }
-  .form-layer .form-footer {
-    height:50px;
-    line-height:50px;
-    background-color: #ecf0f1;
-    width:100%;
-    position:absolute;
-    z-index:200;
-    bottom:0;
-    margin:0;
-  }
-  .form-footer .form-group{
-    margin-left:0;
-    margin-right:0;
-  }
-</style>
-
 <script>
-  layui.use(["badou"], function () {
-    var bdForm = layui.bdForm;
-    var $ = layui.$;
-    var badou = layui.badou;
-    var toast = layui.toast;
-    var form = layui.form;
+    layui.use(["badou"], function () {
+        var bdForm = layui.bdForm;
+        var $ = layui.$;
+        var badou = layui.badou;
+        var toast = layui.toast;
+        var form = layui.form;
 
-
-
-    form.on("submit(changepwd)", function (data) {
-      badou.api.ajax(
-              {
-                url: location.href,
-                data: data.field,
-              },
-              function (ret, res) {
-                if (res.code == 1) {
-                  toast.success({
-                    message: res.msg,
-                    timeout: 500,
-                    onClosing: function () {
-                      window.location.href = res.url;
-                    },
-                  });
-                } else {
+        form.on("submit(changepwd)", function (data) {
+            badou.api.ajax(
+                {
+                    url: location.href,
+                    data: data.field,
+                },
+                function (ret, res) {
+                    if (res.code == 1) {
+                        toast.success({
+                            message: res.msg,
+                            timeout: 500,
+                            onClosing: function () {
+                                window.location.href = res.url;
+                            },
+                        });
+                    } else {
+                    }
+                    return false;
+                },
+                function (data) {
+                    if (data.token) {
+                        $("#token").val(data.token);
+                    }
                 }
-                return false;
-              },
-              function (data) {
-                if (data.token) {
-                  $("#token").val(data.token);
-                }
-              }
-      );
+            );
 
-      return false;
+            return false;
+        });
+
+        bdForm.api.bindevent($("form.layui-form"));
     });
-
-    bdForm.api.bindevent($("form.layui-form"));
-  })
 </script>
 {/block}
