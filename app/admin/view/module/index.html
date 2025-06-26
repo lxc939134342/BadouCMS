@@ -3,6 +3,9 @@
     .layui-btn.active{
        background-color: #2a50c1 !important;
     }
+    .layui-table-cell .layui-btn .fa{
+        font-size: 13px !important;
+    }
 </style>
 <!-- 表格 -->
 <div class="layui-card">
@@ -33,6 +36,11 @@
                 <i class="fa fa-user"></i>
                 {:__('BADOU Userinfo')}
             </button>
+
+            {foreach :hook('module_top_btn',[],true) as $hook}
+                {$hook|raw}
+            {/foreach}
+
         </div>
 
         <table class="layui-hide" id="module"></table>
@@ -43,11 +51,11 @@
     {{ var label = labelarr[d.id % 5] }}
     {{ var module = d.module }}
 
-    <span class="operate" data-id="{{=d.id}}" data-name="{{=d.name}}">
+    <span class="operate" data-id="{{=d.id}}" data-name="{{=d.name}}" data-title="{{=d.title}}">
         {{ if(!module){ }}
             {{ if(typeof d.releaselist !="undefined" && d.releaselist.length>1){ }}
             <button
-                class="layui-btn layui-btn-xs layui-bg-green btn-dropdown"
+                class="layui-btn layui-btn-sm layui-bg-green btn-dropdown"
                 data-operate="install"
                 lay-options="{
                     customName: {
@@ -56,13 +64,14 @@
                     },
                     data: {{= JSON.stringify(d.releaselist) }}
                 }">
+                 <i class="fa fa-cloud-download"></i>
                 {:__('Install')}
-                <i class="layui-icon layui-icon-down layui-font-12"></i>
+                <i class="fa fa-caret-down layui-font-12"></i>
             </button>
             {{ }else if(typeof d.releaselist !="undefined" && d.releaselist.length>0){}}
             <a
                 href="javascript:;"
-                class="layui-btn layui-btn-xs layui-bg-green btn-install"
+                class="layui-btn layui-btn-sm layui-bg-green btn-install"
                 data-type="{{= d.price<=0?'free':'price' }}"
                 data-version="{{=d.version}}">
                 <i class="fa fa-cloud-download"></i>
@@ -70,19 +79,19 @@
             </a>
             {{ } }}
             {{ if(d.demourl){ }}
-            <a href="{{=d.demourl}}" class="layui-btn layui-btn-xs btn-primary btn-info btn-demo" target="_blank">
+            <a href="{{=d.demourl}}" class="layui-btn layui-btn-sm btn-demo" target="_blank">
                 <i class="fa fa-flash"></i>
                 {:__('Demo')}
             </a>
             {{ } }}
             {{ if(d.button){ }}
-            <a href="{{=d.url}}" class="layui-btn layui-btn-xs layui-bg-green btn-info" target="_blank">{{=d.button}}</a>
+            <a href="{{=d.url}}" class="layui-btn layui-btn-sm" target="_blank"><i class="fa fa-info-circle"></i> {{=d.button}}</a>
             {{ } }}
         {{ } else {}}
             {{ if(module.version!=d.version){}}
                 {{ if(typeof d.releaselist !="undefined" && d.releaselist.length>1){ }}
                 <button
-                    class="layui-btn layui-btn-xs btn-dropdown"
+                    class="layui-btn layui-bg-orange layui-btn-sm btn-dropdown"
                     lay-options="{
                         customName: {
                             id: 'id',
@@ -90,13 +99,14 @@
                         },
                         data: {{= JSON.stringify(d.releaselist) }}
                     }">
+                    <i class="fa fa-cloud"></i>
                      {:__('Upgrade')}
-                    <i class="layui-icon layui-icon-down layui-font-12"></i>
+                    <i class="fa fa-caret-down layui-font-13"></i>
                 </button>
                 {{ }else{ }}
                 <a
                     href="javascript:;"
-                    class="layui-btn layui-btn-xs btn-upgrade"
+                    class="layui-btn layui-btn-sm btn-upgrade"
                     title="{:__('Upgrade')}"
                     data-version="{{=d.version}}">
                     <i class="fa fa-cloud"></i>
@@ -105,14 +115,14 @@
                 {{ } }}
             {{ } }}
             {{ if(module.config){ }}
-                <a href="javascript:;" class="layui-btn layui-btn-xs btn-config" title="{:__('Setting')}">
+                <a href="javascript:;" class="layui-btn layui-btn-sm btn-config" title="{:__('Setting')}">
                     <i class="fa fa-pencil"></i>
                     {:__('Setting')}
                 </a>
             {{ } }}
             {{ if(d.state!=-1){ }}
-            <a href="javascript:;" class="layui-btn layui-bg-red layui-btn-xs btn-uninstall" title="{:__('Uninstall')}">
-                <i class="fa fa-times"></i>
+            <a href="javascript:;" class="layui-btn layui-bg-red layui-btn-sm btn-uninstall" title="{:__('Uninstall')}" data-state="{{=d.state}}">
+                <i class="fa fa-trash"></i>
                 {:__('Uninstall')}
             </a>
             {{ } }}
@@ -122,23 +132,20 @@
 
 <script id="uninstalltpl" type="text/html">
     <div class="">
-        <div class="">
-            {{-__("Are you sure you want to unstall %s?", d.title)}}
-            <p class="text-danger">{:__('Delete all the module file and cannot be recovered!')}</p>
-            {if env('app_debug')}
-            <p class="text-danger">
-                <input type="checkbox" name="droptables" id="droptables" data-name="{{=d.name}}" />
-                {:__('Delete all the module database and cannot be recovered!')}
-            </p>
-            {/if}
-            <p class="text-danger">{:__('Please backup important data manually before uninstall!')}</p>
-        </div>
+        <p class="mb-1">{{-__("Are you sure you want to unstall %s?", d.title)}}</p>
+        <p class="layui-font-blue mb-1">{:__('Delete all the module file and cannot be recovered!')}</p>
+        {if env('app_debug')}
+        <p class="layui-font-blue mb-1">
+            <input type="checkbox" name="droptables" id="droptables" data-name="{{=d.name}}" />
+            {:__('Whether to delete all module data, can not be recovered!')}
+        </p>
+        {/if}
+        <p class="layui-font-red">{:__('Please backup important data manually before uninstall!')}</p>
     </div>
 </script>
 
 <script id="conflicttpl" type="text/html">
     <div class="alert alert-dismissable alert-danger">
-        <button type="button" class="close" data-dismiss="alert">×</button>
         <strong>{:__('Warning')}</strong>
         {:__('Conflict tips')}
     </div>
@@ -170,7 +177,7 @@
 </script>
 
 <script type="text/javascript">
-    layui.use(["badou", "tabs", "form", "laytpl"], function () {
+    layui.use(["badou", "tabs", "form", "laytpl","toast"], function () {
         var bdTable = layui.bdTable;
         var card = layui.cardList;
         var form = layui.form;
@@ -179,6 +186,7 @@
         var layer = layui.layer;
         var dropdown = layui.dropdown;
         var table = layui.table;
+        var toast = layui.toast;
 
         var Controller = {
             api: {
@@ -267,14 +275,14 @@
                         field: "downloads",
                         title: __("Downloads"),
                         operate: "LIKE",
-                        width: 150,
+                        width: 100,
                         align: "center",
                     },
                     {
                         field: "version",
                         title: __("Version"),
                         operate: "LIKE",
-                        width: 80,
+                        width: 100,
                         align: "center",
                         templet: function (data) {
                             return data.module ? data.module.version : data.version;
@@ -442,6 +450,7 @@
                     success(data, ret);
                 }
                 bdTable.api.events.toolbar.refresh()
+                return false;
             }, function (data, ret) {
                 if (ret && ret.code === -3) {
                     //模块目录发现影响全局的文件
@@ -475,7 +484,6 @@
                 $(".btn-userinfo").trigger("click", name, version);
                 return false;
             }
-
             badou.api.ajax({
                 url: 'module/install',
                 data: {
@@ -555,7 +563,6 @@
                                 });
                                 return false;
                             }, function () {
-                                console.log(__('Canceled'));
                                 return false;
                             });
                         }
@@ -589,7 +596,12 @@
                 data: {name: name, force: force ? 1 : 0, droptables: droptables ? 1 : 0}
             }, function (data, ret) {
                 layer.closeAll();
-                iframeRefresh();
+                toast.success({
+                    message:ret.msg,
+                    onClosing:function(){
+                        location.reload();
+                    }
+                })
                 return false;
             }, function (data, ret) {
                 if (ret && ret.code === -3) {
@@ -652,13 +664,47 @@
         $(document).on("click", ".btn-uninstall", function () {
             var that = this;
             var name = $(that).parents(".operate").data("name");
-            uninstall(name);
+            var title = $(that).parents(".operate").data("title");
+            var state= $(this).data("state");
+            if (state == 1) {
+                layer.alert(__('Please disable the add before trying to uninstall'), {icon: 7});
+                return false;
+            }
+            laytpl.extendVars({
+                __:__
+            });
+            var uninstalltpl = document.getElementById('uninstalltpl').innerHTML;
+            layer.confirm(laytpl(uninstalltpl).render({title:title,name:name}), {focusBtn: false, title: __("Warning")}, function (index, layero) {
+                uninstall(name, false, $("input[name='droptables']", layero).prop("checked"));
+            });
+
         });
 
         $(document).on("click", ".btn-config", function () {
             var that = this;
             var name = $(that).parents(".operate").data("name");
             config(name);
+        });
+
+        $(document).on("click", "#droptables", function () {
+            var name=$(this).data('name')
+            if ($(this).prop("checked")) {
+                badou.api.ajax({
+                    url: "module/getTableList",
+                    async: false,
+                    data: {name:name}
+                }, function (data) {
+                    tables = data.tables;
+                    return false;
+                });
+                var html;
+                html = tables.length > 0 ? '<div class="alert alert-warning droptablestips" style="max-width:480px;max-height:300px;overflow-y: auto;">' + __('The following data tables will be deleted') + '：<br>' + tables.join("<br>") + '</div>'
+                    : '<div class="alert alert-warning droptablestips">' + __('The Addon did not create a data table') + '</div>';
+                $(html).insertAfter($(this).closest("p"));
+            } else {
+                $(".droptablestips").remove();
+            }
+            $(window).resize();
         });
     });
 </script>

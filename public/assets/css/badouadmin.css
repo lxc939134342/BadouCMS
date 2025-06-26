@@ -105,23 +105,23 @@
 }
 .layui-btn.layui-btn-lg {
     height: 44px;
-    line-height: 44px;
+    line-height: 42px;
     padding: 0 25px;
     font-size: 16px;
 }
 
 .layui-btn.layui-btn-sm {
     height: 26px;
-    line-height: 26px;
-    padding: 0 6px;
-    font-size: 12px;
+    line-height: 24px;
+    padding: 0 7px;
+    font-size: 12px !important;
 }
 
 .layui-btn.layui-btn-xs {
     height: 22px;
-    line-height: 22px;
-    padding: 0 5px;
-    font-size: 12px;
+    line-height: 20px;
+    padding: 0 6px;
+    font-size: 12px !important;
 }
 
 .layui-btn:active,
@@ -294,6 +294,11 @@
     border-color: var(--blue-color) !important;
     color: var(--blue-color) !important;
 }
+.layui-border-primary {
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color) !important;
+}
+
 .layui-border-green {
     border-color: var(--success-color) !important;
     color: var(--success-color) !important;

@@ -29,7 +29,10 @@
                 <!-- 多 系 统 菜 单 -->
                 <div id="control" class="layui-layout-control"></div>
                 <!-- 顶 部 右 侧 菜 单 -->
-                <ul class="layui-nav layui-layout-right">
+                <ul class="layui-nav layui-layout-right" lay-bar="disabled">
+                    {foreach :hook('admin_top_begin',[],true) as $hook}
+                    {$hook|raw}
+                    {/foreach}
                     <li class="layui-nav-item layui-hide-xs">
                         <a href="/" target="_blank" class="layui-icon layui-icon-home"></a>
                     </li>
@@ -65,13 +68,14 @@
                             </dd>
                         </dl>
                     </li>
-                    <li class="layui-nav-item user">
+                    <li class="layui-nav-item admin-info">
                         <!-- 头 像 -->
                         <a class="layui-icon layui-icon-username" href="javascript:;"> <span>{$auth->nickname}</span></a>
                         <!-- 功 能 菜 单 -->
                         <dl class="layui-nav-child">
                             <dd>
                                 <a
+                                    href="javascript:;"
                                     user-menu-url="general.profile"
                                     user-menu-id="2"
                                     user-menu-title="个人资料">
@@ -87,6 +91,9 @@
                     <li class="layui-nav-item layui-hide-xs">
                         <a href="#" class="fullScreen layui-icon layui-icon-screen-full"></a>
                     </li>
+                    {foreach :hook('admin_top_end',[],true) as $hook}
+                    {$hook|raw}
+                    {/foreach}
                     <!-- 主 题 配 置 -->
                     <li class="layui-nav-item setting"><a href="#" class="layui-icon layui-icon-more-vertical"></a></li>
                 </ul>

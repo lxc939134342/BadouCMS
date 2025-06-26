@@ -58,7 +58,9 @@ return [
             ],
         ]
     ],
-    'version' => 'v1.0.0-Alpha',
-    // 'api_url' => 'https://sq.badoucms.com/api/',
-    'api_url' => 'http://ldshouquan.test/api/',
+    //插件启用禁用时是否备份对应的全局文件
+    'backup_global_files'   => true,
+    'version' => 'v1.0.0',
+    'api_url' => 'https://sq.badoucms.com/api/',
+    // 'api_url' => 'http://ldshouquan.test/api/',
 ];

@@ -9,7 +9,7 @@ use think\Exception;
  */
 class ModuleException extends Exception
 {
-    public function __construct($message, $code = 0, $data = '')
+    public function __construct($message, $code = 0, $data = [])
     {
         $this->message  = $message;
         $this->code     = $code;

@@ -456,3 +456,21 @@ if (!function_exists('check_nav_active')) {
         return $requestUrl === str_replace(".", "/", $url) ? $classname : '';
     }
 }
+
+if (!function_exists('hook')) {
+    /**
+     * 处理插件钩子
+     * @param string $hook        钩子名称
+     * @param mixed $params       传入参数
+     * @param  boolean $is_return 是否返回（true:返回值，false:直接输入）
+     * @param  bool   $once       只获取一个有效返回值
+     * @return void
+     */
+    function hook($hook, $params = null, $is_return = false, $once = false)
+    {
+        if ($is_return == true) {
+            return Event::trigger($hook, $params, $once);
+        }
+        Event::trigger($hook, $params, $once);
+    }
+}

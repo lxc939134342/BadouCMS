@@ -30,14 +30,9 @@ class Module extends Backend
             if ($res && $res['code'] == 1) {
                 $list = $res['data'];
             }
+
             foreach ($list as &$item) {
                 $installmodule = $installedModules[$item['name']] ?? [];
-                if ($item['name'] == 'badouadmin') {
-                    $installmodule['state'] = -1;
-                    $installmodule['name'] = 'badouadmin';
-                    $installmodule['version'] = '1.0.0';
-                }
-
                 if ($installmodule) {
                     $item['name'] = $installmodule['name'];
                     $item['state'] = $installmodule['state'];
@@ -134,8 +129,8 @@ class Module extends Backend
             $info = Server::install($name, $force, $extend);
 
         } catch (ModuleException $e) {
-
-            $this->result(__($e->getMessage()), $e->getData(), 0, $e->getCode(), );
+            $getData = is_array($e->getData()) ? $e->getData() : [];
+            $this->result(__($e->getMessage()), $getData, 0, $e->getCode());
         } catch (Exception $e) {
             $this->error(__($e->getMessage()));
         }
@@ -323,7 +318,7 @@ class Module extends Backend
     /**
      * 获取插件相关表
      */
-    public function get_table_list()
+    public function getTableList()
     {
         $name = $this->request->post("name");
         if (!preg_match("/^[a-zA-Z0-9]+$/", $name)) {

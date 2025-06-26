@@ -134,8 +134,9 @@ class Server
                     $body = $response->getBody();
                     $content = $body->getContents();
                 } else {
+                    $json_data = is_array($json['data']) ? $json['data'] : [];
                     //下载返回错误，抛出异常
-                    throw new ModuleException($json['msg'], $json['code'], $json['data']);
+                    throw new ModuleException($json['msg'], $json['code'], $json_data);
                 }
             }
         } catch (TransferException $e) {
@@ -370,7 +371,7 @@ class Server
 
             // 执行安装脚本
             $class = self::getModuleClass($name);
-            if (class_exists($class)) {
+            if (class_exists($class) && method_exists($class, 'install')) {
                 $module = new $class();
                 $module->install();
             }
@@ -420,7 +421,7 @@ class Server
         // 执行卸载脚本
         try {
             $class = self::getModuleClass($name);
-            if (class_exists($class)) {
+            if (class_exists($class) && method_exists($class, 'uninstall')) {
                 $module = new $class();
                 $module->uninstall();
             }
@@ -640,12 +641,8 @@ class Server
     public static function upgrade($name, $extend = [], $tmpFile = false)
     {
         $info = self::getModuleInfo($name);
-        if ($info['state']) {
+        if ($info['state'] == 1) {
             throw new Exception(__('Please disable module first'));
-        }
-        $config = self::getModuleInfo($name);
-        if ($config) {
-            //备份配置
         }
 
         // 远程下载模块(如果为本地文件则使用本地文件)
@@ -825,12 +822,12 @@ class Server
         if (isset($config['domains']) && isset($config['validations']) && isset($config['licensecodes'])) {
             $index = array_search($domain, $config['domains']);
             if ((in_array($domain, $config['domains']) && in_array(md5(md5($domain) . ($config['licensecodes'][$index] ?? '')), $config['validations'])) || $request->isCli()) {
-                $request->bind('authorized', $domain ?: 'cli');
+                $request->param(['authorized' => $domain ?: 'cli']);
                 return true;
             } elseif ($config['domains']) {
                 foreach ($config['domains'] as $index => $item) {
                     if (substr_compare($domain, "." . $item, -strlen("." . $item)) === 0 && in_array(md5(md5($item) . ($config['licensecodes'][$index] ?? '')), $config['validations'])) {
-                        $request->bind('authorized', $domain);
+                        $request->param(['authorized' => $domain ?: 'cli']);
                         return true;
                     }
                 }
@@ -910,7 +907,7 @@ class Server
     }
 
     /**
-     * 获取bootstrap.js路径
+     * 获取模块的bootstrap.stub
      * @return string
      */
     public static function getBootstrapFile($name)
@@ -988,7 +985,7 @@ class Server
             'app',
             'public',
             'template',
-            'publicmodules'
+            'public/modules'
         ];
     }
 

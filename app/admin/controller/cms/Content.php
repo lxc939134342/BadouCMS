@@ -35,6 +35,8 @@ class Content extends Base
     protected $weighField = 'sorting';
 
     protected $quickSearchField = ['id','title'];
+    // 开启关联查询
+    protected $relationSearch = true;
 
     /**
      * 模型ID
@@ -91,6 +93,7 @@ class Content extends Base
             'content.acode','=',get_backend_lang()
         ];
 
+
         /* 查询子栏目数据 */
         $res = $this->model
             ->withJoin('contentsort')
@@ -98,6 +101,8 @@ class Content extends Base
             ->where($where)
             ->order($sort, $order)
             ->paginate($limit);
+
+
         $this->result('', $res->items(), $res->total());
     }
 
