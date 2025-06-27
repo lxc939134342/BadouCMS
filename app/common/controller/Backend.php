@@ -133,7 +133,7 @@ class Backend extends BaseController
         $controllername = strtolower($this->request->controller());
         $actionname     = strtolower($this->request->action());
 
-        $path = str_replace('.', '/', $controllername) . '/' . $actionname;
+        $path = $controllername . '/' . $actionname;
 
         // 检测IP是否允许
         check_ip_allowed();

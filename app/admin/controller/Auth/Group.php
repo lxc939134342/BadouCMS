@@ -56,10 +56,10 @@ class Group extends Backend
             $groups   = $this->auth->getGroups();
             $groupIds = [];
             foreach ($groups as $m => $n) {
-                if (in_array($n['id'], $groupIds) || in_array($n['parentid'], $groupIds)) {
+                if (in_array($n['id'], $groupIds) || in_array($n['pid'], $groupIds)) {
                     continue;
                 }
-                $groupList = array_merge($groupList, Tree::instance()->getTreeList(Tree::instance()->getTreeArray($n['parentid']), 'name'));
+                $groupList = array_merge($groupList, Tree::instance()->getTreeList(Tree::instance()->getTreeArray($n['pid']), 'name'));
                 foreach ($groupList as $index => $item) {
                     $groupIds[] = $item['id'];
                 }
@@ -205,15 +205,9 @@ class Group extends Backend
      */
     public function del()
     {
-        if (false === $this->request->isPost()) {
-            $this->error('未知参数');
-        }
-        $ids = $this->request->param('id/a', null);
-        if (empty($ids)) {
-            $this->error('参数错误！');
-        }
+        $ids = $this->request->param('ids');
         if (!is_array($ids)) {
-            $ids = [0 => $ids];
+            $ids = explode(',', $ids);
         }
         if ($ids) {
             $grouplist = $this->auth->getGroups();
@@ -222,7 +216,6 @@ class Group extends Backend
             }, $grouplist);
             // 移除掉当前管理员所在组别
             $ids = array_diff($ids, $group_ids);
-
             // 循环判断每一个组别是否可删除
             $grouplist = $this->model->where('id', 'in', $ids)->select()->toArray();
             foreach ($grouplist as $k => $v) {
@@ -233,7 +226,7 @@ class Group extends Backend
                     continue;
                 }
                 // 当前组别下有子组别
-                $groupone = $this->model->where(['parentid' => $v['id']])->find();
+                $groupone = $this->model->where(['pid' => $v['id']])->find();
                 if ($groupone) {
                     $ids = array_diff($ids, [$v['id']]);
                     continue;
@@ -257,7 +250,7 @@ class Group extends Backend
      */
     public function roletree()
     {
-        $this->loadlang('auth/group', $this->app->lang->getLangSet());
+        $this->loadlang('auth/rule', $this->app->lang->getLangSet());
 
         $model = new AuthGroupModel();
         $id = $this->request->post("id");

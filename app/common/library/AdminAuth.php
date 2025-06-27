@@ -353,7 +353,7 @@ class AdminAuth extends Auth
             }
         }
         // 取出所有分组
-        $groupList = AdminGroup::where($this->isSuperAdmin() ? '1=1' : ['status' => 'normal'])->select();
+        $groupList = AdminGroup::where($this->isSuperAdmin() ? '1=1' : ['status' => 'normal'])->select()->toArray();
         $objList = [];
         foreach ($groups as $k => $v) {
             if ($v['rules'] === '*') {
@@ -386,6 +386,7 @@ class AdminAuth extends Auth
         $childrenAdminIds = [];
         if (!$this->isSuperAdmin()) {
             $groupIds = $this->getChildrenGroupIds(false);
+
             $childrenAdminIds = AdminGroupAccess::where('group_id', 'in', $groupIds)
                 ->column('uid');
         } else {

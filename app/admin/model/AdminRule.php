@@ -7,12 +7,17 @@ use think\Model;
 
 class AdminRule extends Model
 {
-    const RULE_URL  = 1;
-    const RULE_MAIN = 2; //主菜单
+    public const RULE_URL  = 1;
+    public const RULE_MAIN = 2; //主菜单
     protected $autoWriteTimestamp = true;
 
     public static function onAfterWrite($row)
     {
         Cache::delete('__menu__');
+    }
+
+    public function getTitleAttr($value, $data)
+    {
+        return __($value);
     }
 }

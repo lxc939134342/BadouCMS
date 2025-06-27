@@ -4,6 +4,8 @@ namespace app\admin\controller\Auth;
 
 use app\admin\model\AdminRule;
 use app\common\controller\Backend;
+use app\common\library\Menu;
+use app\common\service\MenuGenerator;
 use badou\Tree;
 use think\facade\Db;
 

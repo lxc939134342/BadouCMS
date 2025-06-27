@@ -119,7 +119,6 @@ class AdminLog extends Model
         $auth     = new AdminAuth();
         $adminId  = $auth->isLogin() ? $auth->id : 0;
         $username = $auth->isLogin() ? $auth->username : request()->param('username', __('Unknown'));
-
         $controller = request()->controller(true);
         $action     = request()->action(true);
         $path       = $controller . '/' . $action;

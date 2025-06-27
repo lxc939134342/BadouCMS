@@ -158,7 +158,7 @@ class Auth
             ->join($this->config['auth_group'] . ' ag', 'aga.group_id = ag.id', 'LEFT')
             ->field('aga.uid,aga.group_id,ag.id,ag.pid,ag.name,ag.rules')
             ->where("aga.uid='{$uid}' and ag.status='normal'")
-            ->select();
+            ->select()->toArray();
         $groups[$uid] = $user_groups ?: [];
         return $groups[$uid];
     }
@@ -190,7 +190,7 @@ class Auth
             'status' => 'normal'
         ];
         if (!in_array('*', $ids)) {
-            $where['id'] = ['in', $ids];
+            $where[] = ['id','in', $ids];
         }
         //读取用户组所有权限规则
         $this->rules = Db::name($this->config['auth_rule'])->where($where)->field('id,pid,condition,icon,name,title,ismenu')->select();

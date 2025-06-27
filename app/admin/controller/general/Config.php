@@ -31,9 +31,7 @@ class Config extends Backend
 
     public function index()
     {
-
         $config      = $this->model->order('weigh desc')->select()->toArray();
-
         $list           = [];
         $newConfigGroup = [];
 

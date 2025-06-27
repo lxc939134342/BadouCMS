@@ -20,10 +20,6 @@ namespace app\admin\controller\Auth;
 
 use app\admin\model\Adminlog as adminlogModel;
 use app\common\controller\Backend;
-use think\exception\ValidateException;
-use badou\Tree;
-use Exception;
-use think\facade\Db;
 
 class Adminlog extends Backend
 {
@@ -36,7 +32,7 @@ class Adminlog extends Backend
         parent::initialize();
         $this->model = new adminlogModel();
 
-        $this->childrenAdminIds = $this->auth->getChildrenAdminIds($this->auth->isSuperAdmin());
+        $this->childrenAdminIds = $this->auth->getChildrenAdminIds(true);
     }
 
     //删除一个月前的操作日志
@@ -62,11 +58,10 @@ class Adminlog extends Backend
             if ($this->request->request('keyField')) {
                 return $this->selectpage();
             }
-            // [$page, $limit, $where, $sort, $order] = $this->buildParames();
-            list($where, $sort, $order, $offset, $limit, $page, $alias, $bind) = $this->buildparams();
-            $isAdministrator                       = $this->auth->isSuperAdmin();
-            $childrenAdminIds                      = $this->childrenAdminIds;
-            $res                                   = $this->model
+            list($where, $sort, $order, $offset, $limit) = $this->buildparams();
+            $isAdministrator                             = $this->auth->isSuperAdmin();
+            $childrenAdminIds                            = $this->childrenAdminIds;
+            $res                                         = $this->model
                 ->where($where)
                 ->where(function ($query) use ($isAdministrator, $childrenAdminIds) {
                     if (!$isAdministrator) {
@@ -75,9 +70,6 @@ class Adminlog extends Backend
                 })
                 ->order($sort, $order)
                 ->paginate($limit);
-
-            // $result = ["code" => 0, 'count' => $res->total(), 'data' => $res->items()];
-            // return json($result);
             $this->result('ok', $res->items(), $res->total());
         }
         return $this->fetch();
