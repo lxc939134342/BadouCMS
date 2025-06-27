@@ -1,9 +1,16 @@
 <?php
 
-namespace modules\nkeditor;
+// +----------------------------------------------------------------------
+// | BADOUCMS [ 八斗网站系统 ]
+// +----------------------------------------------------------------------
+// | Copyright (c) 2024-2030 http://doc.ldcode.com.cn All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
+// +----------------------------------------------------------------------
+// | Author: lande <939134342@qq.com>
+// +----------------------------------------------------------------------
 
-use app\common\library\Menu;
-use think\facade\Log;
+namespace modules\nkeditor;
 
 class Nkeditor
 {

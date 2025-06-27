@@ -3,7 +3,7 @@
 // +----------------------------------------------------------------------
 // | BadouAdmin [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2018 http://badouadmin.com All rights reserved.
+// | Copyright (c) 2018 http://badoucms.com All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------

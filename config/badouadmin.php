@@ -62,5 +62,4 @@ return [
     'backup_global_files'   => true,
     'version' => 'v1.0.0',
     'api_url' => 'https://sq.badoucms.com/api/',
-    // 'api_url' => 'http://ldshouquan.test/api/',
 ];

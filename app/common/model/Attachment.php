@@ -1,5 +1,15 @@
 <?php
 
+// +----------------------------------------------------------------------
+// | BADOUCMS [ 八斗网站系统 ]
+// +----------------------------------------------------------------------
+// | Copyright (c) 2024-2030 http://doc.ldcode.com.cn All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
+// +----------------------------------------------------------------------
+// | Author: lande <939134342@qq.com>
+// +----------------------------------------------------------------------
+
 namespace app\common\model;
 
 use think\Model;
@@ -15,20 +25,6 @@ class Attachment extends Model
         'thumb_style'
     ];
 
-    // protected static function init()
-    // {
-    //     // 如果已经上传该资源，则不再记录
-    //     self::beforeInsert(function ($model) {
-    //         if (self::where('url', '=', $model['url'])->where('storage', $model['storage'])->find()) {
-    //             return false;
-    //         }
-    //     });
-    //     self::beforeWrite(function ($row) {
-    //         if (isset($row['category']) && $row['category'] == 'unclassed') {
-    //             $row['category'] = '';
-    //         }
-    //     });
-    // }
 
     public function setUploadtimeAttr($value)
     {
