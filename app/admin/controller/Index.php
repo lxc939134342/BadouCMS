@@ -62,7 +62,7 @@ class Index extends Backend
                 ]
             ],
             "theme" => [
-                "defaultColor" => "2",
+                "defaultColor" => "1",
                 "defaultMenu" => "dark-theme",
                 "defaultHeader" => "light-theme",
                 "allowCustom" => true,
@@ -72,8 +72,8 @@ class Index extends Backend
             "colors" => [
                 [
                     "id" => "1",
-                    "color" => "#2d8cf0",
-                    "second" => "#ecf5ff"
+                    "color" => "#ff6c02",
+                    "second" => "#fdf6ec"
                 ],
                 [
                     "id" => "2",
@@ -82,8 +82,8 @@ class Index extends Backend
                 ],
                 [
                     "id" => "3",
-                    "color" => "#ff6c02",
-                    "second" => "#fdf6ec"
+                    "color" => "#2d8cf0",
+                    "second" => "#ecf5ff"
                 ],
                 [
                     "id" => "4",

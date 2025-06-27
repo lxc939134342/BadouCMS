@@ -12,6 +12,7 @@
 
 namespace app\admin\model\cms;
 
+use app\common\library\AdminAuth;
 use bd\Tree;
 use think\Model;
 use think\facade\Db;
@@ -104,7 +105,7 @@ class ContentSort extends Model
      */
     public static function addSingle(string $scode, string $title): void
     {
-        $auth = \app\admin\library\Auth::instance()->getInfo();
+        $auth = (new AdminAuth())->getUserInfo();
         // 构建数据
         $data = array(
             'acode' => get_backend_lang(),

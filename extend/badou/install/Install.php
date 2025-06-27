@@ -316,13 +316,6 @@ class Install
         }
         // GD2和freeType-end
 
-        // proc_open
-        $phpProc = function_exists('proc_open') && function_exists('proc_close') && function_exists('proc_get_status');
-        if (!$phpProc) {
-            throw new Exception(__("proc_open is not currently installed and cannot be installed"));
-        }
-        // proc_open-end
-
         // 检测目录是否存在
         $checkDirs = [
             'vendor',

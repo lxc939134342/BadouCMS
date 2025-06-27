@@ -22,7 +22,7 @@ class Models extends Base
     public function add()
     {
         if ($this->request->isPost()) {
-            $data = $this->getPostData();
+            $data = $this->getPostData('row/a');
             // 构建数据
             $default = array(
                 'mcode' => 0,
@@ -51,7 +51,7 @@ class Models extends Base
                 $this->error($e->getMessage());
             }
             if ($result !== false) {
-                $this->success(__('Added successfully'));
+                $this->success(__('Add successful'));
             } else {
                 $this->error(__('No rows were added'));
             }
@@ -60,11 +60,9 @@ class Models extends Base
         return $this->fetch();
     }
 
-    public function del($ids = null): void
+    public function del()
     {
-        if (!$this->request->isDelete() || !$ids) {
-            $this->error(__('Parameter error'));
-        }
+        $ids = $this->request->param('ids');
 
         $where             = [];
         $dataLimitAdminIds = $this->getDataLimitAdminIds();
@@ -91,7 +89,7 @@ class Models extends Base
             $this->error($e->getMessage());
         }
         if ($count) {
-            $this->success(__('Deleted successfully'));
+            $this->success(__('Delete successful'));
         } else {
             $this->error(__('No rows were deleted'));
         }
