@@ -77,7 +77,7 @@ class Slide extends Base
             $post = array_merge($default, $post);
 
             $slideModel = $this->model;
-            if ($this->request->post('gid') == 0) {
+            if ($post['gid'] == 0) {
                 $gid = $slideModel->where('acode', get_backend_lang())->order('gid', 'desc')->value('gid');
                 $post['gid'] = $gid + 1;
             }
