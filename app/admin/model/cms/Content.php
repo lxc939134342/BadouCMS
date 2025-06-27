@@ -43,16 +43,6 @@ class Content extends Model
         return !$value ? '' : htmlspecialchars_decode($value);
     }
 
-    public function setPicsAttr($value, $data): string
-    {
-        return $value ? implode(',', $value) : '';
-    }
-
-    public function getPicsAttr($value): array
-    {
-        return $value ? explode(',', $value) : [];
-    }
-
     public function contentsort()
     {
         return $this->belongsTo(ContentSort::class, 'scode', 'scode');

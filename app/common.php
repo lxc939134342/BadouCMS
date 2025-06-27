@@ -156,7 +156,7 @@ if (!function_exists('check_ip_allowed')) {
     function check_ip_allowed($ip = null)
     {
         $ip = is_null($ip) ? request()->ip() : $ip;
-        $forbiddenipArr = config('site.forbiddenip');
+        $forbiddenipArr = get_sys_config('no_access_ip');
         $forbiddenipArr = !$forbiddenipArr ? [] : $forbiddenipArr;
         $forbiddenipArr = is_array($forbiddenipArr) ? $forbiddenipArr : array_filter(explode("\n", str_replace("\r\n", "\n", $forbiddenipArr)));
         if ($forbiddenipArr && \Symfony\Component\HttpFoundation\IpUtils::checkIp($ip, $forbiddenipArr)) {

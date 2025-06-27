@@ -39,12 +39,7 @@
                 <label class="layui-form-label">缩略图</label>
                 <div class="layui-input-block">
                     <div class="layui-input-group" style="width: 100%">
-                        <input
-                            type="text"
-                            id="c-ico"
-                            name="row[ico]"
-                            class="layui-input"
-                            value="{$row.ico}" />
+                        <input type="text" id="c-ico" name="row[ico]" class="layui-input" value="{$row.ico}" />
                         <div class="layui-input-suffix" style="width: 30%">
                             <button
                                 type="button"
@@ -109,6 +104,35 @@
                         class="layui-input" />
                 </div>
             </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">轮播多图</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-group" style="width: 100%">
+                        <input type="text" id="c-pics" name="row[pics]" class="layui-input" value="{$row.pics}" />
+                        <div class="layui-input-suffix" style="width: 30%">
+                            <button
+                                type="button"
+                                data-input-id="c-pics"
+                                data-preview-id="p-pics"
+                                data-multiple="true"
+                                class="layui-btn btn-bdupload">
+                                <i class="fa fa-upload"></i>
+                                上传
+                            </button>
+                            <button
+                                type="button"
+                                data-input-id="c-pics"
+                                data-multiple="true"
+                                class="layui-btn layui-bg-green btn-bdchoose">
+                                <i class="fa fa-list"></i>
+                                选择
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="layui-upload-list" id="p-pics"></div>
+                </div>
+            </div>
 
             <div class="layui-form-item">
                 <label class="layui-form-label">状态</label>
@@ -124,8 +148,31 @@
                 <div class="layui-card-header">高级内容</div>
                 <div class="layui-card-body">
                     <div class="layui-form-item">
+                        <label class="layui-form-label">
+                            副栏目
+                        </label>
+                        <div class="layui-input-block">
+                            <input
+                                type="hidden"
+                                id="c-subscode"
+                                name="row[subscode]"
+                                value="{$row.subscode}"
+                                class="layui-input" />
+                            <div
+                                class="remoteSelect"
+                                id="remoteSelect-subscode"
+                                data-input-id="c-subscode"
+                                data-primary-key="scode"
+                                data-field="name"
+                                data-source="cms.contentsort/selectpage"
+                                data-is-tree="true"
+                                data-pidname="pcode"
+                                data-multiple="true"
+                                data-params='{"acode":"{$acode}","mcode":"{$mcode}"}'></div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
                         <label class="layui-form-label">标题颜色</label>
-
                         <div class="layui-input-inline">
                             <input
                                 type="text"

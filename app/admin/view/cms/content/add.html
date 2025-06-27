@@ -109,6 +109,36 @@
                         class="layui-input" />
                 </div>
             </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">轮播多图</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-group" style="width: 100%">
+                        <input
+                            type="text"
+                            id="c-pics"
+                            name="row[pics]"
+                            class="layui-input"
+                            value="" />
+                        <div class="layui-input-suffix" style="width: 30%">
+                            <button
+                                type="button"
+                                data-input-id="c-pics"
+                                data-preview-id="p-pics"
+                                data-multiple="true"
+                                class="layui-btn btn-bdupload">
+                                <i class="fa fa-upload"></i>
+                                上传
+                            </button>
+                            <button type="button" data-input-id="c-pics" data-multiple="true" class="layui-btn layui-bg-green btn-bdchoose">
+                                <i class="fa fa-list"></i>
+                                选择
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="layui-upload-list" id="p-pics"></div>
+                </div>
+            </div>
 
             <div class="layui-form-item">
                 <label class="layui-form-label">状态</label>

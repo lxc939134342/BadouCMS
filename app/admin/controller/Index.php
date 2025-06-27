@@ -25,7 +25,7 @@ class Index extends Backend
     {
         $adminConfig = [
             "logo" => [
-                "title" => "BADOUADMIN",
+                "title" => get_sys_config('site_name'),
                 "image" => "/assets/images/logo.png"
             ],
             "menu" => [
@@ -87,7 +87,7 @@ class Index extends Backend
                 ],
             ],
             "other" => [
-                "keepLoad" => "700",
+                "keepLoad" => "500",
                 "autoHead" => false,
                 "footer" => false
             ],

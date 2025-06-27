@@ -102,7 +102,6 @@ class Content extends Base
             ->order($sort, $order)
             ->paginate($limit);
 
-
         $this->result('', $res->items(), $res->total());
     }
 
