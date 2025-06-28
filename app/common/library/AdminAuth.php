@@ -97,7 +97,7 @@ class AdminAuth extends Auth
         Session::delete("admin");
         Cookie::delete("keeplogin");
         $app_name = app('http')->getName();
-        setcookie('fastadmin_userinfo', '', $_SERVER['REQUEST_TIME'] - 3600, rtrim((string)url("/" . $app_name, [], false), '/'));
+        setcookie('badouadmin_userinfo', '', $_SERVER['REQUEST_TIME'] - 3600, rtrim((string)url("/" . $app_name, [], false), '/'));
         return true;
     }
 
@@ -111,9 +111,10 @@ class AdminAuth extends Auth
         if (!$keeplogin) {
             return false;
         }
+
         list($id, $keeptime, $expiretime, $key) = explode('|', $keeplogin);
         if ($id && $keeptime && $expiretime && $key && $expiretime > time()) {
-            $admin = Admin::get($id);
+            $admin = Admin::find($id);
             if (!$admin || !$admin->token) {
                 return false;
             }
@@ -121,15 +122,16 @@ class AdminAuth extends Auth
             if ($key != $this->getKeeploginKey($admin, $keeptime, $expiretime)) {
                 return false;
             }
+
             $ip = request()->ip();
             //IP有变动
-            if ($admin->loginip != $ip) {
+            if ($admin->login_ip != $ip) {
                 return false;
             }
+
             Session::set("admin", $admin->toArray());
             Session::set("admin.safecode", $this->getEncryptSafecode($admin));
-            //刷新自动登录的时效
-            $this->keeplogin($admin, $keeptime);
+
             return true;
         } else {
             return false;
@@ -172,7 +174,7 @@ class AdminAuth extends Auth
     public function getEncryptKeeplogin($params, $keeptime)
     {
         $expiretime = time() + $keeptime;
-        $key = md5(md5($params['id']) . md5($keeptime) . md5($expiretime) . $params['token'] . config('token.key'));
+        $key = md5(md5($params['id']) . md5($keeptime) . md5($expiretime) . $params['token'] . config('badouadmin.token.key'));
         return implode('|', [$this->id, $keeptime, $expiretime, $key]);
     }
 
@@ -185,7 +187,7 @@ class AdminAuth extends Auth
      */
     public function getKeeploginKey($params, $keeptime, $expiretime)
     {
-        $key = md5(md5($params['id']) . md5($keeptime) . md5($expiretime) . $params['token'] . config('token.key'));
+        $key = md5(md5($params['id']) . md5($keeptime) . md5($expiretime) . $params['token'] . config('badouadmin.token.key'));
         return $key;
     }
 
@@ -196,7 +198,7 @@ class AdminAuth extends Auth
      */
     public function getEncryptSafecode($params)
     {
-        return md5(md5($params['username']) . md5(substr($params['password'], 0, 6)) . config('token.key'));
+        return md5(md5($params['username']) . md5(substr($params['password'], 0, 6)) . config('badouadmin.token.key'));
     }
 
     public function check($name, $uid = '', $relation = 'or', $mode = 'url')
@@ -238,28 +240,33 @@ class AdminAuth extends Auth
         if ($this->logined) {
             return true;
         }
+        // 自动登录检测
+        $this->autologin();
+
         $admin = Session::get('admin');
         if (!$admin) {
             return false;
         }
+
         $my = Admin::find($admin['id']);
         if (!$my) {
             return false;
         }
+
         //校验安全码，可用于判断关键信息发生了变更需要重新登录
         if (!isset($admin['safecode']) || $this->getEncryptSafecode($my) !== $admin['safecode']) {
             $this->logout();
             return false;
         }
         //判断是否同一时间同一账号只能在一个地方登录
-        if (Config::get('fastadmin.login_unique')) {
+        if (Config::get('badouadmin.login_unique')) {
             if ($my['token'] != $admin['token']) {
                 $this->logout();
                 return false;
             }
         }
         //判断管理员IP是否变动
-        if (Config::get('fastadmin.loginip_check')) {
+        if (Config::get('badouadmin.loginip_check')) {
             if (!isset($admin['login_ip']) || $admin['login_ip'] != request()->ip()) {
                 $this->logout();
                 return false;

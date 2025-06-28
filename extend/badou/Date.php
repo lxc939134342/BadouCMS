@@ -64,7 +64,7 @@ class Date
      * @return  bool|array|string    associative list of all outputs requested|when only a single output is requested
      * @from https://github.com/kohana/ohanzee-helpers/blob/master/src/Date.php
      */
-    public static function span(int $remote, int $local = null, string $output = 'years,months,weeks,days,hours,minutes,seconds'): bool|array|string
+    public static function span(int $remote, ?int $local = null, string $output = 'years,months,weeks,days,hours,minutes,seconds'): bool|array|string
     {
         // Normalize output
         $output = trim(strtolower($output));

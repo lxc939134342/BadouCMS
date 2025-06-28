@@ -12,10 +12,11 @@
 
 namespace app\admin\controller;
 
+use think\facade\Event;
+use think\facade\Config;
+use think\facade\Session;
 use app\admin\model\AdminLog;
 use app\common\controller\Backend;
-use think\facade\Config;
-use think\facade\Event;
 
 class Index extends Backend
 {
@@ -115,6 +116,7 @@ class Index extends Backend
         if ($this->auth->isLogin()) {
             $this->success(__("You've logged in, do not login again"), $url);
         }
+
         if ($this->isAjax()) {
             $username = $this->request->post('username');
             $password = $this->request->post('password', '', null);
@@ -152,6 +154,7 @@ class Index extends Backend
                 $this->error($msg, $url, ['token' => $this->request->buildToken()]);
             }
         }
+
         return $this->view->fetch();
     }
 

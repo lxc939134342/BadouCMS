@@ -19,7 +19,7 @@
                         <div class="form-center">
                             <div class="form-center-box">
                                 <div class="top-log-title">
-                                    <span>BadouAdmin 1.0</span>
+                                    <span>BadouCMS 2.0</span>
                                 </div>
                                 <div class="top-desc">化繁为简，返璞归真，扩展灵活</div>
                                 <div style="margin-top: 25px">
@@ -76,6 +76,7 @@
                                                     type="checkbox"
                                                     name="keeplogin"
                                                     lay-skin="primary"
+                                                    value="1"
                                                     title="自动登录" />
                                             </div>
                                         </div>
@@ -124,7 +125,7 @@
                     var btn = button.load({
                         elem: ".login",
                     });
-
+                    console.log(data);
                     Badou.api.ajax(
                         {
                             url: location.href,
