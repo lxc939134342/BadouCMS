@@ -233,7 +233,9 @@
                 },
             },
         };
-
+        var userinfo = badou.api.badouStorage.get("userinfo");
+        var uid = userinfo ? userinfo.id : 0;
+        var token = userinfo ? userinfo.token : '';
         bdTable.api.init({
             table: table,
             extend: {
@@ -243,7 +245,7 @@
         });
         bdTable.render({
             elem: "#module",
-            url: "{:url('module/index')}",
+            url: "{:url('module/index')}?bdversion="+Config.bdversion+"&uid="+uid+"&token="+token,
             pk: "id",
             even: true,
             toolbar: false,

@@ -14,3 +14,8 @@ composer.lock
 node_modules
 .user.ini
 /public/install.lock
+moduledev
+/modules
+!/modules/cms
+!/modules/nkeditor
+!/modules/upgrade

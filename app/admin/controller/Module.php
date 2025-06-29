@@ -28,6 +28,14 @@ class Module extends Backend
             $list = [];
             $params = [];
             $type = $this->request->param('type', 'all');
+            $uid = $this->request->get("uid");
+            $token = $this->request->get("token");
+            $bdversion = $this->request->get("bdversion");
+            if ($uid) {
+                $params['uid'] = $uid;
+                $params['token'] = $token;
+                $params['bdversion'] = $bdversion;
+            }
             if (in_array($type, ['template', 'module'])) {
                 $params['type'] = $type;
             }

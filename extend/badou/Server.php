@@ -333,11 +333,12 @@ class Server
 
         $extend['domain'] = request()->host(true);
 
-        try {
-            // 远程下载模块
-            $tmpFile = $tmpFile ?: Server::download($name, $extend);
+        // 远程下载模块
+        $tmpFile = $tmpFile ?: Server::download($name, $extend);
 
-            $moduleDir = self::getModuleDir($name);
+        $moduleDir = self::getModuleDir($name);
+
+        try {
             // 解压模块压缩包到模块目录
             Server::unzip($name, $tmpFile);
 
