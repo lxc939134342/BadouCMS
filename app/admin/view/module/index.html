@@ -284,10 +284,10 @@
                         field: "version",
                         title: __("Version"),
                         operate: "LIKE",
-                        width: 100,
-                        align: "center",
+                        width: 130,
+                        align: "left",
                         templet: function (data) {
-                            return data.module ? data.module.version : data.version;
+                            return data.module && data.module.version != data.version ? data.module.version +' <span class="layui-badge-dot"> </span>' : data.version;
                         },
                     },
                     {
