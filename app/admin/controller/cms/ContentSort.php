@@ -35,6 +35,10 @@ class ContentSort extends Base
     protected $defaultSort = 'sorting';
     protected $defaultOrder = 'ASC';
 
+    /**
+     *
+     * @var \badou\Tree
+     */
     protected object $tree;
     public function initialize(): void
     {
@@ -77,7 +81,7 @@ class ContentSort extends Base
          * 1. 获取表格数据（没有分页，所以简化了以上的数据查询代码）
          * 2. 递归的根据指定字段组装 children 数组，此时直接给前端，表格就可以正常的渲染为树状了，一个方法搞定
          */
-        $list = $this->tree->init($res, 'pcode', null, 'scode')->getTreeArray(0);
+        $list = $this->tree->init($res, 'pcode', null, 'scode')->multipleChild();
 
         $this->result('', $list);
     }
@@ -225,6 +229,17 @@ class ContentSort extends Base
 
     public function selectpage()
     {
-        return parent::selectpage();
+        $custom = (array)$this->request->request("custom/a");
+        $where = [
+            'acode' => $custom['acode'],
+            'mcode' => $custom['mcode']
+        ];
+        $res = $this->model
+            ->where($where)
+            ->order('scode', 'desc')
+            ->select();
+
+        $list = $this->tree->init($res->toArray(), 'pcode', null, 'scode', 'children')->multipleChild();
+        $this->success('ok', '', ['list' => $list, 'total' => $res->count()]);
     }
 }

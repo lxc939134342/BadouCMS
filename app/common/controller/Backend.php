@@ -552,7 +552,6 @@ class Backend extends BaseController
             $datalist = $this->model->where($where)
                 ->page($page, $pagesize)
                 ->select();
-
             foreach ($datalist as $index => $item) {
                 unset($item['password']);
                 if ($this->selectpageFields == '*') {

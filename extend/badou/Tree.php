@@ -19,6 +19,12 @@ class Tree
     public array $arr = [];
 
     /**
+     * 子级数据（树枝）
+     * @var array
+     */
+    protected array $children = [];
+
+    /**
      * 生成树型结构所需修饰符号
      * @var array
      */
@@ -93,6 +99,7 @@ class Tree
     public function getChild($myid)
     {
         $newarr = [];
+
         foreach ($this->arr as $value) {
             if (!isset($value[$this->pk])) {
                 continue;
@@ -275,4 +282,61 @@ class Tree
         }
         return $arr;
     }
+
+
+    /**
+     * 递归的根据指定字段组装 children 数组 （多维数组）
+     * 树状表格必看注释一
+     * @param array  $data 数据源 例如：[['id' => 1, 'pid' => 0, title => '标题1'], ['id' => 2, 'pid' => 1, title => '标题1-1']]
+     * @return array ['id' => 1, 'pid' => 0, 'title' => '标题1', 'children' => ['id' => 2, 'pid' => 1, 'title' => '标题1-1']]
+     */
+    public function multipleChild(): array
+    {
+        $data           = $this->arr;
+
+        $pks            = [];
+        $topLevelData   = []; // 顶级数据
+        $this->children = []; // 置空子级数据
+        foreach ($data as $item) {
+            $pks[] = $item[$this->pk];
+
+            // 以pid组成children
+            $this->children[$item[$this->pidname]][] = $item;
+        }
+        // 上级不存在的就是顶级，只获取它们的 children
+        foreach ($data as $item) {
+            if (!in_array($item[$this->pidname], $pks)) {
+                $topLevelData[] = $item;
+            }
+        }
+
+        if (count($this->children) > 0) {
+            foreach ($topLevelData as $key => $item) {
+                $topLevelData[$key][$this->childname] = $this->getMultipleChildren($this->children[$item[$this->pk]] ?? []);
+            }
+            return $topLevelData;
+        } else {
+            return $data;
+        }
+    }
+
+    /**
+     * 获取 children 数组
+     * 辅助 multipleChild 组装 children
+     * @param array  $data
+     * @return array
+     */
+    protected function getMultipleChildren(array $data): array
+    {
+        if (!$data) {
+            return [];
+        }
+        foreach ($data as $key => $item) {
+            if (array_key_exists($item[$this->pk], $this->children)) {
+                $data[$key][$this->childname] = $this->getMultipleChildren($this->children[$item[$this->pk]]);
+            }
+        }
+        return $data;
+    }
+
 }

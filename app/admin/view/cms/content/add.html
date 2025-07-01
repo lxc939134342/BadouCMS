@@ -152,6 +152,30 @@
                 <div class="layui-card-header">高级内容</div>
                 <div class="layui-card-body">
                     <div class="layui-form-item">
+                        <label class="layui-form-label">
+                            副栏目
+                        </label>
+                        <div class="layui-input-block">
+                            <input
+                                type="hidden"
+                                id="c-subscode"
+                                name="row[subscode]"
+                                value=""
+                                class="layui-input" />
+                            <div
+                                class="remoteSelect"
+                                id="remoteSelect-subscode"
+                                data-input-id="c-subscode"
+                                data-primary-key="scode"
+                                data-field="name"
+                                data-source="cms.contentsort/selectpage"
+                                data-is-tree="true"
+                                data-pidname="pcode"
+                                data-multiple="true"
+                                data-params='{"acode":"{$acode}","mcode":"{$mcode}"}'></div>
+                        </div>
+                    </div>
+                    <div class="layui-form-item">
                         <label class="layui-form-label">标题颜色</label>
 
                         <div class="layui-input-inline">
