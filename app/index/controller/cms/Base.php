@@ -174,7 +174,7 @@ class Base extends Frontend
             'scaction' => url('/search'),
             'sitemap' => url('/sitemap', [], 'xml'),
             'msgaction' => url('/message'),
-            'sitetplpath' => request()->domain().'/template/'. $this->site['theme'],
+            'sitetplpath' => request()->domain().'/template/cms/'. $this->site['theme'],
             'checkcode' => '',
             'islogin' => $this->auth->isLogin(),
             'registerstatus' => true,
