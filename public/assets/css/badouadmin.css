@@ -357,7 +357,10 @@
 
 .layui-upload-list .layui-upload-img {
     width: 100%;
-    height: 80px;
+    box-sizing: border-box;
+    object-fit: contain;
+    height: 100px;
+    margin-bottom: 10px;
 }
 
 .layui-upload-list .layui-upload-item .btn-delete-img {

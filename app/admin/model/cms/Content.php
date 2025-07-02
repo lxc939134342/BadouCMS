@@ -28,21 +28,6 @@ class Content extends Model
 
     protected $dateFormat = 'Y-m-d H:i:s';
 
-
-    public function setContentAttr($value, $data): string
-    {
-        $value = replaceEditorDomain($value, request()->domain());
-        /* 替换富文本中的图片域名 */
-        return $value;
-    }
-
-    public function getContentAttr($value): string
-    {
-        /* 替换富文本中的图片域名 */
-        $value = addEditorDomain($value, request()->domain());
-        return !$value ? '' : htmlspecialchars_decode($value);
-    }
-
     public function contentsort()
     {
         return $this->belongsTo(ContentSort::class, 'scode', 'scode');

@@ -232,8 +232,10 @@ class ContentSort extends Base
         $custom = (array)$this->request->request("custom/a");
         $where = [
             'acode' => $custom['acode'],
-            'mcode' => $custom['mcode']
         ];
+        if (isset($custom['mcode'])) {
+            $where['mcode'] = $custom['mcode'];
+        }
         $res = $this->model
             ->where($where)
             ->order('scode', 'desc')

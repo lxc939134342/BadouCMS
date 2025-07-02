@@ -92,11 +92,36 @@ if (!function_exists('filter')) {
         // 去除字符串两端空格（对防代码注入有一定作用）
         $string = trim($string);
 
-        // 过滤html和php标签
-        $string = strip_tags($string);
+        // 过滤php标签
+        $string = strip_only_php($string);
 
         // 特殊字符转实体
         return htmlspecialchars($string, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML401, 'UTF-8');
+    }
+}
+
+if (!function_exists('strip_only_php')) {
+    /**
+     * 过滤php标签
+     * @param string $string
+     * @return array|string|null
+     */
+    function strip_only_php(string $string): string
+    {
+        /**
+         * 移除所有PHP代码块：
+         * - <?php ... ?> (标准标签)
+         * - <?= ... ?> (短回显标签)
+         * - <? ... ?> (短开放标签，排除 <?xml, <?php, <?=)
+         * /s 修正符让 . 匹配包括换行符在内的所有字符
+         * /i 修正符让匹配不区分大小写 (虽然PHP标签通常是小写，但以防万一)
+         */
+        $string = preg_replace('/<\?(?:php|=)?(?!xml)[^?]*?\?>/si', '', $string);
+
+        // 移除 {$xxxx} 格式的变量插值
+        $string = preg_replace('/\{\$[a-zA-Z_][a-zA-Z0-9_]*\}/', '', $string);
+
+        return $string;
     }
 }
 

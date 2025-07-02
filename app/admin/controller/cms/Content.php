@@ -115,8 +115,9 @@ class Content extends Base
             return $this->view->fetch();
         }
         $data = $this->getPostData('row/a');
-        $data['content'] ?? $data['content'] = '';
-        $data['content'] = $this->request->param('content', '', 'xss_clean');
+
+        $noFilterData = $this->request->post('row/a', '', 'trim');
+        $data['content'] = isset($noFilterData['content']) ? xss_clean($noFilterData['content']) : '';
 
         // 构建数据
         $default = [
@@ -186,7 +187,7 @@ class Content extends Base
             $result = $this->model->save($data);
 
             /* 添加扩展数据 */
-            $extdata = $this->contentExtModel->getExtData($data);
+            $extdata = $this->contentExtModel->getExtData($noFilterData, $this->mcode);
             $extdata['contentid'] = $this->model->id;
 
             $this->contentExtModel->save($extdata);
@@ -236,7 +237,8 @@ class Content extends Base
             $data['ico'] ?? $data['ico'] = $row['ico'];
             $data['scode'] ?? $data['scode'] = $row['scode'];
             $data['title'] ?? $data['title'] = $row['title'];
-            $data['content'] = $this->request->param('content', $row['content'], 'xss_clean');
+            $noFilterData = $this->request->post('row/a', '', 'trim');
+            $data['content'] = isset($noFilterData['content']) ? xss_clean($noFilterData['content']) : '';
             $data['update_user'] = $this->auth->username;
             $result = false;
             $this->model->startTrans();
@@ -267,9 +269,8 @@ class Content extends Base
 
                 $result = $row->save($data);
                 /* 添加扩展数据 */
-                $extdata = $this->contentExtModel->getExtData($data);
+                $extdata = $this->contentExtModel->getExtData($noFilterData, $this->mcode);
                 $extdata['contentid'] = $row['id'];
-
                 if ($extRow) {
                     $extRow->save($extdata);
                 } else {

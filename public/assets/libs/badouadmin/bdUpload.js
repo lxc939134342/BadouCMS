@@ -13,8 +13,8 @@ layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer', 'Sortabl
             elem: '.btn-bdupload',
             accept: 'file',
             previewtpl: `
-                <div class="layui-col-xs3 layui-upload-item"  >
-                    <img src="{{=d.fullurl}}" data-url="{{=d.url}}" class="layui-upload-img" />
+                <div class="layui-col-sm3 layui-col-xs6  layui-upload-item"  >
+                    <img src="{{=d.fullurl}}" data-url="{{=d.url}}" class="layui-upload-img img-thumbnail" />
                     <a href="javascript:;" class="layui-btn layui-btn-xs layui-bg-red btn-delete-img"><i class="fa fa-trash"></i></a>
                 </div>
             `,

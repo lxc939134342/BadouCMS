@@ -27,17 +27,30 @@ class ContentExt extends Model
      * @param mixed $data
      * @return array
      */
-    public function getExtData($data): array
+    public function getExtData($data, $mcode = 0): array
     {
         $extdata = [];
+        $fieldsTypeMap = [];
+        if ($mcode) {
+            $fields = (new Extfield())->getModelFields($mcode);
+            foreach ($fields as $field) {
+                $fieldsTypeMap[$field['name']] = $field['component'];
+            }
+        }
+
         foreach ($data as $key => $value) {
             if (preg_match('/^ext_[\w\-]+$/', $key)) {
-                if (is_array($value)) {
-                    $extdata[$key] = implode(',', $value);
-                } else {
+                if (isset($fieldsTypeMap[$key]) && $fieldsTypeMap[$key] == 'editor') {
+                    $extdata[$key] = xss_clean(str_replace(["\r\n", "\n"], '<br>', $value));
+                } elseif (is_array($value)) {
+                    $extdata[$key] = filter(implode(',', $value));
+                } elseif (is_string($value)) {
                     /* 兼容 windows与linux */
-                    $extdata[$key] = str_replace(["\r\n", "\n"], '<br>', $value);
+                    $extdata[$key] = filter(str_replace(["\r\n", "\n"], '<br>', $value));
+                } else {
+                    $extdata[$key] = filter($value);
                 }
+
             }
         }
         return $extdata;
