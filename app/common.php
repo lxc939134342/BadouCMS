@@ -482,6 +482,22 @@ if (!function_exists('check_nav_active')) {
     }
 }
 
+if (!function_exists('format_bytes')) {
+    /**
+     * 字节转单位
+     * @param mixed $unit
+     * @return int
+     */
+    function format_bytes($data): string
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB'];
+        for ($i = 0; $data >= 1024 && $i < count($units); $i++) {
+            $data /= 1024;
+        }
+        return round($data, 2) .$units[$i];
+    }
+}
+
 if (!function_exists('hook')) {
     /**
      * 处理插件钩子
