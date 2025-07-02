@@ -64,6 +64,19 @@
             </div>
 
             <div class="layui-form-item">
+                <label class="layui-form-label">排序</label>
+                <div class="layui-input-block">
+                    <input
+                        type="text"
+                        name="row[sorting]"
+                        value="{$row.sorting}"
+                        placeholder="请输入排序"
+                        autocomplete="off"
+                        class="layui-input" />
+                </div>
+            </div>
+
+            <div class="layui-form-item">
                 <label class="layui-form-label">状态</label>
                 <div class="layui-input-block">
                     <input type="radio" name="row[status]" value="1" title="显示" {if $row.status==1} checked="checked"

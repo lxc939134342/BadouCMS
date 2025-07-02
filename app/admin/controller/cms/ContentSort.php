@@ -32,9 +32,6 @@ class ContentSort extends Base
     protected $withJoinTable = ['models'];
     protected $pk = 'scode';
     protected $modelValidate = true;
-    protected $defaultSort = 'sorting';
-    protected $defaultOrder = 'ASC';
-
     /**
      *
      * @var \badou\Tree
@@ -69,6 +66,7 @@ class ContentSort extends Base
         $where[] = [
             'acode','=',get_backend_lang()
         ];
+
         $res = $this->model
             ->withJoin($this->withJoinTable, $this->withJoinType)
             ->alias($alias)
