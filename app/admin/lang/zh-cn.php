@@ -4,6 +4,8 @@ return [
     'View'                                                  => '查看',
     'Index'                                                 => '查看',
     'Add'                                                   => '添加',
+    'Batchadd'                                              => '批量添加',
+    'Changelang'                                            => '切换语言',
     'Edit'                                                  => '编辑',
     'Del'                                                   => '删除',
     'Delete'                                                => '删除',

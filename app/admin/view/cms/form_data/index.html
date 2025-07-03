@@ -3,9 +3,9 @@
     <div class="layui-card-body">
         <table
             class="layui-hide"
-            id="formdata"
-            data-operate-edit="{:$auth->check('cms.formdata/edit')}"
-            data-operate-del="{:$auth->check('cms.formdata/del')}"></table>
+            id="form_data"
+            data-operate-edit="{:$auth->check('cms.form_data/edit')}"
+            data-operate-del="{:$auth->check('cms.form_data/del')}"></table>
     </div>
 </div>
 
@@ -28,15 +28,15 @@
         var dropdown = layui.dropdown;
         var badou = layui.badou;
         var laytpl = layui.laytpl;
-        var formdata = layui.formdata;
+        var form_data = layui.form_data;
 
         bdTable.api.init({
             table: table,
             extend: {
-                index_url: "cms.formdata/index?fcode={$fcode}",
-                del_url: "cms.formdata/del",
-                multi_url: "cms.formdata/multi",
-                table: "cms_formdata",
+                index_url: "cms.form_data/index?fcode={$fcode}",
+                del_url: "cms.form_data/del",
+                multi_url: "cms.form_data/multi",
+                table: "cms_form_data",
             },
         });
         var cols=[
@@ -53,7 +53,7 @@
             templet: bdTable.api.formatter.operate
         });
         bdTable.render({
-            elem: "#formdata",
+            elem: "#form_data",
             url: bdTable.extend.index_url,
             pk: "id",
             even: true,

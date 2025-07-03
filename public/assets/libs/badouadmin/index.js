@@ -34,6 +34,30 @@ layui.use(['layer', 'badou', 'toast'], function () {
     var Layer = layui.layer;
     var badou = layui.badou;
     var toast = layui.toast;
+    var table = layui.table
+    function gettablecolumnbutton(options) {
+        if (typeof options.tableId !== 'undefined' && typeof options.field !== 'undefined' && typeof options.buttonIndex !== 'undefined') {
+            var tableOptions = table.getOptions(options.tableId);
+            if (tableOptions) {
+                var columnObj = null;
+                $.each(tableOptions.cols, function (i, columns) {
+                    $.each(columns, function (j, column) {
+                        if (typeof column.field !== 'undefined' && column.field === options.field) {
+                            columnObj = column;
+                            return false;
+                        }
+                    });
+                    if (columnObj) {
+                        return false;
+                    }
+                });
+                if (columnObj) {
+                    return columnObj['buttons'][options.buttonIndex];
+                }
+            }
+        }
+        return null;
+    }
 
     //点击包含.btn-dialog的元素时弹出dialog
     $(document).on('click', '.btn-dialog,.dialogit', function (e) {
@@ -73,6 +97,44 @@ layui.use(['layer', 'badou', 'toast'], function () {
             $(that).data("original-title") ||
             $(that).text();
         top.layui.admin.jump(id, title, url)
+        return false;
+    });
+
+    //点击包含.btn-ajax的元素时发送Ajax请求
+    $(document).on('click', '.btn-ajax,.ajaxit', function (e) {
+        var that = this;
+        var options = $.extend({}, $(that).data() || {});
+        if (typeof options.url === 'undefined' && $(that).attr("href")) {
+            options.url = $(that).attr("href");
+        }
+        var success = typeof options.success === 'function' ? options.success : null;
+        var error = typeof options.error === 'function' ? options.error : null;
+        delete options.success;
+        delete options.error;
+        var button = gettablecolumnbutton(options);
+        if (button) {
+            if (typeof button.success === 'function') {
+                success = button.success;
+            }
+            if (typeof button.error === 'function') {
+                error = button.error;
+            }
+        }
+        //如果未设备成功的回调,设定了自动刷新的情况下自动进行刷新
+        if (!success && typeof options.tableId !== 'undefined' && typeof options.refresh !== 'undefined' && options.refresh) {
+            success = function () {
+                $("#" + options.tableId).bootstrapTable('refresh');
+            }
+        }
+
+        if (typeof options.confirm !== 'undefined') {
+            Layer.confirm(options.confirm, function (index) {
+                badou.api.ajax(options, success, error);
+                Layer.close(index);
+            });
+        } else {
+            badou.api.ajax(options, success, error);
+        }
         return false;
     });
 

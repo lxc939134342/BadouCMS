@@ -26,7 +26,6 @@ class Content extends Model
     public function getContentAttr($value): string
     {
         /* 替换富文本中的图片域名 */
-        $value = addEditorDomain($value, request()->domain());
         return !$value ? '' : html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         ;
     }

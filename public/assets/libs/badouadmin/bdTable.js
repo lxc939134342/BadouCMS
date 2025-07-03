@@ -525,13 +525,13 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
             },
             buttonlink: function (data, buttons, type) {
                 var html = [];
-                var hidden, visible, disable, url, classname, icon, text, title, refresh, confirm, extend,
-                    dropdown, link;
+                var hidden, visible, disable, url, classname, icon, text, title, refresh, confirm, extend, dropdown, link;
                 var dropdowns = {};
                 var table = bdTable.initTable
+                var tableId = table.config.id
+                var field = data.LAY_COL.field;
                 var row = data
                 $.each(buttons, function (i, j) {
-
                     if (type === 'operate') {
                         if (['add', 'edit', 'del', 'multi'].indexOf(j.name) > -1 && !bdTable.extend[j.name + "_url"]) {
                             return true;
@@ -563,7 +563,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         if (disable) {
                             classname = classname + ' disabled';
                         }
-                        link = '<a href="' + url + '" class="' + classname + '" ' + (confirm ? confirm + ' ' : '') + (refresh ? refresh + ' ' : '') + extend + ' title="' + title + '"><i class="' + icon + '"></i>' + (text ? ' ' + text : '') + '</a>';
+                        link = '<a href="' + url + '" class="' + classname + '" ' + (confirm ? confirm + ' ' : '') + (refresh ? refresh + ' ' : '') + extend + ' title="' + title + '" data-table-id="' + (table ? tableId : '') + '" data-field="' + field + '" data-button-index="' + i + '"><i class="' + icon + '"></i>' + (text ? ' ' + text : '') + '</a>';
                         if (dropdown) {
                             if (typeof dropdowns[dropdown] == 'undefined') {
                                 dropdowns[dropdown] = [];
@@ -574,13 +574,6 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         }
                     }
                 });
-                // if (!$.isEmptyObject(dropdowns)) {
-                //     var dropdownHtml = [];
-                //     $.each(dropdowns, function (i, j) {
-                //         dropdownHtml.push('<div class="btn-group"><button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown">' + i + '</button><button type="button" class="btn btn-primary dropdown-toggle btn-xs" data-toggle="dropdown"><span class="caret"></span></button><ul class="dropdown-menu dropdown-menu-right"><li>' + j.join('</li><li>') + '</li></ul></div>');
-                //     });
-                //     html.unshift(dropdownHtml.join(' '));
-                // }
                 return html.join(' ');
             },
             // 获取选中的条目ID集合

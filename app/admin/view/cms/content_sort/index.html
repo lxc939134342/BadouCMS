@@ -14,7 +14,7 @@
         {:__('Add')}
     </button>
     <button
-        class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('cms.contentsort/edit')?'':'hide'}"
+        class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('cms.content_sort/edit')?'':'hide'}"
         lay-event="edit">
         <i class="fa fa-pencil"></i>
         {:__('Edit')}
@@ -23,7 +23,7 @@
         <i class="fa fa-trash"></i>
         {:__('Del')}
     </button>
-    <a href="{:url('cms.contentsort/batchadd')}" class="layui-btn layui-bg-green btn-dialog" data-area='["60%","80%"]'>
+    <a href="{:url('cms.content_sort/batchadd')}" class="layui-btn layui-bg-green btn-dialog" data-area='["60%","80%"]'>
         <i class="fa fa-plus-square"></i>
         {:__('Batchadd')}
     </a>
@@ -37,9 +37,9 @@
     <div class="layui-card-body">
         <table
             class="layui-hide"
-            id="contentsort"
-            data-operate-edit="{:$auth->check('cms.contentsort/edit')}"
-            data-operate-del="{:$auth->check('cms.contentsort/del')}"></table>
+            id="content_sort"
+            data-operate-edit="{:$auth->check('cms.content_sort/edit')}"
+            data-operate-del="{:$auth->check('cms.content_sort/del')}"></table>
     </div>
 </div>
 
@@ -53,16 +53,16 @@
         bdTable.api.init({
             table: treeTable,
             extend: {
-                index_url: "cms.contentsort/index",
-                add_url: "cms.contentsort/add",
-                edit_url: "cms.contentsort/edit",
-                del_url: "cms.contentsort/del",
-                multi_url: "cms.contentsort/multi",
+                index_url: "cms.content_sort/index",
+                add_url: "cms.content_sort/add",
+                edit_url: "cms.content_sort/edit",
+                del_url: "cms.content_sort/del",
+                multi_url: "cms.content_sort/multi",
                 table: "cms_content_sort",
             },
         });
         bdTable.render({
-            elem: "#contentsort",
+            elem: "#content_sort",
             pk: "scode",
             even: true,
             sortName:'sorting asc,id desc',
@@ -128,11 +128,11 @@
             var btn = $(this);
             var isExpanded = btn.hasClass("expanded");
             if (isExpanded) {
-                treeTable.expandAll("contentsort", false);
+                treeTable.expandAll("content_sort", false);
                 btn.removeClass("expanded");
                 btn.html('<i class="fa fa-plus"></i> {:__("Expendall")}');
             } else {
-                treeTable.expandAll("contentsort", true);
+                treeTable.expandAll("content_sort", true);
                 btn.addClass("expanded");
                 btn.html('<i class="fa fa-minus"></i> {:__("Collapseall")}');
             }

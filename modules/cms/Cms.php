@@ -10,7 +10,6 @@ class Cms
     {
         include_once __DIR__ . '/common.php';
         bind('think\Paginator', 'modules\cms\library\Bootstrap');
-        return [];
     }
 
     public function enable()
@@ -27,11 +26,14 @@ class Cms
 
     public function install()
     {
+        $menu = include_once __DIR__ . '/menu.php';
+        Menu::create($menu);
         return true;
     }
 
     public function uninstall()
     {
+        Menu::delete('cms');
         return true;
     }
 

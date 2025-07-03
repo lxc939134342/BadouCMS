@@ -6,8 +6,8 @@
     <div class="layui-card-body">
         <table
             class="layui-hide"
-            id="membercomment"
-            data-operate-del="{:$auth->check('cms.membercomment/del')}"></table>
+            id="member_comment"
+            data-operate-del="{:$auth->check('cms.member_comment/del')}"></table>
     </div>
 </div>
 <!-- 表格左侧按钮 toolbar  -->
@@ -16,7 +16,7 @@
         <i class="fa fa-refresh"></i>
     </a>
     <button
-        class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('cms.membercomment/del')?'':'hide'}"
+        class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('cms.member_comment/del')?'':'hide'}"
         lay-event="del">
         <i class="fa fa-trash"></i>
         {:__('Del')}
@@ -32,15 +32,15 @@
         bdTable.api.init({
             table: table,
             extend: {
-                index_url: "cms.membercomment/index",
-                del_url: "cms.membercomment/del",
-                multi_url: "cms.membercomment/multi",
+                index_url: "cms.member_comment/index",
+                del_url: "cms.member_comment/del",
+                multi_url: "cms.member_comment/multi",
                 table: "cms_member_comment",
             },
         });
         bdTable.render({
-            elem: "#membercomment",
-            url: "{:url('cms.membercomment/index')}",
+            elem: "#member_comment",
+            url: "{:url('cms.member_comment/index')}",
             pk: "id",
             even: true,
             toolbar: "#toolbar",
@@ -65,7 +65,7 @@
                             {
                                 text: __("Info"),
                                 icon: "fa fa-search-plus",
-                                url: "cms.membercomment/info",
+                                url: "cms.member_comment/info",
                                 classname: "layui-btn layui-btn-sm btn-dialog",
                             },
                         ],

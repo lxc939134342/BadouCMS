@@ -23,6 +23,7 @@ class Index extends Base
         $this->site['pagedescription'] = $this->site['sitedescription'];
         $this->site['pagekeywords'] = $this->site['sitekeywords'];
         $this->assignBd();
+
         return $this->view->fetch('/index');
     }
 }

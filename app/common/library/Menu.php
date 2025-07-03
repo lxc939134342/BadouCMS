@@ -130,8 +130,8 @@ class Menu
         $menuList = [];
         $menu = AdminRule::getByName($name);
         if ($menu) {
-            $ruleList = AdminRule::where('id', 'in', $ids)->select()->toArray();
-            $menuList = Tree::instance()->init($ruleList)->getTreeArray($menu['id']);
+            $ruleList = AdminRule::where('id', 'in', $ids)->field('name,id,pid,type,title,icon,ismenu,py,pinyin')->select()->toArray();
+            $menuList = Tree::instance()->init($ruleList, 'pid', null, 'id', 'sublist')->getTreeArray($menu['id']);
         }
         return $menuList;
     }
@@ -150,7 +150,7 @@ class Menu
         } else {
             $pid = $parent;
         }
-        $allow = array_flip(['name', 'title', 'url', 'icon', 'condition', 'remark', 'ismenu', 'menutype', 'extend', 'weigh', 'status']);
+        $allow = array_flip(['name', 'title', 'url', 'icon', 'condition', 'remark', 'ismenu', 'menutype', 'extend', 'weigh', 'status','type']);
         foreach ($newMenu as $k => $v) {
             $hasChild = isset($v['sublist']) && $v['sublist'];
             $data = array_intersect_key($v, $allow);

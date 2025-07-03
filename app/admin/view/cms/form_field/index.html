@@ -3,9 +3,9 @@
     <div class="layui-card-body">
         <table
             class="layui-hide"
-            id="formfield"
-            data-operate-edit="{:$auth->check('cms.formfield/edit')}"
-            data-operate-del="{:$auth->check('cms.formfield/del')}"></table>
+            id="form_field"
+            data-operate-edit="{:$auth->check('cms.form_field/edit')}"
+            data-operate-del="{:$auth->check('cms.form_field/del')}"></table>
     </div>
 </div>
 
@@ -38,22 +38,22 @@
         var dropdown = layui.dropdown;
         var badou = layui.badou;
         var laytpl = layui.laytpl;
-        var formfield = layui.formfield;
+        var form_field = layui.form_field;
 
         bdTable.api.init({
             table: table,
             extend: {
-                index_url: "cms.formfield/index?fcode={$fcode}",
-                add_url: "cms.formfield/add?fcode={$fcode}",
-                edit_url: "cms.formfield/edit",
-                del_url: "cms.formfield/del",
-                multi_url: "cms.formfield/multi",
-                table: "cms_formfield",
+                index_url: "cms.form_field/index?fcode={$fcode}",
+                add_url: "cms.form_field/add?fcode={$fcode}",
+                edit_url: "cms.form_field/edit",
+                del_url: "cms.form_field/del",
+                multi_url: "cms.form_field/multi",
+                table: "cms_form_field",
             },
         });
 
         bdTable.render({
-            elem: "#formfield",
+            elem: "#form_field",
             url: bdTable.extend.index_url,
             pk: "id",
             even: true,
