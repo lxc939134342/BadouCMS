@@ -515,3 +515,56 @@ if (!function_exists('hook')) {
         Event::trigger($hook, $params, $once);
     }
 }
+
+if (!function_exists('convert_path_to_snake_case')) {
+    /**
+     * 将路径中的控制器部分从驼峰命名转换为下划线命名
+     * 例如：cms.ContentSort/index -> cms.content_sort/index
+     * 例如：Abc/index -> abc/index
+     * 例如：Abc -> abc
+     * @param string $path 原始路径字符串
+     * @return string 转换后的路径字符串
+     */
+    function convert_path_to_snake_case(string $path): string
+    {
+        // 分割路径为控制器部分和动作部分
+        $parts = explode('/', $path, 2);
+        $controllerOrModule = $parts[0]; // 可能是 "cms.ContentSort" 或 "Abc"
+        $action = $parts[1] ?? ''; // 动作部分可能不存在
+
+        // 确保引入 ThinkPHP 的 Str 类
+        if (!class_exists(\think\helper\Str::class)) {
+            // 如果 Str 类不存在，则无法进行转换，或者需要手动实现驼峰转下划线逻辑
+            // 对于没有 Str 类的情况，我们只能尝试转换为小写
+            if (str_contains($controllerOrModule, '.')) {
+                // 如果有模块名，但没有 Str 类，则无法正确转换控制器名，返回原路径
+                return $path;
+            } else {
+                // 如果没有模块名，直接转换为小写
+                return strtolower($path);
+            }
+        }
+
+        $newControllerOrModule = '';
+        if (str_contains($controllerOrModule, '.')) {
+            // 包含模块名和控制器名，例如 "cms.ContentSort"
+            $controllerParts = explode('.', $controllerOrModule, 2);
+            $module = $controllerParts[0];
+            $controllerName = $controllerParts[1] ?? '';
+            $snakeCaseControllerName = \think\helper\Str::snake($controllerName);
+            $newControllerOrModule = $module . '.' . $snakeCaseControllerName;
+        } else {
+            // 不包含模块名，直接将整个部分视为控制器名并转换为下划线命名
+            // 例如 "Abc" -> "abc", "Dash" -> "dash"
+            $newControllerOrModule = \think\helper\Str::snake($controllerOrModule);
+        }
+
+        // 重新组合路径
+        $newPath = $newControllerOrModule;
+        if ($action !== '') {
+            $newPath .= '/' . $action;
+        }
+
+        return $newPath;
+    }
+}

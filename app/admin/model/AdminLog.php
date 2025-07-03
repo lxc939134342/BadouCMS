@@ -20,7 +20,7 @@ use think\model\relation\BelongsTo;
 /**
  * AdminLog模型
  */
-class AdminLog extends Model
+class Adminlog extends Model
 {
     protected $autoWriteTimestamp = true;
     protected $updateTime         = false;

@@ -140,7 +140,7 @@ class Backend extends BaseController
     {
         $this->view     = View::instance();
         $modulename     = app('http')->getName();
-        $controllername = strtolower($this->request->controller());
+        $controllername = convert_path_to_snake_case($this->request->controller());
         $actionname     = strtolower($this->request->action());
         $this->request->filter('trim,strip_only_php,xss_clean');
 

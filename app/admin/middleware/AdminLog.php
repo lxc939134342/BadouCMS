@@ -5,9 +5,9 @@ namespace app\admin\middleware;
 use Closure;
 use Throwable;
 use think\facade\Config;
-use app\admin\model\AdminLog as AdminLogModel;
+use app\admin\model\Adminlog as AdminlogModel;
 
-class AdminLog
+class Adminlog
 {
     /**
      * 写入管理日志
@@ -17,7 +17,7 @@ class AdminLog
     {
         $response = $next($request);
         if (($request->isPost() || $request->isDelete()) && Config::get('badouadmin.auto_write_admin_log')) {
-            AdminLogModel::instance()->record();
+            AdminlogModel::instance()->record();
         }
         return $response;
     }

@@ -12,7 +12,7 @@
 
 namespace app\admin\controller;
 
-use app\admin\model\AdminLog;
+use app\admin\model\Adminlog;
 use app\common\controller\Backend;
 use think\facade\Config;
 use think\facade\Event;
@@ -139,7 +139,7 @@ class Index extends Backend
                 $this->error($validate->getError(), $url, ['token' => $this->request->buildToken()]);
             }
 
-            AdminLog::instance()->setTitle(__('Login'));
+            Adminlog::instance()->setTitle(__('Login'));
             $admin_keep_time = Config::get('badouadmin.admin_keep_time');
             $result = $this->auth->login($username, $password, $keeplogin ? $admin_keep_time : 0);
 

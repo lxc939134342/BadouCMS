@@ -89,7 +89,7 @@
                                     return "layui-btn layui-btn-sm layui-bg-green btn-dialog";
                                 },
                                 url: function (row,j) {
-                                    var href = "cms.formdata/index?fcode={fcode}";
+                                    var href = "cms.form_data/index?fcode={fcode}";
                                     href=bdTable.api.replaceurl(href,row,this)
                                     if (row.fcode == 1) {
                                         href = "cms.message";
@@ -103,7 +103,7 @@
                                 title: __("Field manage"),
                                 classname: "layui-btn layui-btn-sm layui-bg-orange btn-dialog",
                                 icon: "fa fa-list",
-                                url: "cms.formfield/index?fcode={fcode}",
+                                url: "cms.form_field/index?fcode={fcode}",
                             },
                             {
                                 name: "edit",
