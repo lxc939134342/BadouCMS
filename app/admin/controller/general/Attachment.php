@@ -30,23 +30,24 @@ class Attachment extends Backend
         if ($this->isAjax()) {
             $mimetypeQuery = [];
             $filter = $this->request->request('filter');
-            $filterArr = (array)json_decode($filter, true);
-            if (isset($filterArr['category']) && $filterArr['category'] == 'unclassed') {
-                $filterArr['category'] = ',unclassed';
-                $this->request->get(['filter' => json_encode(array_diff_key($filterArr, ['category' => '']))]);
+            if ($filter) {
+                $filterArr = (array)json_decode($filter, true);
+                if (isset($filterArr['category']) && $filterArr['category'] == 'unclassed') {
+                    $filterArr['category'] = ',unclassed';
+                    $this->request->get(['filter' => json_encode(array_diff_key($filterArr, ['category' => '']))]);
+                }
+                if (isset($filterArr['mimetype']) && preg_match("/(\/|\,|\*)/", $filterArr['mimetype'])) {
+                    $mimetype = $filterArr['mimetype'];
+                    $filterArr = array_diff_key($filterArr, ['mimetype' => '']);
+                    $mimetypeQuery = function ($query) use ($mimetype) {
+                        $mimetypeArr = array_filter(explode(',', $mimetype));
+                        foreach ($mimetypeArr as $index => $item) {
+                            $query->whereOr('mimetype', 'like', '%' . str_replace("/*", "/", $item) . '%');
+                        }
+                    };
+                }
+                $this->request->get(['filter' => json_encode($filterArr)]);
             }
-            if (isset($filterArr['mimetype']) && preg_match("/(\/|\,|\*)/", $filterArr['mimetype'])) {
-                $mimetype = $filterArr['mimetype'];
-                $filterArr = array_diff_key($filterArr, ['mimetype' => '']);
-                $mimetypeQuery = function ($query) use ($mimetype) {
-                    $mimetypeArr = array_filter(explode(',', $mimetype));
-                    foreach ($mimetypeArr as $index => $item) {
-                        $query->whereOr('mimetype', 'like', '%' . str_replace("/*", "/", $item) . '%');
-                    }
-                };
-            }
-            $this->request->get(['filter' => json_encode($filterArr)]);
-
             list($where, $sort, $order, $offset, $limit) = $this->buildparams();
 
             $list = $this->model
