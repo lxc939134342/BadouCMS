@@ -22,6 +22,8 @@ use think\model\relation\BelongsTo;
  */
 class Adminlog extends Model
 {
+    protected $name = 'admin_log';
+
     protected $autoWriteTimestamp = true;
     protected $updateTime         = false;
 
