@@ -23,11 +23,11 @@ http://www.badoucms.com/
 
 ### 演示站点
 
-http://demo.badoucms.com/admin.php
+http://demo.badoucms.com
 
 ### 演示后台
 
-http://demo.badoucms.com/index.html
+http://demo.badoucms.com/admin.php
 
 ### 演示账号
 
