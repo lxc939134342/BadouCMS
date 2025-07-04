@@ -60,6 +60,6 @@ return [
     ],
     //插件启用禁用时是否备份对应的全局文件
     'backup_global_files'   => true,
-    'version' => 'v1.0.2',
+    'version' => 'v2.0.2',
     'api_url' => 'https://sq.badoucms.com/api/',
 ];
