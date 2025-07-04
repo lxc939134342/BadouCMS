@@ -10,7 +10,7 @@
             </ul>
             <div class="layui-tabs-body">
                 <div class="layui-tabs-item">
-                    <form class="layui-form-content" action="{:url('cms.label/content')}" method="post">
+                    <form class="layui-form layui-form-content" action="{:url('cms.label/content')}" method="post">
                         {:token_field()}
 
                         {include file="cms/common/builder/fields" /}
@@ -65,6 +65,12 @@
         var tabs =layui.tabs;
         bdForm.api.bindevent($("form.layui-form-content"));
 
+        tabs.on('afterChange(label-tabs)', function(data) {
+            if(data.index==0){
+                parent.$('.refresh').trigger('click');
+            }
+        });
+
         bdTable.api.init({
             table: table,
             extend: {
@@ -100,6 +106,7 @@
                     { title: __("Operate"), align: "center", templet: bdTable.api.formatter.operate },
                 ],
             ],
+
         });
     });
 </script>

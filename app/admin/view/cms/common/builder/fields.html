@@ -23,6 +23,11 @@
         {/volist}
         {/case}
 
+        {// 开关 }
+        {case value="switch"}
+        <input type="checkbox" id="c-{$field.name}" name="row[{$field.name}]" {in name="1" value="$row[$field.name]??''" } checked {/in} value="1" lay-skin="switch">
+        {/case}
+
         {// 图片上传 }
         {case value="image" break="0"}{/case}
         {case images}

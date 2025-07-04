@@ -25,10 +25,7 @@ class Label extends Base
      * @var  \app\admin\model\cms\Label
      */
     protected $model;
-
-
     protected string|array $quickSearchField = ['id'];
-
     protected $modelValidate = true;
 
     public function initialize(): void

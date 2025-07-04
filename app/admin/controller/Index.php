@@ -13,6 +13,7 @@
 namespace app\admin\controller;
 
 use app\admin\model\Adminlog;
+use app\admin\model\AdminRule;
 use app\common\controller\Backend;
 use think\facade\Config;
 use think\facade\Event;
@@ -33,6 +34,7 @@ class Index extends Backend
 
     public function adminConfig()
     {
+        $dashboard_id = AdminRule::where('name', 'dashboard')->value('id');
         $adminConfig = [
             "logo" => [
                 "title" => get_sys_config('site_name'),
@@ -45,7 +47,7 @@ class Index extends Backend
                 "collapse" => false,
                 "control" => false,
                 "controlWidth" => 500,
-                "select" => "10",
+                "select" => $dashboard_id,
                 "async" => true
             ],
             "tab" => [
@@ -55,8 +57,8 @@ class Index extends Backend
                 "preload" => false,
                 "max" => "30",
                 "index" => [
-                    "id" => "1",
-                    "href" => (string)url('/dashboard/index'),
+                    "id" => $dashboard_id,
+                    "href" => (string)url('/dashboard'),
                     "title" => __('Dashboard'),
                     "hash" => 'dashboard'
                 ]

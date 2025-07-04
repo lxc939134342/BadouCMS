@@ -66,7 +66,7 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                             //是否展示三角图标
                             showFolderIcon: true,
                             //是否显示虚线
-                            showLine: false,
+                            showLine: true,
                             //间距
                             indent: 20,
                             //默认展开节点的数组, 为 true 时, 展开所有节点
@@ -103,9 +103,14 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
 
                     // 单选
                     if (!multiple) {
+                        // options.max = 1;
+                        // options.maxMethod = function (data, arr) {
+                        //     console.log(data, arr);
+                        //     remoteSelect.setValue([arr]);
+                        // }
                         options.radio = true;
                         options.clickClose = true;
-                        options.model.icon = 'hidden';
+                        // options.model.icon = 'hidden';
                     }
 
                     // 多选的最大数量
