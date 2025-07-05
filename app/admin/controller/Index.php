@@ -114,6 +114,7 @@ class Index extends Backend
     {
         $url = $this->request->get('url', '', 'url_clean');
         $url = $url ?: rtrim(url("/", [], false), '/');
+
         if ($this->auth->isLogin()) {
             $this->success(__("You've logged in, do not login again"), $url);
         }

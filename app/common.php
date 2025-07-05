@@ -204,12 +204,12 @@ if (!function_exists('check_url_allowed')) {
             strtolower(request()->host())
         ];
 
+
         if (empty($url)) {
             return true;
         }
-
         //如果是站内相对链接则允许
-        if (preg_match("/^[\/a-z][a-z0-9][a-z0-9\.\/]+((\?|#).*)?\$/i", $url) && substr($url, 0, 2) !== '//') {
+        if (preg_match("/^[\/a-z][a-z0-9][a-z0-9\.\/\_]+((\?|#).*)?\$/i", $url) && substr($url, 0, 2) !== '//') {
             return true;
         }
 
@@ -566,5 +566,18 @@ if (!function_exists('convert_path_to_snake_case')) {
         }
 
         return $newPath;
+    }
+
+    if (!function_exists('url_clean')) {
+        /**
+         * 清理URL
+         */
+        function url_clean($url)
+        {
+            if (!check_url_allowed($url)) {
+                return '';
+            }
+            return xss_clean($url);
+        }
     }
 }
