@@ -299,6 +299,8 @@ class Auth
             $rule['href'] = '';
             if (!$rule['url']) {
                 $rule['href'] = $rule['name'];
+            } else {
+                $rule['href'] = $rule['url'];
             }
             $rule['title'] = __($rule['title']);
         }

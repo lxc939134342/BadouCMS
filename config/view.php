@@ -29,4 +29,5 @@ return [
         '__ROOT__'   => '',
         '__CDN__'    => '',
     ],
+    'default_filter' => '',
 ];

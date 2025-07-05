@@ -150,7 +150,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 						bodyTab.addTabOnly({
 							id: data.menuId,
 							title: data.menuTitle,
-							url: Config.app_url + '/' + data.menuUrl,
+							url: /^(http|https):\/\//.test(data.menuUrl) ? data.menuUrl : Config.app_url + '/' + data.menuUrl,
 							hash: data.menuUrl || '',
 							icon: data.menuIcon,
 							close: true
@@ -360,10 +360,11 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 
 			this.addTab = function (id, title, url) {
 				if (isMuiltTab(config) === "true" || isMuiltTab(config) === true) {
+
 					bodyTab.addTabOnly({
 						id: id,
 						title: title,
-						url: Config.app_url + '/' + url,
+						url: /^(http|https):\/\//.test(url) ? url : Config.app_url + '/' + url,
 						hash: url || '',
 						icon: null,
 						close: true
