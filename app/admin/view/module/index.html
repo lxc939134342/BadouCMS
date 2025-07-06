@@ -444,10 +444,12 @@
         var uninstalltpl = document.getElementById('uninstalltpl').innerHTML;
 
         var operate = function (name, action, force, success) {
+            var area = [$(window).width() > 650 ? '650px' : '95%', $(window).height() > 710 ? '710px' : '95%'];
             badou.api.ajax({
                 url: 'module/state',
                 data: {name: name, action: action, force: force ? 1 : 0}
             }, function (data, ret) {
+                layer.closeAll();
                 if (typeof success === 'function') {
                     success(data, ret);
                 }
