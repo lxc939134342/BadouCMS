@@ -19,7 +19,9 @@ class Link extends \think\Model
     public static function linkList($gid, $num = 10)
     {
         $selfModel = new self();
-        $res = $selfModel->where('gid', $gid)->limit($num)->select();
+        $res = $selfModel->where('gid', $gid)
+        ->order('sorting ASC,id DESC')
+        ->limit($num)->select();
         if ($res->isEmpty()) {
             return [];
         }

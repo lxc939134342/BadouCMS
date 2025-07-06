@@ -384,3 +384,6 @@
 .fieldlist dd input {
     min-width: 100px;
 }
+.layui-table .layui-table-cell .layui-input {
+    height: 32px;
+}

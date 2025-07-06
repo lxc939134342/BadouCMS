@@ -58,6 +58,7 @@
             url: "{:url('cms.slide/index')}",
             pk: "id",
             even: true,
+            sortName:'gid desc,sorting asc,id desc',
             toolbar: "#toolbar",
             page: true,
             cols: [
@@ -79,6 +80,7 @@
                         field: "sorting",
                         title: __("Sorting"),
                         width: 100,
+                        templet:bdTable.api.formatter.input,
                     },
                     { title: __("Operate"), align: "center", templet: bdTable.api.formatter.operate },
                 ],

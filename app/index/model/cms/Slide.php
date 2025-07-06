@@ -35,7 +35,7 @@ class Slide extends \think\Model
     public static function slideList($gid, $num = 5)
     {
         $selfModel = new self();
-        $res = $selfModel->where('gid', $gid)->order('sorting asc')->limit($num)->select();
+        $res = $selfModel->where('gid', $gid)->order('sorting ASC ,id DESC')->limit($num)->select();
         if ($res->isEmpty()) {
             return [];
         }

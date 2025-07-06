@@ -173,6 +173,9 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         }
                     })
                 })
+
+                //input框
+                bdTable.api.events.input()
             },
             // 过滤表格列
             filterCols: function (cols) {
@@ -363,6 +366,15 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     var html = '<div class="table-image" lay-on="table-image" ><img src="' + getItemField(data, this.field) + '"></div>';
 
                     return html;
+                },
+                input: function (data) {
+                    var that = this;
+                    that.filter = that.filter || that.field || null;
+                    that.url = that.multi_url || bdTable.extend.multi_url;
+                    var value = parseInt(bdTable.api.formatter.value.call(this, data));
+                    var html = laytpl('<input type="input" class="layui-input table-input" data-url="' + that.url + '" name="' + that.field + '" data-id="' + data.id + '" value="' + value + '" data-field="' + that.field + '">').render(data);
+
+                    return html
                 }
             },
             // 批量操作请求
@@ -520,6 +532,18 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                             that.trigger('click');
                             layui.form.render('checkbox');
                         });
+                    });
+                },
+                input: function () {
+                    var table = bdTable.initTable;
+                    $(document).on("change", ".table-input", function () {
+                        var field = $(this).data("field");
+                        var id = $(this).data("id");
+                        var params = {};
+                        params[field] = $(this).val();
+                        $(this).data("params", params);
+                        bdTable.api.multi('', [id], table, this);
+                        return false;
                     });
                 }
             },
