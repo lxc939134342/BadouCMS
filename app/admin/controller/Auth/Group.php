@@ -127,7 +127,6 @@ class Group extends Backend
 
     }
 
-
     //编辑管理员用户组
     public function edit($ids = null)
     {
@@ -205,42 +204,40 @@ class Group extends Backend
      */
     public function del()
     {
-        $ids = $this->request->param('ids');
-        if (!is_array($ids)) {
-            $ids = explode(',', $ids);
+        $ids = $this->request->param('ids/a');
+        if (empty($ids)) {
+            $this->error('请指定需要删除的角色组ID！');
         }
-        if ($ids) {
-            $grouplist = $this->auth->getGroups();
-            $group_ids = array_map(function ($group) {
-                return $group['id'];
-            }, $grouplist);
-            // 移除掉当前管理员所在组别
-            $ids = array_diff($ids, $group_ids);
-            // 循环判断每一个组别是否可删除
-            $grouplist = $this->model->where('id', 'in', $ids)->select()->toArray();
-            foreach ($grouplist as $k => $v) {
-                // 当前组别下有管理员
-                $groupone = AuthGroupAccess::where(['group_id' => $v['id']])->find();
-                if ($groupone) {
-                    $ids = array_diff($ids, [$v['id']]);
-                    continue;
-                }
-                // 当前组别下有子组别
-                $groupone = $this->model->where(['pid' => $v['id']])->find();
-                if ($groupone) {
-                    $ids = array_diff($ids, [$v['id']]);
-                    continue;
-                }
+        $grouplist = $this->auth->getGroups();
+        $group_ids = array_map(function ($group) {
+            return $group['id'];
+        }, $grouplist);
+        // 移除掉当前管理员所在组别
+        $ids = array_diff($ids, $group_ids);
+        // 循环判断每一个组别是否可删除
+        $grouplist = $this->model->where('id', 'in', $ids)->select()->toArray();
+        foreach ($grouplist as $k => $v) {
+            // 当前组别下有管理员
+            $groupone = AuthGroupAccess::where(['group_id' => $v['id']])->find();
+            if ($groupone) {
+                $ids = array_diff($ids, [$v['id']]);
+                continue;
             }
-            if (!$ids) {
-                $this->error('你不能删除含有子组和管理员的组');
-            }
-            $count = $this->model->where('id', 'in', $ids)->delete();
-            if ($count) {
-                $this->success();
+            // 当前组别下有子组别
+            $groupone = $this->model->where(['pid' => $v['id']])->find();
+            if ($groupone) {
+                $ids = array_diff($ids, [$v['id']]);
+                continue;
             }
         }
-        $this->error();
+        if (!$ids) {
+            $this->error('你不能删除含有子组和管理员的组');
+        }
+        $count = $this->model->where('id', 'in', $ids)->delete();
+        if ($count) {
+            $this->success();
+        }
+
     }
 
     /**
