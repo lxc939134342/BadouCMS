@@ -30,4 +30,5 @@ class AdminRule extends Model
     {
         return __($value);
     }
+
 }

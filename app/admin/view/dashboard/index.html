@@ -237,25 +237,14 @@
 			</div>
 			<div class="layui-card-body">
 				<div class="layui-row layui-col-space10">
+					{foreach $quickmenu as $menu}
 					<div class="layui-col-md1 layui-col-sm2 layui-col-xs3">
-						<div class="pear-card" data-id="114" data-title="系统设置" data-url="general.config">
-							<i class="layui-icon layui-icon-set-fill"></i>
+						<div class="pear-card" data-id="{$menu.id}" data-title="{$menu.title}" data-url="{$menu.href}">
+							<i class="{$menu.icon}"></i>
 						</div>
-						<span class="pear-card-title">系统设置</span>
+						<span class="pear-card-title">{$menu.title}</span>
 					</div>
-					<div class="layui-col-md1 layui-col-sm2 layui-col-xs3">
-						<div class="pear-card" data-id="80" data-title="模型管理" data-url="{:url('cms.models/index')}">
-							<i class="layui-icon layui-icon-template-1"></i>
-						</div>
-						<span class="pear-card-title">模型管理</span>
-					</div>
-					<div class="layui-col-md1 layui-col-sm2 layui-col-xs3">
-						<div class="pear-card" data-id="97" data-title="栏目管理"
-							data-url="{:url('cms.content_sort/index')}">
-							<i class="layui-icon layui-icon-menu-fill"></i>
-						</div>
-						<span class="pear-card-title">栏目管理</span>
-					</div>
+					{/foreach}
 				</div>
 			</div>
 		</div>
@@ -330,14 +319,15 @@
 		var echartsRecords = echarts.init(document.getElementById('echarts-records'), 'walden');
 
 		$("body").on("click", "[data-url]", function () {
+			var url= $(this).attr("data-url");
+			url = /^(http|https):\/\//.test(url) ? url : Config.app_url + '/' +url
 			parent.layui.tab.addTabOnlyByElem("content", {
 				id: $(this).attr("data-id"),
 				title: $(this).attr("data-title"),
-				url: $(this).attr("data-url"),
+				url: url,
 				close: true
 			})
 		})
-
 
 		let bgColor = "#fff";
 		let color = [

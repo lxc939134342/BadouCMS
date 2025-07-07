@@ -30,7 +30,6 @@ return [
     'Extfield'       => '模型字段',
     'Member comment' => '文章评论',
     'Single'         => '专题管理',
-
     'SendTestMail'   => '发送测试邮件',
     'Setting'        => '系统设置列表',
     'SaveConfig'     => '保存配置'

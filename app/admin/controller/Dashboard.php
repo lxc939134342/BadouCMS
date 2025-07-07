@@ -12,6 +12,9 @@
 
 namespace app\admin\controller;
 
+use app\admin\model\AdminRule;
+use app\common\library\Menu;
+use badou\Auth;
 use badou\Date;
 use badou\Server;
 use think\facade\Db;
@@ -19,6 +22,7 @@ use app\admin\model\Admin;
 use app\common\model\User;
 use app\common\model\Attachment;
 use app\common\controller\Backend;
+use app\common\library\AdminAuth;
 
 class Dashboard extends Backend
 {
@@ -51,6 +55,17 @@ class Dashboard extends Backend
         $dbTableList = Db::query("SHOW TABLE STATUS");
         $installedModules = Server::getInstalldModuleList();
         $totalmodule = count($installedModules);
+        $quickmenuarr = [
+            'general.config',
+            'cms.models',
+            'cms.content_sort'
+        ];
+
+        $quickmenu = $this->auth->getOriginAuthRules($this->auth->id);
+        $quickmenu = array_filter($quickmenu, function ($item) use ($quickmenuarr) {
+            return in_array($item['name'], $quickmenuarr);
+        });
+
         $this->view->assign([
             'totaluser'         => User::count(),
             'totalmodule'        => $totalmodule,
@@ -59,10 +74,10 @@ class Dashboard extends Backend
             'dbsize'            => array_sum(array_map(function ($item) {
                 return $item['Data_length'] + $item['Index_length'];
             }, $dbTableList)),
-            'attachmentnums'    => Attachment::count(),
-            'attachmentsize'    => Attachment::sum('filesize'),
-            'picturenums'       => Attachment::where('mimetype', 'like', 'image/%')->count(),
-            'picturesize'       => Attachment::where('mimetype', 'like', 'image/%')->sum('filesize'),
+            'attachmentnums'      => Attachment::count(),
+            'attachmentsize'      => Attachment::sum('filesize'),
+            'picturenums'         => Attachment::where('mimetype', 'like', 'image/%')->count(),
+            'picturesize'         => Attachment::where('mimetype', 'like', 'image/%')->sum('filesize'),
             'php_os'              => PHP_OS,
             'server_name'         => $_SERVER['SERVER_NAME'],
             'server_port'         => $_SERVER['SERVER_PORT'],
@@ -71,7 +86,9 @@ class Dashboard extends Backend
             'php_version'         => phpversion(),
             'upload_max_filesize' => ini_get('upload_max_filesize'),
             'post_max_size'       => ini_get('post_max_size'),
+            'quickmenu'           => $quickmenu
         ]);
+
 
         $this->assignconfig('column', array_keys($userlist));
         $this->assignconfig('userdata', array_values($userlist));
