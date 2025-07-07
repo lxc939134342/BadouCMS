@@ -167,7 +167,8 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 					});
 
 					sideMenu.click(function (dom, data) {
-						bodyFrame.changePage(data.menuUrl, true);
+						var url = /^(http|https):\/\//.test(data.menuUrl) ? data.menuUrl : Config.app_url + '/' + data.menuUrl
+						bodyFrame.changePage(url, true);
 						compatible()
 					})
 				}
