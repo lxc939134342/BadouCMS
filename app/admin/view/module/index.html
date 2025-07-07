@@ -532,6 +532,7 @@
                 return false;
             }, function (data, ret) {
                 var area = [$(window).width() > 650 ? '650px' : '95%', $(window).height() > 710 ? '710px' : '95%'];
+
                 if (ret && ret.code === -2) {
                     //如果登录已经超时,重新提醒登录
                     if (uid && uid != ret.data.uid) {
@@ -587,6 +588,9 @@
                         }
                     });
 
+                }else if(ret && ret.code==401){
+                    $(".btn-userinfo").trigger("click", name, version);
+                    return false;
                 } else {
                     layer.alert(ret.msg, {title: __('Warning'), icon: 0});
                 }
@@ -635,12 +639,29 @@
             var userinfo = badou.api.badouStorage.get('userinfo');
             var uid = userinfo ? userinfo.id : 0;
             var token = userinfo ? userinfo.token : '';
+
+            if (parseInt(uid) === 0) {
+                $(".btn-userinfo").trigger("click", name, version);
+                return false;
+            }
             badou.api.ajax({
                 url: 'module/upgrade',
                 data: {name: name, uid: uid, token: token, version: version, faversion: Config.faversion}
             }, function (data, ret) {
                 layer.closeAll();
             }, function (data, ret) {
+                if(ret.code==-2){
+                    //如果登录已经超时,重新提醒登录
+                    if (uid && uid != ret.data.uid) {
+                        badou.api.badouStorage.remove('userinfo');
+                        $(".btn-install").trigger("click");
+                        return;
+                    }
+                }
+                if(ret.code==401){
+                    $(".btn-userinfo").trigger("click", name, version);
+                    return false;
+                }
                 layer.alert(ret.msg, {title: __('Warning')});
                 return false;
             });
