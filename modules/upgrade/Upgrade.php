@@ -41,12 +41,12 @@ class Upgrade
         });
     }
 
-    public function enable($params)
+    public function enable($params = [])
     {
         $moduleDir = Server::getModuleDir('upgrade').DIRECTORY_SEPARATOR.'up'.DIRECTORY_SEPARATOR;
         $infoFile =  $moduleDir.'config'.DIRECTORY_SEPARATOR.'badouadmin.php';
         if (!is_file($infoFile)) {
-            throw new Exception('升级文件不完整！');
+            return true;
         }
 
         $info = include_once $infoFile;
@@ -57,7 +57,7 @@ class Upgrade
         // 备份冲突文件
         $conflictFiles = $this->getGlobalFiles($moduleDir, true);
         if ($conflictFiles) {
-            if (!$params['force']) {
+            if (isset($params['force']) && !$params['force']) {
                 throw new ModuleException(__("Conflicting file found"), -3, ['conflictlist' => $conflictFiles]);
             }
             $zip = new ZipFile();
