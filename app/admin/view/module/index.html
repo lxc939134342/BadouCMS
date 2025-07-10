@@ -310,9 +310,15 @@
                 });
 
                 layui.form.on('switch(state)', function (row) {
+                    row.elem.checked = false;
                     var that = $(this);
                     var value= row.value
-                    operate(that.data('module'), row.value==1 ? "disable" : "enable");
+                    operate(that.data('module'), row.value==1 ? "disable" : "enable",false,function(data,ret){
+                        row.elem.checked = true;
+                    },function(data,ret){
+                        row.elem.checked = false;
+                        return false;
+                    });
                 });
             },
         });
@@ -443,7 +449,7 @@
         var conflicttpl  = document.getElementById('conflicttpl').innerHTML;
         var uninstalltpl = document.getElementById('uninstalltpl').innerHTML;
 
-        var operate = function (name, action, force, success) {
+        var operate = function (name, action, force, success,error) {
             var area = [$(window).width() > 650 ? '650px' : '95%', $(window).height() > 710 ? '710px' : '95%'];
             badou.api.ajax({
                 url: 'module/state',
@@ -453,9 +459,12 @@
                 if (typeof success === 'function') {
                     success(data, ret);
                 }
-                bdTable.api.events.toolbar.refresh()
+                top.window.location.reload()
                 return false;
             }, function (data, ret) {
+                if (typeof error === 'function') {
+                    error(data, ret);
+                }
                 if (ret && ret.code === -3) {
                     //模块目录发现影响全局的文件
                     layer.open({

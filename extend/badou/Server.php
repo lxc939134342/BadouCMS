@@ -504,9 +504,11 @@ class Server
             if (class_exists($class)) {
                 $module = new $class();
                 if (method_exists($class, "enable")) {
-                    $module->enable();
+                    $module->enable(['force' => $force]);
                 }
             }
+        } catch (ModuleException $e) {
+            throw new ModuleException($e->getMessage(), $e->getCode(), $e->getData());
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         }

@@ -12,10 +12,25 @@
 
 namespace modules\upgrade;
 
+use badou\Server;
+use PhpZip\ZipFile;
+use think\Exception;
+use badou\Filesystem;
 use think\facade\Event;
+use badou\ModuleException;
+use RecursiveIteratorIterator;
+use RecursiveDirectoryIterator;
 
 class Upgrade
 {
+    protected $dirs = [
+        'app',
+        'config',
+        'public',
+        'route',
+        'extend',
+        'vendor'
+    ];
     public function appInit()
     {
         // admin 头部添加
@@ -24,14 +39,101 @@ class Upgrade
                 <a href="javascript:;" class="layui-badge-rim ">'.config('badouadmin.version').'</a>
             </li>';
         });
-        // //插件市场 头部按钮
-        // Event::listen('module_top_btn', function ($data) {
-        //     return  '<button type="button" class="layui-btn layui-bg-orange btn-frame-upgrade">
-        //         <i class="fa fa-user"></i>
-        //         '.__('Frame Upgrade').'
-        //     </button>';
-        // });
     }
 
+    public function enable($params)
+    {
+        $moduleDir = Server::getModuleDir('upgrade').DIRECTORY_SEPARATOR.'up'.DIRECTORY_SEPARATOR;
+        $infoFile =  $moduleDir.'config'.DIRECTORY_SEPARATOR.'badouadmin.php';
+        if (!is_file($infoFile)) {
+            throw new Exception('升级文件不完整！');
+        }
 
+        $info = include_once $infoFile;
+        if ($info['version'] == config('badouadmin.version')) {
+            return true;
+        }
+
+        // 备份冲突文件
+        $conflictFiles = $this->getGlobalFiles($moduleDir, true);
+        if ($conflictFiles) {
+            if (!$params['force']) {
+                throw new ModuleException(__("Conflicting file found"), -3, ['conflictlist' => $conflictFiles]);
+            }
+            $zip = new ZipFile();
+            try {
+                foreach ($conflictFiles as $k => $v) {
+                    $zip->addFile(root_path() . $v, $v);
+                }
+                $modulesBackupDir =  Server::getModulesBackupDir();
+                $zip->saveAsFile($modulesBackupDir . "badouadmin-conflict-enable-" . date("YmdHis") . ".zip");
+            } catch (Exception $e) {
+
+            } finally {
+                $zip->close();
+            }
+        }
+
+        // 复制文件到全局
+        foreach ($this->dirs as $k => $dir) {
+            if (is_dir($moduleDir . $dir)) {
+                Filesystem::copydirs($moduleDir . $dir, root_path() . $dir);
+            }
+        }
+
+        // 删除模块目录已复制到全局的文件
+        foreach ($this->dirs as $k => $dir) {
+            Filesystem::delDir($moduleDir . $dir);
+        }
+
+        // 修改版本号
+        $configFile = root_path() . 'config' . DIRECTORY_SEPARATOR . 'badouadmin.php';
+        $config = file_get_contents($configFile);
+        $config = str_replace("'version' => '" . config('badouadmin.version') . "'", "'version' => '" . $info['version'] . "'", $config);
+        file_put_contents($configFile, $config);
+    }
+
+    /**
+     * 获取模块在全局的文件
+     *
+     * @param string  $moduleDir        模块路径
+     * @param boolean $onlyconflict 是否只返回冲突文件
+     * @return  array
+     */
+    protected function getGlobalFiles($moduleDir, $onlyconflict = false)
+    {
+        $list = [];
+
+        // 扫描模块目录是否有覆盖的文件
+        foreach ($this->dirs as $k => $dirName) {
+            //检测目录是否存在
+            if (!is_dir($moduleDir . $dirName)) {
+                continue;
+            }
+            //匹配出所有的文件
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($moduleDir . $dirName, RecursiveDirectoryIterator::SKIP_DOTS),
+                RecursiveIteratorIterator::CHILD_FIRST
+            );
+
+            foreach ($files as $fileinfo) {
+                if ($fileinfo->isFile()) {
+                    $filePath = $fileinfo->getPathName();
+                    $path = str_replace($moduleDir, '', $filePath);
+                    if ($onlyconflict) {
+                        $destPath = root_path() . $path;
+                        if (is_file($destPath)) {
+                            if (filesize($filePath) != filesize($destPath) || md5_file($filePath) != md5_file($destPath)) {
+                                $list[] = $path;
+                            }
+                        }
+                    } else {
+                        $list[] = $path;
+                    }
+                }
+            }
+        }
+        $list = array_filter(array_unique($list));
+        return $list;
+    }
 }

@@ -38,4 +38,5 @@ return [
     'Force Update'                                             => '强制更新',
     'Frame Upgrade'                                            => '框架升级',
     'Module already exists'                                    => '模块已存在',
+    'Continue operate'                                         => '继续操作',
 ];
