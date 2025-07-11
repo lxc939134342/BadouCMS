@@ -216,7 +216,7 @@ class Content extends Model
             ->join('cms_content_sort c', 'a.subscode=c.scode', 'LEFT')
             ->join('cms_model d', 'b.mcode=d.mcode', 'LEFT')
             ->join('cms_content_ext e', 'a.id=e.contentid', 'LEFT')
-            ->join('cms_member_group f', 'a.gid=f.id', 'LEFT')
+            ->join('user_level f', 'a.gid=f.id', 'LEFT')
             ->order('id DESC')
             ->find();
         if (!$result) {
@@ -572,7 +572,7 @@ class Content extends Model
             ->join('cms_content_sort b', 'a.scode=b.scode', 'LEFT')
             ->join('cms_content_sort c', 'a.subscode=c.scode', 'LEFT')
             ->join('cms_model d', 'b.mcode=d.mcode', 'LEFT')
-            ->join('cms_member_group f', 'a.gid=f.id', 'LEFT');
+            ->join('user_level f', 'a.gid=f.id', 'LEFT');
 
         // 获取扩展字段表
         if ($ext_table) {
@@ -939,7 +939,7 @@ class Content extends Model
             ->join('cms_content_sort b', 'a.scode=b.scode', 'LEFT')
             ->join('cms_content_sort c', 'a.subscode=c.scode', 'LEFT')
             ->join('cms_model d', 'b.mcode=d.mcode', 'LEFT')
-            ->join('cms_member_group f', 'a.gid=f.id', 'LEFT');
+            ->join('user_level f', 'a.gid=f.id', 'LEFT');
 
         // 获取扩展字段表
         if ($ext_table) {

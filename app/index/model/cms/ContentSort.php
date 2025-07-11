@@ -83,7 +83,7 @@ class ContentSort extends Model
         $info = $this->alias('a')->field($field)
             ->whereOr(['a.scode' => $scode, 'a.filename' => $scode])
             ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
-            ->join('cms_member_group d', 'a.gid=d.id', 'LEFT')
+            ->join('user_level d', 'a.gid=d.id', 'LEFT')
             ->find();
         if (!$info) {
             return false;
