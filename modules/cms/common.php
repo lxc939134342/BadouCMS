@@ -732,7 +732,6 @@ function bdurl($type, $urlname, $pagetype, $scode, $sortfilename, $id = '', $con
                     $link = url('/'.$id, [], true);
                 }
             } else {
-
                 if ($sortfilename && $contentfilename) {
                     $link = url('/'.$sortfilename . '/' . $contentfilename, [], true);
                 } elseif ($sortfilename) {

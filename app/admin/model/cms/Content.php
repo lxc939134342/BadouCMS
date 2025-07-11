@@ -28,10 +28,15 @@ class Content extends Model
 
     protected $dateFormat = 'Y-m-d H:i:s';
 
+    protected $append = [
+        'view_url'
+    ];
+
     public function contentsort()
     {
         return $this->belongsTo(ContentSort::class, 'scode', 'scode');
     }
+
 
     // 检查自定义URL名称
     public function checkFilename($filename, $where = array())

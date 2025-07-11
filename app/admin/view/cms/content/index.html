@@ -129,7 +129,19 @@
                         templet: bdTable.api.formatter.switch,
                     },
                     { field: "visits", title: __("Visits"), width: 80 },
-                    { title: __("Operate"), align: "center", width: 150, templet: bdTable.api.formatter.operate },
+                    { title: __("Operate"), align: "center", width: 150, templet: bdTable.api.formatter.operate,buttons:[
+                        {
+                            name: 'view',
+                            icon: 'fa fa-search-plus',
+                            title: __('View'),
+                            url:function(row, j){
+                                console.log(row);
+                                return row.view_url;
+                            },
+                            extend:'target="_blank"',
+                            classname: 'layui-btn layui-bg-green layui-btn-sm',
+                        }
+                    ]  },
                 ],
             ],
             done: function(res, curr, count){

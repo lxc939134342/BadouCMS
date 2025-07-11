@@ -29,6 +29,10 @@ class ContentSort extends Model
     // 自动写入时间戳字段
     protected $autoWriteTimestamp = true;
 
+    protected $append = [
+        'view_url'
+    ];
+
     public function models()
     {
         return $this->belongsTo(Models::class, 'mcode', 'mcode');
@@ -69,6 +73,17 @@ class ContentSort extends Model
         Db::name('cms_content')->whereIn('scode', $model['scode'])->delete();
         // 清除缓存
         Cache::tag('cms_cache')->clear();
+    }
+
+    public function getViewUrlAttr($value, $data)
+    {
+        if ($data['outlink']) {
+            return $data['outlink'];
+        }
+        $url = (string)bdurl($data['type'], $data['urlname'], 'list', $data['scode'], $data['filename'], '', '');
+
+        $url = preg_replace("/\/((?!index)[\w]+)\.php\//i", "/", $url);
+        return $url;
     }
 
     /**

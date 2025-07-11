@@ -106,7 +106,27 @@ class Content extends Base
             ->order($sort, $order)
             ->paginate($limit);
 
+        $res->each(function ($item, $key) {
+            $item->view_url = $this->getViewUrl($item);
+        });
+
         $this->result('', $res->items(), $res->total());
+    }
+
+    protected function getViewUrl($data)
+    {
+        if (!isset($data['contentsort']['filename'])) {
+            return '';
+        }
+
+        if (isset($data['outlink']) && $data['outlink']) {
+            return $data['outlink'];
+        }
+
+        $url = (string) bdurl($data['contentsort']['type'], $data['contentsort']['urlname'], 'content', $data['scode'], $data['contentsort']['filename'], $data['id'], $data['filename']);
+
+        $url = preg_replace("/\/((?!index)[\w]+)\.php\//i", "/", $url);
+        return $url;
     }
 
     /**
