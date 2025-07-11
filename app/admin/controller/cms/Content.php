@@ -15,6 +15,7 @@ namespace app\admin\controller\cms;
 use Exception;
 use Throwable;
 use think\facade\Db;
+use app\admin\model\UserLevel;
 
 /**
  * CMS文章内容
@@ -31,6 +32,7 @@ class Content extends Base
      * @var \app\admin\model\cms\Extfield
      */
     protected $extfieldModel;
+
 
     protected $weighField = 'sorting';
 
@@ -50,9 +52,11 @@ class Content extends Base
         $this->model = new \app\admin\model\cms\Content();
         $this->contentExtModel = new \app\admin\model\cms\ContentExt();
         $this->extfieldModel = new \app\admin\model\cms\Extfield();
+        $levelModel = new UserLevel();
         $this->mcode = $this->request->param('mcode') ?? 0;
         $this->assign('mcode', $this->mcode);
-
+        $this->assign('levellist', $levelModel->getLevelList());
+        $this->assign('gtypelist', $levelModel->getGtypeList());
     }
 
     public function index()

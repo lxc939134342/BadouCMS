@@ -133,7 +133,28 @@
                     <div class="layui-upload-list" id="p-pics"></div>
                 </div>
             </div>
-
+            <div class="layui-form-item">
+                <label class="layui-form-label">浏览权限</label>
+                <div class="layui-input-block">
+                    <select name="row[gid]" id="c-gid" class="layui-select">
+                        <option value="">请选择</option>
+                        {foreach $levellist as $level}
+                        <option value="{$level.gcode}">{$level.gname}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">权限类型</label>
+                <div class="layui-input-block">
+                    <select name="row[gtype]" id="c-gtype" class="layui-select">
+                        <option value="">请选择</option>
+                        {foreach $gtypelist as $type}
+                        <option value="{$level.value}">{$type.label}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">排序</label>
                 <div class="layui-input-block">

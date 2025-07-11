@@ -12,6 +12,7 @@
 
 namespace app\admin\controller\cms;
 
+use app\admin\model\UserLevel;
 use Throwable;
 use badou\Tree;
 use think\facade\Db;
@@ -43,14 +44,19 @@ class ContentSort extends Base
         $this->tree  = Tree::instance();
         $this->model = new \app\admin\model\cms\ContentSort();
         $modelsModel = new Models();
+        $levelModel = new UserLevel();
         $this->rules = [
             'name|'.__('name') => 'require',
             'mcode|'.__('mcode') => 'require',
         ];
 
-        $res = $modelsModel->where('status', 1)->order('id', 'desc')->select();
-        $this->assign('models', $res);
+        $res = $modelsModel->where('status', 1)
+            ->order('id', 'desc')
+            ->select();
 
+        $this->assign('models', $res);
+        $this->assign('levellist', $levelModel->getLevelList());
+        $this->assign('gtypelist', $levelModel->getGtypeList());
         $this->assign('tpls', $this->getTpls());
     }
 

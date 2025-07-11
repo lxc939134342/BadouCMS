@@ -56,7 +56,7 @@
                     <select name="row[listtpl]" id="c-listtpl" class="layui-select">
                         <option value="">请选择</option>
                         {foreach $tpls as $tpl}
-                        <option>{$tpl.name}</option>
+                        <option value="{$tpl.id}" >{$tpl.name}</option>
                         {/foreach}
                     </select>
                 </div>
@@ -68,7 +68,7 @@
                     <select name="row[contenttpl]" id="c-contenttpl" class="layui-select">
                         <option value="">请选择</option>
                         {foreach $tpls as $tpl }
-                        <option>{$tpl.name}</option>
+                        <option value="{$tpl.id}">{$tpl.name}</option>
                         {/foreach}
                     </select>
                 </div>
@@ -77,10 +77,10 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">浏览权限</label>
                 <div class="layui-input-block">
-                    <select name="row[listtpl]" id="c-listtpl" class="layui-select">
+                    <select name="row[gid]" id="c-gid" class="layui-select">
                         <option value="">请选择</option>
-                        {foreach $tpls as $tpl}
-                        <option>{$tpl.name}</option>
+                        {foreach $levellist as $level}
+                        <option value="{$level.gcode}">{$level.gname}</option>
                         {/foreach}
                     </select>
                 </div>
@@ -88,10 +88,10 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">权限类型</label>
                 <div class="layui-input-block">
-                    <select name="row[listtpl]" id="c-listtpl" class="layui-select">
+                    <select name="row[gtype]" id="c-gtype" class="layui-select">
                         <option value="">请选择</option>
-                        {foreach $tpls as $tpl}
-                        <option>{$tpl.name}</option>
+                        {foreach $gtypelist as $type}
+                        <option value="{$level.value}">{$type.label}</option>
                         {/foreach}
                     </select>
                 </div>
