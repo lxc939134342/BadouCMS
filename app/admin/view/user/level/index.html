@@ -1,0 +1,61 @@
+{layout name="layout/default" /}
+
+<!-- 表格 -->
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table class="layui-hide" id="user_level" data-operate-edit="{:$auth->check('user.level/edit')}" data-operate-del="{:$auth->check('user.level/del')}"></table>
+    </div>
+</div>
+
+<!-- 表格左侧按钮 toolbar  -->
+<script type="text/html" id="toolbar">
+    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
+    <button class="layui-btn  layui-bg-green" lay-event="add">
+        <i class="fa fa-plus"></i>
+        {:__('Add')}
+    </button>
+    <button class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('user.level/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
+    <button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
+</script>
+
+<script>
+    layui.use(["badou","table"], function () {
+        var bdTable = layui.bdTable;
+        var table = layui.table;
+        var layer = layui.layer;
+        var dropdown = layui.dropdown;
+        bdTable.api.init({
+            table: table,
+            extend: {
+                index_url: "user.level/index",
+                add_url: "user.level/add",
+                edit_url: "user.level/edit",
+                del_url: "user.level/del",
+                multi_url: "user.level/multi",
+                table: "user_level",
+            },
+        });
+        bdTable.render({
+            elem: "#user_level",
+            url: "{:url('user.level/index')}",
+            pk: "id",
+            sortName:'gcode',
+            sortOrder:'asc',
+            even: true,
+            toolbar: "#toolbar",
+            cols: [
+                [
+                    { type: "checkbox" },
+                    { field: "gcode", title: __('Gcode'), width: 120, sort: true },
+                    {field: 'gname', title: __('Gname'),width: 180, operate: 'BETWEEN', sortable: true},
+                    {field: 'description', title: __('Description'), operate: 'LIKE'},
+                    {field: 'lscore', title: __('Lscore'),align: 'center',width: 120},
+                    {field: 'uscore', title: __('Uscore'),align: 'center',width: 120},
+                    {field: 'status', title: __('Status'), templet:bdTable.api.formatter.switch,width:100},
+                    {field: 'create_time', title: __('Create time'),width: 180, templet: bdTable.api.formatter.datetime, searchType:'time'},
+                    { title: __('Operate'),width: 180,templet: bdTable.api.formatter.operate }
+                ]
+            ],
+        });
+    });
+</script>

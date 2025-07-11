@@ -75,6 +75,29 @@
             </div>
 
             <div class="layui-form-item">
+                <label class="layui-form-label">浏览权限</label>
+                <div class="layui-input-block">
+                    <select name="row[listtpl]" id="c-listtpl" class="layui-select">
+                        <option value="">请选择</option>
+                        {foreach $tpls as $tpl}
+                        <option>{$tpl.name}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">权限类型</label>
+                <div class="layui-input-block">
+                    <select name="row[listtpl]" id="c-listtpl" class="layui-select">
+                        <option value="">请选择</option>
+                        {foreach $tpls as $tpl}
+                        <option>{$tpl.name}</option>
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
                 <label class="layui-form-label">排序</label>
                 <div class="layui-input-block">
                     <input
@@ -86,6 +109,7 @@
                         class="layui-input" />
                 </div>
             </div>
+
 
             <div class="layui-form-item">
                 <label class="layui-form-label">状态</label>

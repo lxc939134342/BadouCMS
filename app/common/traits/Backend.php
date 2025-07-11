@@ -62,7 +62,6 @@ trait Backend
         }
 
         [$where, $sort, $order, $offset, $limit] = $this->buildparams();
-
         $res = $this->model
             ->where($where)
             ->order($sort, $order)
@@ -150,6 +149,7 @@ trait Backend
                         if ($this->modelSceneValidate) {
                             $validate->scene('edit');
                         }
+
                         $validate->check($data);
                     }
                 }

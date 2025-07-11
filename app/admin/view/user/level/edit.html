@@ -1,0 +1,91 @@
+{layout name="layout/form" /}
+<form class="layui-form" method="post">
+    <div class="layui-form-item">
+        <label class="layui-form-label">等级编号</label>
+        <div class="layui-input-block">
+            <input
+                type="text"
+                name="row[gcode]"
+                lay-verify="required"
+                autocomplete="off"
+                placeholder="等级编号"
+                class="layui-input"
+                value="{$row.gcode}" />
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">等级名称</label>
+        <div class="layui-input-block">
+            <input
+                type="text"
+                name="row[gname]"
+                lay-verify="required"
+                autocomplete="off"
+                placeholder="等级名称"
+                class="layui-input"
+                value="{$row.gname}" />
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">描述</label>
+        <div class="layui-input-block">
+            <textarea name="row[description]" class="layui-textarea" id="description"  placeholder="请输入描述">{$row.description}</textarea>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">积分下限</label>
+        <div class="layui-input-block">
+            <input
+                type="text"
+                name="row[lscore]"
+                lay-verify="required"
+                autocomplete="off"
+                placeholder="积分下限"
+                class="layui-input"
+                value="{$row.lscore}" />
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">积分上限</label>
+        <div class="layui-input-block">
+            <input
+                type="text"
+                name="row[uscore]"
+                lay-verify="required"
+                autocomplete="off"
+                placeholder="积分上限"
+                class="layui-input"
+                value="{$row.uscore}" />
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+            <input type="radio" name="row[status]" value="1" title="正常" checked />
+            <input type="radio" name="row[status]" value="0" title="禁用" />
+        </div>
+    </div>
+
+    <div class="layui-form-item layer-footer hide">
+        <div class="layui-input-block">
+            <input type="hidden" name="row[id]" value="{$row.id}">
+            <button class="layui-btn pear-btn-primary layui-btn-sm disabled" lay-submit>立即提交</button>
+            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
+        </div>
+    </div>
+</form>
+<script>
+    layui.use(["badou", "jquery", "toast", "form"], function () {
+        var bdForm = layui.bdForm;
+        var $ = layui.$;
+        var badou = layui.badou;
+        var toast = layui.toast;
+        var form = layui.form;
+
+        bdForm.api.bindevent($("form.layui-form"));
+    });
+</script>
