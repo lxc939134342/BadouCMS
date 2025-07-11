@@ -1,0 +1,492 @@
+:root {
+    --primary-color: #ff6c02;
+    --success-color: #61c032;
+    --warning-color: #ffaf00;
+    --danger-color: #f56c6c;
+    --info-color: #909399;
+    --blue-color: #4e73df;
+    --black-color: #2c2d34;
+}
+
+*,
+::after,
+::before {
+    box-sizing: content-box;
+}
+
+.pear-admin {
+    .layui-logo {
+        background-color: #2c2d34;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+
+        .logo {
+            display: block;
+            width: 30px;
+            height: 30px;
+        }
+
+        .title {
+            top: 0;
+            color: #fff !important;
+            font-weight: 500;
+            font-size: 20px;
+        }
+    }
+
+    .light-theme .layui-logo .title {
+        color: var(--primary-color) !important;
+    }
+
+    .layui-side-scroll {
+        background-color: #2c2d34;
+    }
+}
+
+.layui-side {
+    .layui-nav {
+        .layui-nav-item {
+            a {
+                padding: 0 20px;
+
+                i {
+                    font-size: 14px;
+                }
+            }
+
+            .layui-icon-down {
+                font-size: 12px !important;
+            }
+        }
+    }
+}
+
+.layui-nav {
+    .layui-nav-item {
+        a {
+            padding: 0 15px;
+        }
+
+        .user a span {
+            font-size: 15px !important;
+        }
+    }
+}
+
+.layui-tab-item {
+    /* margin: 15px; */
+    background: #fff;
+    /* padding: 15px; */
+}
+
+.layui-btn + .layui-btn {
+    margin-left: 0;
+}
+
+.layui-table-tool {
+    background-color: #f8f8f8;
+}
+
+.layui-table-cell {
+    padding: 0px 15px;
+    margin-right: -1px;
+}
+
+.layui-table {
+    th:last-child,
+    td:last-child {
+        border-right: 0;
+    }
+
+    * {
+        font-size: 14px !important;
+    }
+
+    .layui-table-view::after {
+        width: 0;
+    }
+
+    .layui-table-header {
+        border-bottom: 1px solid #ddd;
+    }
+
+    > thead > tr > th > .layui-table-cell {
+        color: #333;
+    }
+
+    td {
+        border-color: #f4f4f4;
+
+        .table-image {
+            text-align: center;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+
+            img {
+                max-width: 100%;
+                max-height: 100%;
+            }
+        }
+    }
+}
+
+.layui-icon {
+    font-size: 16px !important;
+}
+
+.layui-btn {
+    border-radius: 3px;
+    background-color: #4e73df;
+    height: 32px;
+    line-height: 32px;
+    font-size: 13px;
+    padding: 0 12px;
+
+    &.layui-btn-lg {
+        height: 44px;
+        line-height: 42px;
+        padding: 0 25px;
+        font-size: 16px;
+    }
+
+    &.layui-btn-sm {
+        height: 26px;
+        line-height: 24px;
+        padding: 0 7px;
+        font-size: 12px !important;
+    }
+
+    &.layui-btn-xs {
+        height: 22px;
+        line-height: 20px;
+        padding: 0 6px;
+        font-size: 12px !important;
+    }
+
+    &:active,
+    &:hover {
+        opacity: 0.75;
+    }
+
+    &.disabled,
+    &[disabled] {
+        opacity: 0.65;
+        cursor: not-allowed !important;
+    }
+}
+
+.hide {
+    display: none !important;
+}
+
+.show {
+    display: block !important;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.layui-layer-footer {
+    text-align: left !important;
+}
+
+.project-list-item-body {
+    padding: 10px;
+}
+
+.badouadmin-form-body {
+    padding: 15px;
+
+    .layui-form {
+        padding-bottom: 15px;
+    }
+}
+
+.pear-nav-tree .layui-nav-item a span {
+    letter-spacing: 0.5px;
+}
+
+/* 表格高级搜索 s */
+.badouadmin-commonsearch {
+    .layui-form-item {
+        margin-bottom: 0;
+    }
+
+    .commonsearch-submit {
+        margin-right: 5px;
+    }
+}
+/* 表格高级搜索 e */
+
+/* 弹窗样式 s */
+.layui-layer-badouadmin {
+    &.layui-layer-dialog .layui-layer-content .layui-layer-face {
+        font-size: 30px !important;
+    }
+
+    border-radius: 5px;
+    overflow: hidden;
+
+    .layui-layer-title {
+        background-color: #f6f6f6 !important;
+    }
+
+    .layui-layer-footer {
+        padding: 10px 20px;
+        background-color: #fafaf9;
+        height: auto;
+        text-align: inherit !important;
+
+        .layui-btn {
+            height: 32px;
+            line-height: 32px;
+            padding: 0 12px;
+            font-size: 13px;
+        }
+    }
+}
+
+.layui-input-block {
+    min-height: 32px;
+}
+/* 弹窗样式 e */
+
+/* jsTree树形样式 s */
+#treeview {
+    .jstree-container-ul .jstree-node {
+        display: block;
+        clear: both;
+    }
+
+    .jstree-leaf {
+        float: left;
+        margin-left: 0;
+        padding-left: 24px;
+        min-width: 80px;
+        clear: none;
+        color: #777;
+
+        &:not(:first-child) {
+            float: left;
+            background: none;
+            margin-left: 0;
+            min-width: 80px;
+            clear: none;
+        }
+
+        > .jstree-icon,
+        .jstree-themeicon {
+            display: none;
+        }
+    }
+
+    .jstree-last {
+        background-image: url("../images/32px.png");
+        background-position: -292px -4px;
+        background-repeat: repeat-y;
+    }
+
+    .jstree-children {
+        &:before,
+        &:after {
+            content: " ";
+            display: table;
+        }
+
+        &:after {
+            clear: both;
+        }
+    }
+
+    .jstree-themeicon {
+        display: none;
+    }
+}
+/* jsTree树形样式 e */
+
+.dark-theme {
+    &.layui-header {
+        background-color: #2c2d34 !important;
+    }
+
+    .layui-nav-tree {
+        background-color: #2c2d34 !important;
+    }
+}
+
+.light-theme {
+    .pear-nav-tree,
+    .pear-nav-tree .layui-nav-hover:before,
+    .pear-nav-tree .layui-nav-child {
+        background-color: white !important;
+    }
+}
+
+.pear-nav-tree .layui-nav-hover:before {
+    background-color: #2c2d34 !important;
+}
+
+.btn-theme-color {
+    background-color: var(--theme-color) !important;
+}
+
+.layui-btn-primary {
+    background: none !important;
+
+    &:hover {
+        border-color: var(--blue-color);
+    }
+}
+
+.layui-bg-green {
+    background-color: var(--success-color) !important;
+}
+
+.layui-bg-blue {
+    background-color: var(--blue-color) !important;
+}
+
+.layui-bg-orange {
+    background-color: var(--warning-color) !important;
+}
+
+.layui-bg-red {
+    background-color: var(--danger-color) !important;
+}
+
+.layui-bg-black {
+    background-color: var(--black-color) !important;
+}
+
+.layui-font-green {
+    color: #1db369 !important;
+}
+
+.layui-font-bule {
+    color: var(--blue-color) !important;
+}
+
+.layui-border-blue {
+    border-color: var(--blue-color) !important;
+    color: var(--blue-color) !important;
+}
+
+.layui-border-primary {
+    border-color: var(--primary-color) !important;
+    color: var(--primary-color) !important;
+}
+
+.layui-border-green {
+    border-color: var(--success-color) !important;
+    color: var(--success-color) !important;
+}
+
+.layui-border-orange {
+    border-color: var(--warning-color) !important;
+    color: var(--warning-color) !important;
+}
+
+.layui-border-red {
+    border-color: var(--danger-color) !important;
+    color: var(--danger-color) !important;
+}
+
+.layui-border-black {
+    border-color: var(--black-color) !important;
+    color: var(--black-color) !important;
+}
+
+.layui-font-blue {
+    color: var(--blue-color) !important;
+}
+
+.layui-font-green {
+    color: var(--success-color) !important;
+}
+
+.layui-badge {
+    font-size: 12px !important;
+    height: 20px;
+    line-height: 20px;
+}
+
+.layui-form-switch {
+    height: 20px;
+    line-height: 18px;
+    min-width: 40px;
+
+    > i {
+        top: 1px;
+        left: 2px;
+    }
+}
+
+.layui-form-onswitch > i {
+    margin-left: -18px;
+    left: 100%;
+}
+
+.layui-upload-list {
+    margin: 10px -5px;
+
+    &:after,
+    &:before {
+        content: "";
+        display: block;
+        clear: both;
+    }
+
+    .layui-upload-item {
+        padding: 5px;
+    }
+
+    .layui-upload-img {
+        width: 100%;
+        box-sizing: border-box;
+        object-fit: contain;
+        height: 100px;
+        margin-bottom: 10px;
+    }
+
+    .layui-upload-item .btn-delete-img {
+        width: 100%;
+    }
+}
+
+.layui-tabs-header {
+    .layui-this,
+    li:hover {
+        color: var(--blue-color) !important;
+    }
+}
+
+.fieldlist dd {
+    ins {
+        min-width: 100px;
+        display: inline-block;
+        text-decoration: none;
+        padding: 9px 0;
+        margin-right: 10px;
+        color: #666;
+        font-weight: 400;
+    }
+
+    input {
+        min-width: 100px;
+    }
+}
+
+.layui-table .layui-table-cell .layui-input {
+    height: 32px;
+}
+
+.layui-form {
+    .btn-bdupload,
+    .btn-bdchoose {
+        margin-top: 3px;
+    }
+}

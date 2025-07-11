@@ -1,0 +1,2 @@
+/** pear-admin-v3.10.0 MIT License By http://www.pearadmin.com/ */
+ ;"use strict";layui.define(["jquery","element"],function(exports){layui.jquery,layui.element;exports("convert",new function(){this.imageToBase64=function(img){var canvas=document.createElement("canvas");canvas.width=img.width,canvas.height=img.height,canvas.getContext("2d").drawImage(img,0,0,img.width,img.height);var ext=img.src.substring(img.src.lastIndexOf(".")+1).toLowerCase();return canvas.toDataURL("image/"+ext)}})});
