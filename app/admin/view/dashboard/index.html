@@ -38,6 +38,10 @@
 		margin-bottom: 3px;
 	}
 
+	.pear-admin-dark .pear-card{
+		background-color: #333;
+	}
+
 	.pear-card i {
 		font-size: 30px !important;
 		height: 66px;
@@ -53,7 +57,9 @@
 	.pear-card:hover {
 		box-shadow: 2px 0 8px 0 lightgray !important;
 	}
-
+	.pear-admin-dark .system-info tr td:first-child{
+		background: #333;
+	}
 	.system-info tr td:first-child {
 		width: 100px;
 		background: #e9edf3;
@@ -256,7 +262,7 @@
 		<div class="layui-card">
 			<div class="layui-card-body">
 				<div class="layui-tab custom-tab layui-tab-brief" lay-filter="docDemoTabBrief">
-					<div id="echarts-records" style="background-color:#ffffff;min-height:400px;"></div>
+					<div id="echarts-records" style="min-height:400px;"></div>
 				</div>
 			</div>
 		</div>
@@ -329,7 +335,6 @@
 			})
 		})
 
-		let bgColor = "#fff";
 		let color = [
 			"#0090FF",
 			"#36CE9E",

@@ -433,6 +433,7 @@
 .pear-admin-dark .layui-textarea {
     background-color: #141414;
     border-color: rgba(255, 255, 255, 0.3) !important;
+    color: #f0f0f0 !important;
 }
 
 .pear-admin-dark .layui-input:focus,
@@ -456,4 +457,8 @@
 .pear-admin-dark .layui-iconpicker-icon {
     background-color: #141414 !important;
     color: #fff;
+}
+.pear-admin-dark .layui-border-black {
+    border-color: #333 !important;
+    color: #f2f2f2 !important;
 }
