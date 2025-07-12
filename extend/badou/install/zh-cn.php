@@ -36,4 +36,5 @@ return [
     'public directory is not writable'                                                                      => 'public 目录没有写入权限,无法进行安装',
     'proc_open is not currently installed and cannot be installed'                                          => '当前未开启proc_open，请勿禁用此函数',
     'gd2 is not currently installed and cannot be installed'                                                => '当前未开启gd2 或 freeType，无法进行安装',
+    'Fileinfo extension is not currently installed and cannot be installed' => '当前未开启fileinfo，无法进行安装',
 ];

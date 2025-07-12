@@ -316,6 +316,13 @@ class Install
         }
         // GD2和freeType-end
 
+        // Fileinfo-start
+        $phpFileinfo = extension_loaded('fileinfo');
+        if (!$phpFileinfo) {
+            throw new Exception(__("Fileinfo extension is not currently installed and cannot be installed"));
+        }
+        // Fileinfo-end
+
         // 检测目录是否存在
         $checkDirs = [
             'vendor',

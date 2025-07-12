@@ -13,11 +13,15 @@
 namespace modules\upgrade;
 
 use badou\Server;
+use PDOException;
 use PhpZip\ZipFile;
 use think\Exception;
+use think\facade\Db;
 use badou\Filesystem;
 use think\facade\Event;
 use badou\ModuleException;
+use app\common\library\Menu;
+use app\admin\model\AdminRule;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
 
@@ -135,5 +139,49 @@ class Upgrade
         }
         $list = array_filter(array_unique($list));
         return $list;
+    }
+
+    /**
+     * 插件升级方法
+     */
+    public function upgrade()
+    {
+        $menu = include_once __DIR__ . '/menu.php';
+        $oldmenuname = [
+            'dashboard',
+            'general',
+            'auth',
+            'user',
+            'module'
+        ];
+        $ids = [];
+        foreach ($oldmenuname as $key => $value) {
+            $ids = array_merge($ids, Menu::getAdminRuleIdsByName($value));
+        }
+
+        $old = AdminRule::where('id', 'in', $ids)->select();
+        $old = $old->toArray();
+        $old = array_column($old, null, 'name');
+
+        Db::startTrans();
+        try {
+            Menu::menuUpdate($menu, $old, 'user');
+            $ids = [];
+            foreach ($old as $index => $item) {
+                if (!isset($item['keep'])) {
+                    $ids[] = $item['id'];
+                }
+            }
+            if ($ids) {
+                $where = ['id' => ['in', $ids]];
+                AdminRule::where($where)->delete();
+            }
+
+            Db::commit();
+        } catch (PDOException $e) {
+            Db::rollback();
+            return false;
+        }
+        return true;
     }
 }

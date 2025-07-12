@@ -140,9 +140,9 @@ class Menu
      * 菜单升级
      * @param array $newMenu
      * @param array $oldMenu
-     * @param int   $parent
+     * @param int|string   $parent
      */
-    private static function menuUpdate($newMenu, &$oldMenu, $parent = 0)
+    public static function menuUpdate($newMenu, &$oldMenu, $parent = 0)
     {
         if (!is_numeric($parent)) {
             $parentRule = AdminRule::getByName($parent);
