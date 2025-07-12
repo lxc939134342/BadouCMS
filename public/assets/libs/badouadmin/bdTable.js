@@ -15,6 +15,8 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
         initTable: null,
         // 表格的dom
         table_elem: null,
+        // 是否仅重载数据
+        reloadData: false,
         extend: {
             index_url: '',
             add_url: '',
@@ -424,7 +426,12 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         if (!id) {
                             id = bdTable.initTable.config.id;
                         }
-                        table.reload(id);
+                        if (bdTable.reloadData) {
+                            table.reloadData(id);
+                        } else {
+                            table.reload(id);
+                        }
+
                     },
                     // 添加
                     add: function (id) {

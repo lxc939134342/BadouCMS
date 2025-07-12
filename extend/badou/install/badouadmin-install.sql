@@ -350,7 +350,13 @@ INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`
 INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (988, '1', 986, 'cms.tags/add', '添加', 'fa fa-circle-o', '', '', '', 0, NULL, '', '', '', 1751501205, 1751501205, 0, 'normal');
 INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (989, '1', 986, 'cms.tags/edit', '编辑', 'fa fa-circle-o', '', '', '', 0, NULL, '', '', '', 1751501205, 1751501205, 0, 'normal');
 INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (990, '1', 986, 'cms.tags/del', '删除', 'fa fa-circle-o', '', '', '', 0, NULL, '', '', '', 1751501205, 1751501205, 0, 'normal');
-INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (991, '1', 986, 'cms.tags/multi', '批量更新', 'fa fa-circle-o', '', '', '', 0, NULL, '', '', '', 1751501205, 1751501205, 0, 'normal');
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (991, '1', 986, 'cms.tags/multi', '批量更新', 'fa fa-circle-o', '', '', '', 0, NULL, '', '', '', 1751501205, 1751501205, 0, 'normal');ƒ
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (992, '1', 301, 'user.level', '用户等级', '', '', '', '', 1, '_iframe', '', '', '', 1752203016, 1752203034, 0, 'normal');
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (993, '2', 992, 'user.level/index', '查看', '', '', '', '', 0, '_iframe', '', '', '', 1752203060, 1752203077, 0, 'normal');
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (994, '2', 992, 'user.level/add', '添加', '', '', '', '', 0, '_iframe', '', '', '', 1752203113, 1752203113, 0, 'normal');
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (995, '2', 992, 'user.level/edit', '编辑', '', '', '', '', 0, '_iframe', '', '', '', 1752203137, 1752203137, 0, 'normal');
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (996, '2', 992, 'user.level/del', '删除', '', '', '', '', 0, '_iframe', '', '', '', 1752203162, 1752203162, 0, 'normal');
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (997, '1', 992, 'user.level/multi', '批量更新', '', '', '', '', 0, '_iframe', '', '', '', 1752284573, 1752284573, 0, 'normal');
 COMMIT;
 
 -- ----------------------------
@@ -1022,61 +1028,6 @@ INSERT INTO `bd_cms_member_comment` (`id`, `pid`, `contentid`, `comment`, `uid`,
 COMMIT;
 
 -- ----------------------------
--- Table structure for bd_cms_member_field
--- ----------------------------
-DROP TABLE IF EXISTS `bd_cms_member_field`;
-CREATE TABLE `bd_cms_member_field` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(30) NOT NULL DEFAULT '' COMMENT '字段',
-  `length` int(10) unsigned NOT NULL COMMENT '长度',
-  `required` char(1) NOT NULL DEFAULT '' COMMENT '是否必填',
-  `description` varchar(30) NOT NULL DEFAULT '' COMMENT '描述',
-  `sorting` int(10) unsigned NOT NULL COMMENT '排序',
-  `status` char(1) NOT NULL DEFAULT '' COMMENT '状态',
-  `create_user` varchar(30) NOT NULL,
-  `update_user` varchar(30) NOT NULL,
-  `create_time` datetime NOT NULL,
-  `update_time` datetime NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=27 DEFAULT CHARSET=utf8 COMMENT='会员字段';
-
--- ----------------------------
--- Records of bd_cms_member_field
--- ----------------------------
-BEGIN;
-INSERT INTO `bd_cms_member_field` (`id`, `name`, `length`, `required`, `description`, `sorting`, `status`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (26, 'level1', 20, '0', '等级', 255, '1', 'Admin', 'Admin', '2024-11-22 08:56:39', '2024-11-22 08:56:39');
-COMMIT;
-
--- ----------------------------
--- Table structure for bd_cms_member_group
--- ----------------------------
-DROP TABLE IF EXISTS `bd_cms_member_group`;
-CREATE TABLE `bd_cms_member_group` (
-  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `gcode` varchar(20) NOT NULL COMMENT '等级ID',
-  `gname` varchar(100) NOT NULL COMMENT '等级名称',
-  `description` varchar(200) NOT NULL COMMENT '描述',
-  `status` varchar(1) NOT NULL COMMENT '状态',
-  `lscore` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '积分下限',
-  `uscore` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '积分上限\n',
-  `create_user` varchar(30) NOT NULL,
-  `update_user` varchar(30) NOT NULL,
-  `create_time` datetime NOT NULL,
-  `update_time` datetime NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `member_group_gcode` (`gcode`)
-) ENGINE=MyISAM AUTO_INCREMENT=6 DEFAULT CHARSET=utf8 COMMENT='会员等级';
-
--- ----------------------------
--- Records of bd_cms_member_group
--- ----------------------------
-BEGIN;
-INSERT INTO `bd_cms_member_group` (`id`, `gcode`, `gname`, `description`, `status`, `lscore`, `uscore`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (1, '1', '初级会员', '初级会员具备基本的权限', '1', 0, 999, 'admin', 'Admin', '2020-06-25 00:00:00', '2024-11-10 16:45:07');
-INSERT INTO `bd_cms_member_group` (`id`, `gcode`, `gname`, `description`, `status`, `lscore`, `uscore`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (2, '2', '中级会员', '中级会员具备部分特殊权限', '1', 1000, 9999, 'admin', 'admin', '2020-06-25 00:00:00', '2020-06-25 00:00:00');
-INSERT INTO `bd_cms_member_group` (`id`, `gcode`, `gname`, `description`, `status`, `lscore`, `uscore`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (3, '3', '高级会员', '高级会员具备全部特殊权限', '1', 10000, 4294967295, 'admin', 'admin', '2020-06-25 00:00:00', '2020-06-25 00:00:00');
-COMMIT;
-
--- ----------------------------
 -- Table structure for bd_cms_message
 -- ----------------------------
 DROP TABLE IF EXISTS `bd_cms_message`;
@@ -1467,6 +1418,33 @@ CREATE TABLE `bd_user_group` (
 -- ----------------------------
 BEGIN;
 INSERT INTO `bd_user_group` (`id`, `name`, `rules`, `create_time`, `update_time`, `status`) VALUES (5, '普通', '2,4,11,10,9,12,1,3,7,6,5,8', 1750341203, 1750341203, 'normal');
+COMMIT;
+
+-- ----------------------------
+-- Table structure for bd_user_level
+-- ----------------------------
+DROP TABLE IF EXISTS `bd_user_level`;
+CREATE TABLE `bd_user_level` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `gcode` int(11) NOT NULL COMMENT '等级ID',
+  `gname` varchar(100) NOT NULL COMMENT '等级名称',
+  `description` varchar(200) NOT NULL COMMENT '描述',
+  `status` varchar(1) NOT NULL COMMENT '状态',
+  `lscore` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '积分下限',
+  `uscore` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '积分上限\n',
+  `create_time` datetime NOT NULL,
+  `update_time` datetime NOT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE KEY `user_level_gcode` (`gcode`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='会员等级';
+
+-- ----------------------------
+-- Records of bd_user_level
+-- ----------------------------
+BEGIN;
+INSERT INTO `bd_user_level` (`id`, `gcode`, `gname`, `description`, `status`, `lscore`, `uscore`, `create_time`, `update_time`) VALUES (1, 1, '初级会员', '初级会员具备基本的权限', '1', 0, 999, '2020-06-25 00:00:00', '2025-07-11 16:40:07');
+INSERT INTO `bd_user_level` (`id`, `gcode`, `gname`, `description`, `status`, `lscore`, `uscore`, `create_time`, `update_time`) VALUES (2, 2, '中级会员', '中级会员具备部分特殊权限', '1', 1000, 9999, '2020-06-25 00:00:00', '2020-06-25 00:00:00');
+INSERT INTO `bd_user_level` (`id`, `gcode`, `gname`, `description`, `status`, `lscore`, `uscore`, `create_time`, `update_time`) VALUES (3, 3, '高级会员', '高级会员具备全部特殊权限', '1', 10000, 4294967295, '2020-06-25 00:00:00', '2025-07-11 11:18:41');
 COMMIT;
 
 -- ----------------------------

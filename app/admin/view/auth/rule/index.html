@@ -24,6 +24,7 @@
         var dropdown = layui.dropdown;
         bdTable.api.init({
             table: treeTable,
+            reloadData: true,
             extend: {
                 index_url: "auth.rule/index",
                 add_url: "auth.rule/add",
