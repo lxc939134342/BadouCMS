@@ -33,7 +33,6 @@ class Content extends Base
      */
     protected $extfieldModel;
 
-
     protected $weighField = 'sorting';
 
     protected $quickSearchField = ['id','title'];
@@ -97,11 +96,10 @@ class Content extends Base
             'content.acode','=',get_backend_lang()
         ];
 
-
         /* 查询子栏目数据 */
         $res = $this->model
-            ->withJoin('contentsort')
             ->alias($alias)
+            ->withJoin(['contentsort'])
             ->where($where)
             ->order($sort, $order)
             ->paginate($limit);

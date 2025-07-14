@@ -294,7 +294,7 @@ class Backend extends BaseController
         $aliasName = '';
         if (!empty($this->model) && $relationSearch) {
             $name = $this->model->getTable();
-            $alias[$name] = Str::studly(basename(str_replace('\\', '/', get_class($this->model))));
+            $alias[$name] = Str::camel(basename(str_replace('\\', '/', get_class($this->model))));
             $aliasName = $alias[$name] . '.';
         }
         $sortArr = explode(',', $sort);
@@ -408,7 +408,7 @@ class Backend extends BaseController
                     if (count($tableArr) > 1 && $tableArr[0] != $name && !in_array($tableArr[0], $alias)
                         && !empty($this->model) && $this->relationSearch) {
                         //修复关联模型下时间无法搜索的BUG
-                        $relation = Str::studly($tableArr[0]);
+                        $relation = Str::camel($tableArr[0]);
                         $alias[$this->model->$relation()->getTable()] = $tableArr[0];
                     }
                     $where[] = [$k, str_replace('RANGE', 'BETWEEN', $sym) . ' TIME', $arr];
