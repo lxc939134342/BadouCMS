@@ -107,5 +107,7 @@ return [
     'You can\'t upload files of this type'                  => '不允许上传的文件类型',
     'Server responded with %s code'                         => '服务端响应(Code:%s)',
     'File is too big (%sMiB), Max filesize: %sMiB'          => '当前上传(%sM)，最大允许上传文件大小:%sM',
-    'File'                                                  => '文件'
+    'File'                                                  => '文件',
+    'Can not open zip file'                                 => '无法打开 zip 文件',
+
 ];

@@ -120,6 +120,12 @@
                     {:__('Setting')}
                 </a>
             {{ } }}
+            {{ if(module.is_testdata){ }}
+                <a href="javascript:;" class="layui-btn layui-bg-black layui-btn-sm btn-uninstall" title="{:__('Import data')}" data-state="{{=d.state}}">
+                    <i class="fa fa-database"></i>
+                    {:__('Import data')}
+                </a>
+            {{ } }}
             {{ if(d.state!=-1){ }}
             <a href="javascript:;" class="layui-btn layui-bg-red layui-btn-sm btn-uninstall" title="{:__('Uninstall')}" data-state="{{=d.state}}">
                 <i class="fa fa-trash"></i>
@@ -296,7 +302,7 @@
                         width: 80,
                         templet: Controller.api.formatter.switch,
                     },
-                    { title: __("Operate"),width:200, templet: Controller.api.formatter.operate },
+                    { title: __("Operate"),width:300, templet: Controller.api.formatter.operate },
                 ],
             ],
             done: function () {

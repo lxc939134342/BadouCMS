@@ -1,0 +1,89 @@
+{layout name="layout/default" /}
+
+<!-- 表格 -->
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table class="layui-hide" id="backuplist" data-operate-del="1"></table>
+    </div>
+</div>
+
+<!-- 表格左侧按钮 toolbar  -->
+<script type="text/html" id="toolbar">
+    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black">
+        <i class="fa fa-refresh"></i>
+    </a>
+    <a class="layui-btn layui-bg-green btn-ajax" href="{:url('database/backup')}">
+        <i class="fa fa-database"></i>
+        {:__('Backup')}
+    </a>
+</script>
+<script>
+    layui.use(["badou", "table"], function () {
+        var bdTable = layui.bdTable;
+        var table = layui.table;
+        var layer = layui.layer;
+        var dropdown = layui.dropdown;
+
+        bdTable.api.init({
+            table: table,
+            extend: {
+                index_url: "database/backuplist",
+                del_url: "database/backupdel",
+                table: "database",
+            },
+        });
+        bdTable.render({
+            elem: "#backuplist",
+            url: "{:url('database/backuplist')}",
+            pk: "id",
+            even: true,
+            page: true,
+            commonSearch: false,
+            defaultToolbar: [],
+            toolbar: "#toolbar",
+            cols: [
+                [
+                    { type: "checkbox" },
+                    { field: "file", title: __("File") },
+                    { field: "size", title: __("Size"), width: 180 },
+                    { field: "date", title: __("Backup date"), width: 200 },
+                    {
+                        field: "operate",
+                        title: __("Operate"),
+                        templet: bdTable.api.formatter.operate,
+                        buttons: [
+                            {
+                                name: "restore",
+                                icon: "fa fa-reply",
+                                title: __("Restore"),
+                                text:__("Restore"),
+                                url:'database/restore?file={file}',
+                                classname: "layui-btn layui-bg-blue layui-btn-sm btn-ajax",
+                                confirm:__('Are you sure you want to restore the data?'),
+                                success:function(){
+                                    $('.btn-refresh').trigger('click');
+                                }
+                            },
+                            {
+                                name: "del",
+                                icon: "fa fa-trash",
+                                title: __("Del"),
+                                url:'database/backupdel?file={file}',
+                                classname: "layui-btn layui-bg-red btn-ajax layui-btn-sm",
+                                confirm:__('Are you sure you want to delete this item?'),
+                                success:function(){
+                                    $('.btn-refresh').trigger('click');
+                                }
+                            },
+                        ],
+                    },
+                ],
+            ],
+            done:function(){
+                $('.btn-ajax').data('success',function () {
+                    $('.btn-refresh').trigger('click');
+                })
+            }
+        });
+    });
+</script>

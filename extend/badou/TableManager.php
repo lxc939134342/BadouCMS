@@ -3,13 +3,14 @@
 namespace badou;
 
 use Throwable;
+use ZipArchive;
 use think\Exception;
 use think\facade\Db;
 use think\facade\Config;
 use think\migration\db\Table;
+use Phinx\Db\Adapter\MysqlAdapter;
 use Phinx\Db\Adapter\AdapterFactory;
 use Phinx\Db\Adapter\AdapterInterface;
-use Phinx\Db\Adapter\MysqlAdapter;
 
 /**
  * 数据表管理类
@@ -17,6 +18,9 @@ use Phinx\Db\Adapter\MysqlAdapter;
  */
 class TableManager
 {
+    protected static $ignoreTables = [];
+    protected static $tables = [];
+
     /**
      * 返回一个 Phinx/Db/Table 实例 用于操作数据表
      * @param string  $table         表名
@@ -188,7 +192,152 @@ class TableManager
             'name'            => $config['database'],
             'table_prefix'    => $config['prefix'],
             'migration_table' => $config['prefix'] . $table,
+            'db'              => $db
         ];
+    }
+
+    public static function backup($module = 'all', $type = 0, $backUpdir = '')
+    {
+        self::$tables = array_keys(self::getTableList());
+
+        $sql = self::createSql($type);
+        $zip = new ZipArchive();
+        $date = date('YmdHis');
+        if (!is_dir($backUpdir)) {
+            @mkdir($backUpdir, 0755);
+        }
+
+        $name = "backup-{$module}-{$date}-" . Random::build();
+        $filename = $backUpdir . $name . ".zip";
+
+        if ($zip->open($filename, ZIPARCHIVE::CREATE) !== true) {
+            throw new Exception("Could not open <$filename>\n");
+        }
+        if ($type == 0) {
+            $sql = preg_replace('/AUTO_INCREMENT=\d+ /', '', $sql);
+        }
+        $zip->addFromString($name . ".sql", $sql);
+        $zip->close();
+    }
+
+    private static function createSql($type)
+    {
+        # COUNT
+        $ct = 0;
+        # CONTENT
+        $sqldump = '';
+        # COPYRIGHT & OPTIONS
+        $sqldump .= "-- MySQL dump\n";
+        $sqldump .= "-- version 1.0\n";
+        $sqldump .= "--\n";
+        $sqldump .= "-- SQL Dump created: " . date('F jS, Y \@ g:i a') . "\n\n";
+        $sqldump .= "SET SQL_MODE=\"NO_AUTO_VALUE_ON_ZERO\";";
+        $sqldump .= "\n\n-- --------------------------------------------------------\n\n";
+
+        $tables = array_diff(self::$tables, self::$ignoreTables);
+        $config = self::getPhinxDbConfig();
+        $db = $config['connection'];
+        # LOOP: Get the tables
+        foreach ($tables as $table) {
+            # COUNT
+            $ct++;
+            /** ** ** ** ** **/
+            # DATABASE: Count the rows in each tables
+            $count_rows = $db->prepare("SELECT * FROM `" . $table . "`");
+            $count_rows->execute();
+            $c_rows = $count_rows->columnCount();
+            # DATABASE: Count the columns in each tables
+            $count_columns = $db->prepare("SELECT COUNT(*) FROM `" . $table . "`");
+            $count_columns->execute();
+            $c_columns = $count_columns->fetchColumn();
+            /** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **/
+
+            # MYSQL DUMP: Remove tables if they exists
+            $sqldump .= "--\n";
+            $sqldump .= "-- Table structure for table `" . $table . "`\n";
+            $sqldump .= "--\n\n";
+            $sqldump .= "DROP TABLE IF EXISTS `" . $table . "`;\n\n";
+            /** ** ** ** ** **/
+            # MYSQL DUMP: Create table if they do not exists
+            $sqldump .= "--\n";
+            $sqldump .= "-- Create the table if it not exists\n";
+            $sqldump .= "--\n\n";
+            # LOOP: Get the fields for the table
+            foreach ($db->query("SHOW CREATE TABLE `" . $table . "`") as $field) {
+                $sqldump .= str_replace('CREATE TABLE', 'CREATE TABLE', $field['Create Table']);
+            }
+            # MYSQL DUMP: New rows
+            $sqldump .= ";\n\n";
+            /** ** ** ** ** **/
+
+            # CHECK: There are one or more columns
+            if ($c_columns != 0 && $type != 0) {
+                # MYSQL DUMP: List the data for each table
+                $sqldump .= "--\n";
+                $sqldump .= "-- Dumping data for table `" . $table . "`\n";
+                $sqldump .= "--\n\n";
+
+                # MYSQL DUMP: Insert into each table
+                $sqldump .= "INSERT INTO `" . $table . "` (";
+                # ARRAY
+                $rows = [];
+                $numeric = [];
+                # LOOP: Get the tables
+                foreach ($db->query("DESCRIBE `" . $table . "`") as $row) {
+                    $rows[] = "`" . $row[0] . "`";
+                    $numeric[] = (bool) preg_match('#^[^(]*(BYTE|COUNTER|SERIAL|INT|LONG$|CURRENCY|REAL|MONEY|FLOAT|DOUBLE|DECIMAL|NUMERIC|NUMBER)#i', $row[1]);
+                }
+                $sqldump .= implode(', ', $rows);
+                $sqldump .= ") VALUES\n";
+                # COUNT
+                $c = 0;
+                # LOOP: Get the tables
+                foreach ($db->query("SELECT * FROM `" . $table . "`") as $data) {
+                    # COUNT
+                    $c++;
+                    /** ** ** ** ** **/
+                    $sqldump .= "(";
+                    # ARRAY
+                    $cdata = [];
+                    # LOOP
+                    for ($i = 0; $i < $c_rows; $i++) {
+                        $value = $data[$i];
+
+                        if (is_null($value)) {
+                            $cdata[] = "NULL";
+                        } elseif ($numeric[$i]) {
+                            $cdata[] = $value;
+                        } else {
+                            $cdata[] = $db->quote($value);
+                        }
+                    }
+                    $sqldump .= implode(', ', $cdata);
+                    $sqldump .= ")";
+                    $sqldump .= ($c % 600 != 0 ? ($c_columns != $c ? ',' : ';') : '');
+                    # CHECK
+                    if ($c % 600 == 0) {
+                        $sqldump .= ";\n\n";
+                    } else {
+                        $sqldump .= "\n";
+                    }
+                    # CHECK
+                    if ($c % 600 == 0) {
+                        $sqldump .= "INSERT INTO `" . $table . "`(";
+                        # ARRAY
+                        $rows = [];
+                        # LOOP: Get the tables
+                        foreach ($db->query("DESCRIBE `" . $table . "`") as $row) {
+                            $rows[] = "`" . $row[0] . "`";
+                        }
+                        $sqldump .= implode(', ', $rows);
+                        $sqldump .= ") VALUES\n";
+                    }
+                }
+            }
+        }
+
+        $sqldump .= "\n\n\n";
+        return $sqldump;
     }
 
 }
