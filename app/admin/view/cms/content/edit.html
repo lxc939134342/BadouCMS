@@ -139,7 +139,7 @@
                     <select name="row[gid]" id="c-gid" class="layui-select">
                         <option value="">请选择</option>
                         {foreach $levellist as $level}
-                        <option value="{$level.gcode}">{$level.gname}</option>
+                        <option value="{$level.gcode}" {if $row.gid==$level.gcode}selected{/if}>{$level.gname}</option>
                         {/foreach}
                     </select>
                 </div>
@@ -150,7 +150,7 @@
                     <select name="row[gtype]" id="c-gtype" class="layui-select">
                         <option value="">请选择</option>
                         {foreach $gtypelist as $type}
-                        <option value="{$level.value}">{$type.label}</option>
+                        <option value="{$type.value}"  {if $row.gtype==$type.value}selected{/if}>{$type.label}</option>
                         {/foreach}
                     </select>
                 </div>
