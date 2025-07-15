@@ -41,7 +41,7 @@ class ContentExt extends Model
         foreach ($data as $key => $value) {
             if (preg_match('/^ext_[\w\-]+$/', $key)) {
                 if (isset($fieldsTypeMap[$key]) && $fieldsTypeMap[$key] == 'editor') {
-                    $extdata[$key] = xss_clean(str_replace(["\r\n", "\n"], '<br>', $value));
+                    $extdata[$key] = xss_clean($value);
                 } elseif (is_array($value)) {
                     $extdata[$key] = filter(implode(',', $value));
                 } elseif (is_string($value)) {
