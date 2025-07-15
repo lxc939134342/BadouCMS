@@ -196,9 +196,20 @@ class TableManager
         ];
     }
 
-    public static function backup($module = 'all', $type = 0, $backUpdir = '')
+    public static function backup($module = 'all', $type = 1, $backUpdir = '')
     {
         self::$tables = array_keys(self::getTableList());
+        $config = self::getPhinxDbConfig();
+        /* 单独备份模块数据 */
+        if ($module != 'all') {
+            foreach (self::$tables as $key => $table) {
+                if (stripos($table, $config['table_prefix'].$module . '_') !== 0) {
+                    unset(self::$tables[$key]);
+                }
+            }
+            // 重新索引数组，防止后续遍历出错
+            self::$tables = array_values(self::$tables);
+        }
 
         $sql = self::createSql($type);
         $zip = new ZipArchive();
@@ -207,7 +218,7 @@ class TableManager
             @mkdir($backUpdir, 0755);
         }
 
-        $name = "backup-{$module}-{$date}-" . Random::build();
+        $name = "backup-{$module}-{$date}";
         $filename = $backUpdir . $name . ".zip";
 
         if ($zip->open($filename, ZIPARCHIVE::CREATE) !== true) {
@@ -237,6 +248,7 @@ class TableManager
         $tables = array_diff(self::$tables, self::$ignoreTables);
         $config = self::getPhinxDbConfig();
         $db = $config['connection'];
+
         # LOOP: Get the tables
         foreach ($tables as $table) {
             # COUNT

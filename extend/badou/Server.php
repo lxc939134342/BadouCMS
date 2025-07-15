@@ -59,6 +59,8 @@ class Server
             if (!isset($info['name'])) {
                 continue;
             }
+            $is_testdata = is_file(self::getTestdataFile($name));
+            $info['is_testdata'] = $is_testdata;
             $list[$name] = $info;
         }
         return $list;

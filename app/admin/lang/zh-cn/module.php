@@ -39,4 +39,7 @@ return [
     'Frame Upgrade'                                            => '框架升级',
     'Module already exists'                                    => '模块已存在',
     'Continue operate'                                         => '继续操作',
+    'Import data'                                              => '导入数据',
+    'To prevent data loss, manually back up the data first'    => '防止数据丢失，请先手动备份数据',
+    'Import successful'                                        => '导入成功'
 ];

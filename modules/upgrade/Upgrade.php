@@ -165,7 +165,10 @@ class Upgrade
 
         Db::startTrans();
         try {
-            Menu::menuUpdate($menu, $old, 'user');
+            foreach ($menu as $value) {
+                Menu::menuUpdate([$value], $old, $value['parent_name']);
+            }
+
             $ids = [];
             foreach ($old as $index => $item) {
                 if (!isset($item['keep'])) {

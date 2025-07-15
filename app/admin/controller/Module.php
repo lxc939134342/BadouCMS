@@ -18,6 +18,7 @@ use think\facade\Db;
 use think\facade\Config;
 use badou\ModuleException;
 use app\common\controller\Backend;
+use badou\TableManager;
 
 class Module extends Backend
 {
@@ -282,6 +283,10 @@ class Module extends Backend
         }
 
         try {
+            // 备份模块数据
+            $backupdir = root_path().'runtime'.DIRECTORY_SEPARATOR.'database'.DIRECTORY_SEPARATOR;
+            TableManager::backup('all', 1, $backupdir);
+
             Server::importsql($name, 'testdata.sql');
         } catch (ModuleException $e) {
             $this->result(__($e->getMessage()), $e->getData(), 0, $e->getCode(), );

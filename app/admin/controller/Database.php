@@ -35,7 +35,6 @@ class Database extends Backend
 
     public function index()
     {
-        $group = $this->request->get("group");
         $page = $this->request->get("page", 1);
         $limit = $this->request->get("limit");
         $offset = ($page - 1) * $limit;

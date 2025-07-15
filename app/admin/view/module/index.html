@@ -1,9 +1,9 @@
 {layout name="layout/default" /}
 <style>
-    .layui-btn.active{
-       background-color: #2a50c1 !important;
+    .layui-btn.active {
+        background-color: #2a50c1 !important;
     }
-    .layui-table-cell .layui-btn .fa{
+    .layui-table-cell .layui-btn .fa {
         font-size: 13px !important;
     }
 </style>
@@ -37,102 +37,99 @@
                 {:__('BADOU Userinfo')}
             </button>
 
-            {foreach :hook('module_top_btn',[],true) as $hook}
-                {$hook|raw}
-            {/foreach}
-
+            {foreach :hook('module_top_btn',[],true) as $hook} {$hook|raw} {/foreach}
         </div>
 
         <table class="layui-hide" id="module"></table>
     </div>
 </div>
 <script id="operatetpl" type="text/html">
-    {{ var labelarr = ['primary', 'success', 'info', 'danger', 'warning'] }}
-    {{ var label = labelarr[d.id % 5] }}
-    {{ var module = d.module }}
+    {{ var labelarr = ['primary', 'success', 'info', 'danger', 'warning'] }} {{ var label = labelarr[d.id % 5] }} {{ var
+    module = d.module }}
 
     <span class="operate" data-id="{{=d.id}}" data-name="{{=d.name}}" data-title="{{=d.title}}">
-        {{ if(!module){ }}
-            {{ if(typeof d.releaselist !="undefined" && d.releaselist.length>1){ }}
-            <button
-                class="layui-btn layui-btn-sm layui-bg-green btn-dropdown"
-                data-operate="install"
-                lay-options="{
+        {{ if(!module){ }} {{ if(typeof d.releaselist !="undefined" && d.releaselist.length>1){ }}
+        <button
+            class="layui-btn layui-btn-sm layui-bg-green btn-dropdown"
+            data-operate="install"
+            lay-options="{
                     customName: {
                         id: 'id',
                         title: 'version',
                     },
                     data: {{= JSON.stringify(d.releaselist) }}
                 }">
-                 <i class="fa fa-cloud-download"></i>
-                {:__('Install')}
-                <i class="fa fa-caret-down layui-font-12"></i>
-            </button>
-            {{ }else if(typeof d.releaselist !="undefined" && d.releaselist.length>0){}}
-            <a
-                href="javascript:;"
-                class="layui-btn layui-btn-sm layui-bg-green btn-install"
-                data-type="{{= d.price<=0?'free':'price' }}"
-                data-version="{{=d.version}}">
-                <i class="fa fa-cloud-download"></i>
-                {:__('Install')}
-            </a>
-            {{ } }}
-            {{ if(d.demourl){ }}
-            <a href="{{=d.demourl}}" class="layui-btn layui-btn-sm btn-demo" target="_blank">
-                <i class="fa fa-flash"></i>
-                {:__('Demo')}
-            </a>
-            {{ } }}
-            {{ if(d.button){ }}
-            <a href="{{=d.url}}" class="layui-btn layui-btn-sm" target="_blank"><i class="fa fa-info-circle"></i> {{=d.button}}</a>
-            {{ } }}
-        {{ } else {}}
-            {{ if(module.version!=d.version){}}
-                {{ if(typeof d.releaselist !="undefined" && d.releaselist.length>1){ }}
-                <button
-                    class="layui-btn layui-bg-orange layui-btn-sm btn-dropdown"
-                    lay-options="{
+            <i class="fa fa-cloud-download"></i>
+            {:__('Install')}
+            <i class="fa fa-caret-down layui-font-12"></i>
+        </button>
+        {{ }else if(typeof d.releaselist !="undefined" && d.releaselist.length>0){}}
+        <a
+            href="javascript:;"
+            class="layui-btn layui-btn-sm layui-bg-green btn-install"
+            data-type="{{= d.price<=0?'free':'price' }}"
+            data-version="{{=d.version}}">
+            <i class="fa fa-cloud-download"></i>
+            {:__('Install')}
+        </a>
+        {{ } }} {{ if(d.demourl){ }}
+        <a href="{{=d.demourl}}" class="layui-btn layui-btn-sm btn-demo" target="_blank">
+            <i class="fa fa-flash"></i>
+            {:__('Demo')}
+        </a>
+        {{ } }} {{ if(d.button){ }}
+        <a href="{{=d.url}}" class="layui-btn layui-btn-sm" target="_blank">
+            <i class="fa fa-info-circle"></i>
+            {{=d.button}}
+        </a>
+        {{ } }} {{ } else {}} {{ if(module.version!=d.version){}} {{ if(typeof d.releaselist !="undefined" &&
+        d.releaselist.length>1){ }}
+        <button
+            class="layui-btn layui-bg-orange layui-btn-sm btn-dropdown"
+            lay-options="{
                         customName: {
                             id: 'id',
                             title: 'version',
                         },
                         data: {{= JSON.stringify(d.releaselist) }}
                     }">
-                    <i class="fa fa-cloud"></i>
-                     {:__('Upgrade')}
-                    <i class="fa fa-caret-down layui-font-13"></i>
-                </button>
-                {{ }else{ }}
-                <a
-                    href="javascript:;"
-                    class="layui-btn layui-btn-sm btn-upgrade"
-                    title="{:__('Upgrade')}"
-                    data-version="{{=d.version}}">
-                    <i class="fa fa-cloud"></i>
-                    {:__('Upgrade')}
-                </a>
-                {{ } }}
-            {{ } }}
-            {{ if(module.config){ }}
-                <a href="javascript:;" class="layui-btn layui-btn-sm btn-config" title="{:__('Setting')}">
-                    <i class="fa fa-pencil"></i>
-                    {:__('Setting')}
-                </a>
-            {{ } }}
-            {{ if(module.is_testdata){ }}
-                <a href="javascript:;" class="layui-btn layui-bg-black layui-btn-sm btn-uninstall" title="{:__('Import data')}" data-state="{{=d.state}}">
-                    <i class="fa fa-database"></i>
-                    {:__('Import data')}
-                </a>
-            {{ } }}
-            {{ if(d.state!=-1){ }}
-            <a href="javascript:;" class="layui-btn layui-bg-red layui-btn-sm btn-uninstall" title="{:__('Uninstall')}" data-state="{{=d.state}}">
-                <i class="fa fa-trash"></i>
-                {:__('Uninstall')}
-            </a>
-            {{ } }}
-        {{ } }}
+            <i class="fa fa-cloud"></i>
+            {:__('Upgrade')}
+            <i class="fa fa-caret-down layui-font-13"></i>
+        </button>
+        {{ }else{ }}
+        <a
+            href="javascript:;"
+            class="layui-btn layui-btn-sm btn-upgrade"
+            title="{:__('Upgrade')}"
+            data-version="{{=d.version}}">
+            <i class="fa fa-cloud"></i>
+            {:__('Upgrade')}
+        </a>
+        {{ } }} {{ } }} {{ if(module.config){ }}
+        <a href="javascript:;" class="layui-btn layui-btn-sm btn-config" title="{:__('Setting')}">
+            <i class="fa fa-pencil"></i>
+            {:__('Setting')}
+        </a>
+        {{ } }} {{ if(module.is_testdata){ }}
+        <a
+            href="javascript:;"
+            class="layui-btn layui-bg-black layui-btn-sm btn-importdata"
+            title="{:__('Import data')}"
+            data-state="{{=d.state}}">
+            <i class="fa fa-database"></i>
+            {:__('Import data')}
+        </a>
+        {{ } }} {{ if(d.state!=-1){ }}
+        <a
+            href="javascript:;"
+            class="layui-btn layui-bg-red layui-btn-sm btn-uninstall"
+            title="{:__('Uninstall')}"
+            data-state="{{=d.state}}">
+            <i class="fa fa-trash"></i>
+            {:__('Uninstall')}
+        </a>
+        {{ } }} {{ } }}
     </span>
 </script>
 
@@ -183,7 +180,7 @@
 </script>
 
 <script type="text/javascript">
-    layui.use(["badou", "tabs", "form", "laytpl","toast"], function () {
+    layui.use(["badou", "tabs", "form", "laytpl", "toast"], function () {
         var bdTable = layui.bdTable;
         var card = layui.cardList;
         var form = layui.form;
@@ -203,8 +200,8 @@
                         if (!row.module) {
                             return "";
                         }
-                        if(row.state==-1){
-                            return ""
+                        if (row.state == -1) {
+                            return "";
                         }
                         var value = row.state;
                         that.checked = that.checked || 1;
@@ -215,7 +212,9 @@
                                 that.field +
                                 '" value="' +
                                 row.state +
-                                '" lay-skin="switch" data-module="'+row.name+'" data-field="' +
+                                '" lay-skin="switch" data-module="' +
+                                row.name +
+                                '" data-field="' +
                                 that.field +
                                 '" lay-filter="state" ' +
                                 checked +
@@ -241,7 +240,7 @@
         };
         var userinfo = badou.api.badouStorage.get("userinfo");
         var uid = userinfo ? userinfo.id : 0;
-        var token = userinfo ? userinfo.token : '';
+        var token = userinfo ? userinfo.token : "";
         bdTable.api.init({
             table: table,
             extend: {
@@ -251,14 +250,21 @@
         });
         bdTable.render({
             elem: "#module",
-            url: "{:url('module/index')}?bdversion="+Config.bdversion+"&uid="+uid+"&token="+token,
+            url: "{:url('module/index')}?bdversion=" + Config.bdversion + "&uid=" + uid + "&token=" + token,
             pk: "id",
             even: true,
             toolbar: false,
             page: true,
             cols: [
                 [
-                    { field: "type", title: __("Type"),width:80,templet:bdTable.api.formatter.flag,custom:{'module':'green','template':'orange'},searchList:{'module':'插件','template':'模版'} },
+                    {
+                        field: "type",
+                        title: __("Type"),
+                        width: 80,
+                        templet: bdTable.api.formatter.flag,
+                        custom: { module: "green", template: "orange" },
+                        searchList: { module: "插件", template: "模版" },
+                    },
                     { field: "title", title: __("Title"), width: 250 },
                     {
                         field: "intro",
@@ -293,7 +299,9 @@
                         width: 130,
                         align: "left",
                         templet: function (data) {
-                            return data.module && data.module.version != data.version ? data.module.version +' <span class="layui-badge-dot"> </span>' : data.version;
+                            return data.module && data.module.version != data.version
+                                ? data.module.version + ' <span class="layui-badge-dot"> </span>'
+                                : data.version;
                         },
                     },
                     {
@@ -302,7 +310,7 @@
                         width: 80,
                         templet: Controller.api.formatter.switch,
                     },
-                    { title: __("Operate"),width:300, templet: Controller.api.formatter.operate },
+                    { title: __("Operate"), width: 300, templet: Controller.api.formatter.operate },
                 ],
             ],
             done: function () {
@@ -315,16 +323,22 @@
                     },
                 });
 
-                layui.form.on('switch(state)', function (row) {
+                layui.form.on("switch(state)", function (row) {
                     row.elem.checked = false;
                     var that = $(this);
-                    var value= row.value
-                    operate(that.data('module'), row.value==1 ? "disable" : "enable",false,function(data,ret){
-                        row.elem.checked = true;
-                    },function(data,ret){
-                        row.elem.checked = false;
-                        return false;
-                    });
+                    var value = row.value;
+                    operate(
+                        that.data("module"),
+                        row.value == 1 ? "disable" : "enable",
+                        false,
+                        function (data, ret) {
+                            row.elem.checked = true;
+                        },
+                        function (data, ret) {
+                            row.elem.checked = false;
+                            return false;
+                        }
+                    );
                 });
             },
         });
@@ -452,238 +466,251 @@
             }
         });
 
-        var conflicttpl  = document.getElementById('conflicttpl').innerHTML;
-        var uninstalltpl = document.getElementById('uninstalltpl').innerHTML;
+        var conflicttpl = document.getElementById("conflicttpl").innerHTML;
+        var uninstalltpl = document.getElementById("uninstalltpl").innerHTML;
 
-        var operate = function (name, action, force, success,error) {
-            var area = [$(window).width() > 650 ? '650px' : '95%', $(window).height() > 710 ? '710px' : '95%'];
-            badou.api.ajax({
-                url: 'module/state',
-                data: {name: name, action: action, force: force ? 1 : 0}
-            }, function (data, ret) {
-                layer.closeAll();
-                if (typeof success === 'function') {
-                    success(data, ret);
+        var operate = function (name, action, force, success, error) {
+            var area = [$(window).width() > 650 ? "650px" : "95%", $(window).height() > 710 ? "710px" : "95%"];
+            badou.api.ajax(
+                {
+                    url: "module/state",
+                    data: { name: name, action: action, force: force ? 1 : 0 },
+                },
+                function (data, ret) {
+                    layer.closeAll();
+                    if (typeof success === "function") {
+                        success(data, ret);
+                    }
+                    top.window.location.reload();
+                    return false;
+                },
+                function (data, ret) {
+                    if (typeof error === "function") {
+                        error(data, ret);
+                    }
+                    if (ret && ret.code === -3) {
+                        //模块目录发现影响全局的文件
+                        layer.open({
+                            content: laytpl(conflicttpl, { tagStyle: "modern" }).render(ret.data),
+                            shade: 0.8,
+                            area: area,
+                            title: __("Warning"),
+                            btn: [__("Continue operate"), __("Cancel")],
+                            end: function () {},
+                            yes: function () {
+                                operate(name, action, true, success);
+                            },
+                        });
+                    } else {
+                        layer.alert(ret.msg, { title: __("Warning"), icon: 0 });
+                    }
+                    return false;
                 }
-                top.window.location.reload()
-                return false;
-            }, function (data, ret) {
-                if (typeof error === 'function') {
-                    error(data, ret);
-                }
-                if (ret && ret.code === -3) {
-                    //模块目录发现影响全局的文件
-                    layer.open({
-                        content:laytpl(conflicttpl, {tagStyle: 'modern'}).render(ret.data),
-                        shade: 0.8,
-                        area: area,
-                        title: __('Warning'),
-                        btn: [__('Continue operate'), __('Cancel')],
-                        end: function () {
-
-                        },
-                        yes: function () {
-                            operate(name, action, true, success);
-                        }
-                    });
-
-                } else {
-                    layer.alert(ret.msg, {title: __('Warning'), icon: 0});
-                }
-                return false;
-            });
+            );
         };
 
         var install = function (name, version, force, success) {
-            var userinfo = badou.api.badouStorage.get('userinfo');
+            var userinfo = badou.api.badouStorage.get("userinfo");
             var uid = userinfo ? userinfo.id : 0;
-            var token = userinfo ? userinfo.token : '';
+            var token = userinfo ? userinfo.token : "";
 
             if (parseInt(uid) === 0) {
                 $(".btn-userinfo").trigger("click", name, version);
                 return false;
             }
-            badou.api.ajax({
-                url: 'module/install',
-                data: {
-                    name: name,
-                    force: force ? 1 : 0,
-                    uid: uid,
-                    token: token,
-                    version: version,
-                    bdversion: Config.bdversion
-                }
-            }, function (data, ret) {
-                layer.closeAll();
-                operate(data.module.name, 'enable', false, function () {
-                    layer.alert(__('Online installed tips') + (data.module.testdata ? __('Testdata tips') : ""), {
-                        btn: data.module.testdata ? [__('Import testdata'), __('Skip testdata')] : [__('OK')],
-                        title: __('Warning'),
-                        yes: function (index) {
-                            if (data.module.testdata) {
-                                badou.api.ajax({
-                                    url: 'module/testdata',
-                                    data: {
-                                        name: name,
-                                        uid: uid,
-                                        token: token,
-                                        version: version,
-                                        bdversion: Config.bdversion
-                                    }
-                                }, function (data, ret) {
+            badou.api.ajax(
+                {
+                    url: "module/install",
+                    data: {
+                        name: name,
+                        force: force ? 1 : 0,
+                        uid: uid,
+                        token: token,
+                        version: version,
+                        bdversion: Config.bdversion,
+                    },
+                },
+                function (data, ret) {
+                    layer.closeAll();
+                    operate(data.module.name, "enable", false, function () {
+                        layer.alert(__("Online installed tips") + (data.module.testdata ? __("Testdata tips") : ""), {
+                            btn: data.module.testdata ? [__("Import testdata"), __("Skip testdata")] : [__("OK")],
+                            title: __("Warning"),
+                            yes: function (index) {
+                                if (data.module.testdata) {
+                                    badou.api.ajax(
+                                        {
+                                            url: "module/testdata",
+                                            data: {
+                                                name: name,
+                                                uid: uid,
+                                                token: token,
+                                                version: version,
+                                                bdversion: Config.bdversion,
+                                            },
+                                        },
+                                        function (data, ret) {
+                                            layer.close(index);
+                                        }
+                                    );
+                                } else {
                                     layer.close(index);
-                                });
-                            } else {
-                                layer.close(index);
-                            }
-                        },
-                        icon: 1,
-                        end: function () {
-                            success && success()
-                        }
-                    });
-
-                });
-                return false;
-            }, function (data, ret) {
-                var area = [$(window).width() > 650 ? '650px' : '95%', $(window).height() > 710 ? '710px' : '95%'];
-
-                if (ret && ret.code === -2) {
-                    //如果登录已经超时,重新提醒登录
-                    if (uid && uid != ret.data.uid) {
-                        badou.api.badouStorage.remove('userinfo');
-                        $(".btn-install").trigger("click");
-                        return;
-                    }
-                    top.layer.open({
-                        content: ret.data.payurl,
-                        title: __('Pay now'),
-                        area: area,
-                        type:2,
-                        end: function () {
-                            badou.api.ajax({
-                                url: 'module/isbuy',
-                                data: {
-                                    name: name,
-                                    force: force ? 1 : 0,
-                                    uid: uid,
-                                    token: token,
-                                    version: version,
-                                    bdversion: Config.bdversion
                                 }
-                            }, function () {
-                                top.layer.alert(__('Pay successful tips'), {
-                                    btn: [__('Continue installation')],
-                                    title: __('Warning'),
-                                    icon: 1,
-                                    yes: function (index) {
-                                        top.layer.close(index);
-                                        install(name, version);
-                                    }
-                                });
-                                return false;
-                            }, function () {
-                                return false;
-                            });
-                        }
-                    })
-                } else if (ret && ret.code === -3) {
-                    //模块目录发现影响全局的文件
-                    layer.open({
-                        content: laytpl(conflicttpl, {tagStyle: 'modern'}).render(ret.data),
-                        shade: 0.8,
-                        area: area,
-                        title: __('Warning'),
-                        btn: [__('Continue install'), __('Cancel')],
-                        end: function () {
-
-                        },
-                        yes: function () {
-                            install(name, version, true);
-                        }
+                            },
+                            icon: 1,
+                            end: function () {
+                                success && success();
+                            },
+                        });
                     });
-
-                }else if(ret && ret.code==401){
-                    $(".btn-userinfo").trigger("click", name, version);
                     return false;
-                } else {
-                    layer.alert(ret.msg, {title: __('Warning'), icon: 0});
+                },
+                function (data, ret) {
+                    var area = [$(window).width() > 650 ? "650px" : "95%", $(window).height() > 710 ? "710px" : "95%"];
+
+                    if (ret && ret.code === -2) {
+                        //如果登录已经超时,重新提醒登录
+                        if (uid && uid != ret.data.uid) {
+                            badou.api.badouStorage.remove("userinfo");
+                            $(".btn-install").trigger("click");
+                            return;
+                        }
+                        top.layer.open({
+                            content: ret.data.payurl,
+                            title: __("Pay now"),
+                            area: area,
+                            type: 2,
+                            end: function () {
+                                badou.api.ajax(
+                                    {
+                                        url: "module/isbuy",
+                                        data: {
+                                            name: name,
+                                            force: force ? 1 : 0,
+                                            uid: uid,
+                                            token: token,
+                                            version: version,
+                                            bdversion: Config.bdversion,
+                                        },
+                                    },
+                                    function () {
+                                        top.layer.alert(__("Pay successful tips"), {
+                                            btn: [__("Continue installation")],
+                                            title: __("Warning"),
+                                            icon: 1,
+                                            yes: function (index) {
+                                                top.layer.close(index);
+                                                install(name, version);
+                                            },
+                                        });
+                                        return false;
+                                    },
+                                    function () {
+                                        return false;
+                                    }
+                                );
+                            },
+                        });
+                    } else if (ret && ret.code === -3) {
+                        //模块目录发现影响全局的文件
+                        layer.open({
+                            content: laytpl(conflicttpl, { tagStyle: "modern" }).render(ret.data),
+                            shade: 0.8,
+                            area: area,
+                            title: __("Warning"),
+                            btn: [__("Continue install"), __("Cancel")],
+                            end: function () {},
+                            yes: function () {
+                                install(name, version, true);
+                            },
+                        });
+                    } else if (ret && ret.code == 401) {
+                        $(".btn-userinfo").trigger("click", name, version);
+                        return false;
+                    } else {
+                        layer.alert(ret.msg, { title: __("Warning"), icon: 0 });
+                    }
+                    return false;
                 }
-                return false;
-            });
+            );
         };
 
         var uninstall = function (name, force, droptables) {
-            badou.api.ajax({
-                url: 'module/uninstall',
-                data: {name: name, force: force ? 1 : 0, droptables: droptables ? 1 : 0}
-            }, function (data, ret) {
-                layer.closeAll();
-                toast.success({
-                    message:ret.msg,
-                    onClosing:function(){
-                        location.reload();
-                    }
-                })
-                return false;
-            }, function (data, ret) {
-                if (ret && ret.code === -3) {
-                    //模块目录发现影响全局的文件
-                    layer.open({
-                        content: laytpl(conflicttpl, {tagStyle: 'modern'}).render(ret.data),
-                        shade: 0.8,
-                        area: area,
-                        title: __('Warning'),
-                        btn: [__('Continue uninstall'), __('Cancel')],
-                        end: function () {
-
+            badou.api.ajax(
+                {
+                    url: "module/uninstall",
+                    data: { name: name, force: force ? 1 : 0, droptables: droptables ? 1 : 0 },
+                },
+                function (data, ret) {
+                    layer.closeAll();
+                    toast.success({
+                        message: ret.msg,
+                        onClosing: function () {
+                            location.reload();
                         },
-                        yes: function () {
-                            uninstall(name, true, droptables);
-                        }
                     });
-
-                } else {
-                    layer.alert(ret.msg, {title: __('Warning'), icon: 0});
+                    return false;
+                },
+                function (data, ret) {
+                    if (ret && ret.code === -3) {
+                        //模块目录发现影响全局的文件
+                        layer.open({
+                            content: laytpl(conflicttpl, { tagStyle: "modern" }).render(ret.data),
+                            shade: 0.8,
+                            area: area,
+                            title: __("Warning"),
+                            btn: [__("Continue uninstall"), __("Cancel")],
+                            end: function () {},
+                            yes: function () {
+                                uninstall(name, true, droptables);
+                            },
+                        });
+                    } else {
+                        layer.alert(ret.msg, { title: __("Warning"), icon: 0 });
+                    }
+                    return false;
                 }
-                return false;
-            });
+            );
         };
 
         var upgrade = function (name, version) {
-            var userinfo = badou.api.badouStorage.get('userinfo');
+            var userinfo = badou.api.badouStorage.get("userinfo");
             var uid = userinfo ? userinfo.id : 0;
-            var token = userinfo ? userinfo.token : '';
+            var token = userinfo ? userinfo.token : "";
 
             if (parseInt(uid) === 0) {
                 $(".btn-userinfo").trigger("click", name, version);
                 return false;
             }
-            badou.api.ajax({
-                url: 'module/upgrade',
-                data: {name: name, uid: uid, token: token, version: version, faversion: Config.faversion}
-            }, function (data, ret) {
-                layer.closeAll();
-            }, function (data, ret) {
-                if(ret.code==-2){
-                    //如果登录已经超时,重新提醒登录
-                    if (uid && uid != ret.data.uid) {
-                        badou.api.badouStorage.remove('userinfo');
-                        $(".btn-install").trigger("click");
-                        return;
+            badou.api.ajax(
+                {
+                    url: "module/upgrade",
+                    data: { name: name, uid: uid, token: token, version: version, faversion: Config.faversion },
+                },
+                function (data, ret) {
+                    layer.closeAll();
+                },
+                function (data, ret) {
+                    if (ret.code == -2) {
+                        //如果登录已经超时,重新提醒登录
+                        if (uid && uid != ret.data.uid) {
+                            badou.api.badouStorage.remove("userinfo");
+                            $(".btn-install").trigger("click");
+                            return;
+                        }
                     }
-                }
-                if(ret.code==401){
-                    $(".btn-userinfo").trigger("click", name, version);
+                    if (ret.code == 401) {
+                        $(".btn-userinfo").trigger("click", name, version);
+                        return false;
+                    }
+                    layer.alert(ret.msg, { title: __("Warning") });
                     return false;
                 }
-                layer.alert(ret.msg, {title: __('Warning')});
-                return false;
-            });
+            );
         };
 
         $(document).on("click", ".btn-refresh", function () {
-            bdTable.api.events.toolbar.refresh()
+            bdTable.api.events.toolbar.refresh();
         });
 
         $(document).on("click", ".btn-install", function () {
@@ -693,6 +720,28 @@
             install(name, version, false);
         });
 
+        $(document).on("click", ".btn-importdata", function () {
+            var that = this;
+            var name = $(that).parents(".operate").data("name");
+            layer.confirm(
+                __("To prevent data loss, manually back up the data first"),
+                { icon: 3, title: __("Warning"), shadeClose: true, btn: [__("OK"), __("Cancel")] },
+                function (index) {
+                    layer.close(index);
+                    badou.api.ajax(
+                        {
+                            url: "module/testdata",
+                            data: { name: name },
+                        },
+                        function (data, ret) {
+                            layer.closeAll();
+                            layer.alert(ret.msg, { title: __("Warning"), icon: 1 });
+                            return false;
+                        }
+                    );
+                }
+            );
+        });
 
         $(document).on("click", ".btn-upgrade", function () {
             var that = this;
@@ -705,19 +754,22 @@
             var that = this;
             var name = $(that).parents(".operate").data("name");
             var title = $(that).parents(".operate").data("title");
-            var state= $(this).data("state");
+            var state = $(this).data("state");
             if (state == 1) {
-                layer.alert(__('Please disable the add before trying to uninstall'), {icon: 7});
+                layer.alert(__("Please disable the add before trying to uninstall"), { icon: 7 });
                 return false;
             }
             laytpl.extendVars({
-                __:__
+                __: __,
             });
-            var uninstalltpl = document.getElementById('uninstalltpl').innerHTML;
-            layer.confirm(laytpl(uninstalltpl).render({title:title,name:name}), {focusBtn: false, title: __("Warning")}, function (index, layero) {
-                uninstall(name, false, $("input[name='droptables']", layero).prop("checked"));
-            });
-
+            var uninstalltpl = document.getElementById("uninstalltpl").innerHTML;
+            layer.confirm(
+                laytpl(uninstalltpl).render({ title: title, name: name }),
+                { focusBtn: false, title: __("Warning") },
+                function (index, layero) {
+                    uninstall(name, false, $("input[name='droptables']", layero).prop("checked"));
+                }
+            );
         });
 
         $(document).on("click", ".btn-config", function () {
@@ -727,19 +779,30 @@
         });
 
         $(document).on("click", "#droptables", function () {
-            var name=$(this).data('name')
+            var name = $(this).data("name");
             if ($(this).prop("checked")) {
-                badou.api.ajax({
-                    url: "module/getTableList",
-                    async: false,
-                    data: {name:name}
-                }, function (data) {
-                    tables = data.tables;
-                    return false;
-                });
+                badou.api.ajax(
+                    {
+                        url: "module/getTableList",
+                        async: false,
+                        data: { name: name },
+                    },
+                    function (data) {
+                        tables = data.tables;
+                        return false;
+                    }
+                );
                 var html;
-                html = tables.length > 0 ? '<div class="alert alert-warning droptablestips" style="max-width:480px;max-height:300px;overflow-y: auto;">' + __('The following data tables will be deleted') + '：<br>' + tables.join("<br>") + '</div>'
-                    : '<div class="alert alert-warning droptablestips">' + __('The Addon did not create a data table') + '</div>';
+                html =
+                    tables.length > 0
+                        ? '<div class="alert alert-warning droptablestips" style="max-width:480px;max-height:300px;overflow-y: auto;">' +
+                          __("The following data tables will be deleted") +
+                          "：<br>" +
+                          tables.join("<br>") +
+                          "</div>"
+                        : '<div class="alert alert-warning droptablestips">' +
+                          __("The Addon did not create a data table") +
+                          "</div>";
                 $(html).insertAfter($(this).closest("p"));
             } else {
                 $(".droptablestips").remove();
