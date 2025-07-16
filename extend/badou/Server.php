@@ -195,6 +195,88 @@ class Server
     }
 
     /**
+     * 解压模块
+     *
+     * @param string $name 模块名称
+     * @param string $file 文件路径
+     * @param bool $conflict 检测冲突文件
+     * @return  string
+     * @throws  Exception
+     */
+    public static function upgradeUnzip($name, $file = '', $conflict = true)
+    {
+        if (!$name) {
+            throw new Exception('Invalid parameters');
+        }
+        $modulesBackupDir = self::getModulesBackupDir();
+        $file = $file ?: $modulesBackupDir . $name . '.zip';
+
+        // 打开模块压缩包
+        $zip = new ZipFile();
+        try {
+            $zip->openFile($file);
+        } catch (ZipException $e) {
+            $zip->close();
+            throw new Exception('Unable to open the zip file');
+        }
+
+        $dir = self::getModuleDir($name);
+        if (!is_dir($dir)) {
+            @mkdir($dir, 0755);
+        }
+        $conflictlist = [];
+        $ignoreDirs = config('badouadmin.upgrade_ignore_dirs'); // 需忽略的目录前缀
+        $extractlist = [];
+        // 解压模块压缩包
+        try {
+            $fileList = $zip->getListFiles();
+            foreach ($fileList as $file) {
+                $destPath = $dir . $file;
+                if ($ignoreDirs && self::isIgnoreDirs($ignoreDirs, $file)) {
+                    continue;
+                }
+                // 需要解压的文件
+                $extractlist[] = $file;
+                //检测冲突文件
+                $zipContent = $zip->getEntryContents($file);
+                if ($conflict) {
+                    if (is_file($destPath)) {
+                        if (strlen($zipContent) != filesize($destPath) ||
+    md5($zipContent) != md5_file($destPath)) {
+                            $conflictlist[] =  $file;
+                            continue;
+                        }
+                    }
+                }
+            }
+            /* 备份差异文件 */
+            if (count($conflictlist)) {
+                $backupzip = new ZipFile();
+                try {
+                    foreach ($conflictlist as $k => $v) {
+                        $backupzip->addFile($dir . $v, $v);
+                    }
+                    $modulesBackupDir = self::getModulesBackupDir();
+                    $backupzip->saveAsFile($modulesBackupDir . $name . "-conflict-upgrade-" . date("YmdHis") . ".zip");
+                } catch (Exception $e) {
+
+                } finally {
+                    $backupzip->close();
+                }
+            }
+            // 解压模块压缩包
+            foreach ($extractlist as $file) {
+                $zip->extractTo($dir, $file);
+            }
+        } catch (ZipException $e) {
+            throw new Exception('Unable to extract the file');
+        } finally {
+            $zip->close();
+        }
+        return $dir;
+    }
+
+    /**
      * 验证压缩包、依赖验证
      * @param array $params
      * @return bool
@@ -657,15 +739,11 @@ class Server
 
         $moduleDir = self::getModuleDir($name);
 
-        // 删除模块目录下的app和public
-        $files = self::getCheckDirs();
-        foreach ($files as $index => $file) {
-            Filesystem::delDir($moduleDir . $file);
-        }
-
         try {
             // 解压模块
-            Server::unzip($name, $tmpFile);
+            Server::upgradeUnzip($name, $tmpFile);
+        } catch (ModuleException $e) {
+            throw new ModuleException($e->getMessage(), $e->getCode(), $e->getData());
         } catch (Exception $e) {
             throw new Exception($e->getMessage());
         } finally {
@@ -1138,5 +1216,39 @@ class Server
         }
 
         return true;
+    }
+
+    /**
+     * 忽略匹配
+     * @param string $pattern  规则
+     * @param string $string   字符串
+     * @return bool
+     */
+    public static function ignoreMatch($pattern, $string)
+    {
+        $pattern   = str_replace('\\', '/', $pattern);
+        $pattern   = str_replace('.', '\.', $pattern);
+        $firstChar = substr($pattern, 0, 1);
+        if ($firstChar == '!') {
+            $pattern = '#' . substr($pattern, 1) . '#us';
+            return preg_match($pattern, $string) !== 1;
+        } elseif ($firstChar === '/') {
+            $pattern = '#^' . substr($pattern, 1) . '#us';
+        } else {
+            $pattern = '#' . $pattern . '#us';
+        }
+        return preg_match($pattern, $string) === 1;
+    }
+
+    //是否忽略目录
+    protected static function isIgnoreDirs($ignoreDirs, $relativePath)
+    {
+        foreach ($ignoreDirs as $token) {
+            if (static::ignoreMatch($token, $relativePath)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

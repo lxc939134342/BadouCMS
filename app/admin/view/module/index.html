@@ -636,6 +636,7 @@
         };
 
         var uninstall = function (name, force, droptables) {
+            var area = [$(window).width() > 650 ? "650px" : "95%", $(window).height() > 710 ? "710px" : "95%"];
             badou.api.ajax(
                 {
                     url: "module/uninstall",
@@ -674,6 +675,7 @@
         };
 
         var upgrade = function (name, version) {
+            var area = [$(window).width() > 650 ? "650px" : "95%", $(window).height() > 710 ? "710px" : "95%"];
             var userinfo = badou.api.badouStorage.get("userinfo");
             var uid = userinfo ? userinfo.id : 0;
             var token = userinfo ? userinfo.token : "";
@@ -685,7 +687,7 @@
             badou.api.ajax(
                 {
                     url: "module/upgrade",
-                    data: { name: name, uid: uid, token: token, version: version, faversion: Config.faversion },
+                    data: { name: name, uid: uid, token: token, version: version, faversion: Config.faversion},
                 },
                 function (data, ret) {
                     layer.closeAll();
