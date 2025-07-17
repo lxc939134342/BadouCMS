@@ -131,9 +131,9 @@ class Database extends Backend
      */
     public function backuplist()
     {
-        $group = $this->request->get("group");
-        $offset = $this->request->get("offset");
+        $page = $this->request->get("page");
         $limit = $this->request->get("limit");
+        $offset = ($page - 1) * $limit;
         if ($this->request->isAjax()) {
             $filter = $this->request->request("filter", '', 'trim');
             $filter = (array) json_decode($filter, true);
