@@ -69,7 +69,7 @@ class Index extends Backend
                 "defaultHeader" => "light-theme",
                 "allowCustom" => true,
                 "banner" => false,
-                "dark" => true
+                "dark" => false
             ],
             "colors" => [
                 [

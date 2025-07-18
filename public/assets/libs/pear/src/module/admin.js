@@ -19,8 +19,7 @@ layui.define(['message', 'table', 'jquery', 'element', 'yaml', 'form', 'tab', 'm
 		let sideMenu;
 		let bodyTab;
 		let config;
-		let logout = function () {
-		};
+		let logout = function () { };
 		let msgInstance;
 		const body = $('body');
 
