@@ -94,7 +94,6 @@ class Frontend extends BaseController
                 $this->auth->init($token);
             }
         }
-
         $this->view->assign('user', $this->auth->getUser());
 
         // 语言检测

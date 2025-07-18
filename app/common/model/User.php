@@ -29,7 +29,7 @@ class User extends Model
 {
     // 追加属性
     protected $append = [
-        'url',
+        'url'
     ];
 
     public function getUrlAttr($value, $data)
@@ -58,7 +58,7 @@ class User extends Model
      */
     public function getGroupAttr($value, $data)
     {
-        return UserGroup::get($data['group_id']);
+        return UserGroup::find($data['group_id']);
     }
 
     /**
