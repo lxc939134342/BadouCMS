@@ -18,6 +18,7 @@ use app\common\controller\Backend;
 class Group extends Backend
 {
     protected $model = null;
+    protected $modelValidate = true;
 
     public function initialize()
     {

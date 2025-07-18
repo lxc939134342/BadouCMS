@@ -17,7 +17,7 @@ class User extends Validate
         'nickname' => 'require|unique:user',
         'email'       => 'email|unique:user',
         'mobile'      => 'mobile|unique:user',
-        'password'    => 'require|regex:^(?!.*[&<>"\'\n\r]).{6,32}$',
+        'password'    => 'regex:^(?!.*[&<>"\'\n\r]).{6,32}$',
     ];
 
     /**
