@@ -28,15 +28,10 @@ class Content extends Model
 
     protected $dateFormat = 'Y-m-d H:i:s';
 
-    protected $append = [
-        'view_url'
-    ];
-
     public function contentsort()
     {
         return $this->belongsTo(ContentSort::class, 'scode', 'scode');
     }
-
 
     // 检查自定义URL名称
     public function checkFilename($filename, $where = array())
@@ -71,8 +66,7 @@ class Content extends Model
             $value['date'] = date('Y-m-d H:i:s');
             $value['create_time'] = date('Y-m-d H:i:s');
             $value['update_time'] = date('Y-m-d H:i:s');
-            $value['pics'] = $value['pics'] ? implode(',', $value['pics']) : '';
-            // 插入主内容
+            //插入主内容
             $id = $this->insertGetId($value);
 
             // 插入扩展内容
@@ -84,6 +78,7 @@ class Content extends Model
                 $result = $id;
             }
         }
+
         return $result;
     }
 
