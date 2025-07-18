@@ -20,7 +20,7 @@ use think\facade\Db;
 class Rule extends Backend
 {
     protected $model = null;
-
+    protected $modelValidate = true;
     protected $rulelist = [];
     public function initialize()
     {

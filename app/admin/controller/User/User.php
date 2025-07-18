@@ -18,6 +18,7 @@ use think\facade\Db;
 class User extends Backend
 {
     protected $model = null;
+    protected $modelValidate = true;
     protected $groupList = [];
 
     public function initialize()
