@@ -5,7 +5,7 @@
         <label class="layui-form-label">{:__('Group')}</label>
         <div class="layui-input-block">
             <select name="row[group_id]" lay-verify="required">
-                {foreach name="$groupdata"  item="vo"}
+                {foreach name="$groupdata" item="vo"}
                 <option value="{$key}">{$vo}</option>
                 {/foreach}
             </select>
@@ -14,39 +14,87 @@
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Username')}</label>
         <div class="layui-input-block">
-            <input type="text" name="row[username]" value="{$row.username}" lay-verify="required" autocomplete="off"  placeholder="{:__('Username')}" class="layui-input">
+            <input
+                type="text"
+                name="row[username]"
+                value="{$row.username}"
+                lay-verify="required"
+                autocomplete="off"
+                placeholder="{:__('Username')}"
+                class="layui-input" />
+            <p class="text-secondary mt-2">{:__('Username rule')}</p>
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Nickname')}</label>
         <div class="layui-input-block">
-            <input type="text" name="row[nickname]" value="{$row.nickname}" lay-verify="required" autocomplete="off" placeholder="{:__('Nickname')}" class="layui-input">
+            <input
+                type="text"
+                name="row[nickname]"
+                value="{$row.nickname}"
+                lay-verify="required"
+                autocomplete="off"
+                placeholder="{:__('Nickname')}"
+                class="layui-input" />
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Password')}</label>
         <div class="layui-input-block">
-            <input type="password" name="row[password]" value="" autocomplete="off" placeholder="{:__('Leave password blank if dont want to change')}" class="layui-input">
+            <input
+                type="password"
+                name="row[password]"
+                value=""
+                autocomplete="off"
+                placeholder="{:__('Leave password blank if dont want to change')}"
+                class="layui-input" />
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Email')}</label>
         <div class="layui-input-block">
-            <input type="text" name="row[email]" value="{$row.email}" lay-verify="" autocomplete="off" placeholder="{:__('Email')}" class="layui-input">
+            <input
+                type="text"
+                name="row[email]"
+                value="{$row.email}"
+                lay-verify=""
+                autocomplete="off"
+                placeholder="{:__('Email')}"
+                class="layui-input" />
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Mobile')}</label>
         <div class="layui-input-block">
-            <input type="text" name="row[mobile]" value="{$row.mobile}" lay-verify="" autocomplete="off" placeholder="{:__('Mobile')}" class="layui-input">
+            <input
+                type="text"
+                name="row[mobile]"
+                value="{$row.mobile}"
+                lay-verify=""
+                autocomplete="off"
+                placeholder="{:__('Mobile')}"
+                class="layui-input" />
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Avatar')}</label>
         <div class="layui-input-block">
-            <input type="text" id="c-avatar" name="row[avatar]" lay-verify="" class="layui-input"style="width: 70%;" value="{$row.avatar}" autocomplete="off" placeholder="{:__('Avatar')}" />
-            <div class="layui-input-suffix" style="width: 30%;">
-                <button type="button" data-input-id="c-avatar" data-preview-id="p-avatar" class="layui-btn btn-bdupload">
+            <input
+                type="text"
+                id="c-avatar"
+                name="row[avatar]"
+                lay-verify=""
+                class="layui-input"
+                style="width: 70%"
+                value="{$row.avatar}"
+                autocomplete="off"
+                placeholder="{:__('Avatar')}" />
+            <div class="layui-input-suffix" style="width: 30%">
+                <button
+                    type="button"
+                    data-input-id="c-avatar"
+                    data-preview-id="p-avatar"
+                    class="layui-btn btn-bdupload">
                     <i class="fa fa-upload"></i>
                     上传
                 </button>
@@ -57,117 +105,172 @@
             </div>
             <div class="layui-upload-list" id="p-avatar"></div>
         </div>
-
     </div>
 
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Level')}</label>
         <div class="layui-input-block">
-            <input type="number" name="row[level]" value="{$row.level}" lay-verify="" autocomplete="off" class="layui-input">
+            <input
+                type="number"
+                name="row[level]"
+                value="{$row.level}"
+                lay-verify=""
+                autocomplete="off"
+                class="layui-input" />
         </div>
     </div>
 
     <div class="layui-form-item">
-        <label class="layui-form-label">{:__('Gender')} </label>
+        <label class="layui-form-label">{:__('Gender')}</label>
         <div class="layui-input-block">
             <input type="radio" name="row[gender]" value="1" title="{:__('Male')}" {if $row.gender=='1'}checked{/if}>
             <input type="radio" name="row[gender]" value="0" title="{:__('FeMale')}" {if $row.gender=='0'}checked{/if}>
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">{:__('Birthday')} </label>
+        <label class="layui-form-label">{:__('Birthday')}</label>
         <div class="layui-input-block">
             <input
-                    type="text"
-                    name="row[birthday]"
-                    value="{$row.birthday|default=time()|date='Y-m-d H:i:s'|}"
-                    readonly
-                    placeholder="{:__('Birthday')}"
-                    class="layui-input laydate" />
+                type="text"
+                name="row[birthday]"
+                value="{$row.birthday|default=time()|date='Y-m-d H:i:s'|}"
+                readonly
+                placeholder="{:__('Birthday')}"
+                class="layui-input laydate" />
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Bio')}</label>
         <div class="layui-input-block">
-            <input type="text" name="row[bio]" value="{$row.bio}" lay-verify="" autocomplete="off" class="layui-input">
+            <input
+                type="text"
+                name="row[bio]"
+                value="{$row.bio}"
+                lay-verify=""
+                autocomplete="off"
+                class="layui-input" />
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Money')}</label>
         <div class="layui-input-block">
-            <input type="number" name="row[money]" value="{$row.money}" lay-verify="" autocomplete="off" class="layui-input">
+            <input
+                type="number"
+                name="row[money]"
+                value="{$row.money}"
+                lay-verify=""
+                autocomplete="off"
+                class="layui-input" />
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Score')}</label>
         <div class="layui-input-block">
-            <input type="number" name="row[score]" value="{$row.score}" lay-verify="" autocomplete="off" class="layui-input">
+            <input
+                type="number"
+                name="row[score]"
+                value="{$row.score}"
+                lay-verify=""
+                autocomplete="off"
+                class="layui-input" />
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Successions')}</label>
         <div class="layui-input-block">
-            <input type="number" name="row[successions]" value="{$row.successions}" lay-verify="" autocomplete="off" class="layui-input">
+            <input
+                type="number"
+                name="row[successions]"
+                value="{$row.successions}"
+                lay-verify=""
+                autocomplete="off"
+                class="layui-input" />
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Maxsuccessions')}</label>
         <div class="layui-input-block">
-            <input type="number" name="row[maxsuccessions]" value="{$row.maxsuccessions}" lay-verify="" autocomplete="off" class="layui-input">
+            <input
+                type="number"
+                name="row[maxsuccessions]"
+                value="{$row.maxsuccessions}"
+                lay-verify=""
+                autocomplete="off"
+                class="layui-input" />
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Prevtime')}</label>
         <div class="layui-input-block">
             <input
-                    type="text"
-                    name="row[prevtime]"
-                    value="{$row.prevtime|default=time()|date='Y-m-d H:i:s'|}"
-                    readonly
-                    placeholder="{:__('Prevtime')}"
-                    class="layui-input laydate" />
+                type="text"
+                name="row[prevtime]"
+                value="{$row.prevtime|default=time()|date='Y-m-d H:i:s'|}"
+                readonly
+                placeholder="{:__('Prevtime')}"
+                class="layui-input laydate" />
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Loginip')}</label>
         <div class="layui-input-block">
-            <input type="text" name="row[loginip]" value="{$row.loginip}" lay-verify="" autocomplete="off" class="layui-input datetimepicker">
+            <input
+                type="text"
+                name="row[loginip]"
+                value="{$row.loginip}"
+                lay-verify=""
+                autocomplete="off"
+                class="layui-input datetimepicker" />
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Loginfailure')}</label>
         <div class="layui-input-block">
-            <input type="text" name="row[loginfailure]" value="{$row.loginfailure}" lay-verify="" autocomplete="off" class="layui-input">
+            <input
+                type="text"
+                name="row[loginfailure]"
+                value="{$row.loginfailure}"
+                lay-verify=""
+                autocomplete="off"
+                class="layui-input" />
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Joinip')}</label>
         <div class="layui-input-block">
-            <input type="text" name="row[joinip]" value="{$row.joinip}" lay-verify="" autocomplete="off" class="layui-input">
+            <input
+                type="text"
+                name="row[joinip]"
+                value="{$row.joinip}"
+                lay-verify=""
+                autocomplete="off"
+                class="layui-input" />
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Jointime')}</label>
         <div class="layui-input-block">
             <input
-                    type="text"
-                    name="row[jointime]"
-                    value="{$row.jointime|default=time()|date='Y-m-d H:i:s'|}"
-                    readonly
-                    placeholder="{:__('Jointime')}"
-                    class="layui-input laydate" />
+                type="text"
+                name="row[jointime]"
+                value="{$row.jointime|default=time()|date='Y-m-d H:i:s'}"
+                readonly
+                placeholder="{:__('Jointime')}"
+                class="layui-input laydate" />
         </div>
     </div>
     <div class="layui-form-item">
-        <label class="layui-form-label">{:__('Status')} </label>
+        <label class="layui-form-label">{:__('Status')}</label>
         <div class="layui-input-block">
-            <input type="radio" name="row[status]" value="normal" title="{:__('Normal')}" {if $row.status=='normal'}checked{/if}>
-            <input type="radio" name="row[status]" value="hidden" title="{:__('Hidden')}" {if $row.status=='hidden'}checked{/if}>
+            <input type="radio" name="row[status]" value="normal" title="{:__('Normal')}" {if
+            $row.status=='normal'}checked{/if}> <input type="radio" name="row[status]" value="hidden"
+            title="{:__('Hidden')}" {if $row.status=='hidden'}checked{/if}>
         </div>
     </div>
 
     <div class="layui-form-item layer-footer hide">
         <div class="layui-input-block">
+            <input type="hidden" name="row[id]" value="{$row.id}" />
             <button class="layui-btn pear-btn-primary layui-btn-sm disabled" lay-submit>立即提交</button>
             <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
         </div>
@@ -175,9 +278,9 @@
 </form>
 
 <script>
-    layui.use(['badou'],function () {
+    layui.use(["badou"], function () {
         var bdForm = layui.bdForm;
 
         bdForm.api.bindevent($("form.layui-form"));
-    })
+    });
 </script>

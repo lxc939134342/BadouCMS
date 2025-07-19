@@ -15,6 +15,7 @@
         <label class="layui-form-label">{:__('Username')}</label>
         <div class="layui-input-block">
             <input type="text" name="row[username]" value="" lay-verify="required" autocomplete="off"  placeholder="{:__('Username')}" class="layui-input">
+            <p class="text-secondary mt-2">{:__('Username rule')}</p>
         </div>
     </div>
     <div class="layui-form-item">
@@ -44,7 +45,7 @@
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Avatar')}</label>
         <div class="layui-input-block">
-            <input type="text" id="c-avatar" name="row[avatar]" lay-verify="" class="layui-input" value="" autocomplete="off" placeholder="{:__('Avatar')}" />
+            <input type="text" id="c-avatar" name="row[avatar]" style="width: 70%" lay-verify="" class="layui-input" value="" autocomplete="off" placeholder="{:__('Avatar')}" />
             <div class="layui-input-suffix" style="width: 30%;">
                 <button type="button" data-input-id="c-avatar" data-preview-id="p-avatar" class="layui-btn btn-bdupload">
                     <i class="fa fa-upload"></i>
@@ -104,9 +105,17 @@
             <input type="number" name="row[score]" value="" lay-verify="" autocomplete="off" class="layui-input">
         </div>
     </div>
-
-
-
+    <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Jointime')}</label>
+        <div class="layui-input-block">
+            <input
+                type="text"
+                name="row[jointime]"
+                readonly
+                placeholder="{:__('Jointime')}"
+                class="layui-input laydate" />
+        </div>
+    </div>
 
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Status')} </label>
