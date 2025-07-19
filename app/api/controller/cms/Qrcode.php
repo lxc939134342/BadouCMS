@@ -3,12 +3,11 @@
 namespace app\api\controller\cms;
 
 use app\common\controller\Frontend;
-use bd\qrcode\QRcodeLib;
+use badou\qrcode\QRcodeLib;
 
 class Qrcode extends Frontend
 {
-    protected array $noNeedLogin = ['*'];
-    protected array $noNeedPermission = ['*'];
+    protected $noNeedLogin = ['*'];
     public function index()
     {
         $string = $this->request->param('string');

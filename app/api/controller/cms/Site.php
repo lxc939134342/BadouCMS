@@ -4,7 +4,7 @@ namespace app\api\controller\cms;
 
 class Site extends Base
 {
-    protected array $noNeedLogin = ['*'];
+    protected $noNeedLogin = ['*'];
     protected $model = null;
 
     public function initialize(): void

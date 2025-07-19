@@ -7,7 +7,7 @@ use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 class Addmsg extends Base
 {
-    protected array $noNeedLogin = ['*'];
+    protected $noNeedLogin = ['*'];
     protected $model = null;
 
     public function initialize(): void
