@@ -20,7 +20,10 @@ class Content extends Model
     protected $name = "cms_content";
 
     protected $append = [
-        'link'
+        'link',
+        'sortlink',
+        'subsortlink',
+        'enclosuresize'
     ];
 
     public function getContentAttr($value): string
@@ -58,7 +61,39 @@ class Content extends Model
         if (isset($data['outlink']) && $data['outlink']) {
             return $data['outlink'];
         }
-        return bdurl($data['type'], $data['urlname'], 'content', $data['scode'], $data['sortfilename'], $data['id'], $data['filename']);
+        return (string) bdurl($data['type'], $data['urlname'], 'content', $data['scode'], $data['sortfilename'], $data['id'], $data['filename']);
+    }
+
+    public function getSortLinkAttr($value, $data)
+    {
+        if (!isset($data['type']) || !isset($data['urlname']) || !isset($data['sortfilename'])) {
+            return '';
+        }
+        if (isset($data['outlink']) && $data['outlink']) {
+            return $data['outlink'];
+        }
+        return (string) bdurl($data['type'], $data['urlname'], 'list', $data['scode'], $data['sortfilename']);
+    }
+
+    public function getSubSortLinkAttr($value, $data)
+    {
+        if (!isset($data['type']) || !isset($data['urlname']) || !isset($data['sortfilename'])) {
+            return '';
+        }
+
+        if (isset($data['outlink']) && $data['outlink']) {
+            return $data['outlink'];
+        }
+
+        return (string) bdurl($data['type'], $data['urlname'], 'list', $data['subscode'], $data['subfilename']);
+    }
+
+    public function getEnclosureSizeAttr($value, $data)
+    {
+        if ($data['enclosure'] && file_exists(public_path(). $data['enclosure'])) {
+            return filesize(public_path(). $data['enclosure']);
+        }
+        return '';
     }
 
     // 内容详情页图片
