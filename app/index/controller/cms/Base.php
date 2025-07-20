@@ -299,4 +299,32 @@ class Base extends Frontend
 
         $this->redirect($domain);
     }
+
+    public function likes()
+    {
+        $id = $this->request->param('id/d', 0);
+        if (!$id) {
+            $this->error('参数错误');
+        }
+        if (!cookie('bd_likes_' . $id)) {
+            Db::name('cms_content')->where('id', $id)->inc('likes')->update();
+            cookie('bd_likes_' . $id, true);
+            $this->success('点赞成功');
+        }
+        $this->error('请勿重复操作');
+    }
+
+    public function oppose()
+    {
+        $id = $this->request->param('id/d', 0);
+        if (!$id) {
+            $this->error('参数错误');
+        }
+        if (!cookie('bd_oppose_' . $id)) {
+            Db::name('cms_content')->where('id', $id)->inc('oppose')->update();
+            cookie('bd_oppose_' . $id, true);
+            $this->success('反对成功');
+        }
+        $this->error('请勿重复操作');
+    }
 }

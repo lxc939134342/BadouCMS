@@ -23,7 +23,9 @@ class Content extends Model
         'link',
         'sortlink',
         'subsortlink',
-        'enclosuresize'
+        'enclosuresize',
+        'likeslink',
+        'opposelink'
     ];
 
     public function getContentAttr($value): string
@@ -94,6 +96,16 @@ class Content extends Model
             return filesize(public_path(). $data['enclosure']);
         }
         return '';
+    }
+
+    public function getLikesLinkAttr($value, $data)
+    {
+        return (string) url('/do/likes', ['id' => $data['id']]);
+    }
+
+    public function getOpposeLinkAttr($value, $data)
+    {
+        return (string) url('/do/oppose', ['id' => $data['id']]);
     }
 
     // 内容详情页图片
