@@ -141,7 +141,7 @@ class Base extends Frontend
             $this->view->assign('listsort', $this->contentSort);
             /*验证权限*/
             if ($this->contentSort['gid']) {
-                $this->checkPageLevel($this->contentSort['gid'], $this->contentSort['gtype']);
+                $this->checkPageLevel($this->contentSort['gid'], $this->contentSort['gtype'], $this->contentSort['gnote']);
             }
 
             /*如果是单页直接获取内容*/
