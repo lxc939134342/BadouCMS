@@ -12,8 +12,8 @@
 
 namespace app\index\model\cms;
 
-use ba\TableManager;
 use think\Model;
+use badou\TableManager;
 
 class Site extends Model
 {

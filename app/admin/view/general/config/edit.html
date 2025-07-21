@@ -44,6 +44,14 @@
     </div>
 
     <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Content')}</label>
+        <div class="layui-input-block">
+            <textarea class="layui-textarea" name="row[content]" id="content" placeholder="{:__('Please enter %s',[__('Content')])}">{$row.content}</textarea>
+
+        </div>
+    </div>
+
+    <div class="layui-form-item">
         <label class="layui-form-label">{:__('Extend')}</label>
         <div class="layui-input-block">
             <input type="text" name="row[extend]" class="layui-input" value="{$row.oldextend}"

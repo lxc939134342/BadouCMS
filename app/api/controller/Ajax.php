@@ -23,7 +23,6 @@ class Ajax extends Api
     public function upload()
     {
         $upload = \app\common\model\Config::upload();
-
         $attachment = null;
         //默认普通上传文件
         $file = $this->request->file('file');
@@ -36,4 +35,5 @@ class Ajax extends Api
 
         $this->success(__('Uploaded successful'), ['url' => $attachment->url, 'fullurl' => cdnurl($attachment->url, true)]);
     }
+
 }

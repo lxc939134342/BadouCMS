@@ -26,5 +26,6 @@ return [
     'Weigh'                                          => '权重',
     'Tip'                                            => '提示信息',
     'This configuration item cannot be modified'     => '该配置项不允许修改',
-    'Extend'                                         => '扩展属性'
+    'Extend'                                         => '扩展属性',
+    'Content'                                        => '字典数据'
 ];

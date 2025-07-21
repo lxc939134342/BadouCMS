@@ -105,7 +105,10 @@ class Frontend extends BaseController
         $upload = \app\common\model\Config::upload();
 
         // 上传信息配置后
-        Event::trigger("upload_config_init", $upload);
+        $upload_config_event = Event::trigger('upload_config_init', $upload, true);
+        if ($upload_config_event) {
+            $upload = array_merge($upload, $upload_config_event);
+        }
 
         // 配置信息
         $config = [
@@ -120,7 +123,6 @@ class Frontend extends BaseController
             'app_url'        => $this->request->root(true),
         ];
         $config = array_merge($config, Config::get("view_replace_str"));
-
         Config::set(array_merge(Config::get('upload'), $upload), 'upload');
 
         // 配置信息后

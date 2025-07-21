@@ -12,6 +12,7 @@
 
 namespace app\admin\controller;
 
+use app\admin\model\Config as ConfigModel;
 use think\facade\Db;
 use badou\Filesystem;
 use think\facade\Env;
@@ -70,12 +71,6 @@ class Ajax extends Backend
                     if ($type == 'template') {
                         break;
                     }
-                    //                case 'addons':
-                    //                    // 插件缓存
-                    //                    Service::refresh();
-                    //                    if ($type == 'addons') {
-                    //                        break;
-                    //                    }
                     // no break
                 case 'browser':
                     // 浏览器缓存
@@ -89,7 +84,7 @@ class Ajax extends Backend
                             Db::startTrans();
                             try {
                                 \app\common\model\Config::where('name', 'version')->update(['value' => $newversion]);
-                                \app\common\model\Config::refreshFile();
+                                ConfigModel::clear();
                                 Db::commit();
                             } catch (\Exception $e) {
                                 Db::rollback();

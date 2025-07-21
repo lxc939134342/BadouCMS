@@ -50,12 +50,12 @@ class ContentSort extends Model
 
     public function getIcoAttr($value, $data)
     {
-        return $value ? full_url($value) : '';
+        return $value ? cdnurl($value) : '';
     }
 
     public function getPicAttr($value, $data)
     {
-        return $value ? full_url($value) : '';
+        return $value ? cdnurl($value) : '';
     }
 
     public function getLinkAttr($value, $data)

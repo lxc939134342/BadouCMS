@@ -37,7 +37,7 @@ class Content extends Model
 
     public function getIcoAttr($value, $data)
     {
-        return $value ? full_url($value) : '';
+        return $value ? cdnurl($value) : '';
     }
 
     public function getPicsAttr($value, $data)
@@ -45,10 +45,10 @@ class Content extends Model
         if ($value) {
             $pics = explode(',', $value);
             if (count($pics) == 1) {
-                return full_url($pics[0]);
+                return cdnurl($pics[0]);
             }
             foreach ($pics as &$pic) {
-                $pic = full_url($pic);
+                $pic = cdnurl($pic);
             }
             return $pics;
         }

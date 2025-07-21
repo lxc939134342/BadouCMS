@@ -58,12 +58,11 @@ class Config extends Model
         return $this->typeList;
     }
 
-
     /**
      * 入库前
      * @throws Throwable
      */
-    public static function onBeforeInsert(Config $model): void
+    public static function onBeforeWrite(Config $model): void
     {
         if (!preg_match('/^[a-zA-Z0-9_]+$/', $model->getData('name'))) {
             throw new \think\Exception('配置名称只能包含字母、数字、下划线');
@@ -71,29 +70,23 @@ class Config extends Model
         if (!in_array($model->getData('type'), $model->needContent)) {
             $model->content = null;
         } else {
-            $model->content = json_encode(str_attr_to_array($model->getData('content')));
+            if (is_string($model->getData('content'))) {
+                $model->content = json_encode(parse_array($model->getData('content')));
+            } else {
+                $model->content = json_encode($model->getData('content'));
+            }
         }
         if (is_array($model->rule)) {
             $model->rule = implode(',', $model->rule);
         }
         if ($model->getData('extend')) {
-            $extend      = str_attr_to_array($model->getData('extend'));
-            if ($extend) {
-                $model->extend = json_encode($extend);
+            if (is_string($model->getData('extend'))) {
+                $model->content = json_encode(parse_array($model->getData('extend')));
+            } else {
+                $model->content = json_encode($model->getData('extend'));
             }
         }
         $model->allow_del = 1;
-    }
-
-    public static function onBeforeWrite(Config $model): void
-    {
-        try {
-            $name = $model->getData('name');
-            if (!preg_match('/^[a-zA-Z0-9_]+$/', $name)) {
-                throw new \think\Exception('配置名称只能包含字母、数字、下划线');
-            }
-        } catch (InvalidArgumentException $e) {
-        }
     }
 
     /**
@@ -102,6 +95,12 @@ class Config extends Model
     public static function onAfterWrite(): void
     {
         // 清理配置缓存
+        Cache::tag(self::$cacheTag)->clear();
+    }
+
+
+    public static function clear()
+    {
         Cache::tag(self::$cacheTag)->clear();
     }
 
@@ -149,13 +148,27 @@ class Config extends Model
         return $value;
     }
 
+    public function getContentAttr($value)
+    {
+        if ($value) {
+            if (is_string($value)) {
+                $value = json_decode($value, true);
+            }
+            if (is_array($value)) {
+                return parse_array_string($value);
+            }
+            return $value;
+        }
+        return '';
+    }
+
     public function getContentArrAttr($value, $row)
     {
         if (!isset($row['type'])) {
             return '';
         }
         if (in_array($row['type'], $this->needContent)) {
-            $arr = json_decode($row['content'], true);
+            $arr = is_array($row['content']) ? $row['content'] : json_decode($row['content'], true);
             return $arr ?: [];
         } else {
             return '';
@@ -176,5 +189,93 @@ class Config extends Model
     public function getOldextendAttr($value, $row)
     {
         return $row['extend'];
+    }
+
+    public function setGroup($key, $value)
+    {
+        $config_group = $this->where('name', 'config_group')->find();
+        $config_group_value = json_decode($config_group['value'], true);
+        $ishas = false;
+        foreach ($config_group_value as $index => $item) {
+            if ($item['key'] == $key) {
+                $config_group_value[$index] = ['key' => $key, 'value' => $value];
+                $ishas = true;
+            }
+        }
+        if (!$ishas) {
+            $config_group_value[] = ['key' => $key, 'value' => $value];
+        }
+        $config_group->value = json_encode($config_group_value);
+        $config_group->save();
+    }
+
+    public function delGroup($key)
+    {
+        $config_group = $this->where('name', 'config_group')->find();
+        $config_group_value = json_decode($config_group['value'], true);
+        foreach ($config_group_value as $index => $item) {
+            if ($item['key'] == $key) {
+                unset($config_group_value[$index]);
+            }
+        }
+        $config_group->value = json_encode($config_group_value);
+        $config_group->save();
+    }
+
+    /**
+     * 设置站点配置（批量创建或修改配置项）
+     * @param array $data 配置项数组，每项为一条配置数据
+     * @param bool $cover 覆盖数据
+     * @return bool
+     * @throws Throwable
+     */
+    public function setSysConfig(array $data, bool $cover = true): bool
+    {
+        // $data: [['name'=>'xxx', ...], ...]
+        if (!is_array($data) || empty($data)) {
+            throw new \Exception('参数错误');
+        }
+
+        // 检查name是否有重复
+        $names = array_column($data, 'name');
+        if (count($names) !== count(array_unique($names))) {
+            throw new \Exception('参数中存在重复变量名');
+        }
+        // 查询已存在的name及id
+        $existArr = $this->whereIn('name', $names)->column('id', 'name');
+
+        $toInsert = [];
+        $toUpdate = [];
+        foreach ($data as $item) {
+            if (empty($item['name'])) {
+                throw new \Exception('变量名不能为空');
+            }
+            if (isset($existArr[$item['name']])) {
+                // 只在 $cover 为 true 时才更新
+                if ($cover) {
+                    $item['id'] = $existArr[$item['name']];
+                    $toUpdate[] = $item;
+                }
+                // 不覆盖时跳过
+            } else {
+                $toInsert[] = $item;
+            }
+        }
+        // 检查新增项 name 是否有已存在
+        if (!empty($toInsert)) {
+            $conflict = array_intersect(array_keys($existArr), array_column($toInsert, 'name'));
+            if ($conflict) {
+                throw new \Exception('变量名已存在: ' . implode(',', $conflict));
+            }
+        }
+        // 批量插入
+        if (!empty($toInsert)) {
+            $this->saveAll($toInsert);
+        }
+        // 批量更新
+        if (!empty($toUpdate)) {
+            $this->saveAll($toUpdate);
+        }
+        return true;
     }
 }

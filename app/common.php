@@ -581,3 +581,51 @@ if (!function_exists('convert_path_to_snake_case')) {
         }
     }
 }
+
+if (!function_exists('parse_array')) {
+    /** 解析"1:1\r\n2:3"格式字符串为数组
+     * @param $value
+     * @return array
+     */
+    function parse_array($value)
+    {
+        $data = [];
+        //解析"1:1\r\n2:3"格式字符串为数组
+        $array = preg_split('/[,;\r\n]+/', trim($value, ",;\r\n"));
+        foreach ($array as $val) {
+            if (strpos($val, ':')) {
+                list($k, $v) = explode(':', $val);
+                $data[$k]   = $v;
+            }
+        }
+
+        /*如果没有匹配到`:`分割符，就把解析后的字符串返回出去*/
+        if (empty($data)) {
+            foreach ($array as $val) {
+                $data[$val]   = $val;
+            }
+        }
+
+        return $data;
+    }
+}
+
+if (!function_exists('parse_array_string')) {
+    /**
+     * 数组转换成换行字符串
+     * @param $array
+     * @return string
+     */
+    function parse_array_string($array)
+    {
+        if (is_array($array)) {
+            $lines = [];
+            foreach ($array as $k => $v) {
+                $lines[] = $k . ':' . $v;
+            }
+            return implode("\r\n", $lines);
+        } else {
+            return $array;
+        }
+    }
+}

@@ -41,7 +41,7 @@ class Config extends Backend
 
     public function index()
     {
-        $config      = $this->model->order('weigh desc')->select()->toArray();
+        $config      = $this->model->order('weigh desc,id asc')->select()->toArray();
         $list           = [];
         $newConfigGroup = [];
 
@@ -88,9 +88,12 @@ class Config extends Backend
             foreach ($all as $item) {
                 if (array_key_exists($item->name, $data)) {
                     $configValue[] = [
-                        'id'    => $item->id,
-                        'type'  => $item->getData('type'),
-                        'value' => $data[$item->name]
+                        'id'     => $item->id,
+                        'name'   => $item->name,
+                        'type'   => $item->getData('type'),
+                        'value'  => $data[$item->name],
+                        'extend' => $item->extend,
+                        'content' => $item->content,
                     ];
                 }
             }
@@ -177,7 +180,7 @@ class Config extends Backend
                 $this->error($e->getMessage());
             }
             if ($result !== false) {
-                $this->success(__('Added successfully'));
+                $this->success(__('Added successful'));
             } else {
                 $this->error(__('No rows were added'));
             }
