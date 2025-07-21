@@ -216,15 +216,16 @@ class Base extends Frontend
      */
     protected function checkPageLevel(int $gcode, string $gtype, string $gnote = ''): void
     {
-        /*判断是否登录*/
-        if (!$this->auth->isLogin()) {
-            $this->redirect('/user/login');
-        }
-
         if ($gcode) {
             $deny = false;
             $gtype = $gtype ?: 4;
-            $userInfo = $this->auth->getUserInfo();
+            if ($this->auth->isLogin()) {
+                $userInfo = $this->auth->getUserInfo();
+            } else {
+                $userInfo = [
+                   'level' => 0
+                ];
+            }
             switch ($gtype) {
                 case 1:
                     if ($gcode <= $userInfo['level']) {
@@ -254,7 +255,11 @@ class Base extends Frontend
             }
             if ($deny) {
                 $gnote = $gnote ?: 'Permission denied';
-                $this->error(__($gnote));
+                if ($this->auth->isLogin()) { // 已经登录
+                    $this->error(__($gnote), '/', 1);
+                } else {
+                    $this->error(__($gnote), '/user/login', 1);
+                }
             }
         }
     }
