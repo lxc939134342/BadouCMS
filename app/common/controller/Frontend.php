@@ -55,6 +55,11 @@ class Frontend extends BaseController
 
     public function initialize()
     {
+        $colse_site = get_sys_config('close_site');
+        if (!is_null($colse_site) && $colse_site == 0) {
+            $this->error(get_sys_config('close_site_note') ?: '站点已关闭');
+        }
+
         $this->view     = View::instance();
         //移除HTML标签
         $this->request->filter('trim,strip_tags,htmlspecialchars');

@@ -78,14 +78,18 @@ class Base extends Frontend
 
         $theme = isset($this->site['theme']) && !empty($this->site['theme']) ? $this->site['theme'] : 'default';
 
-        // 手机端模版
-        // TODO 待完善
         /* 设置模版路径 */
         $view_path = root_path() . 'template' . DIRECTORY_SEPARATOR.'cms'.DIRECTORY_SEPARATOR. $theme. DIRECTORY_SEPARATOR;
         if (!is_dir($view_path)) {  //兼容public目录下的模版
             $tpl_html_dir = get_sys_config('tpl_html_dir') ?: 'html';
             $view_path = public_path() . 'template' . DIRECTORY_SEPARATOR. $theme. DIRECTORY_SEPARATOR.$tpl_html_dir. DIRECTORY_SEPARATOR;
         }
+
+        // 手机端模版
+        if ($this->request->isMobile() && get_sys_config('open_wap') == 1) {
+            $view_path .= 'wap'.DIRECTORY_SEPARATOR;
+        }
+
         $this->view = View::instance();
         $this->view->config([
             'view_path' => $view_path,
