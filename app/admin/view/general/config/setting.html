@@ -45,6 +45,7 @@
             even: true,
             toolbar: "#toolbar",
             page: true,
+            limit:30,
             cols: [
                 [
                     { field: "id", title: "ID", width: 80, sort: true },
@@ -67,6 +68,7 @@
                         field: "weigh",
                         title: __("Weigh"),
                         width: 100,
+                        templet:bdTable.api.formatter.input
                     },
                     {
                         title: __("Operate"),

@@ -48,7 +48,7 @@
                                 {case value="checkbox"}
                                 {volist name="$field.content_arr" id="item" key="k" }
                                 <input type="checkbox" id="c-{$field.name}-{$k}" name="row[{$field.name}][]"
-                                    title="{$item}" value="{$key}" {in name="key" value="$row[$field.name]??''" }
+                                    title="{$item}" value="{$key}" {in name="key" value="$field.value??''" }
                                     checked {/in}>
                                 {/volist}
                                 {/case}
@@ -57,7 +57,7 @@
                                 {case value="radio"}
                                 {volist name="$field.content_arr" id="item" key="k" }
                                 <input type="radio" id="c-{$field.name}-{$k}" name="row[{$field.name}]" title="{$item}"
-                                    value="{$key}" {in name="key" value="$row[$field.name]??''" } checked {/in}>
+                                    value="{$key}" {in name="key" value="$field.value??''" } checked {/in}>
                                 {/volist}
                                 {/case}
 
@@ -165,6 +165,7 @@
                                 {/case}
 
                                 {/switch}
+                                <p class="help-block">{$field.tip}</p>
                             </div>
                         </div>
                         {/foreach}
