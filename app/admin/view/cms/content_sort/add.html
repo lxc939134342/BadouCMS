@@ -44,7 +44,7 @@
                     <select name="row[mcode]" id="c-mcode" class="layui-select" lay-verify="required">
                         <option value="">请选择</option>
                         {foreach $models as $model}
-                        <option value="{$model.id}">{$model.name}</option>
+                        <option value="{$model.mcode}">{$model.name}</option>
                         {/foreach}
                     </select>
                 </div>
@@ -85,6 +85,7 @@
                     </select>
                 </div>
             </div>
+
             <div class="layui-form-item">
                 <label class="layui-form-label">权限类型</label>
                 <div class="layui-input-block">
@@ -116,7 +117,6 @@
                         class="layui-input" />
                 </div>
             </div>
-
 
             <div class="layui-form-item">
                 <label class="layui-form-label">状态</label>
@@ -254,9 +254,24 @@
 </form>
 
 <script>
-    layui.use(["badou"], function () {
+    layui.use(["badou", "form"], function () {
         var bdForm = layui.bdForm;
-
+        var form = layui.form;
         bdForm.api.bindevent($("form.layui-form"));
+
+        form.on('select', function(data){
+            if(data.elem.id === 'c-mcode'){
+                var mcode = data.value;
+                if (!mcode || !Config.models) return;
+
+                var model = Config.models.find(function (m) { return m.mcode == mcode; });
+                if (model) {
+                    $("#c-listtpl").val(model.listtpl);
+                    $("#c-contenttpl").val(model.contenttpl);
+                    // 重新渲染 select
+                    form.render("select");
+                }
+            }
+        });
     });
 </script>

@@ -58,6 +58,7 @@ class ContentSort extends Base
         $this->assign('levellist', $levelModel->getLevelList());
         $this->assign('gtypelist', $levelModel->getGtypeList());
         $this->assign('tpls', $this->getTpls());
+        $this->assignconfig('models', $res);
     }
 
     public function index()
@@ -98,15 +99,15 @@ class ContentSort extends Base
         $acode = get_backend_lang();
         $template = Db::name('cms_site')->where('acode', $acode)->value('theme');
         $path = root_path().'template'.DIRECTORY_SEPARATOR.'cms'.DIRECTORY_SEPARATOR.$template.DIRECTORY_SEPARATOR;
-        if (!is_dir($path)) {
-            $this->error('template/'.$template.'模版目录不存在');
+        $list = [];
+        if (is_dir($path)) {
+            $files = Filesystem::getDirFiles($path, ['html']);
+            $list = [];
+            foreach ($files as $key => $value) {
+                $list[] = ['id' => $key,'name' => $value];
+            }
         }
 
-        $files = Filesystem::getDirFiles($path, ['html']);
-        $list = [];
-        foreach ($files as $key => $value) {
-            $list[] = ['id' => $key,'name' => $value];
-        }
         return $list;
     }
 
