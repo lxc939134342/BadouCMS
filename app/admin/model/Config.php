@@ -31,8 +31,6 @@ class Config extends Model
     protected $append = [
         // 'value',
         'content_arr',
-        'extend',
-        'oldextend'
     ];
 
     protected array $jsonDecodeType = ['checkbox', 'selects'];
@@ -69,22 +67,10 @@ class Config extends Model
         }
         if (!in_array($model->getData('type'), $model->needContent)) {
             $model->content = null;
-        } else {
-            if (is_string($model->getData('content'))) {
-                $model->content = json_encode(parse_array($model->getData('content')));
-            } else {
-                $model->content = json_encode($model->getData('content'));
-            }
         }
+
         if (is_array($model->rule)) {
             $model->rule = implode(',', $model->rule);
-        }
-        if ($model->getData('extend')) {
-            if (is_string($model->getData('extend'))) {
-                $model->content = json_encode(parse_array($model->getData('extend')));
-            } else {
-                $model->content = json_encode($model->getData('extend'));
-            }
         }
         $model->allow_del = 1;
     }
@@ -162,6 +148,18 @@ class Config extends Model
         return '';
     }
 
+    public function setContentAttr($value)
+    {
+        if ($value) {
+            if (is_string($value)) {
+                $value = parse_array($value);
+            }
+
+            return json_encode($value);
+        }
+        return '';
+    }
+
     public function getContentArrAttr($value, $row)
     {
         if (!isset($row['type'])) {
@@ -173,22 +171,6 @@ class Config extends Model
         } else {
             return '';
         }
-    }
-
-    public function getExtendAttr($value)
-    {
-        if ($value) {
-            $arr = json_decode($value, true);
-            if ($arr) {
-                return $arr;
-            }
-        }
-        return [];
-    }
-
-    public function getOldextendAttr($value, $row)
-    {
-        return $row['extend'];
     }
 
     public function setGroup($key, $value)
@@ -250,6 +232,7 @@ class Config extends Model
             if (empty($item['name'])) {
                 throw new \Exception('变量名不能为空');
             }
+
             if (isset($existArr[$item['name']])) {
                 // 只在 $cover 为 true 时才更新
                 if ($cover) {

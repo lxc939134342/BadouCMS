@@ -29,7 +29,7 @@
                         {foreach $vo['list'] as $field}
                         <div class="layui-form-item">
                             <label class="layui-form-label">{$field.title}</label>
-                            <div class="layui-input-block">
+                            <div class="layui-input-block" {$field.extend}>
                                 {switch $field.type}
                                 {// 文本框 }
                                 {case value="string"}
