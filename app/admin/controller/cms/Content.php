@@ -284,7 +284,7 @@ class Content extends Base
 
                 // 检查自定义URL名称
                 if ($data['filename']) {
-                    while ($this->model->checkFilename($data['filename'])) {
+                    while ($this->model->checkFilename($data['filename'], [['id', '<>', $row['id']]])) {
                         $data['filename'] = $data['filename'] . '-' . mt_rand(1, 20);
                     }
                 }
