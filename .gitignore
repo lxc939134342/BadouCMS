@@ -4,6 +4,7 @@
 /public/uploads/*
 .DS_Store
 .idea
+.trae
 composer.lock
 *.log
 *.css.map
