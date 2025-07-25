@@ -179,7 +179,7 @@ class Base extends Frontend
             'sitemap' => url('/sitemap', [], 'xml'),
             'msgaction' => url('/message'),
             'sitetplpath' => request()->domain().'/template/cms/'. $this->site['theme'],
-            'checkcode' => '',
+            'checkcode' => (string)url('index/captcha'),
             'islogin' => $this->auth->isLogin(),
             'registerstatus' => true,
             'loginstatus' => true,
