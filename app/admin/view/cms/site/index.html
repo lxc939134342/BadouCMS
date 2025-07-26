@@ -128,13 +128,11 @@
                         <div class="layui-form-item">
                             <label class="layui-form-label">站点主题</label>
                             <div class="layui-input-block">
-                                <input
-                                    type="text"
-                                    name="row[theme]"
-                                    value="{$row.theme}"
-                                    placeholder="请输入站点主题"
-                                    autocomplete="off"
-                                    class="layui-input" />
+                                <select name="row[theme]" class="layui-select" id="c-theme">
+                                    {foreach name="template_dirs" item="vo"}
+                                    <option value="{$vo}" {eq name="row.theme" value="$vo"}selected{/eq}>{$vo}</option>
+                                    {/foreach}
+                                </select>
                             </div>
                         </div>
                         <div class="layui-form-item">

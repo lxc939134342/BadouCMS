@@ -160,19 +160,6 @@ if (!function_exists('xss_clean')) {
     }
 }
 
-if (!function_exists('url_clean')) {
-    /**
-     * 清理URL
-     */
-    function url_clean($url)
-    {
-        if (!check_url_allowed($url)) {
-            return '';
-        }
-        return xss_clean($url);
-    }
-}
-
 if (!function_exists('check_ip_allowed')) {
     /**
      * 检测IP是否允许
@@ -293,7 +280,6 @@ if (!function_exists('full_url')) {
         return $url;
     }
 }
-
 
 if (!function_exists('letter_avatar')) {
     /**
