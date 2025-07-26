@@ -129,7 +129,7 @@
                         templet: bdTable.api.formatter.switch,
                     },
                     { field: "visits", title: __("Visits"), width: 80 },
-                    { title: __("Operate"), align: "center", width: 150, templet: bdTable.api.formatter.operate,buttons:[
+                    { title: __("Operate"), align: "center", width: 150,fixed:'right', templet: bdTable.api.formatter.operate,buttons:[
                         {
                             name: 'view',
                             icon: 'fa fa-search-plus',
@@ -151,7 +151,7 @@
         });
 
         // 移动&复制
-        $(document).on("click", ".btn-move,.btn-copy", function () {
+        $(document).on("click", ".btn-copydata", function () {
             var that = this;
             if ($(this).hasClass("disabled")) {
                 return false;
@@ -175,4 +175,10 @@
             return false;
         });
     });
+
+    $(function(){
+        setTimeout(function(){
+            console.log(window.bdTables);
+        },1000)
+    })
 </script>
