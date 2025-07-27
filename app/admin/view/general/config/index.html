@@ -39,9 +39,9 @@
 
                                 {// 开关 }
                                 {case value="switch"}
-                                <input type="hidden" name="row[{$field.name}]" value="0">
-                                <input type="checkbox" id="c-{$field.name}" name="row[{$field.name}]" lay-skin="switch"
-                                    value="{$field.value}" {if $field.value==1}checked{/if}>
+                                <input type="hidden" id="c-{$field.name}" name="row[{$field.name}]" value="{$field.value}" />
+                                <input type="checkbox" data-input-id="c-{$field.name}"  lay-skin="switch"
+                                    value="{$field.value}" {if $field.value=='1'}checked{/if}>
                                 {/case}
 
                                 {// 多选框 }
@@ -196,10 +196,22 @@
 <script>
     layui.use(["badou", "tabs"], function () {
         var bdForm = layui.bdForm;
+        var form = layui.form;
         var tabs = layui.tabs;
         var layer = layui.layer;
         var badou = layui.badou;
         bdForm.api.bindevent($("form.layui-form"));
+
+        form.on('switch', function(data){
+            var input_id = $(data.elem).attr('data-input-id');
+            var input = $('#' + input_id);
+            var checkbox = data.elem;
+            if(checkbox.checked){
+                input.val('1');
+            } else {
+                input.val('0');
+            }
+        });
 
         $(document).on("click", ".testmail", function () {
             var that = this;
