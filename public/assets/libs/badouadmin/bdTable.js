@@ -7,6 +7,8 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
         tableSearch = layui.tableSearch,
         laytpl = layui.laytpl;
     var util = layui.util;
+    // 暴露全局变量 供外部调用
+    window.bdTables = {};
 
     var bdTable = {
         // 导入layui的table 或者 treeTable
@@ -117,6 +119,8 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                 }
             })
             bdTable.api.bindevent();
+
+            window.bdTables[bdTable.initTable.config.id] = bdTable;
             return bdTable.initTable;
         },
         api: {

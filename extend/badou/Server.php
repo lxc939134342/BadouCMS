@@ -26,6 +26,12 @@ class Server
         return self::sendRequest('module/index', $params, 'GET');
     }
 
+    public static function getDbConfig()
+    {
+        $dbConfig         = Config::get('database');
+        $dbconnect_config = $dbConfig['connections'][$dbConfig['default']];
+        return $dbconnect_config;
+    }
     /**
      * 获得已安装的模块列表
      * @return array
@@ -384,7 +390,8 @@ class Server
 
                 $templine .= $line;
                 if (substr(trim($line), -1, 1) == ';') {
-                    $templine = str_ireplace('__PREFIX__', config('database.prefix'), $templine);
+                    $config = self::getDbConfig();
+                    $templine = str_ireplace('__PREFIX__', $config['prefix'], $templine);
                     $templine = str_ireplace('INSERT INTO ', 'INSERT IGNORE INTO ', $templine);
                     try {
                         Db::getPdo()->exec($templine);
@@ -979,7 +986,8 @@ class Server
         if (is_file($sqlFile)) {
             preg_match_all($regex, file_get_contents($sqlFile), $matches);
             if ($matches && isset($matches[2]) && $matches[2]) {
-                $prefix = config('database.prefix');
+                $dbconfig = self::getDbConfig();
+                $prefix = $dbconfig['prefix'];
                 $tables = array_map(function ($item) use ($prefix) {
                     return str_replace("__PREFIX__", $prefix, $item);
                 }, $matches[2]);
@@ -1090,7 +1098,7 @@ class Server
             'headers'         => [
                 'X-REQUESTED-WITH' => 'XMLHttpRequest',
                 'Referer'          => dirname(request()->root(true)),
-                'User-Agent'       => 'BuildAdminClient',
+                'User-Agent'       => 'BadouCMSClient',
             ]
         ];
         static $client;

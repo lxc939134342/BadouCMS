@@ -37,12 +37,14 @@ class Upgrade
     ];
     public function appInit()
     {
-        // admin 头部添加
-        Event::listen('admin_top_begin', function ($data) {
-            return  '<li class="layui-nav-item layui-hide-xs upgrade">
+        if (app('http')->getName() == 'admin') {
+            // admin 头部添加
+            Event::listen('admin_top_begin', function ($data) {
+                return  '<li class="layui-nav-item layui-hide-xs upgrade">
                 <a href="javascript:;" class="layui-badge-rim ">'.config('badouadmin.version').'</a>
             </li>';
-        });
+            });
+        }
     }
 
     public function enable($params = [])

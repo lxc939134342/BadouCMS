@@ -48,7 +48,6 @@ class Extfield extends Model
                 $key++;
                 $result[] = $item;
             }
-
         }
         return $result;
     }
