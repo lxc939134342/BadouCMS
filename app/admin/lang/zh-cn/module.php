@@ -43,4 +43,5 @@ return [
     'To prevent data loss, manually back up the data first'    => '防止数据丢失，请先手动备份数据',
     'Import successful'                                        => '导入成功',
     'Covering conflict'                                        => '覆盖冲突',
+    'The following data tables will be deleted'                => '以下数据表将被删除',
 ];
