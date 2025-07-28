@@ -66,7 +66,7 @@ class Sitemap extends Base
             return $url;
         }
 
-        return $this->request->scheme().':'. $url;
+        return $this->request->domain(). $url;
     }
 
     // 文本格式
