@@ -98,6 +98,11 @@ class ContentSort extends Base
     {
         $acode = get_backend_lang();
         $template = Db::name('cms_site')->where('acode', $acode)->value('theme');
+        if ($template == '') {
+            $template = 'default';
+            Db::name('cms_site')->where('acode', $acode)->update(['theme' => 'default']);
+        }
+
         $path = root_path().'template'.DIRECTORY_SEPARATOR.'cms'.DIRECTORY_SEPARATOR.$template.DIRECTORY_SEPARATOR;
         $list = [];
         if (is_dir($path)) {

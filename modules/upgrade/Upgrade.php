@@ -19,6 +19,7 @@ use think\Exception;
 use think\facade\Db;
 use badou\Filesystem;
 use think\facade\Event;
+use think\facade\Config;
 use badou\ModuleException;
 use app\common\library\Menu;
 use app\admin\model\AdminRule;
@@ -165,6 +166,8 @@ class Upgrade
         $old = $old->toArray();
         $old = array_column($old, null, 'name');
 
+        $this->importsql('upgrade');
+
         Db::startTrans();
         try {
             foreach ($menu as $value) {
@@ -186,6 +189,43 @@ class Upgrade
         } catch (PDOException $e) {
             Db::rollback();
             return false;
+        }
+        return true;
+    }
+
+    /**
+     * 导入SQL
+     *
+     * @param string $name     模块名称
+     * @param string $fileName SQL文件名称
+     * @return  boolean
+     */
+    protected function importsql($name, $fileName = null)
+    {
+        $fileName = is_null($fileName) ? 'install.sql' : $fileName;
+        $sqlFile = Server::getModuleDir($name) . $fileName;
+        if (is_file($sqlFile)) {
+            $lines = file($sqlFile);
+            $templine = '';
+            foreach ($lines as $line) {
+                if (substr($line, 0, 2) == '--' || $line == '' || substr($line, 0, 2) == '/*') {
+                    continue;
+                }
+
+                $templine .= $line;
+                if (substr(trim($line), -1, 1) == ';') {
+                    $dbConfig         = Config::get('database');
+                    $config = $dbConfig['connections'][$dbConfig['default']];
+                    $templine = str_ireplace('__PREFIX__', $config['prefix'], $templine);
+                    $templine = str_ireplace('INSERT INTO ', 'INSERT IGNORE INTO ', $templine);
+                    try {
+                        Db::getPdo()->exec($templine);
+                    } catch (\PDOException $e) {
+                        //$e->getMessage();
+                    }
+                    $templine = '';
+                }
+            }
         }
         return true;
     }
