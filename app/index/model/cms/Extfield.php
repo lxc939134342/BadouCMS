@@ -36,7 +36,8 @@ class Extfield extends Model
                 parse_str($info['query'], $query);
             }
             $item = [];
-            $data = explode(',', $data);
+
+            $data = parse_array($data);
             $key = 1;
             foreach ($data as $k => $value) {
                 $query[$field] = $value;

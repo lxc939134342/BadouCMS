@@ -576,19 +576,17 @@ if (!function_exists('parse_array')) {
     function parse_array($value)
     {
         $data = [];
-        //解析"1:1\r\n2:3"格式字符串为数组
-        $array = preg_split('/[,;\r\n]+/', trim($value, ",;\r\n"));
-        foreach ($array as $val) {
-            if (strpos($val, ':')) {
-                list($k, $v) = explode(':', $val);
-                $data[$k]   = $v;
-            }
-        }
+        $trimmed = trim($value, " ,，;；\r\n");
 
-        /*如果没有匹配到`:`分割符，就把解析后的字符串返回出去*/
-        if (empty($data)) {
-            foreach ($array as $val) {
-                $data[$val]   = $val;
+        // 使用统一正则分割字符串
+        $array = preg_split('/\s*[,，;；\r\n]+\s*/u', $trimmed, -1, PREG_SPLIT_NO_EMPTY);
+
+        foreach ($array as $val) {
+            if (strpos($val, ':') !== false) {
+                list($k, $v) = explode(':', $val, 2);
+                $data[$k] = $v;
+            } else {
+                $data[$val] = $val;
             }
         }
 
