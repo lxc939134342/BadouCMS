@@ -36,6 +36,17 @@
         </div>
     </div>
     <div class="layui-form-item">
+        <label class="layui-form-label">{:__('Value')}</label>
+        <div class="layui-input-block">
+            <input
+                type="text"
+                name="row[value]"
+                value="{$row.value}"
+                class="layui-input"
+                placeholder="{:__('Please enter %s',[__('Value')])}" />
+        </div>
+    </div>
+    <div class="layui-form-item">
         <label class="layui-form-label">{:__('Tip')}</label>
         <div class="layui-input-block">
             <input type="text" name="row[tip]" class="layui-input" value="{$row.tip}"
