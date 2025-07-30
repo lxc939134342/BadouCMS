@@ -47,7 +47,7 @@
 </script>
 
 <script>
-    layui.use(["badou","changeLang"], function () {
+    layui.use(["badou", "changeLang"], function () {
         var bdTable = layui.bdTable;
         var table = layui.table;
         var layer = layui.layer;
@@ -55,7 +55,7 @@
         var badou = layui.badou;
         var laytpl = layui.laytpl;
         var form = layui.form;
-        var changeLang=layui.changeLang;
+        var changeLang = layui.changeLang;
         badou.http.config.open.area = ["100%", "100%"];
 
         bdTable.api.init({
@@ -74,7 +74,7 @@
             url: bdTable.extend.index_url,
             pk: "id",
             even: true,
-            sortName:'sorting asc,id desc',
+            sortName: "sorting asc,id desc",
             searchFormVisible: true,
             toolbar: "#toolbar",
             page: true,
@@ -82,8 +82,8 @@
                 [
                     { type: "checkbox" },
                     { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "scode", hide: true, title: __("Scode"), width: 90, operate: false },
-                    { field: "contentsort.name", title: __("Scode name"), width: 150 },
+                    { field: "scode", hide: true, title: __("Scode name"), width: 90, searchType: "remoteSelect",extend:'data-source="cms.content_sort/selectpage" data-primary-key="scode" data-field="name" data-is-tree="true" data-pidname="pcode" data-params=\'{"acode":"{$acode}","mcode":"{$mcode}"}\'' },
+                    { field: "contentsort.name", operate: false, title: __("Scode name"), width: 150 },
                     { field: "title", title: __("Title") },
                     { field: "ico", title: __("Ico"), width: 80, templet: bdTable.api.formatter.image, operate: false },
                     {
@@ -129,25 +129,32 @@
                         templet: bdTable.api.formatter.switch,
                     },
                     { field: "visits", title: __("Visits"), width: 80 },
-                    { title: __("Operate"), align: "center", width: 150,fixed:'right', templet: bdTable.api.formatter.operate,buttons:[
-                        {
-                            name: 'view',
-                            icon: 'fa fa-search-plus',
-                            title: __('View'),
-                            url:function(row, j){
-                                return row.view_url;
+                    {
+                        title: __("Operate"),
+                        align: "center",
+                        width: 150,
+                        fixed: "right",
+                        templet: bdTable.api.formatter.operate,
+                        buttons: [
+                            {
+                                name: "view",
+                                icon: "fa fa-search-plus",
+                                title: __("View"),
+                                url: function (row, j) {
+                                    return row.view_url;
+                                },
+                                extend: 'target="_blank"',
+                                classname: "layui-btn layui-bg-green layui-btn-sm",
                             },
-                            extend:'target="_blank"',
-                            classname: 'layui-btn layui-bg-green layui-btn-sm',
-                        }
-                    ]  },
+                        ],
+                    },
                 ],
             ],
-            done: function(res, curr, count){
+            done: function (res, curr, count) {
                 changeLang({
-                    table:bdTable
+                    table: bdTable,
                 });
-            }
+            },
         });
 
         // 移动&复制
@@ -167,7 +174,7 @@
                 idarr.push(v[table.config.pk]);
             });
             var url = $(this).attr("href") + "&ids=" + idarr.join(",");
-            var title=$(this).text()
+            var title = $(this).text();
 
             badou.api.open(url, title, {
                 area: ["550px", "500px"],
@@ -175,10 +182,4 @@
             return false;
         });
     });
-
-    $(function(){
-        setTimeout(function(){
-            console.log(window.bdTables);
-        },1000)
-    })
 </script>

@@ -13,7 +13,7 @@
 namespace app\admin\model\cms;
 
 use app\common\library\AdminAuth;
-use bd\Tree;
+use badou\Tree;
 use think\Model;
 use think\facade\Db;
 use think\facade\Cache;
@@ -160,6 +160,4 @@ class ContentSort extends Model
         );
         Db::name('cms_content')->insert($data);
     }
-
-
 }
