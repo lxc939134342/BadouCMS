@@ -46,6 +46,37 @@
                 </div>
             </div>
 
+            <div class="layui-form-item">
+                <label class="layui-form-label">轮播多图</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-group" style="width: 100%">
+                        <input
+                            type="text"
+                            id="c-pics"
+                            name="row[pics]"
+                            class="layui-input"
+                            value="{$row.pics}" />
+                        <div class="layui-input-suffix" style="width: 30%">
+                            <button
+                                type="button"
+                                data-input-id="c-pics"
+                                data-preview-id="p-pics"
+                                data-multiple="true"
+                                class="layui-btn btn-bdupload">
+                                <i class="fa fa-upload"></i>
+                                上传
+                            </button>
+                            <button type="button" data-input-id="c-pics" data-multiple="true" class="layui-btn layui-bg-green btn-bdchoose">
+                                <i class="fa fa-list"></i>
+                                选择
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="layui-upload-list" id="p-pics"></div>
+                </div>
+            </div>
+
             {include file="cms/common/builder/fields" /}
 
             <div class="layui-form-item">
@@ -54,6 +85,8 @@
                     <textarea class="layui-textarea editor" name="row[content]" rows="5">{$row.content}</textarea>
                 </div>
             </div>
+
+
 
             <div class="layui-form-item">
                 <label class="layui-form-label">tags</label>
