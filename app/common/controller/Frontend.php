@@ -71,7 +71,6 @@ class Frontend extends BaseController
         check_ip_allowed();
 
         $this->auth = Auth::instance();
-
         // token
         $token = $this->request->server('HTTP_TOKEN', $this->request->request('token', Cookie::get('token', '')));
 
@@ -107,8 +106,12 @@ class Frontend extends BaseController
 
         $site = get_sys_config();
 
-        $upload = \app\common\model\Config::upload();
+        // 设置用户中心是否开启
+        if (isset($site['usercenter'])) {
+            Config::set(['usercenter' => $site['usercenter']], 'badouadmin');
+        }
 
+        $upload = \app\common\model\Config::upload();
         // 上传信息配置后
         $upload_config_event = Event::trigger('upload_config_init', $upload, true);
         if ($upload_config_event) {

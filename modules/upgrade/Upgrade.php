@@ -166,6 +166,17 @@ class Upgrade
         $old = $old->toArray();
         $old = array_column($old, null, 'name');
 
+        $config_group = Db::name('config')->where('name', 'config_group')->value('value');
+        $config_group = json_decode($config_group, true);
+        $config_group_key = array_column($config_group, null, 'key');
+        if (!in_array('user', $config_group_key)) {
+            $config_group[] = [
+                'key' => 'user',
+                'name' => '会员配置',
+            ];
+            Db::name('config')->where('name', 'config_group')->update(['value' => json_encode($config_group)]);
+        }
+
         $this->importsql('upgrade');
 
         Db::startTrans();
