@@ -36,7 +36,10 @@ layui.use(['layer', 'badou', 'toast'], function () {
     var toast = layui.toast;
     var table = layui.table
     function gettablecolumnbutton(options) {
-        if (typeof options.tableId !== 'undefined' && typeof options.field !== 'undefined' && typeof options.buttonIndex !== 'undefined') {
+        if (typeof options.field !== 'undefined') {
+            options.field = 'operate'
+        }
+        if (typeof options.tableId !== 'undefined' && typeof options.buttonIndex !== 'undefined') {
             var tableOptions = table.getOptions(options.tableId);
             if (tableOptions) {
                 var columnObj = null;
@@ -107,6 +110,7 @@ layui.use(['layer', 'badou', 'toast'], function () {
         if (typeof options.url === 'undefined' && $(that).attr("href")) {
             options.url = $(that).attr("href");
         }
+
         var success = typeof options.success === 'function' ? options.success : null;
         var error = typeof options.error === 'function' ? options.error : null;
         delete options.success;
@@ -115,15 +119,23 @@ layui.use(['layer', 'badou', 'toast'], function () {
         if (button) {
             if (typeof button.success === 'function') {
                 success = button.success;
+                var origSuccess = success;
+                success = function (data, ret) {
+                    origSuccess.call(that, data, ret);
+                }
             }
             if (typeof button.error === 'function') {
                 error = button.error;
+                var origError = error;
+                error = function (data, ret) {
+                    origError.call(that, data, ret);
+                }
             }
         }
         //如果未设备成功的回调,设定了自动刷新的情况下自动进行刷新
         if (!success && typeof options.tableId !== 'undefined' && typeof options.refresh !== 'undefined' && options.refresh) {
             success = function () {
-                $("#" + options.tableId).bootstrapTable('refresh');
+                table.reload(options.tableId);
             }
         }
 

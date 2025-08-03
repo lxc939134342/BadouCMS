@@ -33,6 +33,10 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                     var orderBy = $(this).data('order-by');
                     var params = $(this).data('params');
                     var inputValue = '';
+                    var show = $(this).data('show');
+                    var hide = $(this).data('hide');
+                    var initData = $(this).data('init-data');  //初始化时加载数据
+
                     // 设置值
                     if (inputId) {
                         inputValue = $('#' + inputId).val();
@@ -41,6 +45,8 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                     if (typeof initValue === 'string' && initValue) {
                         initValue = initValue.split(',');
                     }
+
+                    if (typeof initData === 'undefined') initData = true;
 
                     var options = {
                         el: '#' + id,
@@ -92,7 +98,8 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                                 return item[key];
                             });
                             if (inputId) {
-                                $('#' + inputId).val(values.join(','))
+                                console.log(inputId);
+                                $('#' + inputId).val(values.join(',')).trigger('change')
                             }
                         }
                     }
@@ -135,7 +142,7 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                         data.searchField = searchField;
                     }
 
-                    if (url) {
+                    if (url && initData) {
                         http.api.ajax({
                             url: url,
                             data: data
@@ -152,7 +159,6 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                             return false;
                         });
                     }
-
 
                     window.addEventListener('storage', (e) => {
                         // 暗色模式
