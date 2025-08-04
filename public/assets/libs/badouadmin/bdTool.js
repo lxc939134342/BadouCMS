@@ -36,6 +36,8 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                     var show = $(this).data('show');
                     var hide = $(this).data('hide');
                     var initData = $(this).data('init-data');  //初始化时加载数据
+                    var callbackName = $(this).data('callback');
+                    var filterable = $(this).data('filterable');
 
                     // 设置值
                     if (inputId) {
@@ -47,7 +49,6 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                     }
 
                     if (typeof initData === 'undefined') initData = true;
-
                     var options = {
                         el: '#' + id,
                         toolbar: {
@@ -55,6 +56,7 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                             showIcon: toolbarShowIcon,
                             list: toolbarList
                         },
+                        filterable: filterable,
                         data: [],
                         paging: pagination,
                         pageSize: pageSize,
@@ -86,7 +88,7 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                                 type: 'block',
                                 block: {
                                     template: function (item, sels) {
-                                        return item.name;
+                                        return item[field];
                                     },
                                 },
                             }
@@ -98,8 +100,11 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                                 return item[key];
                             });
                             if (inputId) {
-                                console.log(inputId);
                                 $('#' + inputId).val(values.join(',')).trigger('change')
+                            }
+                            //点击后的回调
+                            if (callbackName && typeof window[callbackName] === 'function') {
+                                window[callbackName](values.join(','), data);
                             }
                         }
                     }
