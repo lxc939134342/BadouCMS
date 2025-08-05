@@ -114,7 +114,6 @@ class Bd extends TagLib
         $isheadline = $tag['isheadline'] ?? '0';
         $fuzzy = $tag['fuzzy'] ?? true;
         $order = $tag['order'] ?? null;
-
         $params = [
             "'num'=>{$num}",
             "'page'=>{$page}",
@@ -127,7 +126,8 @@ class Bd extends TagLib
             $params[] = '"scode"=>'.$scode;
         } else {
             $params[] = '"scode"=>$sort["scode"]';
-            if ($page == 'false') {
+            // 如果不存在 默认开启分页
+            if (!isset($tag['page'])) {
                 $params[] = '"page"=>1';
             }
         }
