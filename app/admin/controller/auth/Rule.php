@@ -10,7 +10,7 @@
 // | Author: lande <939134342@qq.com>
 // +----------------------------------------------------------------------
 
-namespace app\admin\controller\Auth;
+namespace app\admin\controller\auth;
 
 use app\admin\model\AdminRule;
 use app\common\controller\Backend;

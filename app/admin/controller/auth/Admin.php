@@ -16,7 +16,7 @@
 // |  角色组管理控制器
 // +----------------------------------------------------------------------
 
-namespace app\admin\controller\Auth;
+namespace app\admin\controller\auth;
 
 use app\admin\model\AdminGroupAccess as AuthGroupAccess;
 use app\admin\model\AdminGroup as AuthGroupModel;

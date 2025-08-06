@@ -16,7 +16,7 @@
 // |  日志管理控制器
 // +----------------------------------------------------------------------
 
-namespace app\admin\controller\Auth;
+namespace app\admin\controller\auth;
 
 use app\admin\model\Adminlog as adminlogModel;
 use app\common\controller\Backend;
