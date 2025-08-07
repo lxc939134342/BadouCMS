@@ -235,22 +235,24 @@ layui.define(['toast'], function (exports) {
                 if (type) {
                     callback = options;
                 }
-                return toast.success({
+                var options = $.extend({
                     message: __('Operation completed'),
                     offset: 0,
                     onClosing: callback
-                });
+                }, options)
+                return toast.success(options);
             },
             error: function (options, callback) {
                 var type = typeof options === 'function';
                 if (type) {
                     callback = options;
                 }
-                return toast.error({
+                var options = $.extend({
                     message: __('Operation failed'),
                     offset: 0,
                     onClosing: callback
-                })
+                }, options)
+                return toast.error(options)
             },
             msg: function (message, url) {
                 var callback = typeof url === 'function' ? url : function () {

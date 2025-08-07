@@ -41,7 +41,7 @@ layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer', 'Sortabl
                         if (res.code == 1) {
                             bdUpload.events.onUploadSuccess.call(that, res.data, options);
                         } else {
-
+                            http.api.error({ message: res.msg })
                         }
                     }
                 });
