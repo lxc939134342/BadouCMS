@@ -1089,6 +1089,10 @@ class Server
      */
     public static function getClient()
     {
+        if (!extension_loaded('curl') && !ini_get('allow_url_fopen')) {
+            throw new Exception('cURL extension is not installed and allow_url_fopen is disabled');
+        }
+
         $options = [
             'base_uri'        => self::getServerUrl(),
             'timeout'         => 30,
