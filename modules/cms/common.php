@@ -743,6 +743,7 @@ function bdurl($type, $urlname, $pagetype, $scode, $sortfilename, $id = '', $con
             $link = 'javascript:;';
         }
     }
+    $link = preg_replace("/\/((?!index)[\w]+)\.php\//i", "/", (string)$link);
     return $link;
 }
 
