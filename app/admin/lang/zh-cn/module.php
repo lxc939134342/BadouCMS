@@ -45,5 +45,6 @@ return [
     'Covering conflict'                                               => '覆盖冲突',
     'The following data tables will be deleted'                       => '以下数据表将被删除',
     'Module package download failed'                                  => '安装包下载失败，请检查网络~',
-    'cURL extension is not installed and allow_url_fopen is disabled' => 'cURL扩展未安装且allow_url_fopen被禁用'
+    'cURL extension is not installed and allow_url_fopen is disabled' => 'cURL扩展未安装且allow_url_fopen被禁用',
+    'Conflicting file found'                                          => '存在冲突文件!'
 ];
