@@ -107,11 +107,6 @@ class Bd extends TagLib
         $start  = $tag['start'] ?? '0';
         $filter = $tag['filter'] ?? null;
         $tags = $tag['tags'] ?? null;
-        $isico = $tag['isico'] ?? '0';
-        $ispics = $tag['ispics'] ?? '0';
-        $istop = $tag['istop'] ?? '0';
-        $isrecommend = $tag['isrecommend'] ?? '0';
-        $isheadline = $tag['isheadline'] ?? '0';
         $fuzzy = $tag['fuzzy'] ?? true;
         $order = $tag['order'] ?? null;
         $params = [
@@ -123,6 +118,7 @@ class Bd extends TagLib
         if ($scode == '*') {
             $params[] = '"scode"=>"*"';
         } elseif ($scode) {
+            $this->autoBuildVar($scode);
             $params[] = '"scode"=>'.$scode;
         } else {
             $params[] = '"scode"=>$sort["scode"]';
@@ -132,13 +128,14 @@ class Bd extends TagLib
             }
         }
 
+        foreach ($tag as $k => & $v) {
+            if (in_array($k, ['isico', 'ispics', 'istop', 'isrecommend','isheadline'])) {
+                $params[] = '"'.$k.'"=>'.$v;
+            }
+        }
+
         $tags ? $params[] = '"tags"=>"'.$tags.'"' : '';
         $filter ? $params[] = '"filter"=>'.$filter : '';
-        $isico ? $params[] = '"isico"=>'.$isico : '';
-        $ispics ? $params[] = '"ispics"=>'.$ispics : '';
-        $istop ? $params[] = '"istop"=>'.$istop : '';
-        $isrecommend ? $params[] = '"isrecommend"=>'.$isrecommend : '';
-        $isheadline ? $params[] = '"isheadline"=>'.$isheadline : '';
         $order ? $params[] = '"order"=>"'.$order.'"' : '';
 
         $var     = Random::build('alnum', 10);
