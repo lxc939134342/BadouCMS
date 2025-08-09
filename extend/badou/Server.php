@@ -1083,10 +1083,6 @@ class Server
      * 获取请求对象
      * @return Client
      */
-    /**
-     * 获取请求对象
-     * @return Client
-     */
     public static function getClient()
     {
         if (!extension_loaded('curl') && !ini_get('allow_url_fopen')) {

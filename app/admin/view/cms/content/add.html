@@ -6,7 +6,6 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">
                     栏目
-                    <span class="layui-font-red">*</span>
                 </label>
                 <div class="layui-input-block">
                     <input type="hidden" id="c-scode" name="row[scode]" value="" class="layui-input" />
@@ -14,6 +13,7 @@
                         class="remoteSelect"
                         id="remoteSelect-scode"
                         data-input-id="c-scode"
+                        data-verify="required"
                         data-primary-key="scode"
                         data-field="name"
                         data-source="cms.content_sort/selectpage"

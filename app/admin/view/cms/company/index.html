@@ -5,6 +5,7 @@
     .layui-form-label {
         width: 120px;
     }
+
     .layui-input-block {
         margin-left: 150px;
     }
@@ -30,164 +31,184 @@
                     <form class="layui-form" action="{:url('cms.company/edit')}" method="post">
                         {:token_field()}
                         <div class="layui-form-item">
-                            <label class="layui-form-label">公司名称</label>
-                            <div class="layui-input-block">
-                                <input
-                                    type="text"
-                                    name="row[name]"
-                                    value="{$row.name}"
-                                    placeholder="请输入公司名称"
-                                    autocomplete="off"
-                                    class="layui-input" />
-                            </div>
-                        </div>
-                        <div class="layui-form-item">
-                            <label class="layui-form-label">公司地址</label>
-                            <div class="layui-input-block">
-                                <input
-                                    type="text"
-                                    name="row[address]"
-                                    value="{$row.address}"
-                                    placeholder="请输入公司地址"
-                                    autocomplete="off"
-                                    class="layui-input" />
-                            </div>
-                        </div>
-                        <div class="layui-form-item">
-                            <label class="layui-form-label">邮政编码</label>
-                            <div class="layui-input-block">
-                                <input
-                                    type="text"
-                                    name="row[postcode]"
-                                    value="{$row.postcode}"
-                                    placeholder="请输入邮政编码"
-                                    autocomplete="off"
-                                    class="layui-input" />
-                            </div>
-                        </div>
-                        <div class="layui-form-item">
-                            <label class="layui-form-label">公司联系人</label>
-                            <div class="layui-input-block">
-                                <input
-                                    type="text"
-                                    name="row[contact]"
-                                    value="{$row.contact}"
-                                    placeholder="请输入公司联系人"
-                                    autocomplete="off"
-                                    class="layui-input" />
-                            </div>
-                        </div>
-                        <div class="layui-form-item">
-                            <label class="layui-form-label">手机号码</label>
-                            <div class="layui-input-block">
-                                <input
-                                    type="text"
-                                    name="row[mobile]"
-                                    value="{$row.mobile}"
-                                    placeholder="请输入手机号码"
-                                    autocomplete="off"
-                                    class="layui-input" />
-                            </div>
-                        </div>
-                        <div class="layui-form-item">
-                            <label class="layui-form-label">电话号码</label>
-                            <div class="layui-input-block">
-                                <input
-                                    type="text"
-                                    name="row[phone]"
-                                    value="{$row.phone}"
-                                    placeholder="请输入电话号码"
-                                    autocomplete="off"
-                                    class="layui-input" />
-                            </div>
-                        </div>
-                        <div class="layui-form-item">
-                            <label class="layui-form-label">公司传真</label>
-                            <div class="layui-input-block">
-                                <input
-                                    type="text"
-                                    name="row[fax]"
-                                    value="{$row.fax}"
-                                    placeholder="请输入公司传真"
-                                    autocomplete="off"
-                                    class="layui-input" />
-                            </div>
-                        </div>
-                        <div class="layui-form-item">
-                            <label class="layui-form-label">电子邮箱</label>
-                            <div class="layui-input-block">
-                                <input
-                                    type="text"
-                                    name="row[email]"
-                                    value="{$row.email}"
-                                    placeholder="请输入电子邮箱"
-                                    autocomplete="off"
-                                    class="layui-input" />
-                            </div>
-                        </div>
-                        <div class="layui-form-item">
-                            <label class="layui-form-label">公司QQ</label>
-                            <div class="layui-input-block">
-                                <input
-                                    type="text"
-                                    name="row[qq]"
-                                    value="{$row.qq}"
-                                    placeholder="请输入公司QQ"
-                                    autocomplete="off"
-                                    class="layui-input" />
-                            </div>
-                        </div>
-                        <div class="layui-form-item">
-                            <label class="layui-form-label">微信图标</label>
-                            <div class="layui-input-block">
-                                <input
-                                    type="text"
-                                    id="c-weixin"
-                                    name="row[weixin]"
-                                    class="layui-input"
-                                    value="{$row.weixin}" style="width: 80%;" />
-                                <div class="layui-input-suffix text-start" style="width: 20%">
-                                    <button
-                                        type="button"
-                                        data-input-id="c-weixin"
-                                        data-preview-id="p-weixin"
-                                        class="layui-btn btn-bdupload">
-                                        <i class="fa fa-upload"></i>
-                                        上传
-                                    </button>
-                                    <button
-                                        type="button"
-                                        data-input-id="c-weixin"
-                                        class="layui-btn layui-bg-green btn-bdchoose">
-                                        <i class="fa fa-list"></i>
-                                        选择
-                                    </button>
+                            <div class="layui-row layui-col-space15">
+                                <div class="layui-col-md10">
+                                    <label class="layui-form-label">公司名称</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="row[name]" value="{$row.name}" placeholder="请输入公司名称"
+                                            autocomplete="off" class="layui-input" />
+                                    </div>
                                 </div>
-                                <div class="layui-upload-list" id="p-weixin"></div>
+                                <div class="layui-col-md2 layui-hide-xs text-secondary">
+                                    {literal}{$bd.compayname}{/literal}
+                                </div>
                             </div>
                         </div>
                         <div class="layui-form-item">
-                            <label class="layui-form-label">营业执照代码</label>
-                            <div class="layui-input-block">
-                                <input
-                                    type="text"
-                                    name="row[blicense]"
-                                    value="{$row.blicense}"
-                                    placeholder="请输入营业执照代码"
-                                    autocomplete="off"
-                                    class="layui-input" />
+                            <div class="layui-row layui-col-space15">
+                                <div class="layui-col-md10">
+                                    <label class="layui-form-label">公司地址</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="row[address]" value="{$row.address}"
+                                            placeholder="请输入公司地址" autocomplete="off" class="layui-input" />
+                                    </div>
+                                </div>
+                                <div class="layui-col-md2 layui-hide-xs text-secondary">
+                                    {literal}{$bd.compayaddress}{/literal}
+                                </div>
                             </div>
                         </div>
                         <div class="layui-form-item">
-                            <label class="layui-form-label">其他信息</label>
-                            <div class="layui-input-block">
-                                <input
-                                    type="text"
-                                    name="row[other]"
-                                    value="{$row.other}"
-                                    placeholder="请输入其他信息"
-                                    autocomplete="off"
-                                    class="layui-input" />
+                            <div class="layui-row layui-col-space15">
+                                <div class="layui-col-md10">
+                                    <label class="layui-form-label">邮政编码</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="row[postcode]" value="{$row.postcode}"
+                                            placeholder="请输入邮政编码" autocomplete="off" class="layui-input" />
+                                    </div>
+                                </div>
+                                <div class="layui-col-md2 layui-hide-xs text-secondary">
+                                    {literal}{$bd.compaypostcode}{/literal}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-row layui-col-space15">
+                                <div class="layui-col-md10">
+                                    <label class="layui-form-label">公司联系人</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="row[contact]" value="{$row.contact}"
+                                            placeholder="请输入公司联系人" autocomplete="off" class="layui-input" />
+                                    </div>
+                                </div>
+                                <div class="layui-col-md2 layui-hide-xs text-secondary">
+                                    {literal}{$bd.compaycontact}{/literal}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-row layui-col-space15">
+                                <div class="layui-col-md10">
+                                    <label class="layui-form-label">手机号码</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="row[mobile]" value="{$row.mobile}"
+                                            placeholder="请输入手机号码" autocomplete="off" class="layui-input" />
+                                    </div>
+                                </div>
+                                <div class="layui-col-md2 layui-hide-xs text-secondary">
+                                    {literal}{$bd.compaymobile}{/literal}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-row layui-col-space15">
+                                <div class="layui-col-md10">
+                                    <label class="layui-form-label">电话号码</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="row[phone]" value="{$row.phone}" placeholder="请输入电话号码"
+                                            autocomplete="off" class="layui-input" />
+                                    </div>
+                                </div>
+                                <div class="layui-col-md2 layui-hide-xs text-secondary">
+                                    {literal}{$bd.compayphone}{/literal}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-row layui-col-space15">
+                                <div class="layui-col-md10">
+                                    <label class="layui-form-label">公司传真</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="row[fax]" value="{$row.fax}" placeholder="请输入公司传真"
+                                            autocomplete="off" class="layui-input" />
+                                    </div>
+                                </div>
+                                <div class="layui-col-md2 layui-hide-xs text-secondary">
+                                    {literal}{$bd.compayfax}{/literal}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-row layui-col-space15">
+                                <div class="layui-col-md10">
+                                    <label class="layui-form-label">电子邮箱</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="row[email]" value="{$row.email}" placeholder="请输入电子邮箱"
+                                            autocomplete="off" class="layui-input" />
+                                    </div>
+                                </div>
+                                <div class="layui-col-md2 layui-hide-xs text-secondary">
+                                    {literal}{$bd.compayemail}{/literal}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-row layui-col-space15">
+                                <div class="layui-col-md10">
+                                    <label class="layui-form-label">公司QQ</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="row[qq]" value="{$row.qq}" placeholder="请输入公司QQ"
+                                            autocomplete="off" class="layui-input" />
+                                    </div>
+                                </div>
+                                <div class="layui-col-md2 layui-hide-xs text-secondary">
+                                    {literal}{$bd.compayqq}{/literal}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-row layui-col-space15">
+                                <div class="layui-col-md10">
+                                    <label class="layui-form-label">微信图标</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" id="c-weixin" name="row[weixin]" class="layui-input"
+                                            value="{$row.weixin}" style="width: 80%;" />
+                                        <div class="layui-input-suffix text-start" style="width: 20%">
+                                            <button type="button" data-input-id="c-weixin" data-preview-id="p-weixin"
+                                                class="layui-btn btn-bdupload">
+                                                <i class="fa fa-upload"></i>
+                                                上传
+                                            </button>
+                                            <button type="button" data-input-id="c-weixin"
+                                                class="layui-btn layui-bg-green btn-bdchoose">
+                                                <i class="fa fa-list"></i>
+                                                选择
+                                            </button>
+                                        </div>
+                                        <div class="layui-upload-list" id="p-weixin"></div>
+                                    </div>
+                                </div>
+                                <div class="layui-col-md2 layui-hide-xs text-secondary">
+                                    {literal}{$bd.compayweixin}{/literal}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-row layui-col-space15">
+                                <div class="layui-col-md10">
+                                    <label class="layui-form-label">营业执照代码</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="row[blicense]" value="{$row.blicense}"
+                                            placeholder="请输入营业执照代码" autocomplete="off" class="layui-input" />
+                                    </div>
+                                </div>
+                                <div class="layui-col-md2 layui-hide-xs text-secondary">
+                                    {literal}{$bd.compayblicense}{/literal}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="layui-form-item">
+                            <div class="layui-row layui-col-space15">
+                                <div class="layui-col-md10">
+                                    <label class="layui-form-label">其他信息</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="row[other]" value="{$row.other}" placeholder="请输入其他信息"
+                                            autocomplete="off" class="layui-input" />
+                                    </div>
+                                </div>
+                                <div class="layui-col-md2 layui-hide-xs text-secondary">
+                                    {literal}{$bd.compayother}{/literal}
+                                </div>
                             </div>
                         </div>
                         <div class="layui-form-item">
