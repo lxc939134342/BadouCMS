@@ -515,3 +515,11 @@ xm-select > .xm-body {
 .layui-table-hover {
     background-color: #fef8f0 !important;
 }
+.badouadmin-form-body {
+    .layui-form-label {
+        width: 120px !important;
+    }
+    .layui-input-block {
+        margin-left: 150px;
+    }
+}
