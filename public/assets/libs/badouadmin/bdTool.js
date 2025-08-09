@@ -38,6 +38,9 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                     var initData = $(this).data('init-data');  //初始化时加载数据
                     var callbackName = $(this).data('callback');
                     var filterable = $(this).data('filterable');
+                    var layVerify = $(this).data('verify');
+                    var layVerType = $(this).data('vertype') || 'msg';
+                    var layReqText = $(this).data('reqtext') || '必选项不能为空';
 
                     // 设置值
                     if (inputId) {
@@ -49,6 +52,7 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                     }
 
                     if (typeof initData === 'undefined') initData = true;
+
                     var options = {
                         el: '#' + id,
                         toolbar: {
@@ -61,12 +65,16 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                         paging: pagination,
                         pageSize: pageSize,
                         initValue: initValue,
+                        layVerify: layVerify,
+                        layVerType: layVerType,
+                        layReqText: layReqText,
                         prop: {
                             name: field,
                             value: key
                         },
                         theme: {
-                            color: themeColor
+                            color: themeColor,
+                            maxColor: themeColor,
                         },
                         tree: {
                             //是否显示树状结构
