@@ -976,10 +976,15 @@ class Content extends Model
                     $key = 'a.title';
                 }
                 if (preg_match('/^[\w\-\.]+$/', $key)) { // 带有违规字符时不带入查询
-                    $where[] = [$key,'=',$value];
+                    if ($params['fuzzy']) {
+                        $where[] = [$key,'like','%' . $value . '%'];
+                    } else {
+                        $where[] = [$key,'=', $value ];
+                    }
                 }
             }
         }
+
         // 筛选条件支持模糊匹配
         $db = self::name('cms_content')
             ->alias('a')
