@@ -97,7 +97,6 @@ class Bd extends TagLib
     /* 内容列表 */
     public function tagList($tag, $content): string
     {
-        $num   = $tag['num'] ?? 15;
         $alias    = $tag['alias'] ?? 'list';
         $empty = $tag['empty'] ?? '';
         $key   = !empty($tag['key']) ? $tag['key'] : 'i';
@@ -110,7 +109,6 @@ class Bd extends TagLib
         $fuzzy = $tag['fuzzy'] ?? true;
         $order = $tag['order'] ?? null;
         $params = [
-            "'num'=>{$num}",
             "'page'=>{$page}",
             "'start'=>{$start}",
             "'fuzzy'=>{$fuzzy}",
@@ -129,7 +127,7 @@ class Bd extends TagLib
         }
 
         foreach ($tag as $k => & $v) {
-            if (in_array($k, ['isico', 'ispics', 'istop', 'isrecommend','isheadline'])) {
+            if (in_array($k, ['num','isico', 'ispics', 'istop', 'isrecommend','isheadline'])) {
                 $params[] = '"'.$k.'"=>'.$v;
             }
         }

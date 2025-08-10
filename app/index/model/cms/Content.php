@@ -386,7 +386,7 @@ class Content extends Model
         $lfield = ''; // 查询字段限制
         $order = 'a.istop DESC,a.isrecommend DESC,a.isheadline DESC,a.sorting ASC,a.date DESC,a.id DESC'; // 默认排序
         $simple = false;//简洁分页
-        $num = 16;    //如果不传入分页，那么最多获取16条数据
+        $num = 12;    //如果不传入分页，那么最多获取16条数据
         $page = false;
         $start = 0;
         $filterWhere = []; //筛选条件
