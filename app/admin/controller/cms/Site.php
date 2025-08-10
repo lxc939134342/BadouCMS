@@ -12,6 +12,7 @@
 
 namespace app\admin\controller\cms;
 
+use badou\Filesystem;
 use Throwable;
 use badou\TableManager;
 
@@ -48,7 +49,17 @@ class Site extends Base
                 $config[$key] = '';
             }
         }
+
+        $template_path = root_path() . 'template' . DIRECTORY_SEPARATOR;
+        if (!is_dir($template_path)) {  //兼容public目录下的模版
+            $template_path = public_path() . 'template'.DIRECTORY_SEPARATOR;
+        }
+
+        $template_path .= 'cms'.DIRECTORY_SEPARATOR;
+        $dirs = Filesystem::getDirs($template_path);
+
         $this->assign('row', $config);
+        $this->assign('template_dirs', $dirs);
         return $this->view->fetch();
     }
 

@@ -7,6 +7,8 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
         tableSearch = layui.tableSearch,
         laytpl = layui.laytpl;
     var util = layui.util;
+    // 暴露全局变量 供外部调用
+    window.bdTables = {};
 
     var bdTable = {
         // 导入layui的table 或者 treeTable
@@ -117,6 +119,8 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                 }
             })
             bdTable.api.bindevent();
+
+            window.bdTables[bdTable.initTable.config.id] = bdTable;
             return bdTable.initTable;
         },
         api: {
@@ -562,14 +566,17 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                 var tableId = table.config.id
                 var field = data.LAY_COL.field;
                 var row = data
+                var rowIndex = data.LAY_INDEX
                 $.each(buttons, function (i, j) {
                     if (type === 'operate') {
                         if (['add', 'edit', 'del', 'multi'].indexOf(j.name) > -1 && !bdTable.extend[j.name + "_url"]) {
                             return true;
                         }
+                        if (!field) {
+                            field = 'operate'
+                        }
                     }
                     var attr = $(bdTable.table_elem).data(type + "-" + j.name);
-
                     if (typeof attr === 'undefined' || attr) {
                         hidden = typeof j.hidden === 'function' ? j.hidden.call(table, row, j) : (typeof j.hidden !== 'undefined' ? j.hidden : false);
                         if (hidden) {
@@ -594,7 +601,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         if (disable) {
                             classname = classname + ' disabled';
                         }
-                        link = '<a href="' + url + '" class="' + classname + '" ' + (confirm ? confirm + ' ' : '') + (refresh ? refresh + ' ' : '') + extend + ' title="' + title + '" data-table-id="' + (table ? tableId : '') + '" data-field="' + field + '" data-button-index="' + i + '"><i class="' + icon + '"></i>' + (text ? ' ' + text : '') + '</a>';
+                        link = '<a href="' + url + '" class="' + classname + '" ' + (confirm ? confirm + ' ' : '') + (refresh ? refresh + ' ' : '') + extend + ' title="' + title + '" data-table-row-index="' + rowIndex + '" data-table-id="' + (table ? tableId : '') + '" data-field="' + field + '" data-button-index="' + i + '"><i class="' + icon + '"></i>' + (text ? ' ' + text : '') + '</a>';
                         if (dropdown) {
                             if (typeof dropdowns[dropdown] == 'undefined') {
                                 dropdowns[dropdown] = [];

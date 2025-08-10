@@ -1,11 +1,11 @@
 {layout name="layout/form" /}
 <style>
     .layui-form-label {
-        width: 120px;
+        width: 150px;
     }
 
     .layui-input-block {
-        margin-left: 150px;
+        margin-left: 180px;
     }
 </style>
 <div class="layui-card">
@@ -29,7 +29,7 @@
                         {foreach $vo['list'] as $field}
                         <div class="layui-form-item">
                             <label class="layui-form-label">{$field.title}</label>
-                            <div class="layui-input-block">
+                            <div class="layui-input-inline" style="width: 70%;" {$field.extend}>
                                 {switch $field.type}
                                 {// 文本框 }
                                 {case value="string"}
@@ -39,25 +39,25 @@
 
                                 {// 开关 }
                                 {case value="switch"}
-                                <input type="hidden" name="row[{$field.name}]" value="0">
-                                <input type="checkbox" id="c-{$field.name}" name="row[{$field.name}]" lay-skin="switch"
-                                    value="{$field.value}" {if $field.value==1}checked{/if}>
+                                <input type="hidden" id="c-{$field.name}" name="row[{$field.name}]" value="{$field.value}" />
+                                <input type="checkbox" data-input-id="c-{$field.name}"  lay-skin="switch"
+                                    value="{$field.value}" {if $field.value=='1'}checked{/if}>
                                 {/case}
 
                                 {// 多选框 }
                                 {case value="checkbox"}
-                                {volist name="$field.content" id="item" key="k" }
+                                {volist name="$field.content_arr" id="item" key="k" }
                                 <input type="checkbox" id="c-{$field.name}-{$k}" name="row[{$field.name}][]"
-                                    title="{$item}" value="{$key}" {in name="key" value="$row[$field.name]??''" }
+                                    title="{$item}" value="{$key}" {in name="key" value="$field.value??''" }
                                     checked {/in}>
                                 {/volist}
                                 {/case}
 
                                 {// 单选框 }
                                 {case value="radio"}
-                                {volist name="$field.content" id="item" key="k" }
+                                {volist name="$field.content_arr" id="item" key="k" }
                                 <input type="radio" id="c-{$field.name}-{$k}" name="row[{$field.name}]" title="{$item}"
-                                    value="{$key}" {in name="key" value="$row[$field.name]??''" } checked {/in}>
+                                    value="{$key}" {in name="key" value="$field.value??''" } checked {/in}>
                                 {/volist}
                                 {/case}
 
@@ -165,7 +165,9 @@
                                 {/case}
 
                                 {/switch}
+                                <p class="help-block">{$field.tip}</p>
                             </div>
+                            <div class="layui-input-inline" style="padding-left: 15px;color: #999;">{$site.{$field.name|htmlentities}}</div>
                         </div>
                         {/foreach}
                         {if $vo.name=='mail'}
@@ -195,10 +197,22 @@
 <script>
     layui.use(["badou", "tabs"], function () {
         var bdForm = layui.bdForm;
+        var form = layui.form;
         var tabs = layui.tabs;
         var layer = layui.layer;
         var badou = layui.badou;
         bdForm.api.bindevent($("form.layui-form"));
+
+        form.on('switch', function(data){
+            var input_id = $(data.elem).attr('data-input-id');
+            var input = $('#' + input_id);
+            var checkbox = data.elem;
+            if(checkbox.checked){
+                input.val('1');
+            } else {
+                input.val('0');
+            }
+        });
 
         $(document).on("click", ".testmail", function () {
             var that = this;

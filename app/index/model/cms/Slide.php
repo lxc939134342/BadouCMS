@@ -19,15 +19,14 @@ class Slide extends \think\Model
     protected $append = [
         'src'
     ];
+
+    protected function getPicAttr($value, $data)
+    {
+        return $value ? cdnurl($value) : '';
+    }
+
     protected function getSrcAttr($value, $data)
     {
-        if ($data['pic']) {
-            if (! preg_match('/^http/', $data['pic'])) {
-                return full_url($data['pic']);
-            } else {
-                return $data['pic'];
-            }
-        }
         return $data['pic'];
     }
 

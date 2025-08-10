@@ -254,7 +254,7 @@
             pk: "id",
             even: true,
             toolbar: false,
-            page: true,
+            page: false,
             cols: [
                 [
                     {
@@ -296,7 +296,7 @@
                         field: "version",
                         title: __("Version"),
                         operate: "LIKE",
-                        width: 130,
+                        width: 110,
                         align: "left",
                         templet: function (data) {
                             return data.module && data.module.version != data.version

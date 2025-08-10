@@ -10,7 +10,7 @@
 // | Author: lande <939134342@qq.com>
 // +----------------------------------------------------------------------
 
-namespace app\admin\controller\User;
+namespace app\admin\controller\user;
 
 use app\common\controller\Backend;
 use think\facade\Db;

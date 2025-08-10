@@ -88,7 +88,6 @@ class Bd extends TagLib
         $parse  .= '$__' . $var . '__ = \app\index\model\cms\ContentSort::navList(' . $parent . ',"' . $scode . '","' . $num . '");';
         $parse  .= ' ?>';
         $parse  .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
-        $parse .= '<?php $'.$alias.'["'.$key.'"]=$'.$key.';?>';
         $parse  .= $content;
         $parse  .= '{/volist}';
         $parse  .= '{php}$__LASTLIST__=$__' . $var . '__;{/php}';
@@ -98,7 +97,6 @@ class Bd extends TagLib
     /* 内容列表 */
     public function tagList($tag, $content): string
     {
-        $num   = $tag['num'] ?? 15;
         $alias    = $tag['alias'] ?? 'list';
         $empty = $tag['empty'] ?? '';
         $key   = !empty($tag['key']) ? $tag['key'] : 'i';
@@ -108,16 +106,9 @@ class Bd extends TagLib
         $start  = $tag['start'] ?? '0';
         $filter = $tag['filter'] ?? null;
         $tags = $tag['tags'] ?? null;
-        $isico = $tag['isico'] ?? '0';
-        $ispics = $tag['ispics'] ?? '0';
-        $istop = $tag['istop'] ?? '0';
-        $isrecommend = $tag['isrecommend'] ?? '0';
-        $isheadline = $tag['isheadline'] ?? '0';
         $fuzzy = $tag['fuzzy'] ?? true;
         $order = $tag['order'] ?? null;
-
         $params = [
-            "'num'=>{$num}",
             "'page'=>{$page}",
             "'start'=>{$start}",
             "'fuzzy'=>{$fuzzy}",
@@ -125,21 +116,24 @@ class Bd extends TagLib
         if ($scode == '*') {
             $params[] = '"scode"=>"*"';
         } elseif ($scode) {
+            $this->autoBuildVar($scode);
             $params[] = '"scode"=>'.$scode;
         } else {
             $params[] = '"scode"=>$sort["scode"]';
-            if ($page == 'false') {
+            // 如果不存在 默认开启分页
+            if (!isset($tag['page'])) {
                 $params[] = '"page"=>1';
+            }
+        }
+
+        foreach ($tag as $k => & $v) {
+            if (in_array($k, ['num','isico', 'ispics', 'istop', 'isrecommend','isheadline'])) {
+                $params[] = '"'.$k.'"=>'.$v;
             }
         }
 
         $tags ? $params[] = '"tags"=>"'.$tags.'"' : '';
         $filter ? $params[] = '"filter"=>'.$filter : '';
-        $isico ? $params[] = '"isico"=>'.$isico : '';
-        $ispics ? $params[] = '"ispics"=>'.$ispics : '';
-        $istop ? $params[] = '"istop"=>'.$istop : '';
-        $isrecommend ? $params[] = '"isrecommend"=>'.$isrecommend : '';
-        $isheadline ? $params[] = '"isheadline"=>'.$isheadline : '';
         $order ? $params[] = '"order"=>"'.$order.'"' : '';
 
         $var     = Random::build('alnum', 10);
@@ -280,12 +274,11 @@ class Bd extends TagLib
      */
     public function tagSearch($tag, $content): string
     {
-        $num   = $tag['num'] ?? 15;
         $alias    = $tag['alias'] ?? 'search';
         $empty = $tag['empty'] ?? __('No Data');
         $key   = !empty($tag['key']) ? $tag['key'] : 'i';
         $mod   = $tag['mod'] ?? '2';
-        $page  = $tag['page'] ?? 'false';
+        $page  = $tag['page'] ?? 'true';
         $start  = $tag['start'] ?? '0';
         $filter = $tag['filter'] ?? null;
         $tags = $tag['tags'] ?? null;
@@ -293,11 +286,11 @@ class Bd extends TagLib
         $order = $tag['order'] ?? null;
 
         $params = [
-            "'num'=>{$num}",
             "'page'=>{$page}",
             "'start'=>{$start}",
             "'fuzzy'=>{$fuzzy}",
         ];
+        isset($tag['num']) ? $params[] = '"num"=>'.$tag['num'] : '';
 
         $tags ? $params[] = '"tags"=>'.$tags : '';
         $filter ? $params[] = '"filter"=>'.$filter : '';

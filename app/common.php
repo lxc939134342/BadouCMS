@@ -160,19 +160,6 @@ if (!function_exists('xss_clean')) {
     }
 }
 
-if (!function_exists('url_clean')) {
-    /**
-     * 清理URL
-     */
-    function url_clean($url)
-    {
-        if (!check_url_allowed($url)) {
-            return '';
-        }
-        return xss_clean($url);
-    }
-}
-
 if (!function_exists('check_ip_allowed')) {
     /**
      * 检测IP是否允许
@@ -293,7 +280,6 @@ if (!function_exists('full_url')) {
         return $url;
     }
 }
-
 
 if (!function_exists('letter_avatar')) {
     /**
@@ -578,6 +564,52 @@ if (!function_exists('convert_path_to_snake_case')) {
                 return '';
             }
             return xss_clean($url);
+        }
+    }
+}
+
+if (!function_exists('parse_array')) {
+    /** 解析"1:1\r\n2:3"格式字符串为数组
+     * @param $value
+     * @return array
+     */
+    function parse_array($value)
+    {
+        $data = [];
+        $trimmed = trim($value, " ,，;；\r\n");
+
+        // 使用统一正则分割字符串
+        $array = preg_split('/\s*[,，;；\r\n]+\s*/u', $trimmed, -1, PREG_SPLIT_NO_EMPTY);
+
+        foreach ($array as $val) {
+            if (strpos($val, ':') !== false) {
+                list($k, $v) = explode(':', $val, 2);
+                $data[$k] = $v;
+            } else {
+                $data[$val] = $val;
+            }
+        }
+
+        return $data;
+    }
+}
+
+if (!function_exists('parse_array_string')) {
+    /**
+     * 数组转换成换行字符串
+     * @param $array
+     * @return string
+     */
+    function parse_array_string($array)
+    {
+        if (is_array($array)) {
+            $lines = [];
+            foreach ($array as $k => $v) {
+                $lines[] = $k . ':' . $v;
+            }
+            return implode("\r\n", $lines);
+        } else {
+            return $array;
         }
     }
 }

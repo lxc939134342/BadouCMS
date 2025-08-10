@@ -266,7 +266,6 @@ class Upload
         $attachment = new Attachment();
         $attachment->data(array_filter($params));
         $attachment->save();
-
         Event::trigger("upload_after", $attachment);
         return $attachment;
     }

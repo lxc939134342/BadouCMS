@@ -55,6 +55,11 @@ class Frontend extends BaseController
 
     public function initialize()
     {
+        $colse_site = get_sys_config('close_site');
+        if (!is_null($colse_site) && $colse_site == 0) {
+            $this->error(get_sys_config('close_site_note') ?: '站点已关闭');
+        }
+
         $this->view     = View::instance();
         //移除HTML标签
         $this->request->filter('trim,strip_tags,htmlspecialchars');
@@ -66,7 +71,6 @@ class Frontend extends BaseController
         check_ip_allowed();
 
         $this->auth = Auth::instance();
-
         // token
         $token = $this->request->server('HTTP_TOKEN', $this->request->request('token', Cookie::get('token', '')));
 
@@ -102,10 +106,17 @@ class Frontend extends BaseController
 
         $site = get_sys_config();
 
-        $upload = \app\common\model\Config::upload();
+        // 设置用户中心是否开启
+        if (isset($site['usercenter'])) {
+            Config::set(['usercenter' => $site['usercenter']], 'badouadmin');
+        }
 
+        $upload = \app\common\model\Config::upload();
         // 上传信息配置后
-        Event::trigger("upload_config_init", $upload);
+        $upload_config_event = Event::trigger('upload_config_init', $upload, true);
+        if ($upload_config_event) {
+            $upload = array_merge($upload, $upload_config_event);
+        }
 
         // 配置信息
         $config = [
@@ -120,7 +131,6 @@ class Frontend extends BaseController
             'app_url'        => $this->request->root(true),
         ];
         $config = array_merge($config, Config::get("view_replace_str"));
-
         Config::set(array_merge(Config::get('upload'), $upload), 'upload');
 
         // 配置信息后

@@ -33,6 +33,11 @@ class Content extends Model
         return $this->belongsTo(ContentSort::class, 'scode', 'scode');
     }
 
+    public function getIcoAttr($value, $data)
+    {
+        return $value ? cdnurl($value) : '';
+    }
+
     // 检查自定义URL名称
     public function checkFilename($filename, $where = array())
     {

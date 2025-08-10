@@ -12,15 +12,15 @@
 
 namespace app\common\traits;
 
-use app\admin\library\Auth;
-use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
-use PhpOffice\PhpSpreadsheet\Reader\Csv;
-use PhpOffice\PhpSpreadsheet\Reader\Xls;
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use Throwable;
 use PDOException;
 use think\Exception;
 use think\facade\Db;
+use badou\TableManager;
+use PhpOffice\PhpSpreadsheet\Reader\Csv;
+use PhpOffice\PhpSpreadsheet\Reader\Xls;
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 
 trait Backend
 {
@@ -358,20 +358,9 @@ trait Backend
 
     }
 
-    /**
-     ** 导入
-     ** | Author: Wusn <958342972@qq.com>
-     ** | @return void
-     ** * @throws \Exception
-     ** | DateTime: 2025/6/14 16:22
-     */
-    protected function import()
+    protected function getImportData($file)
     {
-        $file = $this->request->request('file');
-        if (!$file) {
-            $this->error(__('Parameter %s can not be empty', 'file'));
-        }
-        $filePath = public_path() . DS . $file;
+        $filePath = public_path() . DIRECTORY_SEPARATOR . $file;
         if (!is_file($filePath)) {
             $this->error(__('No results were found'));
         }
@@ -407,22 +396,6 @@ trait Backend
             $reader = new Xlsx();
         }
 
-        //导入文件首行类型,默认是注释,如果需要使用字段名称请使用name
-        $importHeadType = isset($this->importHeadType) ? $this->importHeadType : 'comment';
-
-        $table = $this->model->getQuery()->getTable();
-        $database = \think\Config::get('database.database');
-        $fieldArr = [];
-        $list = db()->query("SELECT COLUMN_NAME,COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = ? AND TABLE_SCHEMA = ?", [$table, $database]);
-        foreach ($list as $k => $v) {
-            if ($importHeadType == 'comment') {
-                $v['COLUMN_COMMENT'] = explode(':', $v['COLUMN_COMMENT'])[0]; //字段备注有:时截取
-                $fieldArr[$v['COLUMN_COMMENT']] = $v['COLUMN_NAME'];
-            } else {
-                $fieldArr[$v['COLUMN_NAME']] = $v['COLUMN_NAME'];
-            }
-        }
-
         //加载文件
         $insert = [];
         try {
@@ -436,7 +409,11 @@ trait Backend
             $fields = [];
             for ($currentRow = 1; $currentRow <= 1; $currentRow++) {
                 for ($currentColumn = 1; $currentColumn <= $maxColumnNumber; $currentColumn++) {
-                    $val = $currentSheet->getCellByColumnAndRow($currentColumn, $currentRow)->getValue();
+                    $cell = $currentSheet->getCell(Coordinate::stringFromColumnIndex($currentColumn) . $currentRow);
+                    $val = $cell->getValue();
+                    if ($val instanceof \PhpOffice\PhpSpreadsheet\RichText\RichText) {
+                        $val = $val->getPlainText();
+                    }
                     $fields[] = $val;
                 }
             }
@@ -444,23 +421,60 @@ trait Backend
             for ($currentRow = 2; $currentRow <= $allRow; $currentRow++) {
                 $values = [];
                 for ($currentColumn = 1; $currentColumn <= $maxColumnNumber; $currentColumn++) {
-                    $val = $currentSheet->getCellByColumnAndRow($currentColumn, $currentRow)->getValue();
+                    $cell = $currentSheet->getCell(Coordinate::stringFromColumnIndex($currentColumn) . $currentRow);
+                    $val = $cell->getValue();
+                    if ($val instanceof \PhpOffice\PhpSpreadsheet\RichText\RichText) {
+                        $val = $val->getPlainText();
+                    }
                     $values[] = is_null($val) ? '' : $val;
                 }
-                $row = [];
                 $temp = array_combine($fields, $values);
-                foreach ($temp as $k => $v) {
-                    if (isset($fieldArr[$k]) && $k !== '') {
-                        $row[$fieldArr[$k]] = $v;
-                    }
-                }
-                if ($row) {
-                    $insert[] = $row;
-                }
+                $insert[] = $temp;
             }
+
+            return $insert;
         } catch (Exception $exception) {
             $this->error($exception->getMessage());
         }
+    }
+
+    /**
+     * 导入excel
+     * @return void
+     */
+    protected function import()
+    {
+        $file = $this->request->request('file');
+        if (!$file) {
+            $this->error(__('Parameter %s can not be empty', ['file']));
+        }
+
+        $importData = $this->getImportData($file);
+
+        //导入文件首行类型,默认是注释,如果需要使用字段名称请使用name
+        $importHeadType = isset($this->importHeadType) ? $this->importHeadType : 'comment';
+
+        $table = $this->model->getTable();
+        $fieldArr = [];
+        $list = TableManager::getTableColumns($table);
+        foreach ($list as $k => $v) {
+            if ($importHeadType == 'comment') {
+                $v['COLUMN_COMMENT'] = explode(':', $v['COLUMN_COMMENT'])[0]; //字段备注有:时截取
+                $fieldArr[$v['COLUMN_COMMENT']] = $v['COLUMN_NAME'];
+            } else {
+                $fieldArr[$v['COLUMN_NAME']] = $v['COLUMN_NAME'];
+            }
+        }
+        $insert = [];
+        foreach ($importData as $temp) {
+            foreach ($temp as $k => $v) {
+                if (isset($fieldArr[$k]) && $k !== '') {
+                    $row[$fieldArr[$k]] = $v;
+                }
+            }
+            $insert[] = $row;
+        }
+
         if (!$insert) {
             $this->error(__('No rows were updated'));
         }
@@ -475,7 +489,7 @@ trait Backend
                 }
             }
             if ($has_admin_id) {
-                $auth = Auth::instance();
+                $auth = $this->auth;
                 foreach ($insert as &$val) {
                     if (empty($val['admin_id'])) {
                         $val['admin_id'] = $auth->isLogin() ? $auth->id : 0;
@@ -483,7 +497,7 @@ trait Backend
                 }
             }
             $this->model->saveAll($insert);
-        } catch (\think\db\exception\PDOException $exception) {
+        } catch (PDOException $exception) {
             $msg = $exception->getMessage();
             if (preg_match("/.+Integrity constraint violation: 1062 Duplicate entry '(.+)' for key '(.+)'/is", $msg, $matches)) {
                 $msg = "导入失败，包含【{$matches[1]}】的记录已存在";

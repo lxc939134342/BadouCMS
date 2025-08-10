@@ -16,6 +16,7 @@
                         data-input-id="c-scode"
                         data-primary-key="scode"
                         data-field="name"
+                        data-verify="required"
                         data-source="cms.content_sort/selectpage"
                         data-is-tree="true"
                         data-pidname="pcode"
@@ -153,6 +154,13 @@
                         <option value="{$type.value}"  {if $row.gtype==$type.value}selected{/if}>{$type.label}</option>
                         {/foreach}
                     </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">权限不足提示</label>
+                <div class="layui-input-block">
+                    <input type="text" name="row[gnote]" placeholder="请输入权限不足提示语" class="layui-input" value="{$row.gnote}" />
                 </div>
             </div>
             <div class="layui-form-item">

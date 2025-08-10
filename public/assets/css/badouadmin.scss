@@ -497,3 +497,29 @@
 xm-select > .xm-body {
     z-index: 999999 !important;
 }
+.help-block {
+    color: #666;
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+.layui-form-checkbox[lay-skin="primary"] > .layui-icon-indeterminate {
+    border-color: var(--theme-color);
+    &::before {
+        background-color: var(--theme-color);
+    }
+}
+.layui-table-checked {
+    background-color: #fef8f0 !important;
+}
+.layui-table-hover {
+    background-color: #fef8f0 !important;
+}
+.badouadmin-form-body {
+    .layui-form-label {
+        width: 120px !important;
+    }
+    .layui-input-block {
+        margin-left: 150px;
+    }
+}

@@ -179,7 +179,8 @@ class Module extends Backend
         try {
             Server::uninstall($name, $force);
             if ($tables) {
-                $prefix = env('database.prefix');
+                $dbConfig = Server::getDbConfig();
+                $prefix = $dbConfig['prefix'];
                 //删除插件关联表
                 foreach ($tables as $index => $table) {
                     //忽略非插件标识的表名
@@ -348,7 +349,8 @@ class Module extends Backend
             $this->error(__('Module name incorrect'));
         }
         $tables = Server::getModuleTables($name);
-        $prefix = Config::get('database.prefix');
+        $dbConfig = Server::getDbConfig();
+        $prefix = $dbConfig['prefix'];
         foreach ($tables as $index => $table) {
             //忽略非插件标识的表名
             if (!preg_match("/^{$prefix}{$name}/", $table)) {

@@ -78,14 +78,18 @@ class Base extends Frontend
 
         $theme = isset($this->site['theme']) && !empty($this->site['theme']) ? $this->site['theme'] : 'default';
 
-        // 手机端模版
-        // TODO 待完善
         /* 设置模版路径 */
         $view_path = root_path() . 'template' . DIRECTORY_SEPARATOR.'cms'.DIRECTORY_SEPARATOR. $theme. DIRECTORY_SEPARATOR;
         if (!is_dir($view_path)) {  //兼容public目录下的模版
             $tpl_html_dir = get_sys_config('tpl_html_dir') ?: 'html';
             $view_path = public_path() . 'template' . DIRECTORY_SEPARATOR. $theme. DIRECTORY_SEPARATOR.$tpl_html_dir. DIRECTORY_SEPARATOR;
         }
+
+        // 手机端模版
+        if ($this->request->isMobile() && get_sys_config('open_wap') == 1) {
+            $view_path .= 'wap'.DIRECTORY_SEPARATOR;
+        }
+
         $this->view = View::instance();
         $this->view->config([
             'view_path' => $view_path,
@@ -141,7 +145,7 @@ class Base extends Frontend
             $this->view->assign('listsort', $this->contentSort);
             /*验证权限*/
             if ($this->contentSort['gid']) {
-                $this->checkPageLevel($this->contentSort['gid'], $this->contentSort['gtype']);
+                $this->checkPageLevel($this->contentSort['gid'], $this->contentSort['gtype'], $this->contentSort['gnote']);
             }
 
             /*如果是单页直接获取内容*/
@@ -175,7 +179,7 @@ class Base extends Frontend
             'sitemap' => url('/sitemap', [], 'xml'),
             'msgaction' => url('/message'),
             'sitetplpath' => request()->domain().'/template/cms/'. $this->site['theme'],
-            'checkcode' => '',
+            'checkcode' => (string)url('index/captcha'),
             'islogin' => $this->auth->isLogin(),
             'registerstatus' => true,
             'loginstatus' => true,
@@ -216,15 +220,16 @@ class Base extends Frontend
      */
     protected function checkPageLevel(int $gcode, string $gtype, string $gnote = ''): void
     {
-        /*判断是否登录*/
-        if (!$this->auth->isLogin()) {
-            $this->redirect('/user/login');
-        }
-
         if ($gcode) {
             $deny = false;
             $gtype = $gtype ?: 4;
-            $userInfo = $this->auth->getUserInfo();
+            if ($this->auth->isLogin()) {
+                $userInfo = $this->auth->getUserInfo();
+            } else {
+                $userInfo = [
+                   'level' => 0
+                ];
+            }
             switch ($gtype) {
                 case 1:
                     if ($gcode <= $userInfo['level']) {
@@ -254,7 +259,11 @@ class Base extends Frontend
             }
             if ($deny) {
                 $gnote = $gnote ?: 'Permission denied';
-                $this->error(__($gnote));
+                if ($this->auth->isLogin()) { // 已经登录
+                    $this->error(__($gnote), '/', 1);
+                } else {
+                    $this->error(__($gnote), '/user/login', 1);
+                }
             }
         }
     }
@@ -298,5 +307,33 @@ class Base extends Frontend
         }
 
         $this->redirect($domain);
+    }
+
+    public function likes()
+    {
+        $id = $this->request->param('id/d', 0);
+        if (!$id) {
+            $this->error('参数错误');
+        }
+        if (!cookie('bd_likes_' . $id)) {
+            Db::name('cms_content')->where('id', $id)->inc('likes')->update();
+            cookie('bd_likes_' . $id, true);
+            $this->success('点赞成功');
+        }
+        $this->error('请勿重复操作');
+    }
+
+    public function oppose()
+    {
+        $id = $this->request->param('id/d', 0);
+        if (!$id) {
+            $this->error('参数错误');
+        }
+        if (!cookie('bd_oppose_' . $id)) {
+            Db::name('cms_content')->where('id', $id)->inc('oppose')->update();
+            cookie('bd_oppose_' . $id, true);
+            $this->success('反对成功');
+        }
+        $this->error('请勿重复操作');
     }
 }

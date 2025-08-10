@@ -23,7 +23,9 @@ class Content extends Model
         'link',
         'sortlink',
         'subsortlink',
-        'enclosuresize'
+        'enclosuresize',
+        'likeslink',
+        'opposelink'
     ];
 
     public function getContentAttr($value): string
@@ -35,7 +37,7 @@ class Content extends Model
 
     public function getIcoAttr($value, $data)
     {
-        return $value ? full_url($value) : '';
+        return $value ? cdnurl($value) : '';
     }
 
     public function getPicsAttr($value, $data)
@@ -43,10 +45,10 @@ class Content extends Model
         if ($value) {
             $pics = explode(',', $value);
             if (count($pics) == 1) {
-                return full_url($pics[0]);
+                return cdnurl($pics[0]);
             }
             foreach ($pics as &$pic) {
-                $pic = full_url($pic);
+                $pic = cdnurl($pic);
             }
             return $pics;
         }
@@ -94,6 +96,16 @@ class Content extends Model
             return filesize(public_path(). $data['enclosure']);
         }
         return '';
+    }
+
+    public function getLikesLinkAttr($value, $data)
+    {
+        return (string) url('/do/likes', ['id' => $data['id']]);
+    }
+
+    public function getOpposeLinkAttr($value, $data)
+    {
+        return (string) url('/do/oppose', ['id' => $data['id']]);
     }
 
     // 内容详情页图片
@@ -374,7 +386,7 @@ class Content extends Model
         $lfield = ''; // 查询字段限制
         $order = 'a.istop DESC,a.isrecommend DESC,a.isheadline DESC,a.sorting ASC,a.date DESC,a.id DESC'; // 默认排序
         $simple = false;//简洁分页
-        $num = 16;//每页显示数量
+        $num = 12;    //如果不传入分页，那么最多获取16条数据
         $page = false;
         $start = 0;
         $filterWhere = []; //筛选条件
@@ -614,7 +626,6 @@ class Content extends Model
             $db->join('cms_content_ext e', 'a.id=e.contentid', 'LEFT');
         }
         $db->order($order);
-
         if ($page) {
             // 扩展字段数据筛选
             $get = request()->get();
@@ -646,6 +657,7 @@ class Content extends Model
                 $data['total'] = $res->total();
             }
         } else {
+
             $res = $db->limit($start, $num)->select();
             if (!$res->isEmpty()) {
                 $data['total'] = $res->count();
@@ -700,7 +712,7 @@ class Content extends Model
         $lfield = ''; // 查询字段限制
         $order = 'a.istop DESC,a.isrecommend DESC,a.isheadline DESC,a.sorting ASC,a.date DESC,a.id DESC'; // 默认排序
         $simple = false;//简洁分页
-        $num = 16;//每页显示数量
+        $num = 1000; //如果不传入分页，那么最多获取1000条数据
         $page = false;
         $start = 0;
         $filterWhere = []; //筛选条件
@@ -833,6 +845,10 @@ class Content extends Model
                     break;
                 case 'page':
                     $page = $value;
+                    // 开启分页后，如果没有传入num 那么默认的num改为12条
+                    if ($page && !isset($params['num'])) {
+                        $num = 12;
+                    }
                     break;
                 case 'start':
                     // 起始数校验
@@ -960,10 +976,15 @@ class Content extends Model
                     $key = 'a.title';
                 }
                 if (preg_match('/^[\w\-\.]+$/', $key)) { // 带有违规字符时不带入查询
-                    $where[] = [$key,'=',$value];
+                    if ($params['fuzzy']) {
+                        $where[] = [$key,'like','%' . $value . '%'];
+                    } else {
+                        $where[] = [$key,'=', $value ];
+                    }
                 }
             }
         }
+
         // 筛选条件支持模糊匹配
         $db = self::name('cms_content')
             ->alias('a')

@@ -36,7 +36,7 @@ class Extfield extends Model
         if (!$data['value']) {
             return [];
         }
-        $value = preg_split('/\s*[,，\r\n]+\s*/', $data['value'], -1, PREG_SPLIT_NO_EMPTY);
+        $value = parse_array($data['value']);
         $data = [];
         foreach ($value as $item) {
             $data[$item] = $item;

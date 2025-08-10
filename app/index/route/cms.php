@@ -2,6 +2,7 @@
 
 use think\facade\Db;
 use think\facade\Route;
+use think\Http;
 
 /* 变量规则 */
 Route::pattern([
@@ -10,9 +11,9 @@ Route::pattern([
     'tag'      => '\w+',
 ]);
 
-
+$cms_domain = [];
 /* 前台应用获取区域域名 */
-if (app('http')->getName() == 'index') {
+if (strtolower(app('http')->getName()) == 'index') {
     $cms_domain = cache('cms_domain');
     if (!$cms_domain) {
         $cms_domain = Db::name('cms_area')->column('domain', 'acode');

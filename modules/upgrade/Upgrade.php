@@ -19,6 +19,7 @@ use think\Exception;
 use think\facade\Db;
 use badou\Filesystem;
 use think\facade\Event;
+use think\facade\Config;
 use badou\ModuleException;
 use app\common\library\Menu;
 use app\admin\model\AdminRule;
@@ -37,12 +38,14 @@ class Upgrade
     ];
     public function appInit()
     {
-        // admin 头部添加
-        Event::listen('admin_top_begin', function ($data) {
-            return  '<li class="layui-nav-item layui-hide-xs upgrade">
+        if (app('http')->getName() == 'admin') {
+            // admin 头部添加
+            Event::listen('admin_top_begin', function ($data) {
+                return  '<li class="layui-nav-item layui-hide-xs upgrade">
                 <a href="javascript:;" class="layui-badge-rim ">'.config('badouadmin.version').'</a>
             </li>';
-        });
+            });
+        }
     }
 
     public function enable($params = [])
@@ -163,6 +166,19 @@ class Upgrade
         $old = $old->toArray();
         $old = array_column($old, null, 'name');
 
+        $config_group = Db::name('config')->where('name', 'config_group')->value('value');
+        $config_group = json_decode($config_group, true);
+        $config_group_key = array_column($config_group, null, 'key');
+        if (!in_array('user', $config_group_key)) {
+            $config_group[] = [
+                'key' => 'user',
+                'name' => '会员配置',
+            ];
+            Db::name('config')->where('name', 'config_group')->update(['value' => json_encode($config_group)]);
+        }
+
+        $this->importsql('upgrade');
+
         Db::startTrans();
         try {
             foreach ($menu as $value) {
@@ -184,6 +200,43 @@ class Upgrade
         } catch (PDOException $e) {
             Db::rollback();
             return false;
+        }
+        return true;
+    }
+
+    /**
+     * 导入SQL
+     *
+     * @param string $name     模块名称
+     * @param string $fileName SQL文件名称
+     * @return  boolean
+     */
+    protected function importsql($name, $fileName = null)
+    {
+        $fileName = is_null($fileName) ? 'install.sql' : $fileName;
+        $sqlFile = Server::getModuleDir($name) . $fileName;
+        if (is_file($sqlFile)) {
+            $lines = file($sqlFile);
+            $templine = '';
+            foreach ($lines as $line) {
+                if (substr($line, 0, 2) == '--' || $line == '' || substr($line, 0, 2) == '/*') {
+                    continue;
+                }
+
+                $templine .= $line;
+                if (substr(trim($line), -1, 1) == ';') {
+                    $dbConfig         = Config::get('database');
+                    $config = $dbConfig['connections'][$dbConfig['default']];
+                    $templine = str_ireplace('__PREFIX__', $config['prefix'], $templine);
+                    $templine = str_ireplace('INSERT INTO ', 'INSERT IGNORE INTO ', $templine);
+                    try {
+                        Db::getPdo()->exec($templine);
+                    } catch (\PDOException $e) {
+                        //$e->getMessage();
+                    }
+                    $templine = '';
+                }
+            }
         }
         return true;
     }

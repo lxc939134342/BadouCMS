@@ -14,6 +14,7 @@ namespace app\admin\controller\general;
 
 use app\common\controller\Backend;
 use app\common\model\Attachment as ModelAttachment;
+use think\facade\Event;
 
 class Attachment extends Backend
 {
@@ -65,6 +66,36 @@ class Attachment extends Backend
 
         }
         return $this->view->fetch();
+    }
+
+
+    /**
+     * 删除附件
+     * @param array $ids
+     */
+    public function del($ids = "")
+    {
+        if (!$this->request->isPost()) {
+            $this->error(__("Invalid parameters"));
+        }
+        $ids = $ids ? $ids : $this->request->post("ids");
+        if ($ids) {
+            Event::listen('upload_delete', function ($params) {
+                if ($params['storage'] == 'local') {
+                    $attachmentFile = public_path()  . $params['url'];
+                    if (is_file($attachmentFile)) {
+                        @unlink($attachmentFile);
+                    }
+                }
+            });
+            $attachmentlist = $this->model->where('id', 'in', $ids)->select();
+            foreach ($attachmentlist as $attachment) {
+                Event::trigger("upload_delete", $attachment);
+                $attachment->delete();
+            }
+            $this->success();
+        }
+        $this->error(__('Parameter %s can not be empty', ['ids']));
     }
 
 

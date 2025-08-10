@@ -49,10 +49,10 @@ class Attachment extends Model
         if (!isset($data['storage']) || $data['storage'] == 'local') {
             return '';
         } else {
-            // $config = get_addon_config($data['storage']);
-            // if ($config && isset($config['thumbstyle'])) {
-            //     return $config['thumbstyle'];
-            // }
+            $config = get_sys_config('', $data['storage']);
+            if ($config && isset($config[$data['storage'].'_thumbstyle'])) {
+                return $config[$data['storage'].'_thumbstyle'];
+            }
         }
         return '';
     }

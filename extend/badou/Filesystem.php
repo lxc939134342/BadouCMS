@@ -259,6 +259,33 @@ class Filesystem
     }
 
     /**
+     * 获取一个目录内的文件列表
+     * @param string $dir    目录路径
+     * @return array
+     */
+    public static function getDirs(string $dir): array
+    {
+        $files = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir),
+            RecursiveIteratorIterator::CATCH_GET_CHILD
+        );
+
+        $dirs = [];
+        foreach ($files as $file) {
+            if ($file->getPathname() === $dir.'.' or $file->getPathname() === $dir.'..') {
+                continue;
+            }
+            if ($file->isDir()) {
+                $dirpath = $file->getPathname();
+                $name            = str_replace($dir, '', $dirpath);
+                $name            = str_replace(DIRECTORY_SEPARATOR, "/", $name);
+                $dirs[$name] = $name;
+            }
+        }
+        return $dirs;
+    }
+
+    /**
      * 将一个文件单位转为字节
      * @param string $unit 将b、kb、m、mb、g、gb的单位转为 byte
      * @return int byte

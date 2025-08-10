@@ -266,8 +266,6 @@ function mark($string)
     return $string;
 }
 
-
-
 // 字符反转义html实体及斜杠，支持字符串、数组、对象
 function decode_string($string)
 {
@@ -629,7 +627,6 @@ function get_auto_code($string, $start = '1')
     }
 }
 
-
 /**
  * 获取后台语言
  * @return string
@@ -746,6 +743,7 @@ function bdurl($type, $urlname, $pagetype, $scode, $sortfilename, $id = '', $con
             $link = 'javascript:;';
         }
     }
+    $link = preg_replace("/\/((?!index)[\w]+)\.php\//i", "/", (string)$link);
     return $link;
 }
 

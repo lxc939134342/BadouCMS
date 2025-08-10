@@ -87,6 +87,13 @@
             </div>
 
             <div class="layui-form-item">
+                <label class="layui-form-label">权限不足提示</label>
+                <div class="layui-input-block">
+                    <input type="text" name="row[gnote]" placeholder="请输入权限不足提示语" class="layui-input" value="{$row.gnote}" />
+                </div>
+            </div>
+
+            <div class="layui-form-item">
                 <label class="layui-form-label">排序</label>
                 <div class="layui-input-block">
                     <input
@@ -226,7 +233,21 @@
 <script>
     layui.use(['badou'], function () {
         var bdForm = layui.bdForm;
-
+        var form = layui.form;
         bdForm.api.bindevent($("form.layui-form"));
+        form.on('select', function(data){
+            if(data.elem.id === 'c-mcode'){
+                var mcode = data.value;
+                if (!mcode || !Config.models) return;
+
+                var model = Config.models.find(function (m) { return m.mcode == mcode; });
+                if (model) {
+                    $("#c-listtpl").val(model.listtpl);
+                    $("#c-contenttpl").val(model.contenttpl);
+                    // 重新渲染 select
+                    form.render("select");
+                }
+            }
+        });
     });
 </script>
