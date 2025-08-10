@@ -276,12 +276,11 @@ class Bd extends TagLib
      */
     public function tagSearch($tag, $content): string
     {
-        $num   = $tag['num'] ?? 15;
         $alias    = $tag['alias'] ?? 'search';
         $empty = $tag['empty'] ?? __('No Data');
         $key   = !empty($tag['key']) ? $tag['key'] : 'i';
         $mod   = $tag['mod'] ?? '2';
-        $page  = $tag['page'] ?? 'false';
+        $page  = $tag['page'] ?? 'true';
         $start  = $tag['start'] ?? '0';
         $filter = $tag['filter'] ?? null;
         $tags = $tag['tags'] ?? null;
@@ -289,11 +288,11 @@ class Bd extends TagLib
         $order = $tag['order'] ?? null;
 
         $params = [
-            "'num'=>{$num}",
             "'page'=>{$page}",
             "'start'=>{$start}",
             "'fuzzy'=>{$fuzzy}",
         ];
+        isset($tag['num']) ? $params[] = '"num"=>'.$tag['num'] : '';
 
         $tags ? $params[] = '"tags"=>'.$tags : '';
         $filter ? $params[] = '"filter"=>'.$filter : '';

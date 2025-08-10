@@ -386,7 +386,7 @@ class Content extends Model
         $lfield = ''; // 查询字段限制
         $order = 'a.istop DESC,a.isrecommend DESC,a.isheadline DESC,a.sorting ASC,a.date DESC,a.id DESC'; // 默认排序
         $simple = false;//简洁分页
-        $num = 16;//每页显示数量
+        $num = 16;    //如果不传入分页，那么最多获取16条数据
         $page = false;
         $start = 0;
         $filterWhere = []; //筛选条件
@@ -626,7 +626,6 @@ class Content extends Model
             $db->join('cms_content_ext e', 'a.id=e.contentid', 'LEFT');
         }
         $db->order($order);
-
         if ($page) {
             // 扩展字段数据筛选
             $get = request()->get();
@@ -658,6 +657,7 @@ class Content extends Model
                 $data['total'] = $res->total();
             }
         } else {
+
             $res = $db->limit($start, $num)->select();
             if (!$res->isEmpty()) {
                 $data['total'] = $res->count();
@@ -712,7 +712,7 @@ class Content extends Model
         $lfield = ''; // 查询字段限制
         $order = 'a.istop DESC,a.isrecommend DESC,a.isheadline DESC,a.sorting ASC,a.date DESC,a.id DESC'; // 默认排序
         $simple = false;//简洁分页
-        $num = 16;//每页显示数量
+        $num = 1000; //如果不传入分页，那么最多获取1000条数据
         $page = false;
         $start = 0;
         $filterWhere = []; //筛选条件
@@ -845,6 +845,10 @@ class Content extends Model
                     break;
                 case 'page':
                     $page = $value;
+                    // 开启分页后，如果没有传入num 那么默认的num改为12条
+                    if ($page && !isset($params['num'])) {
+                        $num = 12;
+                    }
                     break;
                 case 'start':
                     // 起始数校验
