@@ -27,7 +27,7 @@
         bdTable.api.init({
             table: treeTable,
             extend: {
-                index_url: "user.user/index",
+                index_url: "user.user/index"+ location.search,
                 add_url: "user.user/add",
                 edit_url: "user.user/edit",
                 del_url: "user.user/del",
@@ -41,6 +41,7 @@
             pk: "id",
             even: true,
             toolbar: "#toolbar",
+            page: true,
             cols: [
                 [
                     { type: "checkbox" },
