@@ -21,3 +21,4 @@ moduledev
 !/modules/cms
 !/modules/nkeditor
 !/modules/upgrade
+.cursor

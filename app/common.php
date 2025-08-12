@@ -502,6 +502,21 @@ if (!function_exists('hook')) {
     }
 }
 
+if (!function_exists('has_hook')) {
+    /**
+     * 检查是否存在某个钩子（事件）的监听器
+     * @param string $hook        钩子名称
+     * @return bool               存在监听器返回 true，否则返回 false
+     */
+    function has_hook($hook): bool
+    {
+        return Event::hasListener($hook);
+    }
+}
+
+
+
+
 if (!function_exists('convert_path_to_snake_case')) {
     /**
      * 将路径中的控制器部分从驼峰命名转换为下划线命名

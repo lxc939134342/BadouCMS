@@ -12,7 +12,7 @@
 
 namespace app\index\model\cms;
 
-use ba\TableManager;
+use badou\TableManager;
 use think\Model;
 
 class Company extends Model
