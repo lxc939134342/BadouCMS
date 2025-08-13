@@ -6,39 +6,54 @@
     .layui-table-cell .layui-btn .fa {
         font-size: 13px !important;
     }
+    td[data-field="intro"] .layui-table-cell {
+        font-size: 13px !important;
+        color: #666;
+    }
 </style>
 <!-- 表格 -->
 <div class="layui-card">
     <div class="layui-card-body">
-        <div style="margin-top: 20px">
-            <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black">
-                <i class="fa fa-refresh"></i>
-            </a>
-            <div class="layui-btn-group">
-                <button type="button" class="layui-btn layui-bg-blue btn-type-action active" data-type="all">
-                    <i class="fa fa-list"></i>
-                    {:__('All')}
+        <div class="d-flex mt-3 justify-content-between">
+            <div class="d-flex-1">
+                <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black">
+                    <i class="fa fa-refresh"></i>
+                </a>
+                <div class="layui-btn-group">
+                    <button type="button" class="layui-btn layui-bg-blue btn-type-action active" data-type="all">
+                        <i class="fa fa-list"></i>
+                        {:__('All')}
+                    </button>
+                    <button type="button" class="layui-btn layui-bg-blue btn-type-action" data-type="module">
+                        <i class="fa fa-cubes"></i>
+                        {:__('Module')}
+                    </button>
+                    <button type="button" class="layui-btn layui-bg-blue btn-type-action" data-type="template">
+                        <i class="fa fa-laptop"></i>
+                        {:__('Template')}
+                    </button>
+                    <button type="button" class="layui-btn layui-bg-blue btn-type-action" data-type="installed">
+                        <i class="fa fa-thumb-tack"></i>
+                        {:__('Installed')}
+                    </button>
+                </div>
+                <button type="button" class="layui-btn layui-bg-red btn-userinfo">
+                    <i class="fa fa-user"></i>
+                    {:__('BADOU Userinfo')}
                 </button>
-                <button type="button" class="layui-btn layui-bg-blue btn-type-action" data-type="module">
-                    <i class="fa fa-cubes"></i>
-                    {:__('Module')}
-                </button>
-                <button type="button" class="layui-btn layui-bg-blue btn-type-action" data-type="template">
-                    <i class="fa fa-laptop"></i>
-                    {:__('Template')}
-                </button>
-                <button type="button" class="layui-btn layui-bg-blue btn-type-action" data-type="installed">
-                    <i class="fa fa-thumb-tack"></i>
-                    {:__('Installed')}
-                </button>
-            </div>
-            <button type="button" class="layui-btn layui-bg-red btn-userinfo">
-                <i class="fa fa-user"></i>
-                {:__('BADOU Userinfo')}
-            </button>
 
-            {foreach :hook('module_top_btn',[],true) as $hook} {$hook|raw} {/foreach}
+                {foreach :hook('module_top_btn',[],true) as $hook} {$hook|raw} {/foreach}
+            </div>
+            <div class="d-flex-1 ">
+                <div class="d-flex align-items-center" style="gap:8px; max-width: 420px;">
+                    <input type="text" id="module-search" class="layui-input" placeholder="搜索标题" style="max-width: 320px;" />
+                    <button type="button" class="layui-btn btn-theme-color" id="btn-search">
+                        <i class="layui-icon layui-icon-search"></i>
+                    </button>
+                </div>
+            </div>
         </div>
+
 
         <table class="layui-hide" id="module"></table>
     </div>
@@ -208,7 +223,7 @@
                         var checked = value === that.checked ? "checked" : "";
 
                         return laytpl(
-                            '<input type="checkbox" name="' +
+                            '<input type="checkbox" title="开启|关闭"  name="' +
                                 that.field +
                                 '" value="' +
                                 row.state +
@@ -253,8 +268,10 @@
             url: "{:url('module/index')}?bdversion=" + Config.bdversion + "&uid=" + uid + "&token=" + token,
             pk: "id",
             even: true,
+            page: true,
             toolbar: false,
-            page: false,
+            limit: 50,
+            limits: [10,50, 80,100],
             cols: [
                 [
                     {
@@ -275,7 +292,7 @@
                         field: "author",
                         title: __("Author"),
                         operate: "LIKE",
-                        width: 150,
+                        width: 110,
                     },
                     {
                         field: "price",
@@ -307,7 +324,7 @@
                     {
                         field: "state",
                         title: __("Status"),
-                        width: 80,
+                        width: 100,
                         templet: Controller.api.formatter.switch,
                     },
                     { title: __("Operate"), width: 300, templet: Controller.api.formatter.operate },
@@ -341,6 +358,21 @@
                     );
                 });
             },
+        });
+
+        // 搜索：根据关键字过滤远端数据（服务端模糊查询由后端处理）
+        function doSearch(){
+            var keyword = $.trim($("#module-search").val());
+            // 将关键字透传给后端，后端可在 Server::modules 中处理 name/title/author 模糊
+            bdTable.api.query({ keyword: keyword });
+        }
+        $(document).on('click', '#btn-search', function(){
+            doSearch();
+        });
+        $(document).on('keydown', '#module-search', function(e){
+            if(e.keyCode === 13){
+                doSearch();
+            }
         });
 
         $(document).on("click", ".btn-type-action", function () {

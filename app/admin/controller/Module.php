@@ -28,7 +28,10 @@ class Module extends Backend
             $installedModules = Server::getInstalldModuleList();
             $list = [];
             $params = [];
+            $page = $this->request->get('page', 1);
+            $limit = $this->request->get('limit', 10);
             $type = $this->request->param('type', 'all');
+            $keyword = $this->request->get('keyword', '');
             $uid = $this->request->get("uid");
             $token = $this->request->get("token");
             $bdversion = $this->request->get("bdversion");
@@ -36,6 +39,9 @@ class Module extends Backend
                 $params['uid'] = $uid;
                 $params['token'] = $token;
                 $params['bdversion'] = $bdversion;
+                $params['page'] = $page;
+                $params['limit'] = $limit;
+                $params['keyword'] = $keyword;
             }
             if (in_array($type, ['template', 'module'])) {
                 $params['type'] = $type;
@@ -58,7 +64,8 @@ class Module extends Backend
                     $item['module'] = $installmodule;
                 }
             }
-            $this->result('ok', $list);
+
+            $this->result('ok', $list, $res['total']);
         }
 
         $this->assignconfig([
