@@ -117,8 +117,14 @@ class Content extends Base
             return '';
         }
 
+        // 增加 outlink 前缀处理
         if (isset($data['outlink']) && $data['outlink']) {
-            return $data['outlink'];
+            $outlink = $data['outlink'];
+            // 如果不是以 http:// 或 https:// 开头，则添加前导 /
+            if (!preg_match('#^https?://#i', $outlink)) {
+                $outlink = '/' . ltrim($outlink, '/');
+            }
+            return $outlink;
         }
 
         $url = (string) bdurl($data['contentsort']['type'], $data['contentsort']['urlname'], 'content', $data['scode'], $data['contentsort']['filename'], $data['id'], $data['filename']);
@@ -178,6 +184,8 @@ class Content extends Base
         ];
 
         $data = array_merge($default, $data);
+        // 确保 sorting 字段为有效整数，默认为 255
+        $data['sorting'] = isset($data['sorting']) && is_numeric($data['sorting']) ? intval($data['sorting']) : 255;
 
         $result = false;
         Db::startTrans();
@@ -262,6 +270,8 @@ class Content extends Base
             $noFilterData = $this->request->post('row/a', '', 'trim');
             $data['content'] = isset($noFilterData['content']) ? xss_clean($noFilterData['content']) : '';
             $data['update_user'] = $this->auth->username;
+            // 确保 sorting 字段为有效整数，否则保持原值
+            $data['sorting'] = isset($data['sorting']) && is_numeric($data['sorting']) ? intval($data['sorting']) : $row['sorting'];
             $result = false;
             $this->model->startTrans();
             try {

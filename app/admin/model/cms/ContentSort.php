@@ -77,8 +77,14 @@ class ContentSort extends Model
 
     public function getViewUrlAttr($value, $data)
     {
-        if ($data['outlink']) {
-            return $data['outlink'];
+        // 增加 outlink 前缀处理
+        if (isset($data['outlink']) && $data['outlink']) {
+            $outlink = $data['outlink'];
+            // 如果不是以 http:// 或 https:// 开头，则添加前导 /
+            if (!preg_match('#^https?://#i', $outlink)) {
+                $outlink = '/' . ltrim($outlink, '/');
+            }
+            return $outlink;
         }
         $url = (string)bdurl($data['type'], $data['urlname'], 'list', $data['scode'], $data['filename'], '', '');
 
