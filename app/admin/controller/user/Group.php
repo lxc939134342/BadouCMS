@@ -44,4 +44,9 @@ class Group extends Backend
         $this->assignconfig("nodeList", $nodeList);
         return parent::edit();
     }
+
+    public function selectpage()
+    {
+        return parent::selectpage();
+    }
 }

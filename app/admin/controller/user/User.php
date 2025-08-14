@@ -45,7 +45,6 @@ class User extends Backend
             }
 
             list($where, $sort, $order, $offset, $limit) = $this->buildparams();
-            $where = [];
             $list = $this->model
                 ->with(['user_group'])
                 ->where($where)
