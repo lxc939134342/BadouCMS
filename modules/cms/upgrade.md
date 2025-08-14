@@ -1,3 +1,21 @@
+### 2.0.7
+
+-   fix:优化 cms 排序未填写报错的问题
+-   fix:优化 cms 批量添加栏目默认值
+-   fix:修复 cms 语言包获取不到的问题
+-   fix:修复 cms ba\TableManager 类不存在的问题
+-   fix:优化 cms 搜索功能
+-   fix:优化 cms 字段显示
+-   fix:优化 cms 的字段显示
+-   fix:修复 istop ,isico,ispics,isrecommend,isheadline 设为 0 无效的问题
+-   fix:修复列表页 list 标签 page="false" 不生效的问题
+-   fix:修复 cms 复制与移动交互
+-   fix:cms 单页加上轮播多图组件
+-   fix:优化内容管理，增加栏目筛选
+-   fix:修复 cms 模型扩展字段为选择按钮值时分割数据异常的问题
+-   fix:修复 cms 新增栏目时选择模版路径保存的问题
+-   fix:修复 sitemap 生成链接错误
+
 ### 2.0.6
 
 -   优化：cms 添加栏目选择模型失效的问题

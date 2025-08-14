@@ -172,7 +172,7 @@ class Upgrade
         if (!in_array('user', $config_group_key)) {
             $config_group[] = [
                 'key' => 'user',
-                'name' => '会员配置',
+                'value' => '会员配置',
             ];
             Db::name('config')->where('name', 'config_group')->update(['value' => json_encode($config_group)]);
         }
