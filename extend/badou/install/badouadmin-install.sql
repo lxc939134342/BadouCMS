@@ -1216,13 +1216,13 @@ CREATE TABLE `bd_config` (
   `weigh` int(11) NOT NULL DEFAULT '0' COMMENT '权重',
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='系统配置';
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='系统配置';
 
 -- ----------------------------
 -- Records of bd_config
 -- ----------------------------
 BEGIN;
-INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (1, 'config_group', 'other', 'Config group', '', 'array', '[{\"key\":\"basics\",\"value\":\"Basics\"},{\"key\":\"other\",\"value\":\"\\u5176\\u4ed6\\u914d\\u7f6e\"},{\"key\":\"mail\",\"value\":\"Mail\"},{\"key\":\"cms\",\"value\":\"CMS\\u914d\\u7f6e\"},{\"key\":\"alioss\",\"value\":\"\\u963f\\u91cc\\u4e91OSS\"}]', '', 'required', '', 1, -1);
+INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (1, 'config_group', 'other', 'Config group', '', 'array', '[{\"key\":\"basics\",\"value\":\"Basics\"},{\"key\":\"other\",\"value\":\"\\u5176\\u4ed6\\u914d\\u7f6e\"},{\"key\":\"mail\",\"value\":\"Mail\"},{\"key\":\"user\",\"value\":\"\\u4f1a\\u5458\\u914d\\u7f6e\"},{\"key\":\"cms\",\"value\":\"CMS\\u914d\\u7f6e\"}]', '', 'required', '', 1, -1);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (2, 'site_name', 'basics', 'Site Name', '', 'string', 'BADOUCMS', '', 'required', '', 1, 999);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (4, 'version', 'basics', 'Version number', '系统版本号', 'string', 'v2.0.0', '', 'required', '', 1, 0);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (5, 'time_zone', 'basics', 'time zone', '', 'string', 'Asia/Shanghai', '', 'required', '', 1, 0);
@@ -1247,7 +1247,7 @@ INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`,
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (27, 'form_status', 'cms', '开启表单', '', 'switch', '1', '', '', '', 1, 0);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (28, 'form_check_code', 'cms', '表单验证码', '', 'switch', '0', '', '', '', 1, 0);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (29, 'form_send_mail', 'cms', '表单发送邮件', '', 'switch', '0', '', '', '', 1, 0);
-INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (31, 'tpl_error', 'basics', '模板报错', '', 'switch', '1', '', '', '', 1, 0);
+INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (31, 'tpl_error', 'basics', '模板报错', '', 'switch', '0', '', '', '', 1, 0);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (32, 'api_open', 'cms', 'API状态', '', 'switch', '0', '', '', '', 1, 99);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (33, 'api_auth', 'cms', 'API强制认证', '', 'switch', '0', '', '', '', 1, 98);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (35, 'api_appid', 'cms', 'API认证用户', '', 'string', 'apiadmin', '', '', '', 1, 97);
@@ -1256,6 +1256,7 @@ INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`,
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (38, 'open_wap', 'cms', '独立手机版', '使用响应式模板的用户请不要开启！', 'radio', '0', '[\"\\u5173\\u95ed\",\"\\u5f00\\u542f\"]', '', '', 1, 0);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (39, 'close_site', 'basics', '网站状态', '', 'radio', '1', '[\"\\u5173\\u95ed\",\"\\u5f00\\u542f\"]', '', '', 1, 991);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (40, 'close_site_note', 'basics', '关站提示', '', 'textarea', '', '', '', '', 1, 990);
+INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (41, 'usercenter', 'user', '会员中心', '', 'switch', '1', '', '', '', 1, 0);
 COMMIT;
 
 -- ----------------------------
