@@ -116,8 +116,13 @@ class Bd extends TagLib
         if ($scode == '*') {
             $params[] = '"scode"=>"*"';
         } elseif ($scode) {
-            $this->autoBuildVar($scode);
-            $params[] = '"scode"=>'.$scode;
+            // 如果是数字或数字逗号组合，转为字符串
+            if (preg_match('/^[\d,]+$/', $scode)) {
+                $scode = '"' . $scode . '"';
+            } else {
+                $this->autoBuildVar($scode);
+            }
+            $params[] = '"scode"=>' . $scode;
         } else {
             $params[] = '"scode"=>$sort["scode"]';
             // 如果不存在 默认开启分页

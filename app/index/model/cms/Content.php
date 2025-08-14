@@ -573,13 +573,13 @@ class Content extends Model
         }
 
         $scode_arr = [];
-
         if ($scode && $scode != '*') {
             // 获取所有子类分类编码
             $arr = explode(',', $scode); // 传递有多个分类时进行遍历
             $contentSortModel = new ContentSort();
+            $scodes = [];
             foreach ($arr as $value) {
-                $scodes = $contentSortModel->getSubScodes(trim($value));
+                $scodes = array_merge($scodes, $contentSortModel->getSubScodes(trim($value)));
             }
 
             $scode_arr = [
@@ -912,10 +912,10 @@ class Content extends Model
             // 获取所有子类分类编码
             $arr = explode(',', $scode); // 传递有多个分类时进行遍历
             $contentSortModel = new ContentSort();
+            $scodes = [];
             foreach ($arr as $value) {
-                $scodes = $contentSortModel->getSubScodes(trim($value));
+                $scodes = array_merge($scodes, $contentSortModel->getSubScodes(trim($value)));
             }
-
             $scode_arr = [
                 ['a.scode','in',$scodes],
                 ['a.subscode','=',$scode]
