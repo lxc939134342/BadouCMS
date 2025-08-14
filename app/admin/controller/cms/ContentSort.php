@@ -175,6 +175,55 @@ class ContentSort extends Base
     }
 
     /**
+     * 编辑
+     * @throws Throwable
+     */
+    public function edit()
+    {
+        $id  = $this->request->param('ids');
+        $row = $this->model->where($this->pk, 'in', $id)->find();
+        if (!$row) {
+            $this->error(__('Record not found'));
+        }
+
+        $adminIds = $this->getDataLimitAdminIds();
+        if (is_array($adminIds) && !in_array($row[$this->dataLimitField], $adminIds)) {
+            $this->error(__('You have no permission'));
+        }
+
+        if ($this->request->isPost()) {
+            $data = $this->getPostData('row/a');
+            if (!$data) {
+                $this->error(__('Parameter %s can not be empty', ['']));
+            }
+
+            $data   = $this->preExcludeFields($data);
+            $data['listtpl']    = $data['listtpl'] ?? '';
+            $data['contenttpl'] = $data['contenttpl'] ?? '';
+            $result = false;
+            $this->model->startTrans();
+            try {
+                // 模型验证
+                if ($this->modelValidate) {
+                    $this->modelValidateFunction($data);
+                }
+                $result = $row->save($data);
+                $this->model->commit();
+            } catch (Throwable $e) {
+                $this->model->rollback();
+                $this->error($e->getMessage());
+            }
+            if ($result !== false) {
+                $this->success(__('Update successful'));
+            } else {
+                $this->error(__('No rows updated'));
+            }
+        }
+        $this->view->assign('row', $row);
+        return $this->view->fetch();
+    }
+
+    /**
      * 批量添加
      */
     public function batchAdd()
@@ -188,19 +237,22 @@ class ContentSort extends Base
                 $this->modelValidateFunction($data);
                 $multiplename = str_replace('，', ',', $data['name']);
                 $names = explode(',', $multiplename);
+                // Ensure template fields are not null
+                $listtpl    = isset($data['listtpl']) ? $data['listtpl'] : '';
+                $contenttpl = isset($data['contenttpl']) ? $data['contenttpl'] : '';
 
                 $lastcode = $this->model->getLastCode();
                 $scode = get_auto_code($lastcode);
                 $datalist = [];
                 foreach ($names as $key => $value) {
                     $datalist[] = array(
-                        'acode' => get_backend_lang(),
-                        'pcode' => $data['pcode'] ?? 0,
-                        'scode' => $scode,
-                        'name' => $value,
-                        'mcode' => $data['mcode'],
-                        'listtpl' => $data['listtpl'],
-                        'contenttpl' => $data['contenttpl'],
+                        'acode'      => get_backend_lang(),
+                        'pcode'      => $data['pcode'] ?? 0,
+                        'scode'      => $scode,
+                        'name'       => $value,
+                        'mcode'      => $data['mcode'],
+                        'listtpl'    => $listtpl,
+                        'contenttpl' => $contenttpl,
                         'status' => $data['status'],
                         'gid' => 0,
                         'gtype' => 4,
