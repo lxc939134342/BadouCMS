@@ -59,7 +59,7 @@
                 del_url: "cms.content_sort/del",
                 multi_url: "cms.content_sort/multi",
                 table: "cms_content_sort",
-            },
+            }
         });
         bdTable.render({
             elem: "#content_sort",
@@ -68,6 +68,7 @@
             sortName:'sorting asc,id desc',
             toolbar: "#toolbar",
             commonSearch: false,
+            reloadData:true,
             tree: {
                 customName: {
                     children: "childlist",

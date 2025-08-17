@@ -59,7 +59,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                 "exports",
                 "print", // 内置工具
             ];
-
+            bdTable.reloadData = options.reloadData || false;
             // 高级搜索按钮
             if (options.commonSearch) {
                 options.defaultToolbar.push({
