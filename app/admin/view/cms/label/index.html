@@ -1,0 +1,91 @@
+{layout name="layout/default" /}
+<script src="__CDN__/modules/cms/js/change_lang.js"></script>
+
+<table
+    class="layui-hide"
+    id="label"
+    data-operate-edit="{:$auth->check('cms.label/edit')}"
+    data-operate-del="{:$auth->check('cms.label/del')}"></table>
+
+<!-- 表格左侧按钮 toolbar  -->
+<script type="text/html" id="toolbar">
+    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	">
+        <i class="fa fa-refresh"></i>
+    </a>
+    <button class="layui-btn layui-btn-primary layui-border-black" id="changeLang">
+        <span class="lang-title">{$area_title}</span>
+        <i class="layui-icon layui-icon-down layui-font-12"></i>
+    </button>
+    <button class="layui-btn layui-bg-green" lay-event="add">
+        <i class="fa fa-plus"></i>
+        {:__('Add')}
+    </button>
+    <button
+        class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('cms.link/edit')?'':'hide'}"
+        lay-event="edit">
+        <i class="fa fa-pencil"></i>
+        {:__('Edit')}
+    </button>
+    <button
+        class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('cms.link/del')?'':'hide'}"
+        lay-event="del">
+        <i class="fa fa-trash"></i>
+        {:__('Del')}
+    </button>
+</script>
+<script>
+    layui.use(["badou", "changeLang"], function () {
+        var bdTable = layui.bdTable;
+        var table = layui.table;
+        var layer = layui.layer;
+        var bdTable = layui.bdTable;
+        var changeLang = layui.changeLang;
+        bdTable.api.init({
+            table: table,
+            extend: {
+                index_url: "cms.label/index",
+                add_url: "cms.label/add",
+                edit_url: "cms.label/edit",
+                del_url: "cms.label/del",
+                multi_url: "cms.label/multi",
+                table: "cms_label",
+            },
+        });
+        bdTable.render({
+            elem: "#label",
+            url: "{:url('cms.label/index')}",
+            pk: "id",
+            even: true,
+            toolbar: "#toolbar",
+            page: true,
+            cols: [
+                [
+                    { type: "checkbox" },
+                    { field: "id", title: "ID", width: 80, sort: true },
+                    { field: "name", title: __("Name"), width: 200 },
+                    {
+                        field: "type",
+                        title: __("Type"),
+                        width: 250,
+                        templet: bdTable.api.formatter.label,
+                        searchList: Config.typeText,
+                    },
+                    { field: "description", title: __("Description") },
+                    { field: "create_user", title: __("Create user"), width: 180 },
+                    { field: "update_user", title: __("Update user"), width: 180 },
+                    {
+                        field: "create_time",
+                        title: __("Create time"),
+                        width: 180,
+                    },
+                    { title: __("Operate"), align: "center", templet: bdTable.api.formatter.operate },
+                ],
+            ],
+            done: function () {
+                changeLang({
+                    table: bdTable,
+                });
+            },
+        });
+    });
+</script>

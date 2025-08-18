@@ -1,19 +1,27 @@
 {layout name="layout/default" /}
-
+<script src="__CDN__/modules/cms/js/change_lang.js"></script>
 <div class="layui-card">
     <div class="layui-card-body">
-        <div class="layui-btn-container"></div>
+        <div class="layui-btn-container">
+            <a href="javascript:;" class="layui-btn btn-refresh layui-bg-black">
+                <i class="fa fa-refresh"></i>
+            </a>
+            <button class="layui-btn layui-btn-primary layui-border-black" id="changeLang">
+                <span class="lang-title">{$area_title}</span>
+                <i class="layui-icon layui-icon-down layui-font-12"></i>
+            </button>
+            <a href="cms.label/index" class="layui-btn list-dialog" data-area='["80%","80%"]'>
+                <i class="fa fa-list"></i> 标签列表
+            </a>
+        </div>
         <div class="layui-tabs layui-tabs-card" id="label-tabs" lay-options="{index: 0}">
             <ul class="layui-tabs-header">
                 <li>定制标签</li>
-                <li>标签列表</li>
             </ul>
             <div class="layui-tabs-body">
                 <div class="layui-tabs-item">
                     <form class="layui-form layui-form-content" action="{:url('cms.label/content')}" method="post">
-                        {:token_field()}
-
-                        {include file="cms/common/builder/fields" /}
+                        {:token_field()} {include file="cms/common/builder/fields" /}
                         <div class="layui-form-item">
                             <div class="layui-input-block">
                                 <button class="layui-btn btn-theme-color" lay-filter="content" lay-submit>保存</button>
@@ -22,91 +30,41 @@
                         </div>
                     </form>
                 </div>
-                <div class="layui-tabs-item">
-                    <table
-                        class="layui-hide"
-                        id="label"
-                        data-operate-edit="{:$auth->check('cms.label/edit')}"
-                        data-operate-del="{:$auth->check('cms.label/del')}"></table>
-
-                    <!-- 表格左侧按钮 toolbar  -->
-                    <script type="text/html" id="toolbar">
-                        <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	">
-                            <i class="fa fa-refresh"></i>
-                        </a>
-                        <button class="layui-btn layui-bg-green" lay-event="add">
-                            <i class="fa fa-plus"></i>
-                            {:__('Add')}
-                        </button>
-                        <button
-                            class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('cms.link/edit')?'':'hide'}"
-                            lay-event="edit">
-                            <i class="fa fa-pencil"></i>
-                            {:__('Edit')}
-                        </button>
-                        <button
-                            class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('cms.link/del')?'':'hide'}"
-                            lay-event="del">
-                            <i class="fa fa-trash"></i>
-                            {:__('Del')}
-                        </button>
-                    </script>
-                </div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    layui.use(["badou","tabs"], function () {
+    layui.use(["badou", "tabs", "changeLang"], function () {
         var bdForm = layui.bdForm;
         var bdTable = layui.bdTable;
         var table = layui.table;
-        var tabs =layui.tabs;
-        bdForm.api.bindevent($("form.layui-form-content"));
+        var tabs = layui.tabs;
+        var badou = layui.badou;
 
-        tabs.on('afterChange(label-tabs)', function(data) {
-            if(data.index==0){
-                parent.$('.refresh').trigger('click');
-            }
-        });
-
-        bdTable.api.init({
-            table: table,
-            extend: {
-                index_url: "cms.label/index",
-                add_url: "cms.label/add",
-                edit_url: "cms.label/edit",
-                del_url: "cms.label/del",
-                multi_url: "cms.label/multi",
-                table: "cms_label",
+        var changeLang = layui.changeLang;
+        changeLang({
+            click: function (obj) {
+                top.$(".refresh").trigger("click");
             },
         });
-        bdTable.render({
-            elem: "#label",
-            url: "{:url('cms.label/index')}",
-            pk: "id",
-            even: true,
-            toolbar: "#toolbar",
-            page: true,
-            cols: [
-                [
-                    { type: "checkbox" },
-                    { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "name", title: __("Name"), width: 200 },
-                    { field: "type", title: __("Type"), width: 250, templet: bdTable.api.formatter.label,searchList:Config.typeText },
-                    { field: "description", title: __("Description") },
-                    { field: "create_user", title: __("Create user"), width: 180 },
-                    { field: "update_user", title: __("Update user"), width: 180 },
-                    {
-                        field: "create_time",
-                        title: __("Create time"),
-                        width: 180,
-                    },
-                    { title: __("Operate"), align: "center", templet: bdTable.api.formatter.operate },
-                ],
-            ],
 
+        $(".list-dialog").on("click", function (e) {
+            e.preventDefault();
+            var url = $(this).attr("href");
+            badou.api.open(url, "标签列表", {
+                area: ["80%", "80%"],
+                end: function () {
+                    top.$(".refresh").trigger("click");
+                }
+            });
         });
+
+        $(".btn-refresh").on("click", function () {
+            top.$(".refresh").trigger("click");
+        });
+
+        bdForm.api.bindevent($("form.layui-form-content"));
     });
 </script>

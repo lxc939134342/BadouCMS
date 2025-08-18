@@ -43,12 +43,27 @@ class Label extends Base
         $this->assignconfig('typeText', $typeListTextMap);
     }
 
+    public function index()
+    {
+        if ($this->request->isAjax()) {
+            list($where, $sort, $order, $offset, $limit) = $this->buildparams();
+            $res = $this->model
+                ->where($where)
+                ->where('acode', get_backend_lang())
+                ->order($sort, $order)
+                ->paginate($limit);
+            $this->result('', $res->items(), $res->total());
+        }
+        return $this->view->fetch();
+    }
+
     // 内容表单
     public function content()
     {
         if ($this->request->isPost()) {
             $postData = $this->getPostData('row/a');
-            $list = $this->model->column('id,name');
+
+            $list = $this->model->where('acode', get_backend_lang())->column('id,name');
             $data = [];
 
             foreach ($list as $key => $value) {
@@ -73,6 +88,7 @@ class Label extends Base
             $this->success(__('Update successful'));
         }
         $fields = $this->model
+            ->where('acode', get_backend_lang())
             ->field('id,name,value,description,type')
             ->order('id', 'desc')
             ->select()->toArray();
@@ -101,8 +117,9 @@ class Label extends Base
               'description' => '',
               'value' => '', // 添加时设置为空
               'type' => '',
-              'create_user' => '',
-              'update_user' => ''
+              'create_user' => $this->auth->nickname,
+              'update_user' => $this->auth->nickname,
+              'acode' => get_backend_lang()
             );
             $data = array_merge($default, $data);
             $data['value'] = $data['value'] ?? '';
@@ -143,6 +160,7 @@ class Label extends Base
 
         if ($this->request->isPost()) {
             $data = $this->getPostData('row/a');
+            $data['update_user'] = $this->auth->nickname;
             $result = false;
             $this->model->startTrans();
             try {
