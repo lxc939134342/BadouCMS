@@ -23,14 +23,14 @@ class User extends Validate
         'email'       => 'email|unique:user',
         'mobile'      => 'mobile|unique:user',
         'password'    => 'require|regex:^(?!.*[&<>"\'\n\r]).{6,32}$',
-        'captcha'     => 'require',
+        'captcha'     => 'require|captcha',
     ];
 
     /**
      * 验证场景
      */
     protected $scene = [
-        'login'      => ['password'],
+        'login'      => ['password', 'captcha'],
         'register'   => ['email', 'username', 'password', 'mobile', 'captcha'],
         'forgetpass' => ['password']
     ];
