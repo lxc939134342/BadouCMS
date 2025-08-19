@@ -20,13 +20,17 @@ class Label extends Model
 
     public function getLabelData(): array
     {
-        $info = $this->cache('cms_label', 3600 * 24, 'cms_cache')->column('value', 'name');
+        $acode = get_frontend_lang();
+        $info = $this->cache('cms_label_' . $acode, 3600 * 24, 'cms_cache')
+            ->where('acode', $acode)
+            ->column('value', 'name');
         foreach ($info as $key => &$value) {
             if (!$value) {
                 continue;
             }
             $value = htmlspecialchars_decode_improve($value);
         }
+
         return $info;
     }
 }
