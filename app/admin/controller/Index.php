@@ -57,8 +57,8 @@ class Index extends Backend
                 "preload" => false,
                 "max" => "30",
                 "index" => [
-                    "id" => $dashboard_id,
-                    "href" => (string)url('/dashboard'),
+                    "id" => (string)$dashboard_id,
+                    "href" => (string)url('/dashboard', [], false, true),
                     "title" => __('Dashboard'),
                     "hash" => 'dashboard'
                 ]
