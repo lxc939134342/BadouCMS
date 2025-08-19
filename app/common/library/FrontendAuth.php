@@ -179,7 +179,6 @@ class FrontendAuth
         ];
         $params = array_merge($data, [
             'nickname'  => preg_match("/^1[3-9]{1}\d{9}$/", $username) ? substr_replace($username, '****', 3, 4) : $username,
-            'salt'      => Random::build(),
             'jointime'  => $time,
             'joinip'    => $ip,
             'logintime' => $time,
@@ -187,7 +186,7 @@ class FrontendAuth
             'prevtime'  => $time,
             'status'    => 'normal'
         ]);
-        $params['password'] = $this->getEncryptPassword($password, $params['salt']);
+        $params['password'] = $this->getEncryptPassword($password);
         $params = array_merge($params, $extend);
 
         //账号注册时需要开启事务,避免出现垃圾数据
@@ -498,7 +497,6 @@ class FrontendAuth
     /**
      * 获取密码加密后的字符串
      * @param string $password 密码
-     * @param string $salt     密码盐
      * @return string
      */
     public function getEncryptPassword($password)

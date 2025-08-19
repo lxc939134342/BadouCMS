@@ -146,7 +146,7 @@ class User extends Frontend
         if (!$url && $referer && !preg_match("/(user\/login|user\/register|user\/logout)/i", $referer)) {
             $url = $referer;
         }
-        $this->view->assign('captchaType', config('badouadmin.user_register_captcha'));
+        $this->view->assign('captcha_type', config('badouadmin.user_register_captcha'));
         $this->view->assign('url', $url);
         $this->view->assign('title', __('Register'));
         return $this->view->fetch();

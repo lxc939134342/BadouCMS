@@ -20,10 +20,12 @@ return [
     ],
     //会员中心
     'usercenter' => true,
-    //用户登录验证码
     'user_login_captcha' => true,
+    //用户注册验证码类型email/mobile/wechat/text/false
+    'user_register_captcha' => 'text',
     //发送验证码前验证
     'user_api_captcha' => false,
+
     // Token 配置
     'token'                 => [
         // 默认驱动方式

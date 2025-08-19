@@ -65,7 +65,7 @@ class Sms
         $time = time();
         $ip = request()->ip();
         $sms = \app\common\model\Sms::create(['event' => $event, 'mobile' => $mobile, 'code' => $code, 'ip' => $ip, 'create_time' => $time]);
-        $result = Event::trigger('sms_send', $sms);
+        $result = Event::trigger('sms_send', $sms, true);
         if (!$result) {
             $sms->delete();
             return false;
@@ -88,7 +88,7 @@ class Sms
             'msg'      => $msg,
             'template' => $template
         ];
-        $result = Event::trigger('sms_notice', $params);
+        $result = Event::trigger('sms_notice', $params, true);
         return (bool)$result;
     }
 
@@ -107,7 +107,7 @@ class Sms
             ->order('id', 'DESC')
             ->find();
         if ($sms) {
-            if ($sms['createt_ime'] > $time && $sms['times'] <= self::$maxCheckNums) {
+            if ($sms['create_time'] > $time && $sms['times'] <= self::$maxCheckNums) {
                 $correct = $code == $sms['code'];
                 if (!$correct) {
                     $sms->times = $sms->times + 1;
