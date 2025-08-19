@@ -43,6 +43,7 @@ class Base extends Backend
         $this->assign('area_title', $currentArea['name']);
         $this->assignconfig('acode', $acode);
         $this->assignconfig('alist', $areaList);
+        $this->assignconfig('atitle', $currentArea['name']);
     }
 
     /**
@@ -56,7 +57,12 @@ class Base extends Backend
         if (!in_array($acode, array_column($areaList, 'acode'))) {
             $this->error(__('Invalid parameters'));
         }
+        $currentArea = array_filter($areaList, function ($item) use ($acode) {
+            return $item['acode'] == $acode;
+        });
+        $currentArea = reset($currentArea);
         set_backend_lang($acode);
+        $this->assignconfig('atitle', $currentArea['name']);
         $this->success('切换语言成功', '', get_backend_lang());
     }
 

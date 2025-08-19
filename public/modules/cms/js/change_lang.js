@@ -5,6 +5,7 @@ layui.define(['dropdown'], function (exports) {
         var badou = layui.badou;
         var table = options.table || null;
         var click = options.click || null;
+        $('#changeLang .lang-title').text(Config.atitle);
         dropdown.render({
             elem: '#changeLang',
             customName: {
@@ -22,6 +23,7 @@ layui.define(['dropdown'], function (exports) {
                         click(obj);
                     }
                     $('#changeLang .lang-title').text(obj.name);
+                    Config.atitle = obj.name;
                 });
             }
         });
