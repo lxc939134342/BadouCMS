@@ -25,9 +25,9 @@ return [
         'common','admin'
     ],
     //异常处理页面
-    'http_exception_template'=>[
+    'http_exception_template' => [
         // 定义404错误的模板文件地址
-        404 =>  \think\facade\App::getAppPath() . '404.html',
+        404 =>  \think\facade\App::getRootPath() . 'public'.DIRECTORY_SEPARATOR.'404.html',
     ],
 
     // 异常页面的模板文件
