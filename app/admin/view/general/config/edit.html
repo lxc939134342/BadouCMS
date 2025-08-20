@@ -65,9 +65,10 @@
     <div class="layui-form-item">
         <label class="layui-form-label">{:__('Extend')}</label>
         <div class="layui-input-block">
-            <input type="text" name="row[extend]" class="layui-input" value="{$row.extend}"
-                placeholder="{:__('Please enter %s',[__('Extend')])}" />
+            <textarea name="row[extend]" class="layui-textarea" id="extend" placeholder="{:__('Please enter %s',[__('Extend')])}">{$row.extend}</textarea>
+            <p class="help-block">动态显示此表单可以使用，<code>data-condition="x字段:值1,值2"</code></p>
         </div>
+
     </div>
 
     <div class="layui-form-item">

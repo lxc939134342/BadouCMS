@@ -2,6 +2,7 @@
 <style>
     .layui-form-label {
         width: 150px;
+        color: #393939;
     }
 
     .layui-input-block {
@@ -27,9 +28,9 @@
                     {foreach $list as $index=>$vo}
                     <div class="layui-tabs-item">
                         {foreach $vo['list'] as $field}
-                        <div class="layui-form-item">
+                        <div class="layui-form-item"  {$field.extend}>
                             <label class="layui-form-label">{$field.title}</label>
-                            <div class="layui-input-inline" style="width: 70%;" {$field.extend}>
+                            <div class="layui-input-inline" style="width: 70%;">
                                 {switch $field.type}
                                 {// 文本框 }
                                 {case value="string"}
@@ -39,17 +40,18 @@
 
                                 {// 开关 }
                                 {case value="switch"}
-                                <input type="hidden" id="c-{$field.name}" name="row[{$field.name}]" value="{$field.value}" />
-                                <input type="checkbox" data-input-id="c-{$field.name}"  lay-skin="switch"
-                                    value="{$field.value}" {if $field.value=='1'}checked{/if}>
+                                <input type="hidden" id="c-{$field.name}" name="row[{$field.name}]"
+                                    value="{$field.value}" />
+                                <input type="checkbox" data-input-id="c-{$field.name}" lay-skin="switch"
+                                    value="{$field.value}" {if $field.value=='1' }checked{/if}>
                                 {/case}
 
                                 {// 多选框 }
                                 {case value="checkbox"}
                                 {volist name="$field.content_arr" id="item" key="k" }
                                 <input type="checkbox" id="c-{$field.name}-{$k}" name="row[{$field.name}][]"
-                                    title="{$item}" value="{$key}" {in name="key" value="$field.value??''" }
-                                    checked {/in}>
+                                    title="{$item}" value="{$key}" {in name="key" value="$field.value??''" } checked
+                                    {/in}>
                                 {/volist}
                                 {/case}
 
@@ -142,8 +144,8 @@
                                         <ins>{:__('Array value')}</ins>
                                     </dd>
                                     <dd>
-                                        <a href="javascript:;" class="layui-btn btn-append"><i
-                                                class="fa fa-plus"></i> {:__('Append')}</a>
+                                        <a href="javascript:;" class="layui-btn btn-append"><i class="fa fa-plus"></i>
+                                            {:__('Append')}</a>
                                     </dd>
                                     <textarea name="row[{$field.name|htmlentities}]" class="form-control hide" cols="30"
                                         rows="5">{$field.value}</textarea>
@@ -167,7 +169,8 @@
                                 {/switch}
                                 <p class="help-block">{$field.tip}</p>
                             </div>
-                            <div class="layui-input-inline" style="padding-left: 15px;color: #999;">{$site.{$field.name|htmlentities}}</div>
+                            <div class="layui-input-inline" style="padding-left: 15px;color: #999;">
+                                {$site.{$field.name|htmlentities}}</div>
                         </div>
                         {/foreach}
                         {if $vo.name=='mail'}
@@ -203,11 +206,11 @@
         var badou = layui.badou;
         bdForm.api.bindevent($("form.layui-form"));
 
-        form.on('switch', function(data){
+        form.on('switch', function (data) {
             var input_id = $(data.elem).attr('data-input-id');
             var input = $('#' + input_id);
             var checkbox = data.elem;
-            if(checkbox.checked){
+            if (checkbox.checked) {
                 input.val('1');
             } else {
                 input.val('0');
@@ -224,5 +227,41 @@
             });
 
         });
+
+        // Conditional display based on data-condition attribute
+        function updateCondition() {
+            $('[data-condition]').each(function () {
+                var condition = $(this).data('condition'); // 格式: name:value1,value2
+                if (!condition) return;
+                var parts = condition.split(':');
+                var name = parts[0];
+                var values = parts[1] ? parts[1].split(',') : [];
+                var field = $('[name="row[' + name + ']"]');
+                var current;
+                if (field.is('select')) {
+                    current = field.val();
+                } else {
+                    current = $('[name="row[' + name + ']"]:checked').val() || '';
+                }
+                if ($.inArray(current, values) !== -1) {
+                    $(this).show();
+                    $(this).find('[lay-verify]').each(function () {
+                        $(this).attr('lay-verify', $(this).data('verify-backup'));
+                    });
+                } else {
+                    $(this).hide();
+                    $(this).find('[lay-verify]').each(function () {
+                        var v = $(this).attr('lay-verify');
+                        $(this).data('verify-backup', v);
+                        $(this).removeAttr('lay-verify');
+                    });
+                }
+            });
+        }
+        form.on('radio', updateCondition);
+        form.on('select', updateCondition);
+        // 初始条件更新
+        updateCondition();
     });
+
 </script>
