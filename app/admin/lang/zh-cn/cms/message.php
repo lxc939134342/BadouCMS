@@ -8,4 +8,5 @@ return [
     'Frontend show' => '首页显示',
     'Reply'         => '回复',
     'Reply time'    => '回复时间',
+    'Content'       => '内容'
 ];

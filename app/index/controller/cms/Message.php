@@ -127,7 +127,7 @@ class Message extends Base
 
         // 设置额外数据
         $data['acode'] = get_frontend_lang();
-        $data['user_ip'] = ip2long(get_user_ip());
+        $data['user_ip'] = $this->request->ip();
         $data['user_os'] = get_user_os();
         $data['user_bs'] = get_user_bs();
         $data['recontent'] = '';

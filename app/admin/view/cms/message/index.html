@@ -51,15 +51,15 @@
                 [
                     { type: "checkbox" },
                     { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "user_ip", title: __("User ip"), operate: false },
-                    { field: "user_os", title: __("User os") },
-                    { field: "user_bs", title: __("User bs") },
-                    { field: "create_time", title: __("Create time") },
+                    { field: "content", title: __("Content") },
+
                     { field: "recontent", title: __("Reply content") },
-                    { field: "status", title: __("Status"),templet: bdTable.api.formatter.switch },
+                    { field: "user_ip", title: __("User ip"), operate: false,width:140 },
+                    { field: "status", title: __("Status"),templet: bdTable.api.formatter.switch ,width: 90},
+                    { field: "create_time", title: __("Create time"),width:180 },
                     {
                         title: __("Operate"),
-                        width: 300,
+                        width: 150,
                         templet: bdTable.api.formatter.operate,
                         buttons:[
                             {
