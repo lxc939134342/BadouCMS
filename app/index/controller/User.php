@@ -79,6 +79,10 @@ class User extends Frontend
         if ($this->request->isPost()) {
             $params = $this->request->post(['email', 'mobile', 'username', 'password', 'keeplogin', 'captcha']);
 
+            if (!captcha_check($params['captcha'])) {
+                $this->error(__('Captcha is incorrect'));
+            }
+
             $validate = new UserValidate();
             try {
                 $validate->scene('login')->check($params);
@@ -120,6 +124,26 @@ class User extends Frontend
         }
         if ($this->request->isPost()) {
             $params = $this->request->post(['email', 'mobile', 'username', 'password', 'captcha']);
+            $captcha = $params['captcha'];
+            $mobile = $params['mobile'];
+            $email = $params['email'];
+            //验证码
+            $captchaResult = true;
+            $captchaType = config("badouadmin.user_register_captcha");
+            if ($captchaType) {
+                if ($captchaType == 'mobile') {
+                    $captchaResult = Sms::check($mobile, $captcha, 'register');
+                } elseif ($captchaType == 'email') {
+                    $captchaResult = Ems::check($email, $captcha, 'register');
+                } elseif ($captchaType == 'wechat') {
+                    $captchaResult = false;
+                } elseif ($captchaType == 'text') {
+                    $captchaResult = captcha_check($captcha);
+                }
+            }
+            if (!$captchaResult) {
+                $this->error(__('Captcha is incorrect'));
+            }
 
             $validate = new UserValidate();
             try {

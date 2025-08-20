@@ -23,7 +23,7 @@ class User extends Validate
         'email'       => 'email|unique:user',
         'mobile'      => 'mobile|unique:user',
         'password'    => 'require|regex:^(?!.*[&<>"\'\n\r]).{6,32}$',
-        'captcha'     => 'require|captcha',
+        'captcha'     => 'require',
     ];
 
     /**
