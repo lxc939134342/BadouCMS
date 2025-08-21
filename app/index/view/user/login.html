@@ -226,7 +226,9 @@
                         type="radio"
                         name="type"
                         value="mobile"
+                        {if !has_hook('sms_send')}
                         disabled
+                        {/if}
                         title="通过手机重置"
                         lay-filter="type"
                         data-send-url="{:url('api/sms/send')}" />

@@ -81,12 +81,13 @@ class Sms
      * @param   string $template 消息模板
      * @return  boolean
      */
-    public static function notice($mobile, $msg = '', $template = null)
+    public static function notice($mobile, $template_code, $data = [], $msg = '')
     {
         $params = [
-            'mobile'   => $mobile,
-            'msg'      => $msg,
-            'template' => $template
+            'mobile'        => $mobile,
+            'template_code' => $template_code,
+            'data'          => $data,
+            'msg'           => $msg,
         ];
         $result = Event::trigger('sms_notice', $params, true);
         return (bool)$result;
