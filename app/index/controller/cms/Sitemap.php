@@ -53,7 +53,7 @@ class Sitemap extends Base
     private function makeNode($link, $date, $priority = 0.60)
     {
         return [
-            'loc'      => $this->domainurl($link),
+            'loc'      => empty($link) ? $this->request->domain() : $this->domainurl($link),
             'priority' => $priority,
             'lastmod' => $date,
             'changefreq' => 'Always'
