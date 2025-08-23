@@ -118,6 +118,7 @@ class FormField extends Model
         $databaseConnection = config('database.default');
         $adapter      = TableManager::phinxAdapter(false, $databaseConnection);
         $table_name = Db::name('cms_form')->where('fcode', $fcode)->value('table_name');
+        $table_name = TableManager::tableName($table_name);
         if ($adapter->hasTable($table_name)) {
             $tableManager = TableManager::phinxTable($table_name, [], false, $databaseConnection);
             return $tableManager;

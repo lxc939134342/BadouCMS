@@ -39,7 +39,7 @@ class Form extends Model
             throw new \think\Exception('表名称必须以包含字母、数字、下划线');
         }
 
-        $dbPrefix = config('database.connections.mysql.prefix').'cms_diy_';
+        $dbPrefix = 'cms_diy_';
         if ($dbPrefix && strpos($table_name, $dbPrefix) !== 0) {
             $model->table_name = $dbPrefix . $table_name;
         }
@@ -58,6 +58,7 @@ class Form extends Model
         $data = $model->getData();
         $table_name = $data['table_name'];
         $databaseConnection = config('database.default');
+        $table_name = TableManager::tableName($table_name);
         // 创建表
         $tableManager = TableManager::phinxTable($table_name, [
             'id'          => false,
@@ -93,42 +94,45 @@ class Form extends Model
     }
 
     /* 更新前 */
-    public static function onBeforeUpdate($model)
-    {
-        $data = $model->getData();
-        $changeData = $model->getChangedData();
-        $originData = $model->getOrigin();
-        $oldname = $originData['table_name'];
-        $table_name = $data['table_name'];
-        $dbPrefix = config('database.connections.mysql.prefix').'cms_diy_';
-        if ($dbPrefix && strpos($table_name, $dbPrefix) !== 0) {
-            $table_name = $dbPrefix . $table_name;
-        }
+    // public static function onBeforeUpdate($model)
+    // {
+    //     $data = $model->getData();
+    //     $changeData = $model->getChangedData();
+    //     $originData = $model->getOrigin();
+    //     $oldname = $originData['table_name'];
+    //     $table_name = $data['table_name'];
+    //     $dbPrefix = 'cms_diy_';
+    //     if ($dbPrefix && strpos($table_name, $dbPrefix) !== 0) {
+    //         $table_name = $dbPrefix . $table_name;
+    //     }
 
-        if (!preg_match('/^[a-zA-Z0-9_]+$/', $table_name)) {
-            throw new \think\Exception('表名称必须以包含字母、数字、下划线');
-        }
-        $where = [
-            ['id', '<>', $data['id']],
-            ['table_name', '=',  $table_name]
-        ];
-        $count = Db::name($model->getName())->where($where)->count();
-        if ($count) {
-            throw new \think\Exception('表名称已存在');
-        }
+    //     if (!preg_match('/^[a-zA-Z0-9_]+$/', $table_name)) {
+    //         throw new \think\Exception('表名称必须以包含字母、数字、下划线');
+    //     }
+    //     $where = [
+    //         ['id', '<>', $data['id']],
+    //         ['table_name', '=',  $table_name]
+    //     ];
+    //     $count = Db::name($model->getName())->where($where)->count();
+    //     if ($count) {
+    //         throw new \think\Exception('表名称已存在');
+    //     }
 
-        $databaseConnection = config('database.default');
-        $tableManager = TableManager::phinxTable($oldname, [], false, $databaseConnection);
 
-        if (!$tableManager->getAdapter()->hasTable($oldname)) {
-            throw new \think\Exception('数据表不存在');
-        }
+    //     $databaseConnection = config('database.default');
+    //     $oldname = TableManager::tableName($oldname);
+    //     $table_name = TableManager::tableName($table_name);
+    //     $tableManager = TableManager::phinxTable($oldname, [], false, $databaseConnection);
 
-        if (isset($changeData['table_name'])) {
-            $tableManager->rename($table_name);
-            $tableManager->update();
-        }
-    }
+    //     if (!$tableManager->getAdapter()->hasTable($oldname)) {
+    //         throw new \think\Exception('数据表不存在');
+    //     }
+
+    //     if (isset($changeData['table_name'])) {
+    //         $tableManager->rename($table_name);
+    //         $tableManager->update();
+    //     }
+    // }
 
     /* 删除前 */
     public static function onBeforeDelete($model)

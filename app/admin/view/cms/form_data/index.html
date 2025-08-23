@@ -34,8 +34,8 @@
             table: table,
             extend: {
                 index_url: "cms.form_data/index?fcode={$fcode}",
-                del_url: "cms.form_data/del",
-                multi_url: "cms.form_data/multi",
+                del_url: "cms.form_data/del?fcode={$fcode}",
+                multi_url: "cms.form_data/multi?fcode={$fcode}",
                 table: "cms_form_data",
             },
         });
@@ -45,7 +45,7 @@
         ];
 
         Config.formFields.forEach(function (item) {
-            cols.push({ field: item.name, title: __(item.description) });
+            cols.push({ field: item.name, title: __(item.description),operate:'like' });
         });
 
         cols.push({   title: __("Operate"),

@@ -14,6 +14,7 @@ namespace app\index\model\cms;
 
 use think\Model;
 use think\facade\Db;
+use badou\TableManager;
 
 class Form extends Model
 {
@@ -52,7 +53,7 @@ class Form extends Model
     public function addTableData($fcode, $data)
     {
         $table_name = $this->where('fcode', $fcode)->value('table_name');
-        return Db::table($table_name)->insert($data) > 0 ? true : false;
+        return Db::name($table_name)->insert($data) > 0 ? true : false;
     }
 
     // 获取表单列表
@@ -81,7 +82,7 @@ class Form extends Model
         ];
 
         if ($page) {
-            $db = Db::table($table_name)
+            $db = Db::name($table_name)
                 ->where($where)
                 ->order($order)
                 ->limit($start - 1);
@@ -103,7 +104,7 @@ class Form extends Model
                 $data['page'] = $res->pageData();
             }
         } else {
-            $db = Db::table($table_name)
+            $db = Db::name($table_name)
                 ->where($where)
                 ->order($order)
                 ->limit($start - 1);
