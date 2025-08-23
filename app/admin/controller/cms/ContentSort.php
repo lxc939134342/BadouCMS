@@ -200,6 +200,7 @@ class ContentSort extends Base
             $data   = $this->preExcludeFields($data);
             $data['listtpl']    = $data['listtpl'] ?? '';
             $data['contenttpl'] = $data['contenttpl'] ?? '';
+            $data['pcode'] = isset($data['pcode']) ? (int)$data['pcode'] : 0;
             $result = false;
             $this->model->startTrans();
             try {
@@ -207,6 +208,7 @@ class ContentSort extends Base
                 if ($this->modelValidate) {
                     $this->modelValidateFunction($data);
                 }
+
                 $result = $row->save($data);
                 $this->model->commit();
             } catch (Throwable $e) {
