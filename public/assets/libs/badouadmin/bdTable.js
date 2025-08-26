@@ -113,6 +113,9 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     bdTable.table.reloadData(
                         bdTable.initTable.config.id,
                         {
+                            page: {
+                                curr: 1
+                            },
                             where: where,
                         }
                     )
