@@ -11,6 +11,8 @@ return [
     'admin_keep_time' => 86400,
     //登录验证码
     'admin_login_captcha' => true,
+    //后台登录提示
+    'admin_main_warning' => true,
     //是否自动写入管理员日志
     'auto_write_admin_log' => true,
     //跳转页面模版

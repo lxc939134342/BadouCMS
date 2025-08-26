@@ -114,6 +114,14 @@
             </div>
             <!-- 视 图 页 面 -->
             <div class="layui-body">
+                {if config('badouadmin.admin_main_warning')}
+                    {if preg_match('/\/admin\/|\/admin\.php/i', url())}
+                    <div class="alert alert-danger text-center" style="border:none;margin-bottom:0 !important">
+                        {:__('Security tips')}
+                    </div>
+                    {/if}
+                {/if}
+
                 <!-- 内 容 页 面 -->
                 <div id="content"></div>
             </div>
@@ -121,7 +129,7 @@
             <div class="layui-footer layui-text">
                 <span class="left">Released under the Apache license. badouadmin</span>
                 <span class="center"></span>
-                <span class="right">Copyright © 2025 www.badoucms.com</span>
+                <span class="right">Copyright © {:date('Y')} www.badoucms.com</span>
             </div>
             <!-- 遮 盖 层 -->
             <div class="pear-cover"></div>
