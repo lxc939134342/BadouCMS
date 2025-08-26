@@ -99,7 +99,7 @@ trait Backend
                     if ($this->modelSceneValidate) {
                         $validate->scene('add');
                     }
-                    $validate->check($data);
+                    $validate->failException(true)->check($data);
                 }
             }
             $result = $this->model->save($data);
@@ -150,7 +150,7 @@ trait Backend
                             $validate->scene('edit');
                         }
 
-                        $validate->check($data);
+                        $validate->failException(true)->check($data);
                     }
                 }
                 $result = $row->save($data);

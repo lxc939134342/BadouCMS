@@ -22,6 +22,7 @@ use think\facade\Db;
 class Rule extends Backend
 {
     protected $rulelist = [];
+    protected $modelValidate = true;
 
     public function initialize()
     {
