@@ -41,6 +41,7 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                     var layVerify = $(this).data('verify');
                     var layVerType = $(this).data('vertype') || 'msg';
                     var layReqText = $(this).data('reqtext') || '必选项不能为空';
+                    var dataOptions = $(this).data('options');
 
                     // 设置值
                     if (inputId) {
@@ -138,7 +139,15 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                         options.maxSelectLimit = maxSelectLimit;
                     }
 
-                    var remoteSelect = xmSelect.render(options);
+                    // 确保是对象，避免错误
+                    if (typeof dataOptions !== 'object' || dataOptions === null) {
+                        dataOptions = {};
+                    }
+
+                    // 使用 $.extend 创建一个新的对象，避免修改原 options
+                    const mergedOptions = $.extend({}, options, dataOptions);
+
+                    var remoteSelect = xmSelect.render(mergedOptions);
                     var data = {
                         pageNumber: 1,
                         pageSize: pageSize,
@@ -172,34 +181,36 @@ layui.define(['bdHttp', 'xmSelect'], function (exports) {
                             return false;
                         });
                     }
-
-                    window.addEventListener('storage', (e) => {
-                        // 暗色模式
-                        if (e.key === 'dark') {
-                            if (e.newValue == 'true') {
-                                xmSelect.batch('', 'update', {
-                                    theme: {
-                                        hover: '#000'
-                                    }
-                                });
-                            } else {
-                                xmSelect.batch('', 'update', {
-                                    theme: {
-                                        hover: '#f2f2f2'
-                                    }
-                                });
-                            }
-                        }
-                        if (e.key === 'theme-color-color') {
-                            xmSelect.batch('', 'update', {
-                                theme: {
-                                    color: e.newValue
-                                }
-                            });
-                        }
-                    });
                 });
             }
+
+            // 监听主题颜色发生变化
+            window.addEventListener('storage', (e) => {
+                // 暗色模式
+                if (e.key === 'dark') {
+                    if (e.newValue == 'true') {
+                        xmSelect.batch('', 'update', {
+                            theme: {
+                                hover: '#000'
+                            }
+                        });
+                    } else {
+                        xmSelect.batch('', 'update', {
+                            theme: {
+                                hover: '#f2f2f2'
+                            }
+                        });
+                    }
+                }
+
+                if (e.key === 'theme-color-color') {
+                    xmSelect.batch('', 'update', {
+                        theme: {
+                            color: e.newValue
+                        }
+                    });
+                }
+            });
         },
         // 清空远程下拉
         clearRemoteSelect: function () {

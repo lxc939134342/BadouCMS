@@ -514,9 +514,6 @@ if (!function_exists('has_hook')) {
     }
 }
 
-
-
-
 if (!function_exists('convert_path_to_snake_case')) {
     /**
      * 将路径中的控制器部分从驼峰命名转换为下划线命名

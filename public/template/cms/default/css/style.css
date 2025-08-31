@@ -5239,6 +5239,18 @@ a.search-btn {
     box-shadow: 0 0 0 0.2rem rgba(38, 143, 255, 0.5);
 }
 
-body.lang-english .navbar a {
-    font-size: 14px;
+#lang-wrapper {
+    margin-left: 10px;
+}
+
+#lang-wrapper .dropdown-toggle {
+    color: #fff;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+.header.opaque .header-nav.fixed #lang-wrapper .dropdown-toggle {
+    color: #333;
+    background: rgba(0, 0, 0, 0.1);
 }

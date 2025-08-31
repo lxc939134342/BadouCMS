@@ -199,6 +199,9 @@ layui.define(['toast'], function (exports) {
                     callback.call(undefined, data);
                 }
             },
+            refreshmenu() {
+                top.layui.admin.menuRender(top.layui.admin.readConfig());
+            },
             layerfooter: function (layero, index, that) {
                 var frame = Layer.getChildFrame('html', index);
                 var layerfooter = frame.find(".layer-footer");
