@@ -2,141 +2,111 @@
 
 use think\facade\Db;
 use badou\Filesystem;
+use think\facade\Request;
 
 // 获取用户浏览器类型
-function get_user_bs($bs = null)
+/**
+ * 获取用户浏览器类型
+ * @param string|null $bs 传入字符串检测是否包含于User-Agent中，返回bool
+ * @return string|bool|null 返回浏览器名称，传入参数时返回bool，User-Agent不存在时返回null
+ */
+function get_user_bs(?string $bs = null)
 {
-    if (isset($_SERVER["HTTP_USER_AGENT"])) {
-        $user_agent = strtolower($_SERVER["HTTP_USER_AGENT"]);
-    } else {
+    if (empty($_SERVER['HTTP_USER_AGENT'])) {
         return null;
     }
 
-    // 直接检测传递的值
-    if ($bs) {
-        if (strpos($user_agent, strtolower($bs))) {
-            return true;
-        } else {
-            return false;
+    $user_agent = strtolower($_SERVER['HTTP_USER_AGENT']);
+
+    // 直接检测传递的值，严格判断strpos返回值
+    if ($bs !== null) {
+        return strpos($user_agent, strtolower($bs)) !== false;
+    }
+
+    // 浏览器关键字映射
+    $browser_map = [
+        'micromessenger' => 'Weixin',
+        'qq'             => 'QQ',
+        'weibo'          => 'Weibo',
+        'alipayclient'   => 'Alipay',
+        'trident/7.0'    => 'IE11', // 新版本IE优先，避免360等浏览器的兼容模式检测错误
+        'trident/6.0'    => 'IE10',
+        'trident/5.0'    => 'IE9',
+        'trident/4.0'    => 'IE8',
+        'msie 7.0'       => 'IE7',
+        'msie 6.0'       => 'IE6',
+        'edge'           => 'Edge',
+        'firefox'        => 'Firefox',
+        // chrome和android合并判断
+        'chrome'         => 'Chrome',
+        'android'        => 'Chrome',
+        'safari'         => 'Safari',
+        'mj12bot'        => 'MJ12bot',
+    ];
+
+    foreach ($browser_map as $key => $name) {
+        if (strpos($user_agent, $key) !== false) {
+            return $name;
         }
     }
 
-    // 固定检测
-    if (strpos($user_agent, 'micromessenger')) {
-        $user_bs = 'Weixin';
-    } elseif (strpos($user_agent, 'qq')) {
-        $user_bs = 'QQ';
-    } elseif (strpos($user_agent, 'weibo')) {
-        $user_bs = 'Weibo';
-    } elseif (strpos($user_agent, 'alipayclient')) {
-        $user_bs = 'Alipay';
-    } elseif (strpos($user_agent, 'trident/7.0')) {
-        $user_bs = 'IE11'; // 新版本IE优先，避免360等浏览器的兼容模式检测错误
-    } elseif (strpos($user_agent, 'trident/6.0')) {
-        $user_bs = 'IE10';
-    } elseif (strpos($user_agent, 'trident/5.0')) {
-        $user_bs = 'IE9';
-    } elseif (strpos($user_agent, 'trident/4.0')) {
-        $user_bs = 'IE8';
-    } elseif (strpos($user_agent, 'msie 7.0')) {
-        $user_bs = 'IE7';
-    } elseif (strpos($user_agent, 'msie 6.0')) {
-        $user_bs = 'IE6';
-    } elseif (strpos($user_agent, 'edge')) {
-        $user_bs = 'Edge';
-    } elseif (strpos($user_agent, 'firefox')) {
-        $user_bs = 'Firefox';
-    } elseif (strpos($user_agent, 'chrome') || strpos($user_agent, 'android')) {
-        $user_bs = 'Chrome';
-    } elseif (strpos($user_agent, 'safari')) {
-        $user_bs = 'Safari';
-    } elseif (strpos($user_agent, 'mj12bot')) {
-        $user_bs = 'MJ12bot';
-    } else {
-        $user_bs = 'Other';
-    }
-    return $user_bs;
+    return 'Other';
 }
 
 // 获取用户操作系统类型
-function get_user_os($osstr = null)
+/**
+ * 获取用户操作系统信息
+ *
+ * @param string|null $osstr 可选，检测指定操作系统关键字，返回布尔值
+ * @return string|bool|null 返回操作系统名称，指定关键字检测时返回布尔值，HTTP_USER_AGENT不存在时返回null
+ */
+function get_user_os(?string $osstr = null)
 {
-    if (isset($_SERVER["HTTP_USER_AGENT"])) {
-        $user_agent = strtolower($_SERVER["HTTP_USER_AGENT"]);
-    } else {
+    if (empty($_SERVER['HTTP_USER_AGENT'])) {
         return null;
     }
 
-    // 直接检测传递的值
-    if ($osstr) {
-        if (strpos($user_agent, strtolower($osstr))) {
-            return true;
-        } else {
-            return false;
+    $user_agent = strtolower($_SERVER['HTTP_USER_AGENT']);
+
+    if ($osstr !== null) {
+        return strpos($user_agent, strtolower($osstr)) !== false;
+    }
+
+    $os_map = [
+        'windows nt 10'   => 'Windows 10',
+        'windows nt 6.3'  => 'Windows 8.1',
+        'windows nt 6.2'  => 'Windows 8',
+        'windows nt 6.1'  => 'Windows 7',
+        'windows nt 6.0'  => 'Windows Vista',
+        'windows nt 5.2'  => 'Windows 2003',
+        'windows nt 5.1'  => 'Windows XP',
+        'windows nt 5.0'  => 'Windows 2000',
+        'windows nt 9'    => 'Windows 9X',
+        'windows phone'   => 'Windows Phone',
+        'android'        => 'Android',
+        'iphone'         => 'iPhone',
+        'ipad'           => 'iPad',
+        'mac'            => 'Mac',
+        'sunos'          => 'Sun OS',
+        'bsd'            => 'BSD',
+        'ubuntu'         => 'Ubuntu',
+        'linux'          => 'Linux',
+        'unix'           => 'Unix',
+    ];
+
+    foreach ($os_map as $key => $name) {
+        if (strpos($user_agent, $key) !== false) {
+            return $name;
         }
     }
 
-    if (strpos($user_agent, 'windows nt 5.0')) {
-        $user_os = 'Windows 2000';
-    } elseif (strpos($user_agent, 'windows nt 9')) {
-        $user_os = 'Windows 9X';
-    } elseif (strpos($user_agent, 'windows nt 5.1')) {
-        $user_os = 'Windows XP';
-    } elseif (strpos($user_agent, 'windows nt 5.2')) {
-        $user_os = 'Windows 2003';
-    } elseif (strpos($user_agent, 'windows nt 6.0')) {
-        $user_os = 'Windows Vista';
-    } elseif (strpos($user_agent, 'windows nt 6.1')) {
-        $user_os = 'Windows 7';
-    } elseif (strpos($user_agent, 'windows nt 6.2')) {
-        $user_os = 'Windows 8';
-    } elseif (strpos($user_agent, 'windows nt 6.3')) {
-        $user_os = 'Windows 8.1';
-    } elseif (strpos($user_agent, 'windows nt 10')) {
-        $user_os = 'Windows 10';
-    } elseif (strpos($user_agent, 'windows phone')) {
-        $user_os = 'Windows Phone';
-    } elseif (strpos($user_agent, 'android')) {
-        $user_os = 'Android';
-    } elseif (strpos($user_agent, 'iphone')) {
-        $user_os = 'iPhone';
-    } elseif (strpos($user_agent, 'ipad')) {
-        $user_os = 'iPad';
-    } elseif (strpos($user_agent, 'mac')) {
-        $user_os = 'Mac';
-    } elseif (strpos($user_agent, 'sunos')) {
-        $user_os = 'Sun OS';
-    } elseif (strpos($user_agent, 'bsd')) {
-        $user_os = 'BSD';
-    } elseif (strpos($user_agent, 'ubuntu')) {
-        $user_os = 'Ubuntu';
-    } elseif (strpos($user_agent, 'linux')) {
-        $user_os = 'Linux';
-    } elseif (strpos($user_agent, 'unix')) {
-        $user_os = 'Unix';
-    } else {
-        $user_os = 'Other';
-    }
-    return $user_os;
+    return 'Other';
 }
 
 // 获取用户IP
 function get_user_ip(): string
 {
-    if (isset($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-        $cip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-    } elseif (isset($_SERVER['HTTP_CLIENT_IP'])) {
-        $cip = $_SERVER['HTTP_CLIENT_IP'];
-    } else {
-        $cip = $_SERVER['REMOTE_ADDR'];
-    }
-    if ($cip == '::1') { // 使用localhost时
-        $cip = '127.0.0.1';
-    }
-    if (! preg_match('/^[0-9\.]+$/', $cip)) { // 非标准的IP
-        $cip = '0.0.0.0';
-    }
-    return htmlspecialchars($cip);
+    return Request::ip();
 }
 
 // 返回时间戳格式化日期时间，默认当前
