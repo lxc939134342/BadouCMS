@@ -871,8 +871,8 @@ CREATE TABLE `bd_cms_form` (
 -- Records of bd_cms_form
 -- ----------------------------
 BEGIN;
-INSERT INTO `bd_cms_form` (`id`, `fcode`, `form_name`, `table_name`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (1, '1', '在线留言', 'bd_cms_message', 'Admin', 'Admin', '2025-06-12 08:50:10', '2025-06-12 08:50:10');
-INSERT INTO `bd_cms_form` (`id`, `fcode`, `form_name`, `table_name`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (2, '2', '调研', 'bd_cms_form_data', 'admin', 'admin', '2024-10-25 10:47:51', '2024-10-25 10:47:51');
+INSERT INTO `bd_cms_form` (`id`, `fcode`, `form_name`, `table_name`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (1, '1', '在线留言', 'cms_message', 'Admin', 'Admin', '2025-06-12 08:50:10', '2025-06-12 08:50:10');
+INSERT INTO `bd_cms_form` (`id`, `fcode`, `form_name`, `table_name`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (2, '2', '调研', 'cms_form_data', 'admin', 'admin', '2024-10-25 10:47:51', '2024-10-25 10:47:51');
 COMMIT;
 
 -- ----------------------------
@@ -935,6 +935,7 @@ COMMIT;
 DROP TABLE IF EXISTS `bd_cms_label`;
 CREATE TABLE `bd_cms_label` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
+  `acode` varchar(100) NOT NULL,
   `name` varchar(100) NOT NULL COMMENT '名称',
   `value` varchar(500) NOT NULL COMMENT '值',
   `type` char(1) NOT NULL DEFAULT '1' COMMENT '字段类型',
@@ -950,7 +951,7 @@ CREATE TABLE `bd_cms_label` (
 -- Records of bd_cms_label
 -- ----------------------------
 BEGIN;
-INSERT INTO `bd_cms_label` (`id`, `name`, `value`, `type`, `description`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (7, 'logo2', '/uploads/20250622/8982f0a497e35b37b36bec84b0332d51.png', '3', '第二logo', 'Admin', 'Admin', '2024-10-30 22:09:41', '2025-06-27 16:02:23');
+INSERT INTO `bd_cms_label` (`id`, `acode`,`name`, `value`, `type`, `description`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (7,'cn', 'logo2', '/uploads/20250622/8982f0a497e35b37b36bec84b0332d51.png', '3', '第二logo', 'Admin', 'Admin', '2024-10-30 22:09:41', '2025-06-27 16:02:23');
 COMMIT;
 
 -- ----------------------------
