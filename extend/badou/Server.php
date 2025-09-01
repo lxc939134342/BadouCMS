@@ -795,6 +795,10 @@ class Server
             @unlink($tmpFile);
         }
 
+        // 备份模块数据
+        $backupdir = root_path().'runtime'.DIRECTORY_SEPARATOR.'database'.DIRECTORY_SEPARATOR;
+        TableManager::backup($name, 1, $backupdir);
+
         // 导入
         Server::importsql($name);
 

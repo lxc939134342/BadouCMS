@@ -231,6 +231,11 @@ class TableManager
         $zip->close();
     }
 
+    /**
+     * 将数据库的数据保存为sql文件
+     * @param mixed $type 0=只创建表字段 1=创建表字段与数据
+     * @return string
+     */
     private static function createSql($type)
     {
         # COUNT
