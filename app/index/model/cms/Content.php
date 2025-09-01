@@ -158,10 +158,6 @@ class Content extends Model
                 $tags = explode(',', $result->tags);
                 $scode = $scode ?: $result->scode;
                 $sort =  $sortModel->getSort($scode); // 获取栏目信息
-                if ($num) {
-                    // 限制标签数量
-                    $tags = array_slice($tags, 0, $num);
-                }
                 foreach ($tags as $key => $value) {
                     $data[] = array(
                         'sort' => $sort,
@@ -201,7 +197,7 @@ class Content extends Model
                 }
             }
         }
-        // $target = 'tag';
+
         foreach ($data as $key => &$value) {
             $value['n'] = $key;
             $value['i'] = $key + 1;
@@ -212,6 +208,10 @@ class Content extends Model
                 $value['link'] = bdurl($value['sort']['type'], $value['sort']['urlname'], 'list', $value['sort']['scode'], $value['sort']['filename'], '', '').'?tag=' . urlencode($value['tags']);
             }
             $value['text'] = $value['tags'];
+        }
+
+        if ($num > 0) {
+            $data = array_slice($data, 0, $num);
         }
 
         return $data;
