@@ -542,9 +542,9 @@ class Server
             Server::noconflict($name);
         }
 
+        $conflictFiles = self::getGlobalFiles($name, true);
         //备份冲突文件
         if (config('badouadmin.backup_global_files')) {
-            $conflictFiles = self::getGlobalFiles($name, true);
             if ($conflictFiles) {
                 $zip = new ZipFile();
                 try {
@@ -553,6 +553,28 @@ class Server
                     }
                     $modulesBackupDir = self::getModulesBackupDir();
                     $zip->saveAsFile($modulesBackupDir . $name . "-conflict-enable-" . date("YmdHis") . ".zip");
+                } catch (Exception $e) {
+
+                } finally {
+                    $zip->close();
+                }
+            }
+        }
+
+        // 保护系统原来文件，将插件需要替换的系统文件先进行保护备份，插件关闭后再恢复原来系统文件
+        $protectedFilesPath = MODULE_PATH . $name.DIRECTORY_SEPARATOR.'protectedFiles.php';
+        if (is_file($protectedFilesPath)) {
+            $protectedFiles = include_once $protectedFilesPath;
+            if ($conflictFiles && $protectedFiles) {
+                $zip = new ZipFile();
+                try {
+                    foreach ($conflictFiles as $k => $v) {
+                        if (in_array($v, $protectedFiles)) {
+                            $zip->addFile(root_path() . $v, $v);
+                        }
+                    }
+                    $modulesBackupDir = self::getModulesBackupDir();
+                    $zip->saveAsFile($modulesBackupDir . $name . "-protected.zip");
                 } catch (Exception $e) {
 
                 } finally {
@@ -698,6 +720,21 @@ class Server
         $dirs = array_filter(array_unique($dirs));
         foreach ($dirs as $k => $v) {
             Filesystem::delEmptyDir($v);
+        }
+
+        // 恢复因保护备份的系统原来文件
+        $protectedFilesPath = MODULE_PATH . $name.DIRECTORY_SEPARATOR.'protectedFiles.php';
+        if (is_file($protectedFilesPath)) {
+            $modulesBackupDir = self::getModulesBackupDir();
+            $protectedFiles = include_once $protectedFilesPath;
+            $protectedFilesZip = $modulesBackupDir.$name."-protected.zip";
+            if ($protectedFiles && is_file($protectedFilesZip)) {
+                try {
+                    Filesystem::unzip($protectedFilesZip, root_path());
+                } catch (Exception) {
+                    // skip
+                }
+            }
         }
 
         $info = self::getModuleInfo($name);
