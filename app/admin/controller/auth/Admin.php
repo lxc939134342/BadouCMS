@@ -105,7 +105,7 @@ class Admin extends Backend
             Db::startTrans();
             try {
                 $this->validate($params, 'AdminUser.insert');
-                $params['password'] = password_hash('password', PASSWORD_DEFAULT);
+                $params['password'] = password_hash($params['password'], PASSWORD_DEFAULT);
                 $params['avatar']   = '/assets/img/avatar.png'; //设置新管理员默认头像。
                 $this->model->save($params);
 
