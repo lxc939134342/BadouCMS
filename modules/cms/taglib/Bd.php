@@ -490,6 +490,7 @@ class Bd extends TagLib
     public function tagPics($tag, $content): string
     {
         $id = $tag['id'] ?? '""';
+        $this->autoBuildVar($id);
         $field = $tag['field'] ?? '"pics"';
         $alias    = $tag['alias'] ?? 'pics';
         $empty = $tag['empty'] ?? '';

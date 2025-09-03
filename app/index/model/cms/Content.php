@@ -50,9 +50,10 @@ class Content extends Model
             foreach ($pics as &$pic) {
                 $pic = cdnurl($pic);
             }
-            return $pics;
+            unset($pic);
+            return implode(',', $pics);
         }
-        return [];
+        return '';
     }
 
     public function getLinkAttr($value, $data)
@@ -119,8 +120,8 @@ class Content extends Model
             ->where('a.date', '<', date('Y-m-d H:i:s'))
             ->find();
         $data = [];
-        if ($result) {
-            $pics = $result['pics'];
+        if ($result && $result['pics']) {
+            $pics = explode(',', $result['pics']);
             $picstitle = explode(',', $result->picstitle);
             if ($num) {
                 // 限制标签数量
@@ -129,6 +130,7 @@ class Content extends Model
             if ($onlypic) {
                 return $pics;
             }
+
             foreach ($pics as $key => $pic) {
                 $data[] = [
                     'n' => $key,
@@ -137,6 +139,7 @@ class Content extends Model
                     'title' => isset($picstitle[$key]) ? $picstitle[$key] : '',
                 ];
             }
+            p($data);
         }
         return $data;
     }
