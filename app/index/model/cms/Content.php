@@ -139,7 +139,6 @@ class Content extends Model
                     'title' => isset($picstitle[$key]) ? $picstitle[$key] : '',
                 ];
             }
-            p($data);
         }
         return $data;
     }
