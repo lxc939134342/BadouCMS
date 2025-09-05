@@ -95,46 +95,45 @@ class ContentSort extends Model
     // 多个分类信息，不区分语言，兼容跨语言
     public static function getMultSort($scodes): array
     {
-        $field = array(
-            'a.*',
-            'a.name AS parentname',
-            'b.type',
-            'b.urlname'
-        );
-        $order = 'a.pcode,a.sorting,a.id desc';
         $scode_arr = [];
         if ($scodes) {
             $scode_arr = explode(',', $scodes);
         }
+        $data = ContentSort::getSortsTree(false);
+        $out_data = $data;
 
-        $view = View::instance();
-        $data = self::alias('a')->field($field)
-            ->where('a.scode', 'in', $scode_arr)
-            ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
-            ->order($order)
-            ->filter(function ($row) use ($view) {
-                $row['tcode'] = $view->sort['tcode'] ?? 0;
-                $row['topname'] = $view->sort['topname'] ?? '';
-                $row['toplink'] = $view->sort['toplink'] ?? '';
-                $row['parentname'] = $view->sort['parentname'] ?? '';
-                $row['parentlink'] = $view->sort['parentlink'] ?? '';
-            })
-            ->select();
-        $data = $data->toArray();
-        if (is_array($scode_arr)) {
-            //将数组按照scode_arr的顺序排序
-            usort($data, function ($a, $b) use ($scode_arr) {
-                $aIndex = array_search($a['scode'], $scode_arr);
-                $bIndex = array_search($b['scode'], $scode_arr);
-                return $aIndex - $bIndex;
+        // 读取指定分类
+        if ($scode_arr) {
+            foreach ($out_data as $index => $value) {
+                if (!in_array($value['scode'], $scode_arr)) {
+                    unset($out_data[$index]);
+                }
+            }
+            // 将数组按照scode_arr的顺序排序
+            // 将数组按照scode_arr的顺序排序
+            usort($out_data, function ($a, $b) use ($scode_arr) {
+                $pos_a = array_search($a['scode'], $scode_arr);
+                $pos_b = array_search($b['scode'], $scode_arr);
+                return $pos_a - $pos_b;
             });
         }
-
-        return $data;
+        $key = 0;
+        $result = [];
+        foreach ($out_data as $index => $value) { // 按查询的数据条数循环
+            $value['n'] = $key;
+            $value['i'] = $key + 1;
+            $result[$index] = $value;
+            $key++;
+        }
+        return $result;
     }
 
-    // 分类栏目列表关系树
-    public static function getSortsTree()
+    /**
+     * 分类栏目列表关系树
+     * @param mixed $filter_acode 是否区分站点编号
+     * @return array
+     */
+    public static function getSortsTree($filter_acode = true)
     {
         $fields = array(
             'a.*',
@@ -142,55 +141,82 @@ class ContentSort extends Model
             'b.urlname'
         );
         $order = 'a.pcode,a.sorting,a.id desc';
-        $view = View::instance();
-        $result = self::alias('a')
-            ->where('a.acode', get_frontend_lang())
-            ->where('a.status', 1)
-            ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
-            ->field($fields)
-            ->cache('cms_sorts_tree_' . get_frontend_lang(), 3600, 'cms_cache')
-            ->order($order)
-            ->filter(function ($row) use ($view) {
-                $row['tcode'] = $view->sort['tcode'] ?? 0;
-                $row['topname'] = $view->sort['topname'] ?? '';
-                $row['toplink'] = $view->sort['toplink'] ?? '';
-                $row['parentname'] = $view->sort['parentname'] ?? '';
-                $row['parentlink'] = $view->sort['parentlink'] ?? '';
-                $row['parentrows'] = 0;
-                $row['toprows'] = 0;
-            })
-            ->select();
+        if ($filter_acode) {
+            $result = self::alias('a')
+                ->where('a.acode', get_frontend_lang())
+                ->where('a.status', 1)
+                ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
+                ->field($fields)
+                ->cache('cms_sorts_tree_' . get_frontend_lang(), 3600, 'cms_cache')
+                ->order($order)
+                ->select();
+        } else {
+            $result = self::alias('a')
+                ->where('a.acode', get_frontend_lang())
+                ->where('a.status', 1)
+                ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
+                ->field($fields)
+                ->cache('cms_sorts_tree_all', 3600, 'cms_cache')
+                ->order($order)
+                ->select();
+        }
 
         if ($result->isEmpty()) {
             return [];
         }
         $result = $result->toArray();
-        $data = [];
+        $nodes = [];
         $tree = [];
         $top = [];
         $self = new self();
         foreach ($result as $value) {
             $value['soncount'] = 0;
             $sortrows = $self->getSortRows($value['scode']);
-            $value['rows'] = $sortrows['rows'] ?? 0;
-            $data[$value['scode']] = $value;
-            if (isset($value['pcode']) && $value['pcode']) {
-                $tree[$value['pcode']]['son'][] = $value; // 记录到关系树
+            $value['rows'] = $sortrows ?? 0;
+            $nodes[$value['scode']] = $value;
+        }
+
+        foreach ($nodes as $scode => &$node) {
+            /* 上级名称与链接 */
+            $node['parentname'] = '';
+            $node['parentlink'] = '';
+            $node['parentrows'] = 0;
+
+            /* 顶级名称与链接 */
+            $node['tcode'] = 0;
+            $node['topname'] = '';
+            $node['toplink'] = '';
+            $node['toprows'] = 0;
+
+            //顶级栏目
+            if (isset($node['pcode']) && $node['pcode'] == 0) {
+                $top[] = &$node;
+            }
+
+            //子栏目树
+            if (isset($node['pcode']) && $node['pcode']) {
+                /* 上级名称与链接 */
+                $node['parentname'] = $nodes[$node['pcode']]['name'];
+                $node['parentlink'] = $nodes[$node['pcode']]['link'];
+                $node['parentrows'] = $nodes[$node['pcode']]['rows'];
+
+                /* 顶级编号、名称与链接 */
+                $node['tcode'] = $self->getSortTopScode($node['scode']);
+                $node['topname'] = $nodes[$node['tcode']]['name'];
+                $node['toplink'] = $nodes[$node['tcode']]['link'];
+                $node['toprows'] = $nodes[$node['tcode']]['rows'];
+
+                /* 统计子栏目数量 */
+                $nodes[$node['pcode']]['soncount']++;
+
+                // 记录到关系树
+                $tree[$node['pcode']]['son'][] = &$node;
             }
         }
-        // 统计son数量
-        foreach ($tree as $key => $value) {
-            $tree[$key]['soncount'] = count($value['son']);
-            $data[$key]['soncount'] = count($tree[$key]['son']);
-        }
-        foreach ($data as $key => $value) {
-            if (isset($value['pcode']) && $value['pcode'] == 0) {
-                $top[] = $value;
-            }
-        }
-        $data['top'] = $top;
-        $data['tree'] = $tree;
-        return $data;
+        unset($node);
+        $nodes['top'] = $top;
+        $nodes['tree'] = $tree;
+        return $nodes;
     }
 
     public function getSortList(): array
@@ -511,5 +537,4 @@ class ContentSort extends Model
         }
         return $out_html;
     }
-
 }
