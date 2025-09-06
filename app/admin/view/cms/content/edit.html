@@ -131,7 +131,16 @@
                         </div>
                     </div>
 
-                    <div class="layui-upload-list" id="p-pics"></div>
+                    <div class="layui-upload-list" id="p-pics" data-template="picstpl" data-name="row[picstitle]"></div>
+                    <textarea name="row[picstitle]" class="form-control hide" style="margin-top:5px;">{$row.picstitle}</textarea>
+                    <!-- 设置多图模板 -->
+                    <script type="text/html" id="picstpl">
+                         <div class="layui-col-sm3 layui-col-xs6 layui-upload-item"  >
+                            <img src="{{=d.fullurl}}" data-url="{{=d.url}}" class="layui-upload-img img-thumbnail" />
+                            <input type="text" class="layui-input" name="row[picstitle][{{=d.index}}]" value="{{=d.value}}" placeholder="输入图片标题" >
+                            <a href="javascript:;" class="layui-btn layui-btn-xs layui-bg-red btn-delete-img mt-2"><i class="fa fa-trash"></i></a>
+                        </div>
+                    </script>
                 </div>
             </div>
             <div class="layui-form-item">

@@ -38,6 +38,43 @@ class Content extends Model
         return $value ? cdnurl($value) : '';
     }
 
+    public function getPicstitleAttr($value, $data)
+    {
+        if (!$value) {
+            return '';
+        }
+        $value = explode(',', $value);
+        if (!$value) {
+            return '';
+        }
+
+        return json_encode($value);
+    }
+
+    public function setPicstitleAttr($value, $data)
+    {
+        if (!$value) {
+            return '';
+        }
+        // 如果是JSON字符串，先解析为数组
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                $value = $decoded;
+            } else {
+                return '';
+            }
+        }
+        if (!is_array($value)) {
+            return '';
+        }
+        // 过滤掉空值
+        $value = array_filter($value, function ($item) {
+            return $item !== '' && $item !== null;
+        });
+        return implode(',', $value);
+    }
+
     // 检查自定义URL名称
     public function checkFilename($filename, $where = array())
     {
