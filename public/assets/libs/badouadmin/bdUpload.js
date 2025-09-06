@@ -52,13 +52,16 @@ layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer', 'Sortabl
                         var inputArr = inputStr.split(/\,/);
                         var previewObj = $("#" + preview_id);
                         previewObj.empty();
-                        var tpl = previewObj.data("template") ? previewObj.data("template") : "";
+                        var templateId = previewObj.data("template") ? previewObj.data("template") : "";
+                        var tpl = templateId ? $("#" + templateId).html() : "";
                         var extend = previewObj.next().is("textarea") ? previewObj.next("textarea").val() : "{}";
+
                         var json = {};
                         try {
                             json = JSON.parse(extend);
                         } catch (e) {
                         }
+
                         $.each(inputArr, function (i, j) {
                             if (!j) {
                                 return true;
@@ -125,7 +128,7 @@ layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer', 'Sortabl
             refresh: function (name) {
                 var data = {};
                 var textarea = $("textarea[name='" + name + "']");
-                var container = textarea.prev("ul");
+                var container = textarea.prev(".layui-upload-list");
                 $.each($("input,select,textarea", container).serializeArray(), function (i, j) {
                     var reg = /\[?(\w+)\]?\[(\w+)\]$/g;
                     var match = reg.exec(j.name);
