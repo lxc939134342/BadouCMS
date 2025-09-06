@@ -1,96 +1,167 @@
 {foreach $custom_fields as $field}
+{switch $field.component}
+
+{// 文本框 }
+{case value="string"}
 <div class="layui-form-item">
     <label class="layui-form-label">{$field.description}</label>
     <div class="layui-input-block">
-        {switch $field.component}
-        {// 文本框 }
-        {case value="string"}
-        <input type="text" id="c-{$field.name}" name="row[{$field.name}]" placeholder="请输入{$field.description}" value="{$row[$field.name]|default=''}"
-            class="layui-input" />
-        {/case}
+        <input type="text" id="c-{$field.name}" name="row[{$field.name}]" placeholder="请输入{$field.description}"
+            value="{$row[$field.name]|default=''}" class="layui-input" />
+    </div>
+</div>
+{/case}
 
-        {// 多选框 }
-        {case value="checkbox"}
+{// 多选框 }
+{case value="checkbox"}
+<div class="layui-form-item">
+    <label class="layui-form-label">{$field.description}</label>
+    <div class="layui-input-block">
         {volist name="$field.content" id="item" key="k" }
-        <input type="checkbox" id="c-{$field.name}-{$k}" name="row[{$field.name}][]" title="{$item}" value="{$key}" {in name="key" value="$row[$field.name]??''" } checked {/in} >
+        <input type="checkbox" id="c-{$field.name}-{$k}" name="row[{$field.name}][]" title="{$item}" value="{$key}" {in
+            name="key" value="$row[$field.name]??''" } checked {/in}>
         {/volist}
-        {/case}
+    </div>
+</div>
+{/case}
 
-        {// 单选框 }
-        {case value="radio"}
+{// 单选框 }
+{case value="radio"}
+<div class="layui-form-item">
+    <label class="layui-form-label">{$field.description}</label>
+    <div class="layui-input-block">
         {volist name="$field.content" id="item" key="k" }
-        <input type="radio" id="c-{$field.name}-{$k}" name="row[{$field.name}]" title="{$item}" value="{$key}" {in name="key" value="$row[$field.name]??''" } checked {/in}>
+        <input type="radio" id="c-{$field.name}-{$k}" name="row[{$field.name}]" title="{$item}" value="{$key}" {in name="key"
+            value="$row[$field.name]??''" } checked {/in}>
         {/volist}
-        {/case}
+    </div>
+</div>
+{/case}
 
-        {// 开关 }
-        {case value="switch"}
+{// 开关 }
+{case value="switch"}
+<div class="layui-form-item">
+    <label class="layui-form-label">{$field.description}</label>
+    <div class="layui-input-block">
         <input type="checkbox" id="c-{$field.name}" name="row[{$field.name}]" {in name="1" value="$row[$field.name]??''" } checked {/in} value="1" lay-skin="switch">
-        {/case}
+    </div>
+</div>
+{/case}
 
-        {// 图片上传 }
-        {case value="image" break="0"}{/case}
-        {case images}
+{// 图片上传 }
+{case value="image" break="0"}{/case}
+{case images}
+<div class="layui-form-item">
+    <label class="layui-form-label">{$field.description}</label>
+    <div class="layui-input-block">
         <div class="layui-input-group" style="width: 100%">
-            <input type="text" id="c-{$field.name}" name="row[{$field.name}]" class="layui-input" value="{$row[$field.name]|default=''}" />
+            <input type="text" id="c-{$field.name}" name="row[{$field.name}]" class="layui-input"
+        value="{$row[$field.name]|default=''}" />
             <div class="layui-input-suffix" style="width: 30%">
-                <button type="button" data-input-id="c-{$field.name}" {if $field.component=='images'}data-multiple="true"{/if} data-preview-id="p-{$field.name}" class="layui-btn btn-bdupload">
+                <button type="button" data-input-id="c-{$field.name}" {if $field.component=='images' }data-multiple="true" {/if}
+                    data-preview-id="p-{$field.name}" class="layui-btn btn-bdupload">
                     <i class="fa fa-upload"></i>
                     上传
                 </button>
-                <button type="button" data-input-id="c-{$field.name}" {if $field.component=='images'}data-multiple="true"{/if} class="layui-btn layui-bg-green btn-bdchoose">
+                <button type="button" data-input-id="c-{$field.name}" {if $field.component=='images' }data-multiple="true" {/if}
+                    class="layui-btn layui-bg-green btn-bdchoose">
                     <i class="fa fa-list"></i>
                     选择
                 </button>
             </div>
         </div>
-        <div class="layui-upload-list" id="p-{$field.name}"></div>
-        {/case}
 
-        {// 附件上传 }
-        {case value="file" break="0"}{/case}
-        {case files}
+        {if $field.component=='images'}
+        <div class="layui-upload-list" id="p-{$field.name}" data-template="p{$field.name}tpl"
+            data-name="row[{$field.name}title]"></div>
+
+        <textarea name="row[{$field.name}title]" class="form-control hide"
+            style="margin-top:5px;">{$row[$field.name.'title']}</textarea>
+        <!-- 设置多图模板 -->
+        <script type="text/html" id="p{$field.name}tpl">
+            <div class="layui-col-sm3 layui-col-xs6 layui-upload-item"  >
+                <img src="{{=d.fullurl}}" data-url="{{=d.url}}" class="layui-upload-img img-thumbnail" />
+                <input type="text" class="layui-input" name="row[{$field.name}title][{{=d.index}}]" value="{{=d.value}}" placeholder="输入图片标题" >
+                <a href="javascript:;" class="layui-btn layui-btn-xs layui-bg-red btn-delete-img mt-2"><i class="fa fa-trash"></i></a>
+            </div>
+        </script>
+        {else /}
+        <div class="layui-upload-list" id="p-{$field.name}"></div>
+        {/if}
+    </div>
+</div>
+{/case}
+
+{// 附件上传 }
+{case value="file" break="0"}{/case}
+{case files}
+<div class="layui-form-item">
+    <label class="layui-form-label">{$field.description}</label>
+    <div class="layui-input-block">
         <div class="layui-input-group" style="width: 100%">
             <input type="text" id="c-{$field.name}" name="row[{$field.name}]" class="layui-input"
                 value="{$row[$field.name]|default=''}" />
             <div class="layui-input-suffix" style="width: 30%">
-                <button type="button" {if $field.component=='images'}data-multiple="true"{/if} data-input-id="c-{$field.name}" class="layui-btn btn-bdupload">
+                <button type="button" {if $field.component=='images' }data-multiple="true" {/if} data-input-id="c-{$field.name}"
+                    class="layui-btn btn-bdupload">
                     <i class="fa fa-upload"></i>
                     上传
                 </button>
-                <button type="button" data-input-id="c-{$field.name}" {if $field.component=='files'}data-multiple="true"{/if} class="layui-btn layui-bg-green btn-bdchoose">
+                <button type="button" data-input-id="c-{$field.name}" {if $field.component=='files' }data-multiple="true" {/if}
+                    class="layui-btn layui-bg-green btn-bdchoose">
                     <i class="fa fa-list"></i>
                     选择
                 </button>
             </div>
         </div>
-        {/case}
+    </div>
+</div>
+{/case}
 
-        {// 多行文本框 }
-        {case textarea}
+{// 多行文本框 }
+{case textarea}
+<div class="layui-form-item">
+    <label class="layui-form-label">{$field.description}</label>
+    <div class="layui-input-block">
         <textarea class="layui-textarea" name="row[{$field.name}]" rows="5">{$row[$field.name]|default=''}</textarea>
-        {/case}
+    </div>
+</div>
+{/case}
 
-        {// 富文本 }
-        {case value="editor"}
+{// 富文本 }
+{case value="editor"}
+<div class="layui-form-item">
+    <label class="layui-form-label">{$field.description}</label>
+    <div class="layui-input-block">
         <textarea class="layui-textarea editor" name="row[{$field.name}]" rows="5">{$row[$field.name]|default=''}</textarea>
-        {/case}
+    </div>
+</div>
+{/case}
 
-        {// 日期 }
-        {case value="datetime"}
-        <input type="text" id="c-{$field.name}" name="row[{$field.name}]" class="layui-input laydate" value="{$row[$field.name]|default=''}" />
-        {/case}
+{// 日期 }
+{case value="datetime"}
+<div class="layui-form-item">
+    <label class="layui-form-label">{$field.description}</label>
+    <div class="layui-input-block">
+        <input type="text" id="c-{$field.name}" name="row[{$field.name}]" class="layui-input laydate"
+            value="{$row[$field.name]|default=''}" />
+    </div>
+</div>
+{/case}
 
-        {// 下拉选择 }
-        {case value="select"}
+{// 下拉选择 }
+{case value="select"}
+<div class="layui-form-item">
+    <label class="layui-form-label">{$field.description}</label>
+    <div class="layui-input-block">
         <select name="row[{$field.name}]" class="layui-select">
             {volist name="$field.content" id="item" key="k" }
             <option value="{$key}" {if isset($row[$field.name])&&$row[$field.name]==$key}selected{/if}>{$item}</option>
             {/volist}
         </select>
-        {/case}
-
-        {/switch}
     </div>
 </div>
+{/case}
+
+{/switch}
 {/foreach}
