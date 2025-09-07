@@ -472,6 +472,7 @@ class Bd extends TagLib
     {
         $id = $tag['id'] ?? '""';
         $scode = $tag['scode'] ?? '""';
+        $target = $tag['target'] ?? '';
         $alias    = $tag['alias'] ?? 'tags';
         $empty = $tag['empty'] ?? '';
         $key   = !empty($tag['key']) ? $tag['key'] : 'i';
@@ -479,7 +480,7 @@ class Bd extends TagLib
         $mod   = $tag['mod'] ?? '2';
         $var     = Random::build('alnum', 10);
         $parse   = '<?php ';
-        $parse  .= '$__' . $var . '__ = \app\index\model\cms\Content::getContentTags('.$id.','.$scode.','.$num.');';
+        $parse  .= '$__' . $var . '__ = \app\index\model\cms\Content::getContentTags('.$id.','.$scode.','.$num.',"'.$target.'");';
         $parse  .= '?>';
         $parse  .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
         $parse  .= $content;
