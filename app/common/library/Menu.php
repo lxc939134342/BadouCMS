@@ -131,7 +131,17 @@ class Menu
         $menu = AdminRule::getByName($name);
         if ($menu) {
             $ruleList = AdminRule::where('id', 'in', $ids)->field('name,id,pid,type,title,icon,ismenu,py,pinyin')->select()->toArray();
-            $menuList = Tree::instance()->init($ruleList, 'pid', null, 'id', 'sublist')->getTreeArray($menu['id']);
+            $childList = Tree::instance()->init($ruleList, 'pid', null, 'id', 'sublist')->getTreeArray($menu['id']);
+            $menuList = [
+                'name' => $menu['name'],
+                'title' => $menu['title'],
+                'type' => $menu['type'],
+                'icon' => $menu['icon'],
+                'ismenu' => $menu['ismenu'],
+                'py' => $menu['py'],
+                'pinyin' => $menu['pinyin'],
+                'sublist' => $childList
+            ];
         }
         return $menuList;
     }
