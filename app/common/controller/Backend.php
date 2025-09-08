@@ -177,8 +177,7 @@ class Backend extends BaseController
         $lang = $this->app->lang->getLangSet();
         $lang = preg_match("/^([a-zA-Z\-_]{2,10})\$/i", $lang) ? $lang : 'zh-cn';
 
-        $site = Config::get("site");
-
+        $site = get_sys_config();
         $upload = \app\common\model\Config::upload();
 
         // 上传信息配置后
