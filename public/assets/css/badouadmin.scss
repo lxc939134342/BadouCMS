@@ -13,7 +13,14 @@
 ::before {
     box-sizing: content-box;
 }
-
+.loader:after {
+    background-color: var(--primary-color) !important;
+}
+.layui-input:focus,
+.layui-textarea:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 3px #fffaf3 !important;
+}
 .pear-admin {
     .layui-logo {
         background-color: #2c2d34;
