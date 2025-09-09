@@ -4,7 +4,24 @@ use think\facade\Db;
 use badou\Filesystem;
 use think\facade\Request;
 
-// 获取用户浏览器类型
+if (!function_exists('replace_keyword')) {
+    /**
+     * 替换内容中的敏感词
+     * @param string $content 内容
+     * @return string 替换后的内容
+     */
+    function replace_keyword($content)
+    {
+        $keys = get_sys_config('content_keyword_replace');
+        $keys_arr = explode(',', strip_tags($keys));
+        foreach ($keys_arr as $key => $value) {
+            $content = str_replace($value, str_repeat('*', mb_strlen($value)), $content);
+        }
+        return $content;
+    }
+}
+
+
 /**
  * 获取用户浏览器类型
  * @param string|null $bs 传入字符串检测是否包含于User-Agent中，返回bool

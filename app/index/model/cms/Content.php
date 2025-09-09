@@ -30,9 +30,9 @@ class Content extends Model
 
     public function getContentAttr($value): string
     {
+        $value = replace_keyword($value);
         /* 替换富文本中的图片域名 */
         return !$value ? '' : html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        ;
     }
 
     public function getIcoAttr($value, $data)
