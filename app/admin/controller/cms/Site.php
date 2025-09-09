@@ -15,6 +15,7 @@ namespace app\admin\controller\cms;
 use badou\Filesystem;
 use Throwable;
 use badou\TableManager;
+use think\facade\Cache;
 
 /**
  * 站点配置
@@ -78,6 +79,7 @@ class Site extends Base
                 // 模型验证
                 $this->modelValidateFunction($data);
                 $result = $this->model->save($data);
+                Cache::tag('cms_cache')->clear();
                 $this->model->commit();
             } catch (Throwable $e) {
                 $this->model->rollback();
@@ -110,6 +112,7 @@ class Site extends Base
                     // 模型验证
                     $this->modelValidateFunction($data);
                     $result = $row->save($data);
+                    Cache::tag('cms_cache')->clear();
                     $this->model->commit();
                 } catch (Throwable $e) {
                     $this->model->rollback();

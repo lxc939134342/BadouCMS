@@ -14,6 +14,7 @@ namespace app\admin\controller\cms;
 
 use Throwable;
 use badou\TableManager;
+use think\facade\Cache;
 
 /**
  * 公司信息
@@ -68,6 +69,7 @@ class Company extends Base
                 $this->modelValidateFunction($data);
                 $result = $this->model->save($data);
                 $this->model->commit();
+                Cache::tag('cms_cache')->clear();
             } catch (Throwable $e) {
                 $this->model->rollback();
                 $this->error($e->getMessage());
@@ -100,6 +102,7 @@ class Company extends Base
                     $this->modelValidateFunction($data);
                     $result = $row->save($data);
                     $this->model->commit();
+                    Cache::tag('cms_cache')->clear();
                 } catch (Throwable $e) {
                     $this->model->rollback();
                     $this->error($e->getMessage());
