@@ -21,7 +21,11 @@ class Lists extends Base
     {
         $template = empty($this->contentSort['listtpl']) ? $this->contentSort['contenttpl'] : $this->contentSort['listtpl'];
         $pagetitle = $this->contentSort['title'] ? $this->contentSort['title'] : $this->contentSort['name']; // 页面标题
-        $this->site['sitetitle'] = $pagetitle .'-'.$this->site['sitetitle'] . '-' . $this->site['sitesubtitle'];
+
+        // 过滤空值避免多余的分隔符
+        $titleParts = array_filter([$pagetitle, $this->site['sitetitle'], $this->site['sitesubtitle']]);
+        $this->site['sitetitle'] = implode('-', $titleParts);
+
         $this->site['sitekeywords'] = $this->contentSort['keywords'] ? $this->contentSort['keywords'] : $this->site['sitekeywords'];
         $this->site['sitedescription'] = $this->contentSort['description'] ? $this->contentSort['description'] : $this->site['sitedescription'];
 

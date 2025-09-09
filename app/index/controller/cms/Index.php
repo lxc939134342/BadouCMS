@@ -18,7 +18,10 @@ class Index extends Base
 
     public function index()
     {
-        $this->site['sitetitle'] = $this->site['sitetitle'] . '-' . $this->site['sitesubtitle'];
+        // 过滤空值避免多余的分隔符
+        $titleParts = array_filter([$this->site['sitetitle'], $this->site['sitesubtitle']]);
+        $this->site['sitetitle'] = implode('-', $titleParts);
+
         $this->site['pagetitle'] = $this->site['sitetitle'];
         $this->site['pagedescription'] = $this->site['sitedescription'];
         $this->site['pagekeywords'] = $this->site['sitekeywords'];
