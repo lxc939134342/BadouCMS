@@ -31,6 +31,8 @@
         <i class="fa fa-plus"></i>
         {:__('Expendall')}
     </button>
+    <!-- 钩子 -->
+    {foreach :hook('content_sort_top_btn',[],true) as $hook} {$hook|raw} {/foreach}
 </script>
 
 <div class="layui-card">

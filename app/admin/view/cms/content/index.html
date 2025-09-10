@@ -44,6 +44,8 @@
         <i class="fa fa-magnet"></i>
         {:__('Move')}
     </a>
+    <!-- 钩子 -->
+    {foreach :hook('content_top_btn',[],true) as $hook} {$hook|raw} {/foreach}
 </script>
 
 <script>
