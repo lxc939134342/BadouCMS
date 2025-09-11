@@ -22,6 +22,7 @@ class Base extends Backend
      * @var array
      */
     protected array $rules = [];
+    protected $noNeedRight = ['changelang'];
 
     public function initialize()
     {

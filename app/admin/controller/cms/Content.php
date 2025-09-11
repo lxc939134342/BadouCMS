@@ -39,7 +39,7 @@ class Content extends Base
     // 开启关联查询
     protected $relationSearch = true;
 
-    protected $multiFields = 'istop,isrecommend,isheadline';
+    protected $multiFields = 'status,sorting,istop,isrecommend,isheadline';
 
     /**
      * 模型ID

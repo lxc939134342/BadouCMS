@@ -33,6 +33,7 @@ class ContentSort extends Base
     protected $withJoinTable = ['models'];
     protected $pk = 'scode';
     protected $modelValidate = true;
+    protected $multiFields = 'status,sorting';
     /**
      *
      * @var \badou\Tree
