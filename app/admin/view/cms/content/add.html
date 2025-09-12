@@ -75,41 +75,6 @@
             </div>
 
             <div class="layui-form-item">
-                <label class="layui-form-label">tags</label>
-                <div class="layui-input-block">
-                    <input
-                        type="text"
-                        name="row[tags]"
-                        placeholder="请输入文章tag，英文逗号隔开"
-                        value=""
-                        class="layui-input" />
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">作者</label>
-                <div class="layui-input-block">
-                    <input
-                        type="text"
-                        name="row[author]"
-                        placeholder="请输入作者"
-                        value=""
-                        class="layui-input" />
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">来源</label>
-                <div class="layui-input-block">
-                    <input
-                        type="text"
-                        name="row[source]"
-                        placeholder="请输入来源"
-                        value=""
-                        class="layui-input" />
-                </div>
-            </div>
-            <div class="layui-form-item">
                 <label class="layui-form-label">轮播多图</label>
                 <div class="layui-input-block">
                     <div class="layui-input-group" style="width: 100%">
@@ -150,36 +115,6 @@
             </div>
 
             <div class="layui-form-item">
-                <label class="layui-form-label">浏览权限</label>
-                <div class="layui-input-block">
-                    <select name="row[gid]" id="c-gid" class="layui-select">
-                        <option value="">请选择</option>
-                        {foreach $levellist as $level}
-                        <option value="{$level.gcode}">{$level.gname}</option>
-                        {/foreach}
-                    </select>
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">权限类型</label>
-                <div class="layui-input-block">
-                    <select name="row[gtype]" id="c-gtype" class="layui-select">
-                        <option value="">请选择</option>
-                        {foreach $gtypelist as $type}
-                        <option value="{$level.value}">{$type.label}</option>
-                        {/foreach}
-                    </select>
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">权限不足提示</label>
-                <div class="layui-input-block">
-                    <input type="text" name="row[gnote]" placeholder="请输入权限不足提示语" class="layui-input" />
-                </div>
-            </div>
-
-            <div class="layui-form-item">
                 <label class="layui-form-label">排序</label>
                 <div class="layui-input-block">
                     <input
@@ -200,144 +135,222 @@
             </div>
         </div>
         <div class="layui-col-xs4">
-            <div class="layui-card layui-bg-gray">
-                <div class="layui-card-header">高级内容</div>
-                <div class="layui-card-body">
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">
-                            副栏目
-                        </label>
-                        <div class="layui-input-block">
-                            <input
-                                type="hidden"
-                                id="c-subscode"
-                                name="row[subscode]"
-                                value=""
-                                class="layui-input" />
-                            <div
-                                class="remoteSelect"
-                                id="remoteSelect-subscode"
-                                data-input-id="c-subscode"
-                                data-primary-key="scode"
-                                data-field="name"
-                                data-source="cms.content_sort/selectpage"
-                                data-is-tree="true"
-                                data-pidname="pcode"
-                                data-multiple="true"
-                                data-params='{"acode":"{$acode}","mcode":"{$mcode}"}'></div>
-                        </div>
-                    </div>
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">标题颜色</label>
+            <div class="layui-collapse">
+                <div class="layui-colla-item ">
+                    <div class="layui-colla-title">基础内容</div>
+                    <div class="layui-colla-content layui-show">
+                        <div class="layui-card ">
+                            <div class="layui-card-body form-label-width-short">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">tags</label>
+                                    <div class="layui-input-block">
+                                        <input
+                                            type="text"
+                                            name="row[tags]"
+                                            placeholder="请输入文章tag，英文逗号隔开"
+                                            value=""
+                                            class="layui-input" />
+                                    </div>
+                                </div>
 
-                        <div class="layui-input-inline">
-                            <input
-                                type="text"
-                                name="row[titlecolor]"
-                                value=""
-                                placeholder="请选择标题颜色"
-                                class="layui-input"
-                                id="titlecolor" />
-                        </div>
-                        <div class="layui-inline" style="left: -11px">
-                            <div class="colorpicker" data-input-id="titlecolor"></div>
-                        </div>
-                    </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">作者</label>
+                                    <div class="layui-input-block">
+                                        <input
+                                            type="text"
+                                            name="row[author]"
+                                            placeholder="请输入作者"
+                                            value=""
+                                            class="layui-input" />
+                                    </div>
+                                </div>
 
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">副标题</label>
-                        <div class="layui-input-block">
-                            <input
-                                type="text"
-                                name="row[subtitle]"
-                                value=""
-                                placeholder="请输入副标题"
-                                class="layui-input" />
-                        </div>
-                    </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">来源</label>
+                                    <div class="layui-input-block">
+                                        <input
+                                            type="text"
+                                            name="row[source]"
+                                            placeholder="请输入来源"
+                                            value=""
+                                            class="layui-input" />
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">标题颜色</label>
+                                    <div class="layui-input-inline">
+                                        <input
+                                            type="text"
+                                            name="row[titlecolor]"
+                                            value=""
+                                            placeholder="请选择标题颜色"
+                                            class="layui-input"
+                                            id="titlecolor" />
+                                    </div>
+                                    <div class="layui-inline" style="left: -11px">
+                                        <div class="colorpicker" data-input-id="titlecolor"></div>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">浏览权限</label>
+                                    <div class="layui-input-block">
+                                        <select name="row[gid]" id="c-gid" class="layui-select">
+                                            <option value="">请选择</option>
+                                            {foreach $levellist as $level}
+                                            <option value="{$level.gcode}">{$level.gname}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">权限类型</label>
+                                    <div class="layui-input-block">
+                                        <select name="row[gtype]" id="c-gtype" class="layui-select">
+                                            <option value="">请选择</option>
+                                            {foreach $gtypelist as $type}
+                                            <option value="{$level.value}">{$type.label}</option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
 
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">URL名称</label>
-                        <div class="layui-input-block">
-                            <input
-                                type="text"
-                                name="row[filename]"
-                                value=""
-                                placeholder="请输入URL名称"
-                                class="layui-input" />
-                        </div>
-                    </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">权限不足提示</label>
+                                    <div class="layui-input-block">
+                                        <input type="text" name="row[gnote]" placeholder="请输入权限不足提示语" class="layui-input" />
+                                    </div>
+                                </div>
 
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">跳转链接</label>
-                        <div class="layui-input-block">
-                            <input
-                                type="text"
-                                name="row[outlink]"
-                                value=""
-                                placeholder="请输入跳转链接"
-                                class="layui-input" />
-                        </div>
-                    </div>
-
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">时间</label>
-                        <div class="layui-input-block">
-                            <input
-                                type="text"
-                                name="row[date]"
-                                value="{:date('Y-m-d H:i:s')}"
-                                readonly
-                                placeholder="请选择发布时间"
-                                class="layui-input laydate" />
-                        </div>
-                    </div>
-
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">附件</label>
-                        <div class="layui-input-block">
-                            <div class="layui-input-group" style="width: 100%">
-                                <input
-                                    type="text"
-                                    id="c-enclosure"
-                                    name="row[enclosure]"
-                                    class="layui-input"
-                                    value="" />
-                                <div class="layui-input-suffix" style="width: 50%">
-                                    <button type="button" data-input-id="c-enclosure" class="layui-btn btn-bdupload">
-                                        <i class="fa fa-upload"></i>
-                                        上传
-                                    </button>
-                                    <button
-                                        type="button"
-                                        data-input-id="c-enclosure"
-                                        class="layui-btn layui-bg-green btn-bdchoose">
-                                        <i class="fa fa-list"></i>
-                                        选择
-                                    </button>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">附件</label>
+                                    <div class="layui-input-block">
+                                        <div class="layui-input-group" style="width: 100%">
+                                            <input
+                                                type="text"
+                                                id="c-enclosure"
+                                                name="row[enclosure]"
+                                                class="layui-input"
+                                                value="" />
+                                            <div class="layui-input-suffix" style="width: 50%">
+                                                <button type="button" data-input-id="c-enclosure" class="layui-btn btn-bdupload">
+                                                    <i class="fa fa-upload"></i>
+                                                    上传
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    data-input-id="c-enclosure"
+                                                    class="layui-btn layui-bg-green btn-bdchoose">
+                                                    <i class="fa fa-list"></i>
+                                                    选择
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
+                <div class="layui-colla-item">
+                    <div class="layui-colla-title">高级内容</div>
+                    <div class="layui-colla-content layui-show">
+                        <div class="layui-card ">
+                            <div class="layui-card-body form-label-width-short">
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">
+                                        副栏目
+                                    </label>
+                                    <div class="layui-input-block">
+                                        <input
+                                            type="hidden"
+                                            id="c-subscode"
+                                            name="row[subscode]"
+                                            value=""
+                                            class="layui-input" />
+                                        <div
+                                            class="remoteSelect"
+                                            id="remoteSelect-subscode"
+                                            data-input-id="c-subscode"
+                                            data-primary-key="scode"
+                                            data-field="name"
+                                            data-source="cms.content_sort/selectpage"
+                                            data-is-tree="true"
+                                            data-pidname="pcode"
+                                            data-multiple="true"
+                                            data-params='{"acode":"{$acode}","mcode":"{$mcode}"}'></div>
+                                    </div>
+                                </div>
 
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">SEO关键字</label>
-                        <div class="layui-input-block">
-                            <input
-                                type="text"
-                                name="row[keywords]"
-                                value=""
-                                placeholder="请输入详情页SEO关键字"
-                                class="layui-input" />
-                        </div>
-                    </div>
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">副标题</label>
+                                    <div class="layui-input-block">
+                                        <input
+                                            type="text"
+                                            name="row[subtitle]"
+                                            value=""
+                                            placeholder="请输入副标题"
+                                            class="layui-input" />
+                                    </div>
+                                </div>
 
-                    <div class="layui-form-item">
-                        <label class="layui-form-label">SEO描述</label>
-                        <div class="layui-input-block">
-                            <textarea name="row[description]" placeholder="请输入详情页SEO描述" class="layui-textarea">
-</textarea
-                            >
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">URL名称</label>
+                                    <div class="layui-input-block">
+                                        <input
+                                            type="text"
+                                            name="row[filename]"
+                                            value=""
+                                            placeholder="请输入URL名称"
+                                            class="layui-input" />
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">跳转链接</label>
+                                    <div class="layui-input-block">
+                                        <input
+                                            type="text"
+                                            name="row[outlink]"
+                                            value=""
+                                            placeholder="请输入跳转链接"
+                                            class="layui-input" />
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">时间</label>
+                                    <div class="layui-input-block">
+                                        <input
+                                            type="text"
+                                            name="row[date]"
+                                            value="{:date('Y-m-d H:i:s')}"
+                                            readonly
+                                            placeholder="请选择发布时间"
+                                            class="layui-input laydate" />
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">SEO关键字</label>
+                                    <div class="layui-input-block">
+                                        <input
+                                            type="text"
+                                            name="row[keywords]"
+                                            value=""
+                                            placeholder="请输入详情页SEO关键字"
+                                            class="layui-input" />
+                                    </div>
+                                </div>
+
+                                <div class="layui-form-item">
+                                    <label class="layui-form-label">SEO描述</label>
+                                    <div class="layui-input-block">
+                                        <textarea name="row[description]" placeholder="请输入详情页SEO描述" class="layui-textarea">
+            </textarea
+                                        >
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -4,7 +4,8 @@ layui.define(['toast'], function (exports) {
     var bdHttp = {
         config: {
             open: {
-                area: null
+                area: null,
+                shade: 0,
             }
         },
         events: {
@@ -121,7 +122,9 @@ layui.define(['toast'], function (exports) {
                 url = bdHttp.api.fixurl(url);
 
                 // url = url + (url.indexOf("?") > -1 ? "&" : "?") + "";
-                var area = bdHttp.config.open.area ? bdHttp.config.open.area : [$(window).width() > 800 ? '800px' : '95%', $(window).height() > 600 ? '600px' : '95%'];
+                var area = [$(window).width() > 800 ? '800px' : '95%', $(window).height() > 600 ? '600px' : '95%'];
+                bdHttp.config.open.area ? bdHttp.config.open.area : bdHttp.config.open.area = area;
+
                 var success = options && typeof options.success === 'function' ? options.success : $.noop;
                 if (options && typeof options.success === 'function') {
                     delete options.success;
@@ -181,7 +184,8 @@ layui.define(['toast'], function (exports) {
                         }
                         success.call(this, layero, index);
                     }
-                }, options ? options : {});
+                }, bdHttp.config.open, options ? options : {});
+
                 if ($(window).width() < 480 || (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream)) {
                     options.area = [$(window).width() + "px", $(window).height() + "px"];
                     options.offset = ["0px", "0px"];

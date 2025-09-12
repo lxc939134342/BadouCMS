@@ -530,3 +530,13 @@ xm-select > .xm-body {
         margin-left: 150px;
     }
 }
+
+.form-label-width-short {
+    background-color: #fdfdfd;
+}
+.form-label-width-short .layui-form-label {
+    width: 90px !important;
+}
+.form-label-width-short .layui-input-block {
+    margin-left: 120px !important;
+}

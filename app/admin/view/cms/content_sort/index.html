@@ -51,7 +51,7 @@
         var treeTable = layui.treeTable;
         var badou = layui.badou;
         var changeLang = layui.changeLang;
-        badou.http.config.open.area = ["100%", "100%"];
+        badou.http.config.open.area = ["99%", "98%"];
         bdTable.api.init({
             table: treeTable,
             extend: {
@@ -90,11 +90,12 @@
                     { type: "checkbox" },
                     { field: "scode", title: "ID", width: 80, sort: true },
                     { field: "name", title: "栏目名称", operate: "like" },
+                    { field: "aucode", title: "关联编码", width: 150 },
                     { field: "filename", title: "URL名称", width: 150 },
                     {
                         field: "models.name",
                         title: "模型",
-                        width: 150,
+                        width: 100,
                         templet: function (d) {
                             var colorArr = ["red", "orange", "green", "blue", "purple", "black"];
                             var colorIndex = d.mcode % colorArr.length;
