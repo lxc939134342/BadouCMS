@@ -89,8 +89,8 @@
                 [
                     { type: "checkbox" },
                     { field: "scode", title: "ID", width: 80, sort: true },
-                    { field: "name", title: "栏目名称", operate: "like" },
-                    { field: "aucode", title: "关联编码", width: 150 },
+                    { field: "name", title: "栏目名称",width: 220, operate: "like" },
+                    { field: "aucode", title: "通用编码", width: 130 },
                     { field: "filename", title: "URL名称", width: 150 },
                     {
                         field: "models.name",
@@ -101,7 +101,7 @@
                             var colorIndex = d.mcode % colorArr.length;
                             var color = colorArr[colorIndex];
                             if (d.models) {
-                                return '<span class="layui-badge layui-bg-' + color + '">' + d.models.name + "</span>";
+                                return '<span class="btn-online-round layui-border-'+color+' layui-bg-'+color+'-light ">' + d.models.name + "</span>";
                             } else {
                                 return "-";
                             }

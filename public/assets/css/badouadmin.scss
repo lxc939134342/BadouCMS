@@ -533,10 +533,41 @@ xm-select > .xm-body {
 
 .form-label-width-short {
     background-color: #fdfdfd;
+    .layui-form-label {
+        width: 90px !important;
+    }
+    .layui-input-block {
+        margin-left: 120px !important;
+    }
 }
-.form-label-width-short .layui-form-label {
-    width: 90px !important;
+
+.btn-online-round {
+    border: 1px solid var(--primary-color);
+    border-radius: 60px;
+    padding: 3px 10px;
 }
-.form-label-width-short .layui-input-block {
-    margin-left: 120px !important;
+
+.btn-online {
+    border: 1px solid var(--primary-color);
+    border-radius: 3px;
+    padding: 3px 10px;
+}
+
+.layui-bg-red-light {
+    background-color: #fef1f0 !important;
+}
+.layui-bg-green-light {
+    background-color: #f0faeb !important;
+}
+.layui-bg-blue-light {
+    background-color: #edf5ff !important;
+}
+.layui-bg-orange-light {
+    background-color: #fdf6ec !important;
+}
+.layui-bg-purple-light {
+    background-color: #fef3ff !important;
+}
+.layui-bg-black-light {
+    background-color: #f3f3f3 !important;
 }

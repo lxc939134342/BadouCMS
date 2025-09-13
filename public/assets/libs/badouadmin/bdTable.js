@@ -340,7 +340,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         display = typeof that.searchList !== 'undefined' && typeof that.searchList[value] !== 'undefined' ? that.searchList[value] : __(value.charAt(0).toUpperCase() + value.slice(1));
                         value = http.api.escape(value);
                         display = http.api.escape(display);
-                        label = '<span class="layui-badge layui-bg-' + color + '">' + display + '</span>';
+                        label = '<span class="btn-online-round layui-border-' + color + ' layui-bg-' + color + '-light">' + display + '</span>';
                         if (that.operate) {
                             html.push('<a href="javascript:;" class="searchit" title="' + __('Click to search %s', display) + '" data-field="' + field + '" data-value="' + value + '">' + label + '</a>');
                         } else {
