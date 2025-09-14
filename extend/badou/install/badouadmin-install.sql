@@ -765,13 +765,15 @@ CREATE TABLE `bd_cms_content_sort` (
   `gtype` char(1) NOT NULL DEFAULT '4',
   `gid` varchar(20) NOT NULL DEFAULT '',
   `gnote` varchar(100) NOT NULL DEFAULT '',
+  `aucode` varchar(100) NOT NULL DEFAULT '' COMMENT '语言统一code',
   PRIMARY KEY (`id`),
   UNIQUE KEY `scode` (`scode`),
   KEY `pcode` (`pcode`),
   KEY `acode` (`acode`),
   KEY `mcode` (`mcode`),
   KEY `filename` (`filename`),
-  KEY `sorting` (`sorting`)
+  KEY `sorting` (`sorting`),
+  KEY `aucode` (`aucode`) USING BTREE
 ) ENGINE=MyISAM AUTO_INCREMENT=93 DEFAULT CHARSET=utf8 COMMENT='栏目表';
 
 -- ----------------------------
