@@ -541,16 +541,15 @@ xm-select > .xm-body {
     }
 }
 
+.btn-online,
 .btn-online-round {
-    border: 1px solid var(--primary-color);
-    border-radius: 60px;
-    padding: 3px 10px;
-}
-
-.btn-online {
     border: 1px solid var(--primary-color);
     border-radius: 3px;
     padding: 3px 10px;
+    font-size: 13px !important;
+}
+.btn-online-round {
+    border-radius: 60px;
 }
 
 .layui-bg-red-light {
