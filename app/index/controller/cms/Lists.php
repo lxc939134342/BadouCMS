@@ -24,12 +24,12 @@ class Lists extends Base
 
         // 过滤空值避免多余的分隔符
         $titleParts = array_filter([$pagetitle, $this->site['sitetitle'], $this->site['sitesubtitle']]);
-        $this->site['sitetitle'] = implode('-', $titleParts);
+        $pagetitle = implode('-', $titleParts);
 
         $this->site['sitekeywords'] = $this->contentSort['keywords'] ? $this->contentSort['keywords'] : $this->site['sitekeywords'];
         $this->site['sitedescription'] = $this->contentSort['description'] ? $this->contentSort['description'] : $this->site['sitedescription'];
 
-        $this->site['pagetitle'] = $this->site['sitetitle'];
+        $this->site['pagetitle'] = $pagetitle;
         $this->site['pagedescription'] = $this->site['sitedescription'];
         $this->site['pagekeywords'] = $this->site['sitekeywords'];
         $bootstrap = new Bootstrap(0, 10);

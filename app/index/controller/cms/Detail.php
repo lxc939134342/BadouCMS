@@ -57,11 +57,11 @@ class Detail extends Base
 
         // 过滤空值避免多余的分隔符
         $titleParts = array_filter([$this->contentInfo['title'], $sorttitle, $this->site['sitetitle'], $this->site['sitesubtitle']]);
-        $this->site['sitetitle'] = implode('-', $titleParts);
+        $pagetitle = implode('-', $titleParts);
 
         $this->site['sitekeywords'] = $this->contentInfo['keywords'] ? $this->contentInfo['keywords'] : $this->site['sitekeywords'];
         $this->site['sitedescription'] = $this->contentInfo['description'] ? $this->contentInfo['description'] : $this->site['sitedescription'];
-        $this->site['pagetitle'] = $this->site['sitetitle'];
+        $this->site['pagetitle'] = $pagetitle;
         $this->site['pagedescription'] = $this->site['sitedescription'];
         $this->site['pagekeywords'] = $this->site['sitekeywords'];
         $this->contentInfo['sortlink'] = $this->contentSort['link'];
