@@ -46,10 +46,6 @@ class ContentSort extends Base
         $this->model = new \app\admin\model\cms\ContentSort();
         $modelsModel = new Models();
         $levelModel = new UserLevel();
-        $this->rules = [
-            'name|'.__('name') => 'require',
-            'mcode|'.__('mcode') => 'require',
-        ];
 
         $res = $modelsModel->where('status', 1)
             ->order('id', 'desc')

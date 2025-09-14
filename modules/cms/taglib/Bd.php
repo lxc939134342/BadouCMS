@@ -35,22 +35,32 @@ class Bd extends TagLib
         'form'       => ['attr' => 'fcode','close' => 0],
         'formlist'   => ['attr' => 'fcode','close' => 1],
         'tags'       => ['attr' => '','close' => 1],
-        'pics' => ['attr' => '','close' => 1],
-        'qrcode' => ['attr' => 'string','close' => 0],
-        'loop' => ['attr' => '','close' => 1],
+        'pics'       => ['attr' => '','close' => 1],
+        'qrcode'     => ['attr' => 'string','close' => 0],
+        'loop'       => ['attr' => '','close' => 1],
     ];
 
     /*当前分类 子分类列表*/
     public function tagSort($tag, $content)
     {
-        if (!isset($tag['scode'])) {
+        if (!isset($tag['scode']) && !isset($tag['aucode'])) {
             if (get_sys_config('tpl_error')) {
-                throw new \think\Exception('scode参数不能为空');
+                throw new \think\Exception('属性至少填写一个');
             }
             return $content;
         }
-        $this->autoBuildVar($tag['scode']);
-        $scode  = $this->isVar($tag['scode']) ? $tag['scode'] : '"'.$tag['scode'].'"';
+
+        $scode = 'null';
+        $aucode = 'null';
+
+        if (isset($tag['scode'])) {
+            $this->autoBuildVar($tag['scode']);
+            $scode  = $this->isVar($tag['scode']) ? $tag['scode'] : '"'.$tag['scode'].'"';
+        }
+        if (isset($tag['aucode'])) {
+            $this->autoBuildVar($tag['aucode']);
+            $aucode  = $this->isVar($tag['aucode']) ? $tag['aucode'] : '"'.$tag['aucode'].'"';
+        }
 
         $alias  = $tag['alias'] ?? 'sort';
         $empty  = $tag['empty'] ?? '';
@@ -58,7 +68,7 @@ class Bd extends TagLib
         $mod    = $tag['mod'] ?? '2';
         $var    = Random::build('alnum', 10);
         $parse  = '<?php ';
-        $parse .= '$__' . $var . '__ = \app\index\model\cms\ContentSort::getMultSort(' . $scode . ');';
+        $parse .= '$__' . $var . '__ = \app\index\model\cms\ContentSort::getMultSort(' . $scode . ','.$aucode.');';
         $parse .= '?>';
         $parse .= '{volist name="$__' . $var . '__" id="' .$alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
         $parse .= $content;
@@ -70,13 +80,13 @@ class Bd extends TagLib
     /* 导航 */
     public function tagNav($tag, $content): string
     {
-        $parent  = $tag['parent'] ?? 0;
-        $num     = $tag['num'] ?? false;
-        $scode   = $tag['scode'] ?? false;
-        $alias   = $tag['alias'] ?? 'nav';
-        $empty   = $tag['empty'] ?? '';
-        $key     = !empty($tag['key']) ? $tag['key'] : 'i';
-        $mod     = $tag['mod'] ?? '2';
+        $parent = $tag['parent'] ?? 0;
+        $num    = $tag['num'] ?? false;
+        $scode  = $tag['scode'] ?? false;
+        $alias  = $tag['alias'] ?? 'nav';
+        $empty  = $tag['empty'] ?? '';
+        $key    = !empty($tag['key']) ? $tag['key'] : 'i';
+        $mod    = $tag['mod'] ?? '2';
         if ($parent) {
             $parent = $this->autoBuildVar($parent);
         }
@@ -86,7 +96,7 @@ class Bd extends TagLib
         $var     = Random::build('alnum', 10);
         $parse   = '<?php ';
         $parse  .= '$__' . $var . '__ = \app\index\model\cms\ContentSort::navList(' . $parent . ',"' . $scode . '","' . $num . '");';
-        $parse  .= ' ?>';
+        $parse  .= '?>';
         $parse  .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
         $parse  .= $content;
         $parse  .= '{/volist}';
@@ -97,17 +107,17 @@ class Bd extends TagLib
     /* 内容列表 */
     public function tagList($tag, $content): string
     {
-        $alias    = $tag['alias'] ?? 'list';
-        $empty = $tag['empty'] ?? '';
-        $key   = !empty($tag['key']) ? $tag['key'] : 'i';
-        $mod   = $tag['mod'] ?? '2';
-        $scode = $tag['scode'] ?? null;
-        $page  = $tag['page'] ?? 'false';
+        $alias  = $tag['alias'] ?? 'list';
+        $empty  = $tag['empty'] ?? '';
+        $key    = !empty($tag['key']) ? $tag['key'] : 'i';
+        $mod    = $tag['mod'] ?? '2';
+        $scode  = $tag['scode'] ?? null;
+        $page   = $tag['page'] ?? 'false';
         $start  = $tag['start'] ?? '0';
         $filter = $tag['filter'] ?? null;
-        $tags = $tag['tags'] ?? null;
-        $fuzzy = $tag['fuzzy'] ?? true;
-        $order = $tag['order'] ?? null;
+        $tags   = $tag['tags'] ?? null;
+        $fuzzy  = $tag['fuzzy'] ?? true;
+        $order  = $tag['order'] ?? null;
         $params = [
             "'page'=>{$page}",
             "'start'=>{$start}",

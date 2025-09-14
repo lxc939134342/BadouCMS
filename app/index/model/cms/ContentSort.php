@@ -92,31 +92,55 @@ class ContentSort extends Model
         return $info;
     }
 
-    // 多个分类信息，不区分语言，兼容跨语言
-    public static function getMultSort($scodes): array
+    /**
+     * 多个分类信息，不区分语言，兼容跨语言
+     * @param mixed $scodes
+     * @param mixed $aucodes  语言统一调用编码
+     * @return array
+     */
+    public static function getMultSort($scodes = null, $aucodes = null): array
     {
-        $scode_arr = [];
+        $out_data = ContentSort::getSortsTree(false);
+
         if ($scodes) {
             $scode_arr = explode(',', $scodes);
-        }
-        $data = ContentSort::getSortsTree(false);
-        $out_data = $data;
 
-        // 读取指定分类
-        if ($scode_arr) {
-            foreach ($out_data as $index => $value) {
-                if (!in_array($value['scode'], $scode_arr)) {
-                    unset($out_data[$index]);
+            // 读取指定分类
+            if ($scode_arr) {
+                foreach ($out_data as $index => $value) {
+                    if (!in_array($value['scode'], $scode_arr)) {
+                        unset($out_data[$index]);
+                    }
                 }
+                // 将数组按照scode_arr的顺序排序
+                usort($out_data, function ($a, $b) use ($scode_arr) {
+                    $pos_a = array_search($a['scode'], $scode_arr);
+                    $pos_b = array_search($b['scode'], $scode_arr);
+                    return $pos_a - $pos_b;
+                });
             }
-            // 将数组按照scode_arr的顺序排序
-            // 将数组按照scode_arr的顺序排序
-            usort($out_data, function ($a, $b) use ($scode_arr) {
-                $pos_a = array_search($a['scode'], $scode_arr);
-                $pos_b = array_search($b['scode'], $scode_arr);
-                return $pos_a - $pos_b;
-            });
+        } elseif ($aucodes) {
+            $aucodes_arr = explode(',', $aucodes);
+
+            // 读取指定分类
+            if ($aucodes_arr) {
+                foreach ($out_data as $index => $value) {
+                    if (!in_array($value['aucode'], $aucodes_arr)) {
+                        unset($out_data[$index]);
+                    }
+                    if ($value['acode'] != get_frontend_lang()) {
+                        unset($out_data[$index]);
+                    }
+                }
+                // 将数组按照aucodes_arr的顺序排序
+                usort($out_data, function ($a, $b) use ($aucodes_arr) {
+                    $pos_a = array_search($a['aucode'], $aucodes_arr);
+                    $pos_b = array_search($b['aucode'], $aucodes_arr);
+                    return $pos_a - $pos_b;
+                });
+            }
         }
+
         $key = 0;
         $result = [];
         foreach ($out_data as $index => $value) { // 按查询的数据条数循环
@@ -127,6 +151,7 @@ class ContentSort extends Model
         }
         return $result;
     }
+
 
     /**
      * 分类栏目列表关系树
@@ -152,7 +177,6 @@ class ContentSort extends Model
                 ->select();
         } else {
             $result = self::alias('a')
-                ->where('a.acode', get_frontend_lang())
                 ->where('a.status', 1)
                 ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
                 ->field($fields)
