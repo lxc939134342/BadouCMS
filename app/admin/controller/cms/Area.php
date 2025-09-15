@@ -27,6 +27,8 @@ class Area extends Base
 
     protected string|array $quickSearchField = ['id'];
 
+    protected $defaultOrder = 'ASC';
+
     /**
      * 默认排序
      * @var string|array

@@ -42,6 +42,8 @@ class Base extends Backend
             set_backend_lang($currentArea['acode']);
         }
         $this->assign('area_title', $currentArea['name']);
+        $this->assign('alist', $areaList);
+        $this->assign('atitle', $currentArea['name']);
         $this->assignconfig('acode', $acode);
         $this->assignconfig('alist', $areaList);
         $this->assignconfig('atitle', $currentArea['name']);

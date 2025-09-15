@@ -56,7 +56,7 @@ class Area extends Model
 
     public function areaList()
     {
-        $langs = $this->order('id DESC')->column('id,acode,name');
+        $langs = $this->order('id ASC')->column('id,acode,name');
         return $langs;
     }
 
