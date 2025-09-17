@@ -20,7 +20,7 @@
         <span class="lang-title">{$area_title}</span>
         <i class="layui-icon layui-icon-down layui-font-12"></i>
     </button>
-    <button class="layui-btn layui-bg-green" lay-event="add">
+    <button class="layui-btn layui-bg-green {:$auth->check('cms.tags/add')?'':'hide'}" lay-event="add">
         <i class="fa fa-plus"></i>
         {:__('Add')}
     </button>

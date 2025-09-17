@@ -15,7 +15,7 @@
     <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	">
         <i class="fa fa-refresh"></i>
     </a>
-    <button class="layui-btn layui-bg-green" lay-event="add">
+    <button class="layui-btn layui-bg-green {:$auth->check('cms.area/add')?'':'hide'}" lay-event="add">
         <i class="fa fa-plus"></i>
         {:__('Add')}
     </button>

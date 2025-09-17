@@ -167,6 +167,7 @@ body {
     width: 100%;
     box-sizing: border-box;
 }
+
 button.login {
     height: 38px;
     line-height: 38px;
@@ -199,6 +200,14 @@ button.login {
 .layui-btn {
     border-radius: 4px;
     background-color: var(--primary-color);
+}
+
+.layui-form-checked[lay-skin="primary"] > i {
+    border-color: #ff6c02 !important;
+    background-color: #ff6c02;
+}
+.layui-form-checkbox[lay-skin="primary"]:hover > i {
+    border-color: #ff6c02;
 }
 
 @media (min-width: 992px) and (max-width: 1200px) {

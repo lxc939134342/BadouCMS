@@ -9,7 +9,7 @@
         <span class="lang-title">{$area_title}</span>
         <i class="layui-icon layui-icon-down layui-font-12"></i>
     </button>
-    <button class="layui-btn btn-theme-color" lay-event="add">
+    <button class="layui-btn btn-theme-color {:$auth->check('cms.content_sort/add')?'':'hide'}" lay-event="add">
         <i class="fa fa-plus"></i>
         {:__('Add')}
     </button>
@@ -19,11 +19,11 @@
         <i class="fa fa-pencil"></i>
         {:__('Edit')}
     </button>
-    <button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del">
+    <button class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('cms.content_sort/del')?'':'hide'}" lay-event="del">
         <i class="fa fa-trash"></i>
         {:__('Del')}
     </button>
-    <a href="{:url('cms.content_sort/batchadd')}" class="layui-btn layui-bg-green btn-dialog" data-area='["60%","80%"]'>
+    <a href="{:url('cms.content_sort/batchadd')}" class="layui-btn layui-bg-green btn-dialog {:$auth->check('cms.content_sort/batchadd')?'':'hide'}" data-area='["60%","80%"]'>
         <i class="fa fa-plus-square"></i>
         {:__('Batchadd')}
     </a>
@@ -56,7 +56,7 @@
             table: treeTable,
             extend: {
                 index_url: "cms.content_sort/index",
-                add_url: "cms.content_sort/add",
+                add_url: "cms.content_sort/addformtabs",
                 edit_url: "cms.content_sort/edit",
                 del_url: "cms.content_sort/del",
                 multi_url: "cms.content_sort/multi",

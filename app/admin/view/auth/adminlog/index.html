@@ -6,7 +6,7 @@
         <table
             class="layui-hide"
             id="adminlog"
-            data-operate-del="{:$auth->check('auth.admin/del')}"></table>
+            data-operate-del="{:$auth->check('auth.adminlog/del')}"></table>
     </div>
 </div>
 
@@ -15,7 +15,7 @@
     <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	">
         <i class="fa fa-refresh"></i>
     </a>
-    <button class="layui-btn layui-bg-red btn-disabled disabled" lay-event="del">
+    <button class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('auth.adminlog/del')?'':'hide'}" lay-event="del">
         <i class="fa fa-trash"></i>
         {:__('Del')}
     </button>

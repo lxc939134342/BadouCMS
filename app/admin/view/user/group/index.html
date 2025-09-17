@@ -16,17 +16,17 @@
     <a href="javascript:;" lay-event="refresh" class="layui-btn  btn-refresh layui-bg-black	">
         <i class="fa fa-refresh"></i>
     </a>
-    <button class="layui-btn  layui-bg-green" lay-event="add">
+    <button class="layui-btn layui-bg-green {:$auth->check('user.group/add')?'':'hide'}" lay-event="add">
         <i class="fa fa-plus"></i>
         {:__('Add')}
     </button>
     <button
-        class="layui-btn  layui-bg-blue btn-disabled disabled {:$auth->check('user.group/edit')?'':'hide'}"
+        class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('user.group/edit')?'':'hide'}"
         lay-event="edit">
         <i class="fa fa-pencil"></i>
         {:__('Edit')}
     </button>
-    <button class="layui-btn  layui-bg-red btn-disabled disabled" lay-event="del">
+    <button class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('user.group/del')?'':'hide'}" lay-event="del">
         <i class="fa fa-trash"></i>
         {:__('Del')}
     </button>
