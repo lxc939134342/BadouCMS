@@ -148,15 +148,15 @@ if (!function_exists('xss_clean')) {
      */
     function xss_clean(string $string): string
     {
-        $antiXss = new AntiXSS();
+        $config = \HTMLPurifier_Config::createDefault();
 
-        // 允许 style 属性（style="list-style-image: url(javascript:alert(0))" 任然可被正确过滤）
-        $antiXss->removeEvilAttributes(['style']);
+        // 安全设置
+        $config->set('CSS.AllowTricky', false);
+        $config->set('CSS.AllowImportant', false);
 
-        // 检查到 xss 代码之后使用 cleanXss 替换它
-        $antiXss->setReplacement('cleanXss');
-
-        return $antiXss->xss_clean($string);
+        $purifier = new \HTMLPurifier($config);
+        $clean_html = $purifier->purify($string);
+        return $clean_html;
     }
 }
 

@@ -154,8 +154,8 @@
                                 <div class="layui-col-md10">
                                     <label class="layui-form-label">站点统计码</label>
                                     <div class="layui-input-block">
-                                        <input type="text" name="row[statistical]" value="{$row.statistical}"
-                                            placeholder="请输入站点统计码" autocomplete="off" class="layui-input" />
+                                        <textarea class="layui-textarea" name="row[statistical]">{$row.statistical}</textarea>
+                                        <p class="help-block">不支持script标签，将被过滤</p>
                                     </div>
                                 </div>
                                 <div class="layui-col-md2 layui-hide-xs text-secondary">{literal}{$bd.sitestatistical}{/literal}</div>
