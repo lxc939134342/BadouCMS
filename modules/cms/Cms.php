@@ -39,6 +39,17 @@ class Cms
         return true;
     }
 
+    public function upgrade()
+    {
+        $config = include_once __DIR__ . '/config.php';
+        $configModel = new ConfigModel();
+        $configModel->setGroup('cms', 'CMS配置');
+        $configModel->setSysConfig($config, false);
+        $configModel::clear();
+
+        return true;
+    }
+
     public function uninstall()
     {
         Menu::delete('cms');

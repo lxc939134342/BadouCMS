@@ -51,22 +51,29 @@ class Detail extends Base
         $pre = $this->model::getContentPreNext($scodes, $this->contentInfo['id'], 'pre');
         $this->contentInfo = array_merge($this->contentInfo, $next, $pre);
 
-        $template = $this->contentSort['contenttpl'];
+        $this->site['sitekeywords'] = $this->contentInfo['keywords'] ? $this->contentInfo['keywords'] : $this->site['sitekeywords'];
+        $this->site['sitedescription'] = $this->contentInfo['description'] ? $this->contentInfo['description'] : $this->site['sitedescription'];
+        $this->contentInfo['sortlink'] = $this->contentSort['link'];
+        $this->view->assign('content', $this->contentInfo);
 
         $sorttitle = $this->contentSort['title'] ? $this->contentSort['title'] : $this->contentSort['name']; // 栏目标题
 
-        // 过滤空值避免多余的分隔符
-        $titleParts = array_filter([$this->contentInfo['title'], $sorttitle, $this->site['sitetitle'], $this->site['sitesubtitle']]);
-        $pagetitle = implode('-', $titleParts);
+        // 页面标题
+        $content_title = get_sys_config('content_title');
+        if ($content_title) {
+            $pagetitle = $this->view->display($content_title, ['sorttitle' => $sorttitle]);
+        } else {
+            // 过滤空值避免多余的分隔符
+            $titleParts = array_filter([$this->contentInfo['title'], $sorttitle, $this->site['sitetitle']]);
+            $pagetitle = implode('-', $titleParts);
+        }
 
-        $this->site['sitekeywords'] = $this->contentInfo['keywords'] ? $this->contentInfo['keywords'] : $this->site['sitekeywords'];
-        $this->site['sitedescription'] = $this->contentInfo['description'] ? $this->contentInfo['description'] : $this->site['sitedescription'];
         $this->site['pagetitle'] = $pagetitle;
         $this->site['pagedescription'] = $this->site['sitedescription'];
         $this->site['pagekeywords'] = $this->site['sitekeywords'];
-        $this->contentInfo['sortlink'] = $this->contentSort['link'];
+
         $this->assignBd();
-        $this->view->assign('content', $this->contentInfo);
+        $template = $this->contentSort['contenttpl'];
         return $this->view->fetch('/'.basename($template, '.html'));
     }
 

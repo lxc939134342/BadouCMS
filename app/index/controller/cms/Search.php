@@ -42,6 +42,15 @@ class Search extends Base
         $keyword = mb_substr($keyword, 0, 15);
         $this->view->assign('keyword', $keyword);
 
+        // 页面标题
+        $search_title = get_sys_config('search_title');
+        if ($search_title) {
+            $pagetitle = $this->view->display($search_title);
+        } else {
+            $pagetitle = '搜索-'.$this->site['sitetitle'];
+        }
+        $this->site['pagetitle'] = $pagetitle;
+        $this->assignBd();
         return $this->view->fetch('/'.basename($tpl, '.html'));
     }
 }

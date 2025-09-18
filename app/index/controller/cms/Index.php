@@ -18,9 +18,14 @@ class Index extends Base
 
     public function index()
     {
-        // 过滤空值避免多余的分隔符
-        $titleParts = array_filter([$this->site['sitetitle'], $this->site['sitesubtitle']]);
-        $pagetitle = implode('-', $titleParts);
+        $index_title = get_sys_config('index_title');
+        if ($index_title) {
+            $pagetitle = $this->view->display($index_title);
+        } else {
+            // 过滤空值避免多余的分隔符
+            $titleParts = array_filter([$this->site['sitetitle'], $this->site['sitesubtitle']]);
+            $pagetitle = implode('-', $titleParts);
+        }
 
         $this->site['pagetitle'] = $pagetitle;
         $this->site['pagedescription'] = $this->site['sitedescription'];

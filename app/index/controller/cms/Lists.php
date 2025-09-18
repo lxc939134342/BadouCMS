@@ -20,14 +20,20 @@ class Lists extends Base
     public function index(): string
     {
         $template = empty($this->contentSort['listtpl']) ? $this->contentSort['contenttpl'] : $this->contentSort['listtpl'];
-        $pagetitle = $this->contentSort['title'] ? $this->contentSort['title'] : $this->contentSort['name']; // 页面标题
-
-        // 过滤空值避免多余的分隔符
-        $titleParts = array_filter([$pagetitle, $this->site['sitetitle'], $this->site['sitesubtitle']]);
-        $pagetitle = implode('-', $titleParts);
 
         $this->site['sitekeywords'] = $this->contentSort['keywords'] ? $this->contentSort['keywords'] : $this->site['sitekeywords'];
         $this->site['sitedescription'] = $this->contentSort['description'] ? $this->contentSort['description'] : $this->site['sitedescription'];
+        $sorttitle = $this->contentSort['title'] ? $this->contentSort['title'] : $this->contentSort['name'];
+
+        // 页面标题
+        $list_title = get_sys_config('list_title');
+        if ($list_title) {
+            $pagetitle = $this->view->display($list_title, ['sorttitle' => $sorttitle]);
+        } else {
+            // 过滤空值避免多余的分隔符
+            $titleParts = array_filter([$sorttitle, $this->site['sitetitle']]);
+            $pagetitle = implode('-', $titleParts);
+        }
 
         $this->site['pagetitle'] = $pagetitle;
         $this->site['pagedescription'] = $this->site['sitedescription'];
