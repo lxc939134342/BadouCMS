@@ -503,10 +503,12 @@ class Content extends Model
                     }
                     break;
                 case 'ispics':
-                    $where[] = ["a.pics",'<>',""];
+                    $eq = $value ? '<>' : '=';
+                    $where[] = ["a.pics",$eq,""];
                     break;
                 case 'isico':
-                    $where[] = ["a.ico",'<>',""];
+                    $eq = $value ? '<>' : '=';
+                    $where[] = ["a.ico",$eq,""];
                     break;
                 case 'istop':
                     $where[] = ["a.istop",'=',$value];

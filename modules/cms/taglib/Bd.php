@@ -148,7 +148,7 @@ class Bd extends TagLib
         }
 
         $tags ? $params[] = '"tags"=>"'.$tags.'"' : '';
-        $filter ? $params[] = '"filter"=>'.$filter : '';
+        $filter ? $params[] = '"filter"=>"'.$filter.'"' : '';
         $order ? $params[] = '"order"=>"'.$order.'"' : '';
 
         $var     = Random::build('alnum', 10);
