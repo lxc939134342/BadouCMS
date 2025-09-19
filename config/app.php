@@ -31,10 +31,10 @@ return [
     ],
 
     // 异常页面的模板文件
-    'exception_tmpl'   => app()->getThinkPath() . 'tpl/think_exception.tpl',
+    'exception_tmpl'   => app()->getRootPath() . 'app'.DIRECTORY_SEPARATOR.'common'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'tpl'.DIRECTORY_SEPARATOR.'think_exception.tpl',
 
     // 错误显示信息,非调试模式有效
     'error_message'    => '页面错误！请稍后再试～',
     // 显示错误信息
-    'show_error_msg'   => true,
+    'show_error_msg'   => env('APP_DEBUG', 'true'),
 ];
