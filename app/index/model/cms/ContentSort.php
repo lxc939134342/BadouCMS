@@ -294,6 +294,13 @@ class ContentSort extends Model
         if (!isset($sorts[$scode])) {
             return false;
         }
+        // 检查自引用（父级等于自己）
+        if ($sorts[$scode]['pcode'] == $scode) {
+            // 发现自引用，直接返回当前分类编码
+            $this->position[] = $sorts[$scode];
+            return $scode;
+        }
+
         $this->position[] = $sorts[$scode];
         if ($sorts[$scode]['pcode']) {
             return $this->getTopParent($sorts[$scode]['pcode'], $sorts);
@@ -329,6 +336,15 @@ class ContentSort extends Model
             $this->scodes = [];  // 重置结果数组
             $sorts = $this->getSortList();
         }
+        // 检查自引用（父级等于自己）
+        if (isset($sorts[$scode]) && $sorts[$scode]['pcode'] == $scode) {
+            // 发现自引用，只添加当前分类并返回，避免递归调用
+            if (!in_array($scode, $this->scodes)) {
+                $this->scodes[] = $scode;
+            }
+            return $this->scodes;
+        }
+
         $this->scodes[] = $scode;
         // 查找所有直接子分类
         foreach ($sorts as $sort) {

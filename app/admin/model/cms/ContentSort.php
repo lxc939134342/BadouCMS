@@ -14,6 +14,7 @@ namespace app\admin\model\cms;
 
 use app\common\library\AdminAuth;
 use badou\Tree;
+use think\Exception;
 use think\Model;
 use think\facade\Db;
 use think\facade\Cache;
@@ -38,6 +39,24 @@ class ContentSort extends Model
         return $this->belongsTo(Models::class, 'mcode', 'mcode');
     }
 
+    public static function onBeforeUpdate($model)
+    {
+        $data = $model->getData();
+
+        // 检查父类不能是自己
+        if (isset($data['pcode']) && isset($data['scode']) && $data['pcode'] == $data['scode']) {
+            throw new Exception(__('The father column can not be yourself'));
+        }
+        // 检查父类不能是自己的子类
+        if (isset($data['pcode']) && isset($data['scode'])) {
+            $contentSort = new self();
+            $childrenIds = $contentSort->getChildrenIds($data['scode']);
+            if (in_array($data['pcode'], $childrenIds)) {
+                throw new Exception(__('The parent column cannot be its own sub-column'));
+            }
+        }
+    }
+
     public static function onAfterInsert($model)
     {
         $data = $model->getData();
@@ -53,6 +72,8 @@ class ContentSort extends Model
         $data = $model->getData();
         $type = Db::name('cms_model')->where('mcode', $data['mcode'])->value('type');
         $content = Db::name('cms_content')->where('scode', $data['scode'])->find();
+
+
         // 如果修改为单页并且跳转，则删除单页内容，否则判断是否存在内容，不存在则添加
         if ($type == 1 && $data['outlink']) {
             Db::name('cms_content')->where('scode', $data['scode'])->delete();
