@@ -109,5 +109,6 @@ return [
     'File is too big (%sMiB), Max filesize: %sMiB'          => '当前上传(%sM)，最大允许上传文件大小:%sM',
     'File'                                                  => '文件',
     'Can not open zip file'                                 => '无法打开 zip 文件',
+    'Record not found'                                      => '记录未找到'
 
 ];
