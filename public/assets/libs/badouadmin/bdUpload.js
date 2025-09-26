@@ -37,6 +37,7 @@ layui.define(['jquery', 'bdHttp', 'toast', 'upload', 'laytpl', 'layer', 'Sortabl
                     elem: that, // 绑定多个元素
                     url: url, // 此处配置你自己的上传接口即可
                     accept: options.accept, // 普通文件
+                    multiple: multiple ? true : false, // 支持多文件上传
                     done: function (res, index, upload) {
                         if (res.code == 1) {
                             bdUpload.events.onUploadSuccess.call(that, res.data, options);
