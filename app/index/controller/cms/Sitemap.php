@@ -50,13 +50,13 @@ class Sitemap extends Base
         return response($list, 200, [], 'xml');
     }
 
-    private function makeNode($link, $date, $priority = 0.60)
+    private function makeNode($link, $date, $priority = 0.60, $changefreq = 'always')
     {
         return [
-            'loc'      => empty($link) ? $this->request->domain() : $this->domainurl($link),
+            'loc'      => empty($link) ? $this->request->domain() : $this->domainurl(htmlspecialchars($link, ENT_XML1 | ENT_QUOTES, 'UTF-8')),
             'priority' => $priority,
             'lastmod' => $date,
-            'changefreq' => 'Always'
+            'changefreq' => $changefreq
         ];
     }
 
@@ -100,5 +100,4 @@ class Sitemap extends Base
         echo $str;
         exit;
     }
-
 }
