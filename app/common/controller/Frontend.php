@@ -153,8 +153,10 @@ class Frontend extends BaseController
         }
 
         $lang    = preg_match("/^([a-zA-Z\-_]{2,10})\$/i", $lang) ? $lang : 'zh-cn';
+        $lang = $lang == 'cn' ? 'zh-cn' : $lang;
+
         $langArr = $this->app->lang->load([
-            app_path() . 'lang' . DIRECTORY_SEPARATOR . $lang . DIRECTORY_SEPARATOR . (str_replace('.', DIRECTORY_SEPARATOR, $name)) . '.php',
+            app_path() . 'lang' . DIRECTORY_SEPARATOR . $lang . DIRECTORY_SEPARATOR . (str_replace('.', DIRECTORY_SEPARATOR, $name)) . '.php'
         ]);
         return $langArr;
     }

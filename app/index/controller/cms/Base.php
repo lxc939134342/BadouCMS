@@ -70,8 +70,12 @@ class Base extends Frontend
      */
     public function initialize(): void
     {
+        $lang = get_frontend_lang() == 'cn' ? 'zh-cn' : get_frontend_lang();
+        $this->app->lang->load([
+            app_path() . 'lang' . DIRECTORY_SEPARATOR . $lang . '.php'
+        ]);
         parent::initialize();
-        $this->loadlang('cms/index');
+
         $this->site = (new Site())->getSiteData();
         $this->company = (new Company())->getCompanyData();
         $this->label = (new Label())->getLabelData();
@@ -103,7 +107,6 @@ class Base extends Frontend
 
         $controllername = strtolower($this->request->controller());
         $this->loadlang($controllername, get_frontend_lang());
-        $this->loadlang('cms/index', get_frontend_lang());
     }
 
     /*获取分类信息*/
