@@ -84,6 +84,7 @@ class ContentSort extends Model
             ->whereOr(['a.scode' => $scode, 'a.filename' => $scode])
             ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
             ->join('user_level d', 'a.gid=d.id', 'LEFT')
+            ->where('acode', get_frontend_lang())
             ->find();
         if (!$info) {
             return false;
