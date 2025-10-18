@@ -22,6 +22,11 @@ use app\admin\model\UserLevel;
  */
 class Content extends Base
 {
+    protected $noNeedRight = ['getFieldHtml'];
+    /**
+     * @var \app\admin\model\cms\Content
+     */
+    protected $model;
     /**
      * Contentext模型对象
      * @var \app\admin\model\cms\ContentExt
@@ -38,6 +43,8 @@ class Content extends Base
     protected $quickSearchField = ['id','title'];
     // 开启关联查询
     protected $relationSearch = true;
+
+    protected $modelValidate = true;
 
     protected $multiFields = 'status,sorting,istop,isrecommend,isheadline';
 
@@ -141,7 +148,6 @@ class Content extends Base
     public function add()
     {
         if (!$this->isAjax()) {
-            $this->view->assign('custom_fields', $this->extfieldModel->getModelFields($this->mcode));
             return $this->view->fetch();
         }
         $data = $this->getPostData('row/a');
@@ -186,36 +192,18 @@ class Content extends Base
         ];
 
         $data = array_merge($default, $data);
-        // 确保 sorting 字段为有效整数，默认为 255
-        $data['sorting'] = isset($data['sorting']) && is_numeric($data['sorting']) ? intval($data['sorting']) : 255;
-
+        $data['sorting'] = $data['sorting'] ?? 255;
         $result = false;
         Db::startTrans();
         try {
             // 模型验证
             $this->modelValidateFunction($data);
 
-            if ($data['filename'] && ! preg_match('/^[a-zA-Z0-9\-_\/]+$/', $data['filename'])) {
-                throw new Exception(__('URL name only allows letters, numbers, lines, underscores'));
-            }
-
-            // 自动提起前一百个字符为描述
-            if (! $data['description'] && isset($data['content'])) {
-                $data['description'] = escape_string(clear_html_blank(substr_both(strip_tags($data['content']), 0, 150)));
-            }
-
-            // 无缩略图时，自动提取文章第一张图为缩略图
-            if (! $data['ico'] && preg_match('/<img\s+.*?src=\s?[\'|\"](.*?(\.gif|\.jpg|\.png|\.jpeg))[\'|\"].*?[\/]?>/i', decode_string($data['content']), $srcs) && isset($srcs[1])) {
-                $data['ico'] = $srcs[1];
-            }
-
             // 检查自定义URL名称
             if ($data['filename']) {
-                while ($this->model->checkFilename($data['filename'])) {
-                    $data['filename'] = $data['filename'] . '-' . mt_rand(1, 20);
-                }
+                $data['filename'] = $this->model->checkFilename($data['filename']);
             }
-
+            $data['aucode'] = $this->model->getUniqueAucode();
             $result = $this->model->save($data);
 
             /* 添加扩展数据 */
@@ -272,33 +260,16 @@ class Content extends Base
             $noFilterData = $this->request->post('row/a', '', 'trim');
             $data['content'] = isset($noFilterData['content']) ? xss_clean($noFilterData['content']) : '';
             $data['update_user'] = $this->auth->username;
-            // 确保 sorting 字段为有效整数，否则保持原值
-            $data['sorting'] = isset($data['sorting']) && is_numeric($data['sorting']) ? intval($data['sorting']) : $row['sorting'];
+            $data['sorting'] = $data['sorting'] ?? $row['sorting'];
             $result = false;
             $this->model->startTrans();
             try {
                 $data['id'] = $row['id'];
                 $this->modelValidateFunction($data);
 
-                if ($data['filename'] && ! preg_match('/^[a-zA-Z0-9\-_\/]+$/', $data['filename'])) {
-                    throw new Exception(__('URL name only allows letters, numbers, lines, underscores'));
-                }
-
-                // 自动提起前一百个字符为描述
-                if (! $data['description'] && isset($data['content'])) {
-                    $data['description'] = escape_string(clear_html_blank(substr_both(strip_tags($data['content']), 0, 150)));
-                }
-
-                // 无缩略图时，自动提取文章第一张图为缩略图
-                if (! $data['ico'] && preg_match('/<img\s+.*?src=\s?[\'|\"](.*?(\.gif|\.jpg|\.png|\.jpeg))[\'|\"].*?[\/]?>/i', decode_string($data['content']), $srcs) && isset($srcs[1])) {
-                    $data['ico'] = $srcs[1];
-                }
-
                 // 检查自定义URL名称
                 if ($data['filename']) {
-                    while ($this->model->checkFilename($data['filename'], [['id', '<>', $row['id']]])) {
-                        $data['filename'] = $data['filename'] . '-' . mt_rand(1, 20);
-                    }
+                    $data['filename'] = $this->model->checkFilename($data['filename']);
                 }
 
                 $result = $row->save($data);
@@ -323,7 +294,6 @@ class Content extends Base
             }
         }
 
-        $this->view->assign('custom_fields', $this->extfieldModel->getModelFields($this->mcode));
         $this->assign('row', $row);
         return $this->view->fetch();
     }
@@ -367,5 +337,71 @@ class Content extends Base
         }
         $this->model->moveContent($ids, $scode);
         $this->success(__('Move successful'));
+    }
+
+    public function getFieldHtml()
+    {
+        $id = $this->request->param('id');
+        $acode = $this->request->param('content_acode', get_backend_lang());
+        $mcode = $this->request->param('mcode');
+        if (!$mcode) {
+            $this->error(__('Invalid parameters'));
+        }
+        if ($id) {
+            $rowitem = $this->model->find($id);
+            /* 获取扩展数据 */
+            $extRow = $this->contentExtModel->where('contentid', $rowitem['id'])->find();
+            if ($extRow) {
+                /* 合并数据 */
+                $extRowArr = $extRow->toArray();
+                $extRowArr = $this->contentExtModel->formatValue($this->mcode, $extRowArr);
+                $rowitem->appendData($extRowArr);
+            }
+        }
+
+        $custom_fields = [];
+        $custom_fields = $this->extfieldModel->getModelFields($this->mcode);
+        if ($custom_fields) {
+            foreach ($custom_fields as $key => $field) {
+                $custom_fields[$key]['form_name'] = 'row['.$field['name'].']';
+                $custom_fields[$key]['form_id'] = $field['name'];
+                $custom_fields[$key]['form_value'] = $rowitem[$field['name']] ??  '';
+                $custom_fields[$key]['form_acode'] = $acode;
+            }
+        }
+        $this->view->assign('custom_fields', $custom_fields);
+        $this->view->assign('row', $rowitem);
+
+        // p($custom_fields);
+
+        $this->success('', null, ['html' => $this->view->fetch('cms/common/builder/fields')]);
+    }
+
+    /**
+     * 选择内容
+     */
+    public function selectpage()
+    {
+        $custom = (array)$this->request->request("custom/a");
+        $where = [
+            'acode' => $custom['acode'],
+        ];
+
+        if (isset($custom['mcode']) && $custom['mcode']) {
+            // 获取属于指定模型的所有栏目代码
+            $contentsortModel = new \app\admin\model\cms\ContentSort();
+            $scodeList = $contentsortModel->where('mcode', $custom['mcode'])->column('scode');
+
+            if (!empty($scodeList)) {
+                $where[] = ['scode', 'in', $scodeList];
+            }
+        }
+
+        $res = $this->model
+            ->where($where)
+            ->order('id', 'desc')
+            ->select();
+
+        $this->success('ok', '', ['list' => $res, 'total' => $res->count()]);
     }
 }

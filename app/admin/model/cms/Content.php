@@ -28,6 +28,19 @@ class Content extends Model
 
     protected $dateFormat = 'Y-m-d H:i:s';
 
+    // 模型事件
+    public static function onBeforeWrite($model)
+    {
+        $data = $model->getData();
+        if (empty($data['description']) && isset($data['content'])) {
+            $data['description'] = self::extractDescription($data['content']);
+        }
+
+        if (empty($data['ico']) && isset($data['content'])) {
+            $data['ico'] = self::extractThumbnail($data['content']);
+        }
+    }
+
     public function contentsort()
     {
         return $this->belongsTo(ContentSort::class, 'scode', 'scode');
@@ -76,12 +89,32 @@ class Content extends Model
     }
 
     // 检查自定义URL名称
-    public function checkFilename($filename, $where = array())
+    public function checkFilename($filename, $where = [])
     {
-        return $this->field('id')
-            ->where("filename='$filename'")
-            ->where($where)
-            ->find();
+        do {
+            $exists = $this->field('id')
+                ->where("filename='$filename'")
+                ->where($where)
+                ->count();
+            $filename .= '-' . mt_rand(1, 20);
+        } while ($exists);
+
+        return $filename;
+    }
+
+    /**
+     * 生成一个唯一的aucode
+     * @return string
+     */
+    public function getUniqueAucode(): string
+    {
+        $aucode = $this->order('aucode', 'desc')->value('aucode');
+        do {
+            $aucode = (int)$aucode + 1;
+            $exists = $this->where('aucode', $aucode)->count();
+        } while ($exists);
+
+        return $aucode;
     }
 
     /**
@@ -131,5 +164,37 @@ class Content extends Model
             ->where('id', 'in', $id)
             ->update(['scode' => $scode]);
     }
+
+    /**
+     * 自动提取描述
+     * @param string $content 内容
+     * @return string
+     */
+    public static function extractDescription($content)
+    {
+        if (!$content) {
+            return '';
+        }
+        return escape_string(clear_html_blank(substr_both(strip_tags($content), 0, 150)));
+    }
+
+    /**
+     * 自动提取缩略图
+     * @param string $content 内容
+     * @return string
+     */
+    public static function extractThumbnail($content)
+    {
+        if (!$content) {
+            return '';
+        }
+
+        if (preg_match('/<img\s+.*?src=\s?[\'|\"](.*?(\.gif|\.jpg|\.png|\.jpeg))[\'|\"].*?[\/]?>/i', decode_string($content), $srcs) && isset($srcs[1])) {
+            return $srcs[1];
+        }
+
+        return '';
+    }
+
 
 }

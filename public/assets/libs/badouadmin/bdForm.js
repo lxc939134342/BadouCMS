@@ -16,6 +16,7 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'co
         events: {
             //绑定事件
             bindevent: function (layform) {
+                form.render()
                 //绑定上传组件
                 bdUpload.render()
                 //绑定颜色选择器事件
@@ -185,17 +186,49 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'co
                         var textarea = $("textarea[name='" + name + "']", form);
                         var template = container.data("template");
                         console.log(template);
-                        $.each($("input,select,textarea", container).serializeArray(), function (i, j) {
-                            var reg = /\[(\w+)\]\[(\w+)\]$/g;
-                            var match = reg.exec(j.name);
-                            if (!match)
-                                return true;
-                            match[1] = "x" + parseInt(match[1]);
-                            if (typeof data[match[1]] == 'undefined') {
-                                data[match[1]] = {};
+                        // 新的解析函数，能够处理任意层级的嵌套结构
+                        var parseFieldName = function (fieldName) {
+                            // 提取所有 [...] 中的内容
+                            var matches = fieldName.match(/\[([^\]]+)\]/g);
+                            if (!matches || matches.length < 2) {
+                                return null; // 至少需要两个层级才能处理
                             }
-                            data[match[1]][match[2]] = j.value;
+
+                            // 提取匹配的内容
+                            var parts = matches.map(function (match) {
+                                return match.substring(1, match.length - 1); // 去掉 [ 和 ]
+                            });
+
+                            // 最后一个部分是 key，倒数第二个部分是 index
+                            var key = parts[parts.length - 1];
+                            var index = parts[parts.length - 2];
+
+                            // 构建前缀路径，用于标识这个字段所属的数据结构
+                            var prefix = parts.slice(0, -2).join('[');
+                            if (prefix) prefix += ']';
+
+                            return {
+                                key: key,
+                                index: index,
+                                prefix: prefix
+                            };
+                        };
+
+                        $.each($("input,select,textarea", container).serializeArray(), function (i, j) {
+                            var parsed = parseFieldName(j.name);
+                            if (!parsed) {
+                                return true; // 跳过无法解析的字段名
+                            }
+
+                            // 构建数据结构的唯一标识
+                            var dataKey = parsed.prefix + '[x' + parseInt(parsed.index) + ']';
+
+                            if (typeof data[dataKey] == 'undefined') {
+                                data[dataKey] = {};
+                            }
+                            data[dataKey][parsed.key] = j.value;
                         });
+
                         //使用数组保存
                         var usearray = container.data("usearray") || false;
                         //保留空数据

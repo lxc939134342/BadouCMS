@@ -41,8 +41,20 @@ class Base extends Backend
             $currentArea = $areaModel->defaultArea();
             set_backend_lang($currentArea['acode']);
         }
+
+        // 重新排序 areaList，将当前语言排在第一个
+        $curralist = [
+            $currentArea
+        ];
+        foreach ($areaList as $key => $item) {
+            if ($item['acode'] != $acode) {
+                $curralist[] = $item;
+            }
+        }
+
         $this->assign('area_title', $currentArea['name']);
         $this->assign('alist', $areaList);
+        $this->assign('curralist', $curralist);
         $this->assign('atitle', $currentArea['name']);
         $this->assignconfig('acode', $acode);
         $this->assignconfig('alist', $areaList);
