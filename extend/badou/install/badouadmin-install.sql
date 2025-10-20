@@ -459,10 +459,10 @@ CREATE TABLE `bd_cms_area` (
 -- Records of bd_cms_area
 -- ----------------------------
 BEGIN;
-INSERT INTO `bd_cms_area` (`id`, `acode`, `pcode`, `name`, `domain`, `is_default`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (4, 'en', '0', 'English', '', '0', 'admin', 'Admin', '2023-02-02 21:20:40', '2025-06-27 15:58:10',1);
-INSERT INTO `bd_cms_area` (`id`, `acode`, `pcode`, `name`, `domain`, `is_default`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (5, 'oe', '0', '德文', '', '0', 'admin', 'admin', '2024-08-19 06:06:25', '2025-06-08 18:32:48',1);
-INSERT INTO `bd_cms_area` (`id`, `acode`, `pcode`, `name`, `domain`, `is_default`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (1, 'cn', '', '中文', '', '1', 'Admin', 'admin', '2024-09-22 08:02:37', '2025-06-14 22:56:34',1);
-INSERT INTO `bd_cms_area` (`id`, `acode`, `pcode`, `name`, `domain`, `is_default`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (13, 'jp', '0', '日文', '', '0', 'admin', 'admin', '2025-06-08 18:33:14', '2025-06-08 18:33:22',1);
+INSERT INTO `bd_cms_area` (`id`, `acode`, `pcode`, `name`, `domain`, `is_default`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (4, 'en', '0', 'English', '', '0', 'admin', 'Admin', '2023-02-02 21:20:40', '2025-06-27 15:58:10');
+INSERT INTO `bd_cms_area` (`id`, `acode`, `pcode`, `name`, `domain`, `is_default`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (5, 'oe', '0', '德文', '', '0', 'admin', 'admin', '2024-08-19 06:06:25', '2025-06-08 18:32:48');
+INSERT INTO `bd_cms_area` (`id`, `acode`, `pcode`, `name`, `domain`, `is_default`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (1, 'cn', '', '中文', '', '1', 'Admin', 'admin', '2024-09-22 08:02:37', '2025-06-14 22:56:34');
+INSERT INTO `bd_cms_area` (`id`, `acode`, `pcode`, `name`, `domain`, `is_default`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (13, 'jp', '0', '日文', '', '0', 'admin', 'admin', '2025-06-08 18:33:14', '2025-06-08 18:33:22');
 COMMIT;
 
 -- ----------------------------
