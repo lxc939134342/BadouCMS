@@ -29,7 +29,7 @@ class Content extends Model
     protected $dateFormat = 'Y-m-d H:i:s';
 
     // 模型事件
-    public static function onBeforeWrite($model)
+    public static function onBeforeInsert($model)
     {
         $data = $model->getData();
         if (empty($data['description']) && isset($data['content'])) {
