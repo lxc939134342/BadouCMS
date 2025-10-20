@@ -21,7 +21,8 @@
             <div class="layui-tabs-body">
                 <div class="layui-tabs-item">
                     <form class="layui-form layui-form-content" action="{:url('cms.label/content')}" method="post">
-                        {:token_field()} {include file="cms/common/builder/fields" /}
+                        {:token_field()}
+                        <div id="extend"></div>
                         <div class="layui-form-item">
                             <div class="layui-input-block">
                                 <button class="layui-btn btn-theme-color" lay-filter="content" lay-submit>保存</button>
@@ -46,9 +47,19 @@
         var changeLang = layui.changeLang;
         changeLang({
             click: function (obj) {
-                top.$(".refresh").trigger("click");
+                getFieldHtml()
             },
         });
+
+        function getFieldHtml(){
+            badou.api.ajax({
+                url: 'cms.label/getFieldHtml'
+            }, function (data) {
+                $("#extend").html(data.html)
+                bdForm.api.bindevent($("#extend"));
+                return false;
+            })
+        }
 
         $(".list-dialog").on("click", function (e) {
             e.preventDefault();
@@ -56,14 +67,18 @@
             badou.api.open(url, "标签列表", {
                 area: ["80%", "80%"],
                 end: function () {
-                    top.$(".refresh").trigger("click");
+                    getFieldHtml()
                 }
             });
         });
 
         $(".btn-refresh").on("click", function () {
-            top.$(".refresh").trigger("click");
+            getFieldHtml()
         });
+
+
+
+        getFieldHtml()
 
         bdForm.api.bindevent($("form.layui-form-content"));
     });

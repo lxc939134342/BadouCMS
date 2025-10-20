@@ -27,6 +27,7 @@ class Label extends Base
     protected $model;
     protected string|array $quickSearchField = ['id'];
     protected $modelValidate = true;
+    protected $noNeedRight = ['getFieldHtml'];
 
     public function initialize(): void
     {
@@ -87,20 +88,6 @@ class Label extends Base
             Cache::delete('cms_label');
             $this->success(__('Update successful'));
         }
-        $fields = $this->model
-            ->where('acode', get_backend_lang())
-            ->field('id,name,value,description,type')
-            ->order('id', 'desc')
-            ->select()->toArray();
-        $typeListComponentMap = $this->model->typeListComponentMap();
-        $row = [];
-        foreach ($fields as $k => $v) {
-            $fields[$k]['component'] = $typeListComponentMap[$v['type']];
-            $row[$v['name']] = $v['value'];
-        }
-        $this->view->assign('custom_fields', $fields);
-        $this->view->assign('row', $row);
-
         return $this->view->fetch();
     }
 
@@ -180,5 +167,30 @@ class Label extends Base
         }
         $this->view->assign('row', $row);
         return $this->view->fetch();
+    }
+
+    public function getFieldHtml()
+    {
+        $fields = $this->model
+            ->where('acode', get_backend_lang())
+            ->field('id,name,value,description,type')
+            ->order('id', 'desc')
+            ->select()->toArray();
+        $typeListComponentMap = $this->model->typeListComponentMap();
+        $row = [];
+        foreach ($fields as $k => $v) {
+            $fields[$k]['component'] = $typeListComponentMap[$v['type']];
+            $row[$v['name']] = $v['value'];
+            $fields[$k]['form_name'] = 'row['.$v['name'].']';
+            $fields[$k]['form_id'] = $v['name'];
+            $fields[$k]['form_value'] = $row[$v['name']] ??  '';
+            $fields[$k]['form_acode'] = $v;
+        }
+        $this->view->assign('custom_fields', $fields);
+        $this->view->assign('row', $row);
+
+        // p($custom_fields);
+
+        $this->success('', null, ['html' => $this->view->fetch('cms/common/builder/fields')]);
     }
 }
