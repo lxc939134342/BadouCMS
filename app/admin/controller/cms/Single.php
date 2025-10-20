@@ -125,19 +125,6 @@ class Single extends Base
                 if ($data['filename']) {
                     $data['filename'] = $this->model->checkFilename($data['filename']);
                 }
-                $rowRes = [];
-                /* 如果设置了通用编码，表示有关联其他语言的数据 */
-                if ($row['aucode']) {
-                    $rowAll = $this->model
-                        ->where('aucode', $row['aucode'])
-                        ->where('id', '<>', $row['id'])
-                        ->select();
-                    foreach ($rowAll as $key => $value) {
-                        $rowRes[$value['acode']] = $value;
-                    }
-                } else { // 设置一个默认的通用编码，以便后续关联其他语言
-                    $data['aucode'] = $this->model->getUniqueAucode();
-                }
 
                 $result = $row->save($data);
                 /* 添加扩展数据 */
