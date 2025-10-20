@@ -24,6 +24,8 @@ class Single extends Base
     */
     protected $contentExtModel;
 
+    protected $noNeedRight = ['getFieldHtml'];
+
     public function initialize(): void
     {
         parent::initialize();
@@ -46,6 +48,8 @@ class Single extends Base
         }
 
         $contentsortModel = new \app\admin\model\cms\ContentSort();
+        $modelsModel = new \app\admin\model\cms\Models();
+        $mcodes = $modelsModel->getMcodesOfType(1);
 
         list($where, $sort, $order, $offset, $limit, $page, $alias, $bind) = $this->buildparams();
         foreach ($where as &$whereitem) {
@@ -62,15 +66,11 @@ class Single extends Base
             }
         }
         unset($whereitem);
-        if ($this->mcode) {
-            $where[] = [
-                'contentsort.mcode',
-                '=',
-                $this->mcode
-            ];
-        }
         $where[] = [
-            'content.acode','=',get_backend_lang()
+            'contentsort.mcode','in',$mcodes
+        ];
+        $where[] = [
+            'content.acode','=',get_backend_lang(),
         ];
 
         /* 查询子栏目数据 */
@@ -121,25 +121,22 @@ class Single extends Base
                 $data['id'] = $row['id'];
                 $this->modelValidateFunction($data);
 
-                if ($data['filename'] && ! preg_match('/^[a-zA-Z0-9\-_\/]+$/', $data['filename'])) {
-                    throw new Exception(__('URL name only allows letters, numbers, lines, underscores'));
-                }
-
-                // 自动提起前一百个字符为描述
-                if (! $data['description'] && isset($data['content'])) {
-                    $data['description'] = escape_string(clear_html_blank(substr_both(strip_tags($data['content']), 0, 150)));
-                }
-
-                // 无缩略图时，自动提取文章第一张图为缩略图
-                if (! $data['ico'] && preg_match('/<img\s+.*?src=\s?[\'|\"](.*?(\.gif|\.jpg|\.png|\.jpeg))[\'|\"].*?[\/]?>/i', decode_string($data['content']), $srcs) && isset($srcs[1])) {
-                    $data['ico'] = $srcs[1];
-                }
-
                 // 检查自定义URL名称
                 if ($data['filename']) {
-                    while ($this->model->checkFilename($data['filename'])) {
-                        $data['filename'] = $data['filename'] . '-' . mt_rand(1, 20);
+                    $data['filename'] = $this->model->checkFilename($data['filename']);
+                }
+                $rowRes = [];
+                /* 如果设置了通用编码，表示有关联其他语言的数据 */
+                if ($row['aucode']) {
+                    $rowAll = $this->model
+                        ->where('aucode', $row['aucode'])
+                        ->where('id', '<>', $row['id'])
+                        ->select();
+                    foreach ($rowAll as $key => $value) {
+                        $rowRes[$value['acode']] = $value;
                     }
+                } else { // 设置一个默认的通用编码，以便后续关联其他语言
+                    $data['aucode'] = $this->model->getUniqueAucode();
                 }
 
                 $result = $row->save($data);
@@ -165,8 +162,50 @@ class Single extends Base
             }
         }
 
-        $this->view->assign('custom_fields', $this->extfieldModel->getModelFields($this->mcode));
         $this->assign('row', $row);
         return $this->view->fetch();
+    }
+
+    public function getFieldHtml()
+    {
+        $id = $this->request->param('id');
+        $acode = $this->request->param('content_acode', get_backend_lang());
+        $mcode = $this->request->param('mcode');
+        $scode = $this->request->param('scode');
+        if (!$mcode && !$scode) {
+            $this->error(__('Invalid parameters'));
+        }
+        if (!$mcode) {
+            $contentSortModel = new \app\admin\model\cms\ContentSort();
+            $mcode = $contentSortModel::where('scode', $scode)->value('mcode');
+        }
+        if ($id) {
+            $rowitem = $this->model->find($id);
+            /* 获取扩展数据 */
+            $extRow = $this->contentExtModel->where('contentid', $rowitem['id'])->find();
+            if ($extRow) {
+                /* 合并数据 */
+                $extRowArr = $extRow->toArray();
+                $extRowArr = $this->contentExtModel->formatValue($mcode, $extRowArr);
+                $rowitem->appendData($extRowArr);
+            }
+        }
+
+        $custom_fields = [];
+        $custom_fields = $this->extfieldModel->getModelFields($mcode);
+        if ($custom_fields) {
+            foreach ($custom_fields as $key => $field) {
+                $custom_fields[$key]['form_name'] = 'row['.$field['name'].']';
+                $custom_fields[$key]['form_id'] = $field['name'];
+                $custom_fields[$key]['form_value'] = $rowitem[$field['name']] ??  '';
+                $custom_fields[$key]['form_acode'] = $acode;
+            }
+        }
+        $this->view->assign('custom_fields', $custom_fields);
+        $this->view->assign('row', $rowitem);
+
+        // p($custom_fields);
+
+        $this->success('', null, ['html' => $this->view->fetch('cms/common/builder/fields')]);
     }
 }

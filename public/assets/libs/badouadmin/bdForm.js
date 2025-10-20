@@ -241,6 +241,7 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'co
                         if (isassociative && keys.length === 2) {
                             result = {};
                         }
+
                         $.each(data, function (i, j) {
                             if (j) {
                                 if (isassociative) {
@@ -248,7 +249,6 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'co
                                         if (j.key != '' || keepempty) {
                                             result['__PLACEHOLDKEY__' + j.key] = j.value;
                                         }
-                                        console.log(result);
                                     } else {
                                         //一维数组
                                         result.push(j.value);

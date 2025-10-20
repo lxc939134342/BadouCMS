@@ -86,7 +86,7 @@
                 </div>
             </div>
 
-            {include file="cms/common/builder/fields" /}
+            <div id="extend"></div>
 
             <div class="layui-form-item">
                 <label class="layui-form-label">内容</label>
@@ -256,6 +256,27 @@
     layui.use(["badou"], function () {
         var bdForm = layui.bdForm;
 
+        function getFieldHtml(id,scode){
+            badou.api.ajax({
+                url: 'cms.single/getFieldHtml',
+                data: {id: id,mcode:'{$mcode}',scode:scode}
+            }, function (data) {
+                $("#extend").html(data.html)
+                bdForm.api.bindevent($("#extend"));
+                return false;
+            },function(){
+                return false;
+            });
+        }
+
+        getFieldHtml('{$row["id"]}','{$row["scode"]}');
+        $(document).on('change', '#c-scode', function () {
+            var scode=$(this).val();
+            if(!scode){
+                return false;
+            }
+            getFieldHtml('',scode);
+        })
         bdForm.api.bindevent($("form.layui-form"));
     });
 </script>

@@ -12,8 +12,9 @@
 
 namespace app\admin\controller\cms;
 
-use Exception;
+use app\admin\model\cms\Models;
 use Throwable;
+use badou\Tree;
 use think\facade\Db;
 use app\admin\model\UserLevel;
 
@@ -22,7 +23,7 @@ use app\admin\model\UserLevel;
  */
 class Content extends Base
 {
-    protected $noNeedRight = ['getFieldHtml'];
+    protected $noNeedRight = ['getFieldHtml','getContentSort'];
     /**
      * @var \app\admin\model\cms\Content
      */
@@ -78,6 +79,8 @@ class Content extends Base
         }
 
         $contentsortModel = new \app\admin\model\cms\ContentSort();
+        $modelsModel = new \app\admin\model\cms\Models();
+        $mcodes = $modelsModel->getMcodesOfType(2);
 
         list($where, $sort, $order, $offset, $limit, $page, $alias, $bind) = $this->buildparams();
         foreach ($where as &$whereitem) {
@@ -94,16 +97,8 @@ class Content extends Base
             }
         }
         unset($whereitem);
-        if ($this->mcode) {
-            $where[] = [
-                'contentsort.mcode',
-                '=',
-                $this->mcode
-            ];
-        }
-        $where[] = [
-            'content.acode','=',get_backend_lang()
-        ];
+        $where[] = ['contentsort.mcode','in',$mcodes];
+        $where[] = ['content.acode','=',get_backend_lang()];
 
         /* 查询子栏目数据 */
         $res = $this->model
@@ -344,8 +339,13 @@ class Content extends Base
         $id = $this->request->param('id');
         $acode = $this->request->param('content_acode', get_backend_lang());
         $mcode = $this->request->param('mcode');
-        if (!$mcode) {
+        $scode = $this->request->param('scode');
+        if (!$mcode && !$scode) {
             $this->error(__('Invalid parameters'));
+        }
+        if (!$mcode) {
+            $contentSortModel = new \app\admin\model\cms\ContentSort();
+            $mcode = $contentSortModel::where('scode', $scode)->value('mcode');
         }
         if ($id) {
             $rowitem = $this->model->find($id);
@@ -354,13 +354,13 @@ class Content extends Base
             if ($extRow) {
                 /* 合并数据 */
                 $extRowArr = $extRow->toArray();
-                $extRowArr = $this->contentExtModel->formatValue($this->mcode, $extRowArr);
+                $extRowArr = $this->contentExtModel->formatValue($mcode, $extRowArr);
                 $rowitem->appendData($extRowArr);
             }
         }
 
         $custom_fields = [];
-        $custom_fields = $this->extfieldModel->getModelFields($this->mcode);
+        $custom_fields = $this->extfieldModel->getModelFields($mcode);
         if ($custom_fields) {
             foreach ($custom_fields as $key => $field) {
                 $custom_fields[$key]['form_name'] = 'row['.$field['name'].']';
@@ -403,5 +403,37 @@ class Content extends Base
             ->select();
 
         $this->success('ok', '', ['list' => $res, 'total' => $res->count()]);
+    }
+
+    public function getContentSort()
+    {
+        $contentSortModel = new \app\admin\model\cms\ContentSort();
+        $modelsModel = new Models();
+        $tree = Tree::instance(['childname' => 'children']);
+        $acode = $this->request->param('acode', get_backend_lang());
+
+        $where[] = [
+            'acode','=',$acode
+        ];
+        $where[] = [
+            'mcode','in',$modelsModel->getMcodesOfType(2)
+        ];
+
+        $res = $contentSortModel
+            ->where($where)
+            ->order('sorting asc,id desc')
+            ->select();
+        $res->each(function ($item) {
+            $item->spread = true;
+        });
+
+        /**
+         * 树状表格必看注释一
+         * 1. 获取表格数据（没有分页，所以简化了以上的数据查询代码）
+         * 2. 递归的根据指定字段组装 children 数组，此时直接给前端，表格就可以正常的渲染为树状了，一个方法搞定
+         */
+        $list = $tree->init($res->toArray(), 'pcode', null, 'scode')->multipleChild();
+
+        $this->success('ok', '', ['list' => $list, 'total' => $res->count()]);
     }
 }

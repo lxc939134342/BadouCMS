@@ -20,7 +20,7 @@
                         data-source="cms.content_sort/selectpage"
                         data-is-tree="true"
                         data-pidname="pcode"
-                        data-params='{"acode":"{$acode}","mcode":"{$mcode}"}'></div>
+                        data-params='{"acode":"{$acode}"}'></div>
                 </div>
             </div>
             <div class="layui-form-item">
@@ -370,18 +370,27 @@
         var bdForm = layui.bdForm;
         var badou=layui.badou;
 
-        function getFieldHtml(id){
+        function getFieldHtml(id,scode){
             badou.api.ajax({
                 url: 'cms.content/getFieldHtml',
-                data: {id: id,mcode:'{$mcode}'}
+                data: {id: id,mcode:'{$mcode}',scode:scode}
             }, function (data) {
                 $("#extend").html(data.html)
                 bdForm.api.bindevent($("#extend"));
                 return false;
-            })
+            },function(){
+                return false;
+            });
         }
 
-        getFieldHtml('{$row["id"]}')
+        getFieldHtml('{$row["id"]}','{$row["scode"]}');
+        $(document).on('change', '#c-scode', function () {
+            var scode=$(this).val();
+            if(!scode){
+                return false;
+            }
+            getFieldHtml('',scode);
+        })
 
         bdForm.api.bindevent($("form.layui-form"));
     });
