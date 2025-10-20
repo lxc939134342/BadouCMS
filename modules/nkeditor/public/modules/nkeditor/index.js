@@ -161,9 +161,7 @@ KindEditor.ready(function (K) {
             };
         });
 
-        var _bindevent = layui.bdForm.events.bindevent;
-        layui.bdForm.events.bindevent = function (form) {
-            _bindevent.apply(this, [form]);
+        function loadEditor() {
             K.create(".editor", {
                 dialogOffset: 0, //对话框距离页面顶部的位置，默认为0居中，
                 allowFileManager: true,
@@ -299,6 +297,14 @@ KindEditor.ready(function (K) {
                     }
                 },
             });
+        }
+
+        loadEditor();
+        var _bindevent = layui.bdForm.events.bindevent;
+
+        layui.bdForm.events.bindevent = function (layform) {
+            _bindevent.apply(this, [layform]);
+            loadEditor();
         }
     });
 });

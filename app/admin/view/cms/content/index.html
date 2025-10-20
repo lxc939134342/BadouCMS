@@ -1,5 +1,6 @@
 {layout name="layout/default" /}
 <style>
+    /* 栏目树样式 */
     #contentSortTree .layui-tree-icon .layui-icon{font-size: 12px !important;}
     #contentSortTree .layui-tree-entry{
         box-sizing: content-box;
@@ -17,14 +18,76 @@
         font-weight: 600;
         color: #333;
     }
+
+    /* 容器 */
+    .contentSortTreeBox{
+        position: relative;
+        height: calc(100% - 45px);
+    }
+
+    /* 开关按钮（宽度 15px，便于点击） */
+    .contentSortTreeBox .on-off {
+        cursor: pointer;
+        position: absolute;
+        text-align: center;
+        display: block;
+        right: 0;
+        top: 50%;
+        margin-top: -13px;
+        width: 15px;
+        height: 26px;
+        line-height: 26px;
+        background-color:var(--primary-color);
+        border-radius: 4px 0 0 4px;
+        transition: right .25s ease, border-radius .25s ease, transform .25s ease;
+        z-index: 5;
+    }
+    .contentSortTreeBox .on-off .fa{
+        color: #fff;
+    }
+
+    .layui-col-md2.collapsed{
+        flex: 0 0 0;
+        width: 0;
+        min-width: 0;
+        overflow: visible;
+        padding: 0;
+    }
+    .layui-col-md2.collapsed .layui-card-header,
+    .layui-col-md2.collapsed #contentSortTree{
+        display: none;
+        opacity: 0;
+    }
+    .layui-col-md2.collapsed .contentSortTreeBox{
+        padding: 0;
+    }
+    .layui-col-md2.collapsed .contentSortTreeBox .on-off{
+        right: -20px;
+        border-radius: 0 4px 4px 0;
+    }
+
+    /* 折叠时右侧区域占满剩余宽度（100%） */
+    .layui-col-md2.collapsed ~ .layui-col-md10,
+    .layui-col-md2.collapsed + .layui-col-md10{
+        flex: 1 0 100%;
+        max-width: 100%;
+    }
+
+    /* 让树区域淡入淡出 */
+    #contentSortTree{
+        transition: opacity .18s ease;
+    }
 </style>
 <script src="__CDN__/modules/cms/js/change_lang.js"></script>
 <div class="layui-row layui-col-space10 d-flex">
     <div class="layui-col-md2">
         <div class="layui-card h-100">
             <div class="layui-card-header" style="background-color: #e9e9f0;">栏目列表</div>
-            <div class="layui-card-body">
+            <div class="layui-card-body contentSortTreeBox">
                 <div id="contentSortTree"></div>
+                <div class="on-off">
+                    <i class="fa fa-angle-left"></i>
+                </div>
             </div>
         </div>
     </div>
@@ -265,6 +328,37 @@
                 area: ["550px", "500px"],
             });
             return false;
+        });
+
+        // 切换左侧栏目树显示
+        var storageKey = 'cms.content.left.collapsed';
+        // 读取缓存状态并应用
+        var initCollapsed = localStorage.getItem(storageKey) === '1';
+        if(initCollapsed){
+            $('.layui-col-md2').addClass('collapsed');
+            $('.contentSortTreeBox .on-off').addClass('collapsed').find('i.fa').removeClass('fa-angle-left').addClass('fa-angle-right');
+        }
+        // 绑定点击事件
+        $(document).on('click', '.contentSortTreeBox .on-off', function(e){
+            e.preventDefault();
+            var $btn = $(this);
+            var $col = $btn.closest('.layui-col-md2');
+            var $icon = $btn.find('i.fa');
+
+            var collapsed = $col.hasClass('collapsed');
+            if(collapsed){
+                // 展开
+                $col.removeClass('collapsed');
+                $btn.removeClass('collapsed');
+                $icon.removeClass('fa-angle-right').addClass('fa-angle-left');
+                localStorage.setItem(storageKey, '0');
+            }else{
+                // 收起
+                $col.addClass('collapsed');
+                $btn.addClass('collapsed');
+                $icon.removeClass('fa-angle-left').addClass('fa-angle-right');
+                localStorage.setItem(storageKey, '1');
+            }
         });
     });
 </script>
