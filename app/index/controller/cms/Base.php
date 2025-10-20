@@ -104,8 +104,8 @@ class Base extends Frontend
         // 会员验权和登录标签位
         Event::trigger('cmsInit', $this->auth);
         $this->getSort();
-
         $controllername = strtolower($this->request->controller());
+        $this->loadlang('cms.index', get_frontend_lang());
         $this->loadlang($controllername, get_frontend_lang());
     }
 
