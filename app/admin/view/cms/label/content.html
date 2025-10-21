@@ -53,6 +53,7 @@
 
         function getFieldHtml(){
             badou.api.ajax({
+                type:'get',
                 url: 'cms.label/getFieldHtml'
             }, function (data) {
                 $("#extend").html(data.html)

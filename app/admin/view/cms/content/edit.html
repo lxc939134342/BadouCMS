@@ -372,6 +372,7 @@
 
         function getFieldHtml(id,scode){
             badou.api.ajax({
+                type:'get',
                 url: 'cms.content/getFieldHtml',
                 data: {id: id,mcode:'{$mcode}',scode:scode}
             }, function (data) {

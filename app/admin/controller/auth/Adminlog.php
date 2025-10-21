@@ -25,6 +25,7 @@ class Adminlog extends Backend
 {
     protected $modelClass       = null;
     protected $childrenAdminIds = [];
+    protected $noNeedRight      = ['selectpage'];
 
 
     public function initialize()
@@ -44,7 +45,7 @@ class Adminlog extends Backend
         if (!$isAdministrator) {
             $where[] = ['admin_id', 'in', $childrenAdminIds];
         }
-        AdminlogModel::where('create_time', '<= time', time() - (86400 * 30))->where($where)->delete();
+        AdminlogModel::where('create_time', '<= time', time() - (86400 * 7))->where($where)->delete();
         $this->success("删除日志成功！");
     }
 
@@ -61,7 +62,7 @@ class Adminlog extends Backend
             list($where, $sort, $order, $offset, $limit) = $this->buildparams();
             $isAdministrator                             = $this->auth->isSuperAdmin();
             $childrenAdminIds                            = $this->childrenAdminIds;
-            $res                                         = $this->model
+            $res = $this->model
                 ->where($where)
                 ->where(function ($query) use ($isAdministrator, $childrenAdminIds) {
                     if (!$isAdministrator) {
@@ -112,5 +113,13 @@ class Adminlog extends Backend
         $this->error();
     }
 
+    public function selectpage()
+    {
+        list($where, $sort, $order, $offset, $limit) = $this->buildparams();
+        $res = $this->model->where($where)
+            ->order($sort, $order)
+            ->paginate($limit);
 
+        $this->result('ok', $res->items(), $res->total());
+    }
 }
