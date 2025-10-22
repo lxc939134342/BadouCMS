@@ -12,9 +12,8 @@
 
 namespace app\index\model\cms;
 
-use think\Model;
-
-class Label extends Model
+use app\admin\model\cms\Label as adminLabel;
+class Label extends adminLabel
 {
     protected $name = 'cms_label';
 
@@ -23,14 +22,24 @@ class Label extends Model
         $acode = get_frontend_lang();
         $info = $this->cache('cms_label_' . $acode, 3600 * 24, 'cms_cache')
             ->where('acode', $acode)
-            ->column('value', 'name');
-        foreach ($info as $key => &$value) {
-            if (!$value) {
+            ->column('value,type', 'name');
+        $typeMap=$this->typeList();
+        $result=[];
+        foreach ($info as $key => $item) {
+            if (!$item) {
                 continue;
             }
-            $value = htmlspecialchars_decode_improve($value);
+            if($typeMap[$item['type']]['inputType']=='images'){
+                $item['value']=explode(',',$item['value']);
+            }
+            elseif($typeMap[$item['type']]['inputType']=='images_title'){
+                $item['value']=json_decode($item['value'],true);
+            }else{
+                $item['value'] = htmlspecialchars_decode_improve($item['value']);
+            }
+            $result[$item['name']]=$item['value'];
         }
 
-        return $info;
+        return $result;
     }
 }

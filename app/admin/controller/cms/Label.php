@@ -184,7 +184,7 @@ class Label extends Base
             $fields[$k]['form_name'] = 'row['.$v['name'].']';
             $fields[$k]['form_id'] = $v['name'];
             $fields[$k]['form_value'] = $row[$v['name']] ??  '';
-            $fields[$k]['form_acode'] = $v;
+            $fields[$k]['form_acode'] = '';
         }
         $this->view->assign('custom_fields', $fields);
         $this->view->assign('row', $row);

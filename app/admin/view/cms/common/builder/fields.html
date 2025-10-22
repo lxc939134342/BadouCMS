@@ -73,15 +73,15 @@
 
         {if $field.component=='images'}
         <div class="layui-upload-list" id="p-{$field.form_id}" data-template="p{$field.form_id}tpl"
-            data-name="row[{$field.form_acode}][{$field.name}title]"></div>
-        <textarea name="row[{$field.form_acode}][{$field.name}title]" class="form-control hide"
+            data-name="row[{$field.name}title]"></div>
+        <textarea name="row[{$field.name}title]" class="form-control hide"
             style="margin-top:5px;">{$row[$field['name'].'title']}</textarea>
 
         <!-- 设置多图模板 -->
         <script type="text/html" id="p{$field.form_id}tpl">
             <div class="layui-col-sm3 layui-col-xs6 layui-upload-item"  >
                 <img src="{{=d.fullurl}}" data-url="{{=d.url}}" class="layui-upload-img img-thumbnail" />
-                <input type="text" class="layui-input" name="row[{$field.form_acode}][{$field.name}title][{{=d.index}}]" value="{{=d.value}}" placeholder="输入图片标题" >
+                <input type="text" class="layui-input" name="row[{$field.name}title][{{=d.index}}]" value="{{=d.value}}" placeholder="输入图片标题" >
                 <a href="javascript:;" class="layui-btn layui-btn-xs layui-bg-red btn-delete-img mt-2"><i class="fa fa-trash"></i></a>
             </div>
         </script>
