@@ -536,6 +536,7 @@ CREATE TABLE `bd_cms_content` (
   `gtype` char(1) NOT NULL DEFAULT '4',
   `gid` varchar(20) NOT NULL DEFAULT '',
   `gnote` varchar(100) NOT NULL DEFAULT '',
+  `aucode` int(10) DEFAULT NULL COMMENT '语言统一code',
   PRIMARY KEY (`id`),
   KEY `ay_content_scode` (`scode`),
   KEY `ay_content_subscode` (`subscode`),
@@ -544,7 +545,8 @@ CREATE TABLE `bd_cms_content` (
   KEY `ay_content_date` (`date`),
   KEY `ay_content_sorting` (`sorting`),
   KEY `ay_content_status` (`status`)
-) ENGINE=MyISAM AUTO_INCREMENT=123 DEFAULT CHARSET=utf8 COMMENT='CMS文章内容';
+  KEY `content_aucode` (`aucode`) USING BTREE
+) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COMMENT='CMS文章内容';
 
 -- ----------------------------
 -- Records of bd_cms_content
