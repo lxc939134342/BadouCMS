@@ -93,6 +93,31 @@ class ContentSort extends Model
         return $info;
     }
 
+    // 获取默认语言的urlname
+    public function getSortNotLang($scode){
+        $field = array(
+            'a.*',
+            'a.name AS parentname',
+            'b.type',
+            'b.urlname',
+            'd.gcode'
+        );
+
+        $info = $this->alias('a')->field($field)
+            ->whereOr(['a.scode' => $scode, 'a.filename' => $scode])
+            ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
+            ->join('user_level d', 'a.gid=d.id', 'LEFT')
+            ->order('id asc')
+            ->find();
+        if (!$info) {
+            return false;
+        }
+        $info = $info->toArray();
+        set_forntend_lang($info['acode']);
+
+        return $info;
+    }
+
     /**
      * 多个分类信息，不区分语言，兼容跨语言
      * @param mixed $scodes
@@ -208,7 +233,7 @@ class ContentSort extends Model
             $node['parentrows'] = 0;
 
             /* 顶级名称与链接 */
-            $node['tcode'] = 0;
+            $node['tcode'] = $scode;
             $node['topname'] = '';
             $node['toplink'] = '';
             $node['toprows'] = 0;
@@ -314,7 +339,7 @@ class ContentSort extends Model
     public function getSortTopScode($scode)
     {
         $result = $this->getSortList();
-        return $this->getTopParent($scode, $result);
+        return $this->getTopParent($scode, $result)?:$scode;
     }
 
     // 获取位置

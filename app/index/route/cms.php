@@ -1,8 +1,9 @@
 <?php
 
+use app\index\model\cms\Area;
 use think\facade\Db;
 use think\facade\Route;
-use think\Http;
+use think\facade\Config;
 
 /* 变量规则 */
 Route::pattern([
@@ -14,11 +15,9 @@ Route::pattern([
 $cms_domain = [];
 /* 前台应用获取区域域名 */
 if (strtolower(app('http')->getName()) == 'index') {
-    $cms_domain = cache('cms_domain');
-    if (!$cms_domain) {
-        $cms_domain = Db::name('cms_area')->column('domain', 'acode');
-        cache('cms_domain', $cms_domain);
-    }
+    $cms_area = (new Area())->getList();
+    Config::set(['area_list' => $cms_area], 'cms');
+    $cms_domain = array_column($cms_area, 'domain', 'acode');
 }
 
 $cms_domain   = array_diff($cms_domain, ['']);
@@ -26,8 +25,16 @@ $cms_domain   = array_diff($cms_domain, ['']);
 /* 设置主域名使用的语言 */
 // $cms_domain[get_default_lang()] = $main_domain ;
 
-$param = [];
-$lg = get_frontend_lang();
+$lg = null;
+/* 设置语言 */
+if (request()->param('lg')) {
+    $lg = request()->param('lg');
+}
+if (!$lg) {
+    $default = array_shift($cms_area);
+    $lg = $default['acode'];
+}
+set_forntend_lang($lg);
 $param = [
     'lg' => $lg
 ];

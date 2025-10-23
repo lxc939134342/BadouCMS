@@ -75,35 +75,14 @@ class Base extends Frontend
             app_path() . 'lang' . DIRECTORY_SEPARATOR . $lang . '.php'
         ]);
         parent::initialize();
-
+        $this->getSort();
         $this->site = (new Site())->getSiteData();
         $this->company = (new Company())->getCompanyData();
         $this->label = (new Label())->getLabelData();
-
-        $theme = isset($this->site['theme']) && !empty($this->site['theme']) ? $this->site['theme'] : 'default';
-
-        /* 设置模版路径 */
-        $view_path = root_path() . 'template' . DIRECTORY_SEPARATOR.'cms'.DIRECTORY_SEPARATOR. $theme. DIRECTORY_SEPARATOR;
-        if (!is_dir($view_path)) {  //兼容public目录下的模版
-            $tpl_html_dir = get_sys_config('tpl_html_dir') ?: 'html';
-            $view_path = public_path() . 'template' . DIRECTORY_SEPARATOR. $theme. DIRECTORY_SEPARATOR.$tpl_html_dir. DIRECTORY_SEPARATOR;
-        }
-
-        // 手机端模版
-        if ($this->request->isMobile() && get_sys_config('open_wap') == 1) {
-            $view_path .= 'wap'.DIRECTORY_SEPARATOR;
-        }
-
-        $this->view = View::instance();
-        $this->view->config([
-            'view_path' => $view_path,
-            'taglib_pre_load' => Bd::class
-        ]);
-
+        $this->setTheme();
         $this->assignBd();
         // 会员验权和登录标签位
         Event::trigger('cmsInit', $this->auth);
-        $this->getSort();
         $controllername = strtolower($this->request->controller());
         $this->loadlang('cms.index', get_frontend_lang());
         $this->loadlang($controllername, get_frontend_lang());
@@ -122,6 +101,9 @@ class Base extends Frontend
             }
 
             $this->contentSort = $contentSortModel->getSort($urlname);
+            if (!$this->contentSort) {
+                $this->contentSort=$contentSortModel->getSortNotLang($urlname);
+            }
             /*内容不存在*/
             if (!$this->contentSort) {
                 abort(404, __('Not found'));
@@ -203,6 +185,7 @@ class Base extends Frontend
             'pagetitle' => $this->site['sitetitle'],
             'pagedescription' => $this->site['sitedescription'],
             'pagekeywords' => $this->site['sitekeywords'],
+            'homeurl'=>(string)url('/')
         ];
         $api_data = $this->apiSecret();
         $this->view->assign('bd', array_merge($bdassign, $api_data, $this->site, $this->company, $this->label));
@@ -342,5 +325,27 @@ class Base extends Frontend
             $this->success('反对成功');
         }
         $this->error('请勿重复操作');
+    }
+
+    public function setTheme(){
+        $theme = isset($this->site['theme']) && !empty($this->site['theme']) ? $this->site['theme'] : 'default';
+
+        /* 设置模版路径 */
+        $view_path = root_path() . 'template' . DIRECTORY_SEPARATOR.'cms'.DIRECTORY_SEPARATOR. $theme. DIRECTORY_SEPARATOR;
+        if (!is_dir($view_path)) {  //兼容public目录下的模版
+            $tpl_html_dir = get_sys_config('tpl_html_dir') ?: 'html';
+            $view_path = public_path() . 'template' . DIRECTORY_SEPARATOR. $theme. DIRECTORY_SEPARATOR.$tpl_html_dir. DIRECTORY_SEPARATOR;
+        }
+
+        // 手机端模版
+        if ($this->request->isMobile() && get_sys_config('open_wap') == 1) {
+            $view_path .= 'wap'.DIRECTORY_SEPARATOR;
+        }
+
+        $this->view = View::instance();
+        $this->view->config([
+            'view_path' => $view_path,
+            'taglib_pre_load' => Bd::class
+        ]);
     }
 }

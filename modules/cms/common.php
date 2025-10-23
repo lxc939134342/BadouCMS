@@ -635,10 +635,6 @@ function get_backend_lang(): string
 function get_frontend_lang(): string
 {
     $lg = cookie('f_lg');
-    if (request()->param('lg')) {
-        $lg = request()->param('lg');
-        cookie('f_lg', $lg);
-    }
     if (!$lg) {
         /* 去数据库中取默认的语言 */
         $lg = get_default_lang();

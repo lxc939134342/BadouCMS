@@ -544,7 +544,7 @@ CREATE TABLE `bd_cms_content` (
   KEY `ay_content_filename` (`filename`),
   KEY `ay_content_date` (`date`),
   KEY `ay_content_sorting` (`sorting`),
-  KEY `ay_content_status` (`status`)
+  KEY `ay_content_status` (`status`),
   KEY `content_aucode` (`aucode`) USING BTREE
 ) ENGINE=MyISAM AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COMMENT='CMS文章内容';
 
