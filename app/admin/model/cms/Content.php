@@ -29,7 +29,7 @@ class Content extends Model
     protected $dateFormat = 'Y-m-d H:i:s';
 
     // 模型事件
-    public static function onBeforeInsert($model)
+    public static function onBeforeWrite($model)
     {
         $data = $model->getData();
         if (empty($data['description']) && isset($data['content'])) {
@@ -39,6 +39,7 @@ class Content extends Model
         if (empty($data['ico']) && isset($data['content'])) {
             $data['ico'] = self::extractThumbnail($data['content']);
         }
+        $model->data($data);
     }
 
     public function contentsort()
