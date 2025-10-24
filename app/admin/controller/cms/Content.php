@@ -309,7 +309,10 @@ class Content extends Base
         if (! $scode) {
             $this->error(__('Please Select a Category'));
         }
-        $this->model->copyContent($ids, $scode);
+        $res=$this->model->copyContent($ids, $scode);
+        if(!$res){
+            $this->error(__('Copy failed'));
+        }
         $this->success(__('Copy successful'));
     }
 
@@ -330,7 +333,10 @@ class Content extends Base
         if (! $scode) {
             $this->error(__('Please Select a Category'));
         }
-        $this->model->moveContent($ids, $scode);
+        $res=$this->model->moveContent($ids, $scode);
+        if(!$res){
+            $this->error(__('Move failed'));
+        }
         $this->success(__('Move successful'));
     }
 

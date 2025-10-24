@@ -3,6 +3,9 @@
     {:token_field()}
     <div class="layui-row layui-col-space20">
         <div class="layui-col-xs12">
+            <div class="alert alert-warning" role="alert">
+                只支持复制到相同模型栏目
+            </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">
                     栏目
@@ -15,11 +18,11 @@
                         id="remoteSelect-scode"
                         data-input-id="c-scode"
                         data-field="name"
-                        data-source="cms.content_sort/selectpage"
+                        data-source="cms.content/getContentSort"
                         data-is-tree="true"
                         data-pidname="pcode"
                         data-primary-key="scode"
-                        data-params='{"acode":"{$acode}","mcode":"{$mcode}"}'></div>
+                        data-params='{"acode":"{$acode}"}'></div>
                 </div>
             </div>
         </div>

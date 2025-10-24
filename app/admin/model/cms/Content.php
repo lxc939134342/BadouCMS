@@ -12,8 +12,8 @@
 
 namespace app\admin\model\cms;
 
-use think\facade\Db;
 use think\Model;
+use think\facade\Db;
 
 /**
  * Content
@@ -125,10 +125,14 @@ class Content extends Model
      */
     public function copyContent($ids, $scode): int|string
     {
+        $mcode=ContentSort::where('scode',$scode)->value('mcode');
         // 查找出要复制的主内容
         $data = $this->where('id', 'in', $ids)->select();
-
+        $result=0;
         foreach ($data as $key => $value) {
+            if($mcode!=ContentSort::where('scode',$value['scode'])->value('mcode')){
+                continue;
+            }
             $value = $value->toArray();
             // 查找扩展内容
             $extdata = Db::name('cms_content_ext')
@@ -160,9 +164,18 @@ class Content extends Model
     // 修改文章
     public function moveContent($id, $scode)
     {
-        return $this
-            ->where('id', 'in', $id)
-            ->update(['scode' => $scode]);
+        $result=0;
+        $mcode=ContentSort::where('scode',$scode)->value('mcode');
+        $res=$this->where('id','in',$id)->select();
+        foreach($res as $item){
+            if($mcode!=ContentSort::where('scode',$item['scode'])->value('mcode')){
+                continue;
+            }
+            $item->scode=$scode;
+            $item->save();
+            $result++;
+        }
+        return $result;
     }
 
     /**

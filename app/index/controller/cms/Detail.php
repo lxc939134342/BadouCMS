@@ -76,5 +76,4 @@ class Detail extends Base
         $template = $this->contentSort['contenttpl'];
         return $this->view->fetch('/'.basename($template, '.html'));
     }
-
 }
