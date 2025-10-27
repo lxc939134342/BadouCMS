@@ -23,13 +23,23 @@
     <div class="layui-form-item">
         <label class="layui-form-label">列表页模板</label>
         <div class="layui-input-block">
-            <input type="text" name="row[listtpl]" value="{$row.listtpl}" placeholder="请输入输入框内容" autocomplete="off" class="layui-input">
+            <select name="row[listtpl]" id="c-listtpl" class="layui-select" lay-search="">
+                <option value="">请选择</option>
+                {foreach $tpls as $tpl}
+                <option value="{$tpl.id}" {if $row.listtpl==$tpl.id}selected{/if} >{$tpl.name}</option>
+                {/foreach}
+            </select>
         </div>
     </div>
     <div class="layui-form-item">
         <label class="layui-form-label">内容页模板</label>
         <div class="layui-input-block">
-            <input type="text" name="row[contenttpl]" value="{$row.contenttpl}" placeholder="请输入输入框内容" autocomplete="off" class="layui-input">
+            <select name="row[contenttpl]" id="c-contenttpl" class="layui-select" lay-search="">
+                <option value="">请选择</option>
+                {foreach $tpls as $tpl }
+                <option value="{$tpl.id}" {if $row.contenttpl==$tpl.id}selected{/if}>{$tpl.name}</option>
+                {/foreach}
+            </select>
         </div>
     </div>
 

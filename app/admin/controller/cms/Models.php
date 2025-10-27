@@ -4,6 +4,8 @@ namespace app\admin\controller\cms;
 
 use Throwable;
 use think\Exception;
+use think\facade\Db;
+use badou\Filesystem;
 
 class Models extends Base
 {
@@ -14,6 +16,7 @@ class Models extends Base
         $typeList = $this->model->getTypeList();
         $this->assign("type_list", $typeList);
         $this->assignconfig("type_list", $this->model->getTypeList());
+        $this->assign('tpls', $this->getTpls());
     }
 
     /**
@@ -93,5 +96,26 @@ class Models extends Base
         } else {
             $this->error(__('No rows were deleted'));
         }
+    }
+
+        /**
+     * 获取模版文件列表
+     */
+    protected function getTpls()
+    {
+        $default_code = Db::name('cms_area')->where('is_default', 1)->value('acode');
+        $template = Db::name('cms_site')->where('acode', $default_code)->value('theme');
+        $template=$template?:'default';
+        $path = root_path().'template'.DIRECTORY_SEPARATOR.'cms'.DIRECTORY_SEPARATOR.$template.DIRECTORY_SEPARATOR;;
+        $list = [];
+        if (is_dir($path)) {
+            $files = Filesystem::getDirFiles($path, ['html']);
+            $list = [];
+            foreach ($files as $key => $value) {
+                $list[] = ['id' => $key,'name' => $value];
+            }
+        }
+
+        return $list;
     }
 }

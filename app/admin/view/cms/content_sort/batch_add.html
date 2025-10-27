@@ -24,7 +24,7 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">模型</label>
                 <div class="layui-input-block">
-                    <select name="row[mcode]" id="c-mcode" class="layui-select" lay-verify="required">
+                    <select name="row[mcode]" id="c-mcode" class="layui-select" lay-search="" lay-verify="required">
                         <option value="">请选择</option>
                         {foreach $models as $model}
                         <option value="{$model.mcode}">{$model.name}</option>
@@ -36,7 +36,7 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">列表页模板</label>
                 <div class="layui-input-block">
-                    <select name="row[listtpl]" id="c-listtpl" class="layui-select">
+                    <select name="row[listtpl]" id="c-listtpl" class="layui-select" lay-search="">
                         <option value="">请选择</option>
                         {foreach $tpls as $tpl}
                         <option >{$tpl.name}</option>
@@ -48,7 +48,7 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">详情页模板</label>
                 <div class="layui-input-block">
-                    <select name="row[contenttpl]" id="c-contenttpl" class="layui-select">
+                    <select name="row[contenttpl]" id="c-contenttpl" class="layui-select" lay-search="">
                         <option value="">请选择</option>
                         {foreach $tpls as $tpl }
                         <option >{$tpl.name}</option>
