@@ -8,7 +8,7 @@
                     栏目
                 </label>
                 <div class="layui-input-block">
-                    <input type="hidden" id="c-scode" name="row[scode]" value="" class="layui-input" />
+                    <input type="hidden" id="c-scode" name="row[scode]" value="{$Request.get.scode}" class="layui-input" />
                     <div
                         class="remoteSelect"
                         id="remoteSelect-scode"
@@ -383,14 +383,14 @@
             });
         }
 
-        getFieldHtml();
+        getFieldHtml('',$('#c-scode').val());
         $(document).on('change', '#c-scode', function () {
             var scode=$(this).val();
             if(!scode){
                 return false;
             }
             getFieldHtml('',scode);
-        })
+        });
 
         bdForm.api.bindevent($("form.layui-form"));
     });

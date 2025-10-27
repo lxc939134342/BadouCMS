@@ -283,10 +283,26 @@
                         $('.layui-tree-spread').removeClass('active')
                         obj.elem.addClass('active')
                         var data=obj.data;
-                        bdTable.extend.add_url+='?scode='+data.scode;
-                        bdTable.extend.edit_url+='?scode='+data.scode;
-                        bdTable.extend.del_url+='?scode='+data.scode;
-                        bdTable.extend.multi_url+='?scode='+data.scode;
+
+                        // 辅助函数：处理URL参数
+                        function handleUrlParam(url, paramName, paramValue) {
+                            // 检查URL中是否已包含该参数
+                            var regex = new RegExp('([?&])' + paramName + '=[^&]*');
+                            if (regex.test(url)) {
+                                // 如果已存在，替换参数值
+                                return url.replace(regex, '$1' + paramName + '=' + paramValue);
+                            } else {
+                                // 如果不存在，添加参数
+                                var separator = url.indexOf('?') !== -1 ? '&' : '?';
+                                return url + separator + paramName + '=' + paramValue;
+                            }
+                        }
+
+                        // 使用辅助函数处理各个URL
+                        bdTable.extend.add_url = handleUrlParam(bdTable.extend.add_url, 'scode', data.scode);
+                        bdTable.extend.edit_url = handleUrlParam(bdTable.extend.edit_url, 'scode', data.scode);
+                        bdTable.extend.del_url = handleUrlParam(bdTable.extend.del_url, 'scode', data.scode);
+                        bdTable.extend.multi_url = handleUrlParam(bdTable.extend.multi_url, 'scode', data.scode);
                         bdTable.table.reloadData(
                             bdTable.initTable.config.id,
                             {

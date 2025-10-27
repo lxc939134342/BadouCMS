@@ -146,7 +146,6 @@ class Content extends Base
             return $this->view->fetch();
         }
         $data = $this->getPostData('row/a');
-
         $noFilterData = $this->request->post('row/a', '', 'trim');
         $data['content'] = isset($noFilterData['content']) ? xss_clean($noFilterData['content']) : '';
 
