@@ -196,16 +196,19 @@ class Admin extends Backend
         if (false === $this->request->isPost()) {
             $this->error('未知参数');
         }
-        $ids = $this->request->param('ids/a');
+        $ids = $this->request->param('ids');
         if (empty($ids)) {
             $this->error('请指定需要删除的用户ID！');
         }
-        $ids = array_intersect($this->childrenAdminIds, array_filter($ids));
+
+        $ids = array_intersect($this->childrenAdminIds, array_filter(explode(',',$ids)));
+
         // 避免越权删除管理员
         $childrenGroupIds = $this->childrenGroupIds;
         $adminList        = $this->model->where('id', 'in', $ids)->where('id', 'in', function ($query) use ($childrenGroupIds) {
             $query->name('admin_group_access')->where('group_id', 'in', $childrenGroupIds)->field('uid');
         })->select();
+
         if ($adminList) {
             $deleteIds = [];
             foreach ($adminList as $k => $v) {
