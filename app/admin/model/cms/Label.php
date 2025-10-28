@@ -34,7 +34,8 @@ class Label extends Model
             '3' => ['text' => '多图上传', 'inputType' => 'images', 'type' => 'string', 'limit' => 1000, 'default' => ''],
             '4' => ['text' => '附件上传', 'inputType' => 'files', 'type' => 'string', 'limit' => 255, 'default' => ''],
             '5' => ['text' => '编辑器', 'inputType' => 'editor', 'type' => 'text', 'limit' => 0, 'default' => ''],
-            '6' => ['text' => '开关', 'inputType' => 'switch', 'type' => 'string', 'limit' => 255, 'default' => '']
+            '6' => ['text' => '开关', 'inputType' => 'switch', 'type' => 'string', 'limit' => 255, 'default' => ''],
+            '8' => ['text' => '单图', 'inputType' => 'image', 'type' => 'string', 'limit' => 255, 'default' => null],
         ];
 
         return $options;
