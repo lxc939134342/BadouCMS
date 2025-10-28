@@ -958,7 +958,7 @@ CREATE TABLE `bd_cms_label` (
 -- Records of bd_cms_label
 -- ----------------------------
 BEGIN;
-INSERT INTO `bd_cms_label` (`id`, `acode`,`name`, `value`, `type`, `description`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (7,'cn', 'logo2', '/uploads/20250622/8982f0a497e35b37b36bec84b0332d51.png', '3', '第二logo', 'Admin', 'Admin', '2024-10-30 22:09:41', '2025-06-27 16:02:23');
+INSERT INTO `bd_cms_label` (`id`, `acode`,`name`, `value`, `type`, `description`, `create_user`, `update_user`, `create_time`, `update_time`) VALUES (7,'cn', 'logo2', '/uploads/20250622/8982f0a497e35b37b36bec84b0332d51.png', '8', '第二logo', 'Admin', 'Admin', '2024-10-30 22:09:41', '2025-06-27 16:02:23');
 COMMIT;
 
 -- ----------------------------
