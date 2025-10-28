@@ -25,11 +25,13 @@ $cms_domain   = array_diff($cms_domain, ['']);
 /* 设置主域名使用的语言 */
 // $cms_domain[get_default_lang()] = $main_domain ;
 
-$lg = null;
+$lg = get_frontend_lang();
+
 /* 设置语言 */
 if (request()->param('lg')) {
     $lg = request()->param('lg');
 }
+
 if (!$lg) {
     $default = array_shift($cms_area);
     $lg = $default['acode'];
@@ -62,7 +64,6 @@ $route_arr = [
 foreach ($route_arr as $key => $value) {
     Route::rule($key, $value)->append($param);
 }
-
 /* 设置域名路由 */
 if ($cms_domain) {
     /* 匹配当前域名的语言 */

@@ -280,12 +280,14 @@ class Base extends Frontend
     public function area()
     {
         $lg = $this->request->param('lg');
+
         if (!$lg) {
             $this->redirect('/');
         }
         $cms_area = Db::name('cms_area')
             ->where('acode', $lg)
             ->field('domain,acode')->find();
+
         if (!$cms_area || empty($cms_area['domain'])) {
             $this->redirect('/');
         }
