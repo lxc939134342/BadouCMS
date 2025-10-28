@@ -565,18 +565,18 @@ if (!function_exists('convert_path_to_snake_case')) {
 
         return $newPath;
     }
+}
 
-    if (!function_exists('url_clean')) {
-        /**
-         * 清理URL
-         */
-        function url_clean($url)
-        {
-            if (!check_url_allowed($url)) {
-                return '';
-            }
-            return xss_clean($url);
+if (!function_exists('url_clean')) {
+    /**
+     * 清理URL
+     */
+    function url_clean($url)
+    {
+        if (!check_url_allowed($url)) {
+            return '';
         }
+        return xss_clean($url);
     }
 }
 
@@ -623,5 +623,25 @@ if (!function_exists('parse_array_string')) {
         } else {
             return $array;
         }
+    }
+}
+
+if(!function_exists('array_to_value')){
+    /**
+     * 获取数组中自定元素的值
+     * @param mixed $array
+     * @param mixed $index
+     */
+    function array_to_value($array,$index=0){
+        if(empty($array)){
+            return '';
+        }
+        if(!is_array($array)){
+            return $array;
+        }
+        if(isset($array[$index])){
+            return $array[$index];
+        }
+        return '';
     }
 }
