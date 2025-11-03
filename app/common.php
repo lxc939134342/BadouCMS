@@ -6,7 +6,6 @@ use think\facade\App;
 use think\facade\Lang;
 use think\facade\Event;
 use think\facade\Config;
-use voku\helper\AntiXSS;
 use app\admin\model\Config as configModel;
 use think\exception\HttpResponseException;
 
@@ -148,14 +147,71 @@ if (!function_exists('xss_clean')) {
      */
     function xss_clean(string $string): string
     {
-        $config = \HTMLPurifier_Config::createDefault();
+        try{
+            $config = \HTMLPurifier_Config::createDefault();
 
-        // 安全设置
-        $config->set('CSS.AllowTricky', false);
-        $config->set('CSS.AllowImportant', false);
+            // 安全设置
+            $config->set('CSS.AllowTricky', false);
+            $config->set('CSS.AllowImportant', false);
 
-        $purifier = new \HTMLPurifier($config);
-        $clean_html = $purifier->purify($string);
+            // 允许内联 style 并限制允许的 CSS 属性（根据需要增减）
+            $config->set('CSS.AllowedProperties', [
+                'padding', 'margin', 'width', 'height',
+                'text-align', 'font-size', 'color', 'background-color', 'line-height'
+            ]);
+
+            // 自定义 HTML 定义以支持 HTML5 标签及指定属性
+            $config->set('HTML.DefinitionID', 'html5-def');
+            $config->set('HTML.DefinitionRev', 1);
+            if ($def = $config->maybeGetRawHTMLDefinition()) {
+                // 添加 HTML5 块级元素
+                $html5BlockElements = [
+                    'section', 'article', 'aside', 'header', 'footer', 'nav',
+                    'main', 'figure', 'figcaption', 'details', 'summary'
+                ];
+
+                foreach ($html5BlockElements as $element) {
+                    $def->addElement($element, 'Block', 'Flow', 'Common');
+                }
+
+                // 添加 HTML5 内联元素
+                $html5InlineElements = [
+                    'mark', 'time', 'wbr', 'meter', 'progress'
+                ];
+
+                foreach ($html5InlineElements as $element) {
+                    $def->addElement($element, 'Inline', 'Inline', 'Common');
+                }
+
+                // 允许特定的 data-* 属性（HTMLPurifier 不支持通配 data-*，需要逐一列出）
+                $dataAttributes = [
+                    'data-id'
+                ];
+
+                // 为所有支持的元素添加 data-* 属性
+                $allElements = array_merge($html5BlockElements, $html5InlineElements, ['section', 'span', 'div']);
+                foreach ($allElements as $element) {
+                    foreach ($dataAttributes as $attr) {
+                        $def->addAttribute($element, $attr, 'CDATA');
+                    }
+                    // 允许 style 属性
+                    $def->addAttribute($element, 'style', 'CDATA');
+                }
+
+                // 允许 label 属性（常见于编辑器生成的标签）
+                foreach ($html5BlockElements as $element) {
+                    $def->addAttribute($element, 'label', 'CDATA');
+                }
+            }
+
+            $purifier = new \HTMLPurifier($config);
+
+            $clean_html = $purifier->purify($string);
+        }catch(Exception $e){
+            trace($e->getMessage(),'error');
+            return '';
+        }
+
         return $clean_html;
     }
 }
@@ -628,7 +684,7 @@ if (!function_exists('parse_array_string')) {
 
 if(!function_exists('array_to_value')){
     /**
-     * 获取数组中自定元素的值
+     * 获取数组中指定元素的值
      * @param mixed $array
      * @param mixed $index
      */
