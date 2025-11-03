@@ -42,6 +42,12 @@ class Content extends Model
         $model->data($data);
     }
 
+    public static function onAfterDelete($model)
+    {
+        $data = $model->getData();
+        Db::name('cms_content_ext')->where('contentid', $data['id'])->delete();
+    }
+
     public function contentsort()
     {
         return $this->belongsTo(ContentSort::class, 'scode', 'scode');

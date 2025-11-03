@@ -76,7 +76,7 @@ class ContentSort extends Model
 
         // 如果修改为单页并且跳转，则删除单页内容，否则判断是否存在内容，不存在则添加
         if ($type == 1 && $data['outlink']) {
-            Db::name('cms_content')->where('scode', $data['scode'])->delete();
+            Content::where('scode', $data['scode'])->delete();
         } elseif ($type == 1 && ! $content) {
             self::addSingle($data['scode'], $data['name']);
         }
@@ -88,10 +88,19 @@ class ContentSort extends Model
         Cache::tag('cms_cache')->clear();
     }
 
+    public static function onBeforeDelete($model)
+    {
+        $data = $model->getData();
+        if ($model->where('pcode', $data['scode'])->count()) {
+            throw new Exception(__('Please delete the sub-column first'));
+        }
+        if(Content::where('scode', $data['scode'])->count()) {
+            throw new Exception(__('Please delete the content first'));
+        }
+    }
+
     public static function onAfterDelete($model)
     {
-        /*同步删除内容*/
-        Db::name('cms_content')->whereIn('scode', $model['scode'])->delete();
         // 清除缓存
         Cache::tag('cms_cache')->clear();
     }
