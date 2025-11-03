@@ -18,6 +18,8 @@ use think\facade\Event;
 
 class Attachment extends Backend
 {
+    protected $noNeedRight =['select'];
+
     public function initialize()
     {
         parent::initialize();
