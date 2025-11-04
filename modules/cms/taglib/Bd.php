@@ -169,10 +169,13 @@ class Bd extends TagLib
     /* 指定内容 */
     public function tagContent($tag, $content): string
     {
-        $id    = $tag['id'] ?? null ;
-        $scode = $tag['scode'] ?? null;
-        $scode ? $param[] = '"'. $scode .'"' : '';
-        $id ? $param[] = '"'. $id .'"' : '';
+        $id = $tag['id'] ? $this->autoBuildVar($tag['id']) : null;
+        $scode = $tag['scode'] ? $this->autoBuildVar($tag['scode']) : null;
+
+        $scode ? $param[] =  $scode : '';
+        $id ? $param[] = $id : '';
+
+        // p($tag);
         $empty = $tag['empty'] ?? '';
         $alias    = $tag['alias'] ?? 'content';
         $parse   = '<?php ';
