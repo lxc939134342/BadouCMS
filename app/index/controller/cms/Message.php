@@ -68,8 +68,13 @@ class Message extends Base
 
         if ($this->model->addTableData($fcode, $data)) {
             session('lastsub', time()); // 记录最后提交时间
-
-            if (get_sys_config('message_send_mail') && get_sys_config('message_send_to')) {
+            $send_email=false;
+            if($fcode==1){
+                $send_email=get_sys_config('message_send_mail');
+            }else{
+                $send_email=get_sys_config('form_send_mail');
+            }
+            if ($send_email && get_sys_config('message_send_to')) {
                 $mail   = new Email();
                 if (!$mail->configured) {
                     // 邮件发送服务不可用
@@ -157,6 +162,17 @@ class Message extends Base
             // 表单提交地址有误，留言提交请使用留言专用地址!
             $this->error(__('FormSubmitAddressError'));
         }
+        // 验证码验证
+        if (get_sys_config('form_check_code')) {
+            $captcha = $this->request->param('captcha');
+            if (empty($captcha)) {
+                $this->error(__('CaptchaError'));
+            }
+            if (!captcha_check($captcha)) {
+                $this->error(__('CaptchaError'));
+            }
+        }
+
         $data = [
             'acode' => get_frontend_lang(),
             'create_time' => date('Y-m-d H:i:s'),
