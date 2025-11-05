@@ -416,12 +416,19 @@ class Content extends Base
         $modelsModel = new Models();
         $tree = Tree::instance(['childname' => 'children']);
         $acode = $this->request->param('acode', get_backend_lang());
-
+        $mcode = $this->request->param('mcode');
+        $scode = $this->request->param('scode');
+        if($scode && !$mcode){
+            $mcode = $contentSortModel->where('scode',$scode)->value('mcode');
+        }
+        if(!$mcode){
+            $mcode = $modelsModel->getMcodesOfType(2);
+        }
         $where[] = [
             'acode','=',$acode
         ];
         $where[] = [
-            'mcode','in',$modelsModel->getMcodesOfType(2)
+            'mcode','in',$mcode
         ];
 
         $res = $contentSortModel
