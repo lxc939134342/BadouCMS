@@ -126,7 +126,7 @@ class ContentSort extends Model
      */
     public static function getMultSort($scodes = null, $aucodes = null): array
     {
-        $out_data = ContentSort::getSortsTree(false);
+        $out_data = ContentSort::getSortsTree(false,0);
 
         if ($scodes) {
             $scode_arr = explode(',', $scodes);
@@ -182,9 +182,10 @@ class ContentSort extends Model
     /**
      * 分类栏目列表关系树
      * @param mixed $filter_acode 是否区分站点编号
+     * @param mixed $is_status    1:只获取状态为1的分类 0:获取所有分类
      * @return array
      */
-    public static function getSortsTree($filter_acode = true)
+    public static function getSortsTree($filter_acode = true,$is_status = 1): array
     {
         $fields = array(
             'a.*',
@@ -195,7 +196,6 @@ class ContentSort extends Model
         if ($filter_acode) {
             $result = self::alias('a')
                 ->where('a.acode', get_frontend_lang())
-                ->where('a.status', 1)
                 ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
                 ->field($fields)
                 ->cache('cms_sorts_tree_' . get_frontend_lang(), 3600, 'cms_cache')
@@ -203,7 +203,6 @@ class ContentSort extends Model
                 ->select();
         } else {
             $result = self::alias('a')
-                ->where('a.status', 1)
                 ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
                 ->field($fields)
                 ->cache('cms_sorts_tree_all', 3600, 'cms_cache')
@@ -220,6 +219,10 @@ class ContentSort extends Model
         $top = [];
         $self = new self();
         foreach ($result as $value) {
+            // 过滤掉关闭的分类
+            if($is_status == 1 && $value['status'] != 1){
+                continue;
+            }
             $value['soncount'] = 0;
             $sortrows = $self->getSortRows($value['scode']);
             $value['rows'] = $sortrows ?? 0;
