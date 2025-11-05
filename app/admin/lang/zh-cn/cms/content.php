@@ -11,4 +11,5 @@ return [
     'Ico'          => '缩略图',
     'Copy failed'  => '复制失败!',
     'Move failed'  => '移动失败!',
+    'Aucode'       => '统一编号'
 ];

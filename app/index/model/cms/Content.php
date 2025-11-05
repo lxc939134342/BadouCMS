@@ -155,7 +155,6 @@ class Content extends Model
             ->where('status=1')
             ->where('date', '<', date('Y-m-d H:i:s'))
             ->find();
-
             if ($result && $result->tags) {
                 $tags = explode(',', $result->tags);
                 $scode = $scode ?: $result->scode;
@@ -242,20 +241,10 @@ class Content extends Model
 
         $where = [];
         if ($scode) {
-            $where[] = function ($query) use ($scode) {
-                $query->whereOr([
-                    'a.scode' => $scode,
-                    'b.filename' => $scode
-                ]);
-            };
+            $where[]=['a.scode|b.filename','=',$scode];
         }
         if ($id) {
-            $where[] = function ($query) use ($id) {
-                $query->whereOr([
-                    'a.id' => $id,
-                    'a.filename' => $id
-                ]);
-            };
+            $where[]=['a.id|a.filename','=',$id];
         }
         $result = self::alias('a')
             ->field($field)

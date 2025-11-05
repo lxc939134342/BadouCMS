@@ -29,7 +29,7 @@
         <i class="fa fa-trash"></i>
         {:__('Del')}
     </button>
-    <a href="{:url('cms.extfield/index')}" class="layui-btn btn-dialog layui-bg-orange {:$auth->check('cms.extfield/index')?'':'hide'}" data-area='["100%","100%"]'>
+    <a href="{:url('cms.extfield/index')}" class="layui-btn btn-dialog layui-bg-orange {:$auth->check('cms.extfield/index')?'':'hide'}" data-area='["99%","98%"]'>
         <i class="fa fa-list-ul"></i>
         {:__('Field management')}
     </a>
@@ -40,6 +40,7 @@
         var table = layui.table;
         var layer = layui.layer;
         var dropdown = layui.dropdown;
+        var badou=layui.badou;
         bdTable.api.init({
             table: table,
             extend: {

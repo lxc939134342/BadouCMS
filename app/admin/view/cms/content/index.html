@@ -179,9 +179,10 @@
                 [
                     { type: "checkbox" },
                     { field: "id", title: "ID", width: 80, sort: true },
+                    { field: "aucode", title: __("Aucode"), width: 110, sort: true },
                     { field: "scode", hide: true, title: __("Scode name"), width: 90, searchType: "remoteSelect",extend:'data-source="cms.content/getContentSort" data-primary-key="scode" data-field="name" data-is-tree="true" data-pidname="pcode" data-params=\'{"acode":"{$acode}"}\'' },
                     { field: "contentsort.name", operate: false, title: __("Scode name"), width: 150 },
-                    { field: "title", title: __("Title") ,operate:'like'},
+                    { field: "title", title: __("Title"),width:'250' ,operate:'like'},
                     { field: "ico", title: __("Ico"), width: 80, templet: bdTable.api.formatter.image, operate: false },
                     {
                         field: "date",

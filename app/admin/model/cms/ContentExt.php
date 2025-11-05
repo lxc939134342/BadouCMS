@@ -48,7 +48,7 @@ class ContentExt extends Model
                     /* 兼容 windows与linux */
                     $extdata[$key] = filter(str_replace(["\r\n", "\n"], '<br>', $value));
                 } else {
-                    $extdata[$key] = filter($value);
+                    $extdata[$key] = $value?filter($value):'';
                 }
 
             }

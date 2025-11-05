@@ -273,8 +273,9 @@
                                             data-input-id="c-subscode"
                                             data-primary-key="scode"
                                             data-field="name"
-                                            data-source="cms.content_sort/selectpage"
+                                            data-source="cms.content/getContentSort"
                                             data-is-tree="true"
+                                            data-init-data="false"
                                             data-pidname="pcode"
                                             data-multiple="true"
                                             data-params='{"acode":"{$acode}","mcode":"{$mcode}"}'></div>
@@ -370,6 +371,23 @@
         var bdForm = layui.bdForm;
         var badou=layui.badou;
 
+        // 同时加载副栏目下拉
+        function updateSubscode(scode){
+            badou.api.ajax({
+                type:'get',
+                url: 'cms.content/getContentSort',
+                data: {scode: scode}
+            }, function (data) {
+                var subscodeSelect = xmSelect.get('#remoteSelect-subscode',true);
+                subscodeSelect.update({
+                    data: data.list,
+                });
+                subscodeSelect.changeExpandedKeys(true)
+                return false;
+            },function(){
+                return false;
+            });
+        }
         function getFieldHtml(id,scode){
             badou.api.ajax({
                 type:'get',
@@ -378,6 +396,7 @@
             }, function (data) {
                 $("#extend").html(data.html)
                 bdForm.api.bindevent($("#extend"));
+                updateSubscode(scode)
                 return false;
             },function(){
                 return false;

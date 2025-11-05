@@ -189,7 +189,7 @@ class Label extends Base
         $this->view->assign('custom_fields', $fields);
         $this->view->assign('row', $row);
 
-        // p($custom_fields);
+
 
         $this->success('', null, ['html' => $this->view->fetch('cms/common/builder/fields')]);
     }
