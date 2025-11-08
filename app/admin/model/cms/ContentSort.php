@@ -73,7 +73,6 @@ class ContentSort extends Model
         $type = Db::name('cms_model')->where('mcode', $data['mcode'])->value('type');
         $content = Db::name('cms_content')->where('scode', $data['scode'])->find();
 
-
         // 如果修改为单页并且跳转，则删除单页内容，否则判断是否存在内容，不存在则添加
         if ($type == 1 && $data['outlink']) {
             Content::where('scode', $data['scode'])->delete();
@@ -91,6 +90,11 @@ class ContentSort extends Model
     public static function onBeforeDelete($model)
     {
         $data = $model->getData();
+        $type = Db::name('cms_model')->where('mcode', $data['mcode'])->value('type');
+        if ($type == 1) {
+            Content::where('scode', $data['scode'])->delete();
+            return true;
+        }
         if ($model->where('pcode', $data['scode'])->count()) {
             throw new Exception(__('Please delete the sub-column first'));
         }
