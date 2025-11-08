@@ -138,9 +138,9 @@ class Group extends Backend
             $this->error(__('No Results were found'));
         }
         if ($this->request->isPost()) {
-            $this->token();
             $AuthGroupModel = new AuthGroupModel();
             $params = $this->request->post("row/a", [], 'strip_tags');
+
             //父节点不能是非权限内节点
             if (!in_array($params['pid'], $this->childrenGroupIds)) {
                 $this->error(__('The parent group exceeds permission limit'));
@@ -193,7 +193,6 @@ class Group extends Backend
                 $this->success();
             }
             $this->error();
-            return;
         }
         $this->view->assign("row", $row);
         return $this->fetch();
