@@ -33,6 +33,8 @@ class Form extends Base
      */
     protected $formFieldModel;
 
+    protected $noNeedRight = ['resetprefix'];
+
     public function initialize(): void
     {
         parent::initialize();
@@ -81,5 +83,36 @@ class Form extends Base
             $this->error(__('No rows were inserted'));
         }
         $this->success(__('Add successful'));
+    }
+
+    /* 重置表前缀 */
+    public function resetprefix(){
+        $ids = $this->request->post('ids/a');
+        if (empty($ids)) {
+            $this->error(__('Parameter %s can not be empty', ['ids']));
+        }
+
+        // 查找对应id的表名称
+        $forms = $this->model->where('id', 'in', $ids)->select();
+        if ($forms->isEmpty()) {
+            $this->error(__('No data found'));
+        }
+
+        $this->model->startTrans();
+        try {
+            foreach ($forms as $v) {
+                $tableName = $v['table_name'];
+                 // 使用正则表达式去掉cms之前的部分，保留cms及之后的部分
+                $newTableName = preg_replace('/^.*?(?=cms)/', '', $tableName);
+                $v->table_name=$newTableName;
+                $v->save();
+            }
+            $this->model->commit();
+        } catch (Throwable $e) {
+            $this->model->rollback();
+            $this->error($e->getMessage());
+        }
+
+        $this->success(__('Update successful'));
     }
 }

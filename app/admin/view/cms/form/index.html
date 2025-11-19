@@ -28,6 +28,10 @@
         <i class="fa fa-trash"></i>
         {:__('Del')}
     </button>
+    <button class="layui-btn layui-bg-purple btn-disabled disabled" lay-event="reset_prefix">
+        <i class="fa fa-refresh"></i>
+        {:__('Reset table prefix')}
+    </button>
 </script>
 
 <script>
@@ -39,7 +43,7 @@
         var badou = layui.badou;
         var laytpl = layui.laytpl;
         var form = layui.form;
-        badou.http.config.open.area = ["100%", "100%"];
+        badou.http.config.open.area = ["99%", "98%"];
         bdTable.api.init({
             table: table,
             extend: {
@@ -51,6 +55,30 @@
                 table: "cms_form",
             },
         });
+
+        /* 注入事件 */
+        bdTable.api.events.toolbar.reset_prefix= function (id, obj) {
+            var that = this;
+            var table = bdTable.initTable;
+            var ids = bdTable.api.selectedids();
+            if (ids.length === 0) {
+                layer.msg(__('Please select at least one item'));
+                return false;
+            }
+            var idarr=[];
+            $.each(ids, function (i, v) {
+                idarr.push(v[table.config.pk]);
+            });
+            badou.api.ajax({
+                url:'cms.form/resetprefix',
+                data:{
+                    ids:idarr
+                }
+            },function () {
+                bdTable.api.events.toolbar.refresh('form');
+            })
+        }
+
         bdTable.render({
             elem: "#form",
             url: bdTable.extend.index_url,
@@ -67,7 +95,7 @@
                     { field: "table_name", title: __("Table name") },
                     {
                         title: __("Operate"),
-                        width: 300,
+                        width: 360,
                         templet: bdTable.api.formatter.operate,
                         buttons: [
                             {
@@ -129,5 +157,7 @@
                 ],
             ],
         });
+
+
     });
 </script>

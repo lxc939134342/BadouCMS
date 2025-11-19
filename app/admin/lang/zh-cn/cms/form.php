@@ -5,5 +5,6 @@ return [
     'Form name'    => '表单名称',
     'Table name'   => '表名称',
     'Data manage'  => '数据管理',
-    'Field manage' => '字段管理'
+    'Field manage' => '字段管理',
+    'Reset table prefix'=>'重置表前缀'
 ];
