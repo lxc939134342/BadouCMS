@@ -303,6 +303,6 @@ class ContentSort extends Base
             ->select();
 
         $list = $this->tree->init($res->toArray(), 'pcode', null, 'scode', 'children')->multipleChild();
-        $this->success('ok', '', ['list' => $list, 'total' => $res->count()]);
+        $this->success('', '', ['list' => $list, 'total' => $res->count()]);
     }
 }
