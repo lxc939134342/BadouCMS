@@ -644,8 +644,8 @@ if (!function_exists('parse_array')) {
     function parse_array($value)
     {
         $data = [];
-        $trimmed = trim($value, " ,，;；\r\n");
-
+        // 去掉字符串两端的空白字符和指定的分隔符
+        $trimmed = preg_replace('/^[\s,，;；\r\n]+|[\s,，;；\r\n]+$/u', '', $value);
         // 使用统一正则分割字符串
         $array = preg_split('/\s*[,，;；\r\n]+\s*/u', $trimmed, -1, PREG_SPLIT_NO_EMPTY);
 
