@@ -71,7 +71,7 @@ http://demo.badoucms.com/admin.php
 -   [x] API 翻译数据
 -   [x] 短信发送
 -   [x] 对象存储
--   [ ] 缩略图水印
+-   [x] 缩略图水印（插件实现）
 
 ### 特别鸣谢
 
