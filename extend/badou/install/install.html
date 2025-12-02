@@ -253,6 +253,14 @@
 
                 $('form').on('submit', function (e) {
                     e.preventDefault();
+                    // 表前缀验证
+                    var prefix = $('input[name="prefix"]').val();
+                    if (prefix === 'cms_') {
+                        $("#error").show().text("表前缀不能为 'cms_'，请更换其他前缀");
+                        $("html,body").animate({scrollTop: 0}, 500);
+                        return false;
+                    }
+                    
                     // 添加密码验证
                     var password = $('input[name="adminpassword"]').val();
                     if (!/^(?!.*[&<>"'\n\r]).{6,32}$/.test(password)) {
