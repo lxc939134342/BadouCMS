@@ -689,37 +689,40 @@ function bdurl($type, $urlname, $pagetype, $scode, $sortfilename, $id = '', $con
 {
     $url_break_char = '_';
     $url_rule_content_path = false;
+    /* url模型 0去掉后缀 1携带.html后缀 */
+    $url_type=get_sys_config('url_type')==1 ?true:false;
+
     if ($type == 1 || $pagetype == 'about') {
         $urlname = $urlname ?: 'about';
         if ($sortfilename) {
-            $link = url('/'.$sortfilename);
+            $link = url('/'.$sortfilename,[],$url_type);
         } else {
-            $link = url('/'.$urlname . $url_break_char . $scode);
+            $link = url('/'.$urlname . $url_break_char . $scode,[],$url_type);
         }
     } else {
         $urlname = $urlname ?: 'list';
         if ($pagetype == 'list') {
             if ($sortfilename) {
-                $link = url('/'.$sortfilename);
+                $link = url('/'.$sortfilename,[],$url_type);
             } else {
-                $link = url('/'.$urlname . $url_break_char . $scode);
+                $link = url('/'.$urlname . $url_break_char . $scode,[],$url_type);
             }
         } elseif ($pagetype == 'content') {
             if ($url_rule_content_path) {
                 if ($contentfilename) {
-                    $link = url('/'.$contentfilename, [], true);
+                    $link = url('/'.$contentfilename, [], $url_type);
                 } else {
-                    $link = url('/'.$id, [], true);
+                    $link = url('/'.$id, [], $url_type);
                 }
             } else {
                 if ($sortfilename && $contentfilename) {
-                    $link = url('/'.$sortfilename . '/' . $contentfilename, [], true);
+                    $link = url('/'.$sortfilename . '/' . $contentfilename, [], $url_type);
                 } elseif ($sortfilename) {
-                    $link = url('/'.$sortfilename . '/' . $id, [], true);
+                    $link = url('/'.$sortfilename . '/' . $id, [], $url_type);
                 } elseif ($contentfilename) {
-                    $link = url('/'.$urlname . $url_break_char . $scode . '/' . $contentfilename, [], true);
+                    $link = url('/'.$urlname . $url_break_char . $scode . '/' . $contentfilename, [], $url_type);
                 } else {
-                    $link = url('/'.$urlname . $url_break_char . $scode . '/' . $id, [], true);
+                    $link = url('/'.$urlname . $url_break_char . $scode . '/' . $id, [], $url_type);
                 }
             }
         } else {
