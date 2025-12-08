@@ -150,57 +150,56 @@ if (!function_exists('xss_clean')) {
         try{
             $config = \HTMLPurifier_Config::createDefault();
 
-            // 安全设置
-            $config->set('CSS.AllowTricky', false);
-            $config->set('CSS.AllowImportant', false);
+            /* ---------- 1. 黑名单：禁用高危标签/属性 ---------- */
+            $config->set('HTML.ForbiddenElements',  ['script', 'object', 'embed', 'frame', 'frameset']);
+            $config->set('HTML.ForbiddenAttributes', ['on*']);
 
-            // 允许内联 style 并限制允许的 CSS 属性（根据需要增减）
-            $config->set('CSS.AllowedProperties', [
-                'padding', 'margin', 'width', 'height',
-                'text-align', 'font-size', 'color', 'background-color', 'line-height'
-            ]);
-
-            // 自定义 HTML 定义以支持 HTML5 标签及指定属性
-            $config->set('HTML.DefinitionID', 'html5-def');
+            /* ---------- 2. 注册 HTML5 <video> / <source> ---------- */
+            $config->set('HTML.DefinitionID', 'html5-video');
             $config->set('HTML.DefinitionRev', 1);
             if ($def = $config->maybeGetRawHTMLDefinition()) {
-                // 添加 HTML5 块级元素
-                $html5BlockElements = [
-                    'section', 'article', 'aside', 'header', 'footer', 'nav',
-                    'main', 'figure', 'figcaption', 'details', 'summary'
-                ];
+                // 空元素 <source>
+                $def->addElement('source', 'Inline', 'Empty', 'Common', [
+                    'src'  => 'URI',
+                    'type' => 'Text',
+                ]);
 
-                foreach ($html5BlockElements as $element) {
-                    $def->addElement($element, 'Block', 'Flow', 'Common');
+                // 块级元素 <video>
+                $def->addElement('video', 'Block', 'Optional: #PCDATA | source', 'Common', [
+                    'src'      => 'URI',
+                    'controls' => 'CDATA',   // 支持 controls=""
+                    'preload'  => 'Enum#auto,metadata,none',
+                    'width'    => 'Length',
+                    'height'   => 'Length',
+                    'class'    => 'CDATA',
+                    'id'       => 'ID',
+                    'data-setup' => 'CDATA',
+                ]);
+
+                /* ---------- 3. 一次性注册常用 HTML5 标签 ---------- */
+                $html5Block = ['section','article','aside','header','footer','nav','main','figure','figcaption','details','summary'];
+                $html5Inline = ['mark','time','wbr','meter','progress'];
+
+                foreach ($html5Block as $tag) {
+                    $def->addElement($tag, 'Block', 'Flow', 'Common');
+                }
+                foreach ($html5Inline as $tag) {
+                    $def->addElement($tag, 'Inline', 'Inline', 'Common');
                 }
 
-                // 添加 HTML5 内联元素
-                $html5InlineElements = [
-                    'mark', 'time', 'wbr', 'meter', 'progress'
-                ];
+                /* ---------- 4. 给常用元素批量追加 data-* 属性 ---------- */
+                $commonElements = array_merge(
+                    ['video', 'source'],
+                    $html5Block,
+                    $html5Inline,
+                    ['div', 'span', 'a', 'img', 'p', 'li', 'td', 'th', 'button']
+                );
+                $dataAttrs = ['data-id', 'data-toggle', 'data-url', 'data-target', 'data-key', 'data-value']; // 按需继续补
 
-                foreach ($html5InlineElements as $element) {
-                    $def->addElement($element, 'Inline', 'Inline', 'Common');
-                }
-
-                // 允许特定的 data-* 属性（HTMLPurifier 不支持通配 data-*，需要逐一列出）
-                $dataAttributes = [
-                    'data-id'
-                ];
-
-                // 为所有支持的元素添加 data-* 属性
-                $allElements = array_merge($html5BlockElements, $html5InlineElements, ['section', 'span', 'div']);
-                foreach ($allElements as $element) {
-                    foreach ($dataAttributes as $attr) {
-                        $def->addAttribute($element, $attr, 'CDATA');
+                foreach ($commonElements as $tag) {
+                    foreach ($dataAttrs as $attr) {
+                        $def->addAttribute($tag, $attr, 'CDATA');
                     }
-                    // 允许 style 属性
-                    $def->addAttribute($element, 'style', 'CDATA');
-                }
-
-                // 允许 label 属性（常见于编辑器生成的标签）
-                foreach ($html5BlockElements as $element) {
-                    $def->addAttribute($element, 'label', 'CDATA');
                 }
             }
 
@@ -211,7 +210,6 @@ if (!function_exists('xss_clean')) {
             trace($e->getMessage(),'error');
             return '';
         }
-
         return $clean_html;
     }
 }
