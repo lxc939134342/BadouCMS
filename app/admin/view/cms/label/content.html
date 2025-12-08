@@ -13,6 +13,8 @@
             <a href="cms.label/index" class="layui-btn list-dialog" data-area='["80%","80%"]'>
                 <i class="fa fa-list"></i> 标签列表
             </a>
+            <!-- 钩子 -->
+            {foreach :hook('cms_label_top_btn',[],true) as $hook} {$hook|raw} {/foreach}
         </div>
         <div class="layui-tabs layui-tabs-card" id="label-tabs" lay-options="{index: 0}">
             <ul class="layui-tabs-header">
