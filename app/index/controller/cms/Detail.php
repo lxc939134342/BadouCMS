@@ -73,7 +73,8 @@ class Detail extends Base
         $this->site['pagekeywords'] = $this->site['sitekeywords'];
 
         $this->assignBd();
-        $template = $this->contentSort['contenttpl'];
-        return $this->view->fetch('/'.basename($template, '.html'));
+        $custom_tpl = isset($this->contentInfo['custom_tpl']) && !empty($this->contentInfo['custom_tpl']) ? $this->contentInfo['custom_tpl'] : false;
+        $template = $custom_tpl ?: $this->contentSort['contenttpl'];
+        return $this->view->fetch('/' . basename($template, '.html'));
     }
 }

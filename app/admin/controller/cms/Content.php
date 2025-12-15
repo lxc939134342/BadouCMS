@@ -17,13 +17,15 @@ use Throwable;
 use badou\Tree;
 use think\facade\Db;
 use app\admin\model\UserLevel;
+use badou\Filesystem;
+
 
 /**
  * CMS文章内容
  */
 class Content extends Base
 {
-    protected $noNeedRight = ['getFieldHtml','getContentSort'];
+    protected $noNeedRight = ['getFieldHtml', 'getContentSort'];
     /**
      * @var \app\admin\model\cms\Content
      */
@@ -41,7 +43,7 @@ class Content extends Base
 
     protected $weighField = 'sorting';
 
-    protected $quickSearchField = ['id','title'];
+    protected $quickSearchField = ['id', 'title'];
     // 开启关联查询
     protected $relationSearch = true;
 
@@ -66,6 +68,7 @@ class Content extends Base
         $this->assign('mcode', $this->mcode);
         $this->assign('levellist', $levelModel->getLevelList());
         $this->assign('gtypelist', $levelModel->getGtypeList());
+        $this->assign('tpls', $this->getTpls());
     }
 
     public function index()
@@ -97,8 +100,8 @@ class Content extends Base
             }
         }
         unset($whereitem);
-        $where[] = ['contentsort.mcode','in',$mcodes];
-        $where[] = ['content.acode','=',get_backend_lang()];
+        $where[] = ['contentsort.mcode', 'in', $mcodes];
+        $where[] = ['content.acode', '=', get_backend_lang()];
 
         /* 查询子栏目数据 */
         $res = $this->model
@@ -181,8 +184,9 @@ class Content extends Base
             'visits' => 0,
             'likes' => 0,
             'oppose' => 0,
+            'custom_tpl' => '',
             'create_user' => $this->auth->username,
-            'update_user' => $this->auth->username
+            'update_user' => $this->auth->username,
         ];
 
         $data = array_merge($default, $data);
@@ -216,7 +220,6 @@ class Content extends Base
         } else {
             $this->error(__('No rows were added'));
         }
-
     }
 
     /**
@@ -308,8 +311,8 @@ class Content extends Base
         if (! $scode) {
             $this->error(__('Please Select a Category'));
         }
-        $res=$this->model->copyContent($ids, $scode);
-        if(!$res){
+        $res = $this->model->copyContent($ids, $scode);
+        if (!$res) {
             $this->error(__('Copy failed'));
         }
         $this->success(__('Copy successful'));
@@ -332,8 +335,8 @@ class Content extends Base
         if (! $scode) {
             $this->error(__('Please Select a Category'));
         }
-        $res=$this->model->moveContent($ids, $scode);
-        if(!$res){
+        $res = $this->model->moveContent($ids, $scode);
+        if (!$res) {
             $this->error(__('Move failed'));
         }
         $this->success(__('Move successful'));
@@ -368,7 +371,7 @@ class Content extends Base
         $custom_fields = $this->extfieldModel->getModelFields($mcode);
         if ($custom_fields) {
             foreach ($custom_fields as $key => $field) {
-                $custom_fields[$key]['form_name'] = 'row['.$field['name'].']';
+                $custom_fields[$key]['form_name'] = 'row[' . $field['name'] . ']';
                 $custom_fields[$key]['form_id'] = $field['name'];
                 $custom_fields[$key]['form_value'] = $rowitem[$field['name']] ??  '';
                 $custom_fields[$key]['form_acode'] = $acode;
@@ -418,17 +421,21 @@ class Content extends Base
         $acode = $this->request->param('acode', get_backend_lang());
         $mcode = $this->request->param('mcode');
         $scode = $this->request->param('scode');
-        if($scode && !$mcode){
-            $mcode = $contentSortModel->where('scode',$scode)->value('mcode');
+        if ($scode && !$mcode) {
+            $mcode = $contentSortModel->where('scode', $scode)->value('mcode');
         }
-        if(!$mcode){
+        if (!$mcode) {
             $mcode = $modelsModel->getMcodesOfType(2);
         }
         $where[] = [
-            'acode','=',$acode
+            'acode',
+            '=',
+            $acode
         ];
         $where[] = [
-            'mcode','in',$mcode
+            'mcode',
+            'in',
+            $mcode
         ];
 
         $res = $contentSortModel
@@ -447,5 +454,30 @@ class Content extends Base
         $list = $tree->init($res->toArray(), 'pcode', null, 'scode')->multipleChild();
 
         $this->success('ok', '', ['list' => $list, 'total' => $res->count()]);
+    }
+
+    /**
+     * 获取模版文件列表
+     */
+    protected function getTpls()
+    {
+        $acode = get_backend_lang();
+        $template = Db::name('cms_site')->where('acode', $acode)->value('theme');
+        if ($template == '') {
+            $template = 'default';
+            Db::name('cms_site')->where('acode', $acode)->update(['theme' => 'default']);
+        }
+
+        $path = root_path() . 'template' . DIRECTORY_SEPARATOR . 'cms' . DIRECTORY_SEPARATOR . $template . DIRECTORY_SEPARATOR;
+        $list = [];
+        if (is_dir($path)) {
+            $files = Filesystem::getDirFiles($path, ['html']);
+            $list = [];
+            foreach ($files as $key => $value) {
+                $list[] = ['id' => $key, 'name' => $value];
+            }
+        }
+
+        return $list;
     }
 }

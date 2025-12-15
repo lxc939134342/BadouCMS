@@ -642,7 +642,7 @@ CREATE TABLE `bd_cms_content_ext` (
   `ext_acc1` text,
   PRIMARY KEY (`extid`),
   KEY `ay_content_ext_contentid` (`contentid`)
-) ENGINE=MyISAM AUTO_INCREMENT=88 DEFAULT CHARSET=utf8 COMMENT='CMS文章内容-自定义字段';
+) ENGINE=MyISAM AUTO_INCREMENT=88 DEFAULT CHARSET=utf8mb4 COMMENT='CMS文章内容-自定义字段';
 
 -- ----------------------------
 -- Records of bd_cms_content_ext
@@ -779,7 +779,7 @@ CREATE TABLE `bd_cms_content_sort` (
   KEY `filename` (`filename`),
   KEY `sorting` (`sorting`),
   KEY `aucode` (`aucode`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=93 DEFAULT CHARSET=utf8 COMMENT='栏目表';
+) ENGINE=MyISAM AUTO_INCREMENT=93 DEFAULT CHARSET=utf8mb4 COMMENT='栏目表';
 
 -- ----------------------------
 -- Records of bd_cms_content_sort
@@ -839,7 +839,7 @@ CREATE TABLE `bd_cms_extfield` (
   `sorting` int(11) NOT NULL COMMENT '排序',
   PRIMARY KEY (`id`),
   KEY `extfield_mcode` (`mcode`)
-) ENGINE=MyISAM AUTO_INCREMENT=23 DEFAULT CHARSET=utf8 COMMENT='模型字段';
+) ENGINE=MyISAM AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COMMENT='模型字段';
 
 -- ----------------------------
 -- Records of bd_cms_extfield
@@ -872,7 +872,7 @@ CREATE TABLE `bd_cms_form` (
   `update_time` datetime NOT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `ay_form_fcode` (`fcode`)
-) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8 COMMENT='自定义表单';
+) ENGINE=MyISAM AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COMMENT='自定义表单';
 
 -- ----------------------------
 -- Records of bd_cms_form
@@ -922,7 +922,7 @@ CREATE TABLE `bd_cms_form_field` (
   PRIMARY KEY (`id`),
   KEY `ay_form_field_fcode` (`fcode`),
   KEY `ay_form_field_sorting` (`sorting`)
-) ENGINE=MyISAM AUTO_INCREMENT=31 DEFAULT CHARSET=utf8 COMMENT='自定义表单-字段';
+) ENGINE=MyISAM AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COMMENT='自定义表单-字段';
 
 -- ----------------------------
 -- Records of bd_cms_form_field
@@ -952,7 +952,7 @@ CREATE TABLE `bd_cms_label` (
   `create_time` datetime NOT NULL COMMENT '创建时间',
   `update_time` datetime NOT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8 COMMENT='定制标签';
+) ENGINE=MyISAM AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COMMENT='定制标签';
 
 -- ----------------------------
 -- Records of bd_cms_label
@@ -981,7 +981,7 @@ CREATE TABLE `bd_cms_link` (
   KEY `ay_link_acode` (`acode`),
   KEY `ay_link_gid` (`gid`),
   KEY `ay_link_sorting` (`sorting`)
-) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8 COMMENT='友情链接';
+) ENGINE=MyISAM AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COMMENT='友情链接';
 
 -- ----------------------------
 -- Records of bd_cms_link
@@ -1021,7 +1021,7 @@ CREATE TABLE `bd_cms_member_comment` (
   KEY `member_comment_contentid` (`contentid`),
   KEY `member_comment_uid` (`uid`),
   KEY `member_comment_puid` (`puid`)
-) ENGINE=MyISAM AUTO_INCREMENT=28 DEFAULT CHARSET=utf8 COMMENT='文章评论表';
+) ENGINE=MyISAM AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COMMENT='文章评论表';
 
 -- ----------------------------
 -- Records of bd_cms_member_comment
@@ -1064,7 +1064,7 @@ CREATE TABLE `bd_cms_message` (
   `uid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '用户ID(默认匿名用户ID)',
   PRIMARY KEY (`id`),
   KEY `ay_message_acode` (`acode`)
-) ENGINE=MyISAM AUTO_INCREMENT=22 DEFAULT CHARSET=utf8 COMMENT='在线留言';
+) ENGINE=MyISAM AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COMMENT='在线留言';
 
 -- ----------------------------
 -- Records of bd_cms_message
@@ -1105,7 +1105,7 @@ CREATE TABLE `bd_cms_model` (
   `update_time` datetime NOT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`),
   UNIQUE KEY `mcode` (`mcode`)
-) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=utf8 COMMENT='模型管理';
+) ENGINE=MyISAM AUTO_INCREMENT=60 DEFAULT CHARSET=utf8mb4 COMMENT='模型管理';
 
 -- ----------------------------
 -- Records of bd_cms_model
@@ -1138,7 +1138,7 @@ CREATE TABLE `bd_cms_site` (
   `copyright` varchar(200) NOT NULL COMMENT '版权信息',
   PRIMARY KEY (`id`),
   KEY `site_acode` (`acode`)
-) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='站点配置';
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COMMENT='站点配置';
 
 -- ----------------------------
 -- Records of bd_cms_site
@@ -1169,7 +1169,7 @@ CREATE TABLE `bd_cms_slide` (
   PRIMARY KEY (`id`),
   KEY `ay_slide_acode` (`acode`),
   KEY `ay_slide_gid` (`gid`)
-) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8 COMMENT='轮播图片';
+) ENGINE=MyISAM AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COMMENT='轮播图片';
 
 -- ----------------------------
 -- Records of bd_cms_slide
@@ -1196,7 +1196,7 @@ CREATE TABLE `bd_cms_tags` (
   `update_time` datetime NOT NULL COMMENT '更新时间',
   PRIMARY KEY (`id`),
   KEY `ay_tags_acode` (`acode`)
-) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8 COMMENT='文章内链';
+) ENGINE=MyISAM AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COMMENT='文章内链';
 
 -- ----------------------------
 -- Records of bd_cms_tags

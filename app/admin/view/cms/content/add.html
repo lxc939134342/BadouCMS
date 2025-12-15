@@ -8,48 +8,27 @@
                     栏目
                 </label>
                 <div class="layui-input-block">
-                    <input type="hidden" id="c-scode" name="row[scode]" value="{$Request.get.scode}" class="layui-input" />
-                    <div
-                        class="remoteSelect"
-                        id="remoteSelect-scode"
-                        data-input-id="c-scode"
-                        data-verify="required"
-                        data-primary-key="scode"
-                        data-field="name"
-                        data-source="cms.content/getContentSort"
-                        data-is-tree="true"
-                        data-pidname="pcode"
-                        data-params='{"acode":"{$acode}"}'></div>
+                    <input type="hidden" id="c-scode" name="row[scode]" value="{$Request.get.scode}"
+                        class="layui-input" />
+                    <div class="remoteSelect" id="remoteSelect-scode" data-input-id="c-scode" data-verify="required"
+                        data-primary-key="scode" data-field="name" data-source="cms.content/getContentSort"
+                        data-is-tree="true" data-pidname="pcode" data-params='{"acode":"{$acode}"}'></div>
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">标题</label>
                 <div class="layui-input-block">
-                    <input
-                        type="text"
-                        name="row[title]"
-                        lay-verify="required"
-                        autocomplete="off"
-                        value=""
-                        placeholder="标题"
-                        class="layui-input" />
+                    <input type="text" name="row[title]" lay-verify="required" autocomplete="off" value=""
+                        placeholder="标题" class="layui-input" />
                 </div>
             </div>
             <div class="layui-form-item">
                 <label class="layui-form-label">缩略图</label>
                 <div class="layui-input-block">
                     <div class="layui-input-group" style="width: 100%">
-                        <input
-                            type="text"
-                            id="c-ico"
-                            name="row[ico]"
-                            class="layui-input"
-                            value="" />
+                        <input type="text" id="c-ico" name="row[ico]" class="layui-input" value="" />
                         <div class="layui-input-suffix" style="width: 30%">
-                            <button
-                                type="button"
-                                data-input-id="c-ico"
-                                data-preview-id="p-ico"
+                            <button type="button" data-input-id="c-ico" data-preview-id="p-ico"
                                 class="layui-btn btn-bdupload">
                                 <i class="fa fa-upload"></i>
                                 上传
@@ -78,32 +57,24 @@
                 <label class="layui-form-label">轮播多图</label>
                 <div class="layui-input-block">
                     <div class="layui-input-group" style="width: 100%">
-                        <input
-                            type="text"
-                            id="c-pics"
-                            name="row[pics]"
-                            class="layui-input"
-                            value="" />
+                        <input type="text" id="c-pics" name="row[pics]" class="layui-input" value="" />
                         <div class="layui-input-suffix" style="width: 30%">
-                            <button
-                                type="button"
-                                data-input-id="c-pics"
-                                data-preview-id="p-pics"
-                                data-multiple="true"
+                            <button type="button" data-input-id="c-pics" data-preview-id="p-pics" data-multiple="true"
                                 class="layui-btn btn-bdupload">
                                 <i class="fa fa-upload"></i>
                                 上传
                             </button>
-                            <button type="button" data-input-id="c-pics" data-multiple="true" class="layui-btn layui-bg-green btn-bdchoose">
+                            <button type="button" data-input-id="c-pics" data-multiple="true"
+                                class="layui-btn layui-bg-green btn-bdchoose">
                                 <i class="fa fa-list"></i>
                                 选择
                             </button>
                         </div>
                     </div>
 
-                    <div class="layui-upload-list" id="p-pics"  data-template="picstpl" data-name="row[picstitle]"></div>
+                    <div class="layui-upload-list" id="p-pics" data-template="picstpl" data-name="row[picstitle]"></div>
                     <textarea name="row[picstitle]" class="form-control hide" style="margin-top:5px;"></textarea>
-                     <!-- 设置多图模板 -->
+                    <!-- 设置多图模板 -->
                     <script type="text/html" id="picstpl">
                          <div class="layui-col-sm3 layui-col-xs6 layui-upload-item"  >
                             <img src="{{=d.fullurl}}" data-url="{{=d.url}}" class="layui-upload-img img-thumbnail" />
@@ -117,12 +88,7 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">排序</label>
                 <div class="layui-input-block">
-                    <input
-                        type="text"
-                        name="row[sorting]"
-                        value=""
-                        placeholder="请输入排序"
-                        autocomplete="off"
+                    <input type="text" name="row[sorting]" value="" placeholder="请输入排序" autocomplete="off"
                         class="layui-input" />
                 </div>
             </div>
@@ -130,7 +96,8 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">状态</label>
                 <div class="layui-input-block">
-                    <input type="radio" name="row[status]" checked value="1" title="显示"> <input type="radio" name="row[status]" value="0" title="隐藏">
+                    <input type="radio" name="row[status]" checked value="1" title="显示"> <input type="radio"
+                        name="row[status]" value="0" title="隐藏">
                 </div>
             </div>
         </div>
@@ -144,11 +111,7 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">tags</label>
                                     <div class="layui-input-block">
-                                        <input
-                                            type="text"
-                                            name="row[tags]"
-                                            placeholder="请输入文章tag，英文逗号隔开"
-                                            value=""
+                                        <input type="text" name="row[tags]" placeholder="请输入文章tag，英文逗号隔开" value=""
                                             class="layui-input" />
                                     </div>
                                 </div>
@@ -156,11 +119,7 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">作者</label>
                                     <div class="layui-input-block">
-                                        <input
-                                            type="text"
-                                            name="row[author]"
-                                            placeholder="请输入作者"
-                                            value=""
+                                        <input type="text" name="row[author]" placeholder="请输入作者" value=""
                                             class="layui-input" />
                                     </div>
                                 </div>
@@ -168,24 +127,15 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">来源</label>
                                     <div class="layui-input-block">
-                                        <input
-                                            type="text"
-                                            name="row[source]"
-                                            placeholder="请输入来源"
-                                            value=""
+                                        <input type="text" name="row[source]" placeholder="请输入来源" value=""
                                             class="layui-input" />
                                     </div>
                                 </div>
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">标题颜色</label>
                                     <div class="layui-input-inline">
-                                        <input
-                                            type="text"
-                                            name="row[titlecolor]"
-                                            value=""
-                                            placeholder="请选择标题颜色"
-                                            class="layui-input"
-                                            id="titlecolor" />
+                                        <input type="text" name="row[titlecolor]" value="" placeholder="请选择标题颜色"
+                                            class="layui-input" id="titlecolor" />
                                     </div>
                                     <div class="layui-inline" style="left: -11px">
                                         <div class="colorpicker" data-input-id="titlecolor"></div>
@@ -217,7 +167,8 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">权限不足提示</label>
                                     <div class="layui-input-block">
-                                        <input type="text" name="row[gnote]" placeholder="请输入权限不足提示语" class="layui-input" />
+                                        <input type="text" name="row[gnote]" placeholder="请输入权限不足提示语"
+                                            class="layui-input" />
                                     </div>
                                 </div>
 
@@ -225,20 +176,15 @@
                                     <label class="layui-form-label">附件</label>
                                     <div class="layui-input-block">
                                         <div class="layui-input-group" style="width: 100%">
-                                            <input
-                                                type="text"
-                                                id="c-enclosure"
-                                                name="row[enclosure]"
-                                                class="layui-input"
-                                                value="" />
+                                            <input type="text" id="c-enclosure" name="row[enclosure]"
+                                                class="layui-input" value="" />
                                             <div class="layui-input-suffix" style="width: 50%">
-                                                <button type="button" data-input-id="c-enclosure" class="layui-btn btn-bdupload">
+                                                <button type="button" data-input-id="c-enclosure"
+                                                    class="layui-btn btn-bdupload">
                                                     <i class="fa fa-upload"></i>
                                                     上传
                                                 </button>
-                                                <button
-                                                    type="button"
-                                                    data-input-id="c-enclosure"
+                                                <button type="button" data-input-id="c-enclosure"
                                                     class="layui-btn layui-bg-green btn-bdchoose">
                                                     <i class="fa fa-list"></i>
                                                     选择
@@ -261,23 +207,12 @@
                                         副栏目
                                     </label>
                                     <div class="layui-input-block">
-                                        <input
-                                            type="hidden"
-                                            id="c-subscode"
-                                            name="row[subscode]"
-                                            value=""
+                                        <input type="hidden" id="c-subscode" name="row[subscode]" value=""
                                             class="layui-input" />
-                                        <div
-                                            class="remoteSelect"
-                                            id="remoteSelect-subscode"
-                                            data-input-id="c-subscode"
-                                            data-primary-key="scode"
-                                            data-field="name"
-                                            data-source="cms.content/getContentSort"
-                                            data-is-tree="true"
-                                            data-init-data="false"
-                                            data-pidname="pcode"
-                                            data-multiple="true"
+                                        <div class="remoteSelect" id="remoteSelect-subscode" data-input-id="c-subscode"
+                                            data-primary-key="scode" data-field="name"
+                                            data-source="cms.content/getContentSort" data-is-tree="true"
+                                            data-init-data="false" data-pidname="pcode" data-multiple="true"
                                             data-params='{"acode":"{$acode}"}'></div>
                                     </div>
                                 </div>
@@ -285,11 +220,7 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">副标题</label>
                                     <div class="layui-input-block">
-                                        <input
-                                            type="text"
-                                            name="row[subtitle]"
-                                            value=""
-                                            placeholder="请输入副标题"
+                                        <input type="text" name="row[subtitle]" value="" placeholder="请输入副标题"
                                             class="layui-input" />
                                     </div>
                                 </div>
@@ -297,23 +228,29 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">URL名称</label>
                                     <div class="layui-input-block">
-                                        <input
-                                            type="text"
-                                            name="row[filename]"
-                                            value=""
-                                            placeholder="请输入URL名称"
+                                        <input type="text" name="row[filename]" value="" placeholder="请输入URL名称"
                                             class="layui-input" />
                                     </div>
                                 </div>
 
                                 <div class="layui-form-item">
+                                    <label class="layui-form-label">自定义模版</label>
+                                    <div class="layui-input-block">
+                                        <select name="row[custom_tpl]" id="c-custom_tpl" class="layui-select"
+                                            lay-search="">
+                                            <option value="">请选择</option>
+                                            {foreach $tpls as $tpl }
+                                            <option value="{$tpl.id}">
+                                                {$tpl.name}
+                                            </option>
+                                            {/foreach}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="layui-form-item">
                                     <label class="layui-form-label">跳转链接</label>
                                     <div class="layui-input-block">
-                                        <input
-                                            type="text"
-                                            name="row[outlink]"
-                                            value=""
-                                            placeholder="请输入跳转链接"
+                                        <input type="text" name="row[outlink]" value="" placeholder="请输入跳转链接"
                                             class="layui-input" />
                                     </div>
                                 </div>
@@ -321,24 +258,15 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">时间</label>
                                     <div class="layui-input-block">
-                                        <input
-                                            type="text"
-                                            name="row[date]"
-                                            value="{:date('Y-m-d H:i:s')}"
-                                            readonly
-                                            placeholder="请选择发布时间"
-                                            class="layui-input laydate" />
+                                        <input type="text" name="row[date]" value="{:date('Y-m-d H:i:s')}" readonly
+                                            placeholder="请选择发布时间" class="layui-input laydate" />
                                     </div>
                                 </div>
 
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">SEO关键字</label>
                                     <div class="layui-input-block">
-                                        <input
-                                            type="text"
-                                            name="row[keywords]"
-                                            value=""
-                                            placeholder="请输入详情页SEO关键字"
+                                        <input type="text" name="row[keywords]" value="" placeholder="请输入详情页SEO关键字"
                                             class="layui-input" />
                                     </div>
                                 </div>
@@ -346,7 +274,8 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">SEO描述</label>
                                     <div class="layui-input-block">
-                                        <textarea name="row[description]" placeholder="请输入详情页SEO描述" class="layui-textarea"></textarea>
+                                        <textarea name="row[description]" placeholder="请输入详情页SEO描述"
+                                            class="layui-textarea"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -368,47 +297,47 @@
 <script>
     layui.use(["badou"], function () {
         var bdForm = layui.bdForm;
-        var badou=layui.badou;
+        var badou = layui.badou;
 
         // 同时加载副栏目下拉
-        function updateSubscode(scode){
+        function updateSubscode(scode) {
             badou.api.ajax({
-                type:'get',
+                type: 'get',
                 url: 'cms.content/getContentSort',
-                data: {scode: scode}
+                data: { scode: scode }
             }, function (data) {
-                var subscodeSelect = xmSelect.get('#remoteSelect-subscode',true);
+                var subscodeSelect = xmSelect.get('#remoteSelect-subscode', true);
                 subscodeSelect.update({
                     data: data.list,
                 });
                 subscodeSelect.changeExpandedKeys(true)
                 return false;
-            },function(){
+            }, function () {
                 return false;
             });
         }
-        function getFieldHtml(id,scode){
+        function getFieldHtml(id, scode) {
             badou.api.ajax({
-                type:'get',
+                type: 'get',
                 url: 'cms.content/getFieldHtml',
-                data: {id: id,scode:scode}
+                data: { id: id, scode: scode }
             }, function (data) {
                 $("#extend").html(data.html)
                 bdForm.api.bindevent($("#extend"));
                 updateSubscode(scode);
                 return false;
-            },function(){
+            }, function () {
                 return false;
             });
         }
 
-        getFieldHtml('',$('#c-scode').val());
+        getFieldHtml('', $('#c-scode').val());
         $(document).on('change', '#c-scode', function () {
-            var scode=$(this).val();
-            if(!scode){
+            var scode = $(this).val();
+            if (!scode) {
                 return false;
             }
-            getFieldHtml('',scode);
+            getFieldHtml('', scode);
         });
 
         bdForm.api.bindevent($("form.layui-form"));
