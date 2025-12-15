@@ -21,23 +21,23 @@ class Bd extends TagLib
     protected $tags = [
         'sort'       => ['attr' => 'cid', 'close' => 1],
         'nav'        => ['attr' => '', 'close' => 1],
-        'list'       => ['attr' => '','close' => 1],
+        'list'       => ['attr' => '', 'close' => 1],
         'slide'      => ['attr' => 'gid', 'close' => 1],
         'link'       => ['attr' => 'gid', 'close' => 1],
-        'content'    => ['attr' => '','close' => 1],
-        'position'   => ['attr' => '','close' => 0],
-        'select'     => ['attr' => 'field','close' => 1],
-        'selectall'  => ['attr' => 'field','close' => 0],
-        'search'     => ['attr' => '','close' => 1],
-        'comment'    => ['attr' => '','close' => 1],
-        'commentsub' => ['attr' => '','close' => 1],
-        'message'    => ['attr' => '','close' => 1],
-        'form'       => ['attr' => 'fcode','close' => 0],
-        'formlist'   => ['attr' => 'fcode','close' => 1],
-        'tags'       => ['attr' => '','close' => 1],
-        'pics'       => ['attr' => '','close' => 1],
-        'qrcode'     => ['attr' => 'string','close' => 0],
-        'loop'       => ['attr' => '','close' => 1],
+        'content'    => ['attr' => '', 'close' => 1],
+        'position'   => ['attr' => '', 'close' => 0],
+        'select'     => ['attr' => 'field', 'close' => 1],
+        'selectall'  => ['attr' => 'field', 'close' => 0],
+        'search'     => ['attr' => '', 'close' => 1],
+        'comment'    => ['attr' => '', 'close' => 1],
+        'commentsub' => ['attr' => '', 'close' => 1],
+        'message'    => ['attr' => '', 'close' => 1],
+        'form'       => ['attr' => 'fcode', 'close' => 0],
+        'formlist'   => ['attr' => 'fcode', 'close' => 1],
+        'tags'       => ['attr' => '', 'close' => 1],
+        'pics'       => ['attr' => '', 'close' => 1],
+        'qrcode'     => ['attr' => 'string', 'close' => 0],
+        'loop'       => ['attr' => '', 'close' => 1],
     ];
 
     /*当前分类 子分类列表*/
@@ -55,11 +55,11 @@ class Bd extends TagLib
 
         if (isset($tag['scode'])) {
             $this->autoBuildVar($tag['scode']);
-            $scode  = $this->isVar($tag['scode']) ? $tag['scode'] : '"'.$tag['scode'].'"';
+            $scode  = $this->isVar($tag['scode']) ? $tag['scode'] : '"' . $tag['scode'] . '"';
         }
         if (isset($tag['aucode'])) {
             $this->autoBuildVar($tag['aucode']);
-            $aucode  = $this->isVar($tag['aucode']) ? $tag['aucode'] : '"'.$tag['aucode'].'"';
+            $aucode  = $this->isVar($tag['aucode']) ? $tag['aucode'] : '"' . $tag['aucode'] . '"';
         }
 
         $alias  = $tag['alias'] ?? 'sort';
@@ -68,12 +68,12 @@ class Bd extends TagLib
         $mod    = $tag['mod'] ?? '2';
         $var    = Random::build('alnum', 10);
         $parse  = '<?php ';
-        $parse .= '$__' . $var . '__ = \app\index\model\cms\ContentSort::getMultSort(' . $scode . ','.$aucode.');';
+        $parse .= '$__' . $var . '__ = \app\index\model\cms\ContentSort::getMultSort(' . $scode . ',' . $aucode . ');';
         $parse .= '?>';
-        $parse .= '{volist name="$__' . $var . '__" id="' .$alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
+        $parse .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
         $parse .= $content;
         $parse .= '{/volist}';
-        $parse .= '<?php unset($'.$alias.');$sort=$listsort; ?>';
+        $parse .= '<?php unset($' . $alias . ');$sort=$listsort; ?>';
         return $parse;
     }
 
@@ -141,15 +141,31 @@ class Bd extends TagLib
             }
         }
 
-        foreach ($tag as $k => & $v) {
-            if (in_array($k, ['num','isico', 'ispics', 'istop', 'isrecommend','isheadline'])) {
-                $params[] = '"'.$k.'"=>'.$v;
+        foreach ($tag as $k => &$v) {
+            if (in_array($k, ['num', 'isico', 'ispics', 'istop', 'isrecommend', 'isheadline'])) {
+                $params[] = '"' . $k . '"=>' . $v;
             }
         }
 
-        $tags ? $params[] = '"tags"=>"'.$tags.'"' : '';
-        $filter ? $params[] = '"filter"=>"'.$filter.'"' : '';
-        $order ? $params[] = '"order"=>"'.$order.'"' : '';
+        if ($filter) {
+            // 处理 filter 参数，支持竖线后的变量
+            if (strpos($filter, '|') !== false) {
+                list($field, $value) = explode('|', $filter, 2);
+                $this->autoBuildVar($value);
+                if ($this->isVar($value)) {
+                    $filter = '"' . $field . '|".' . $value;
+                } else {
+                    $filter = '"' . $field . '|' . $value . '"';
+                }
+            } else {
+                $this->autoBuildVar($filter);
+            }
+            $params[] = '"filter"=>' . $filter;
+        }
+
+        $tags ? $params[] = '"tags"=>"' . $tags . '"' : '';
+        // $filter ? $params[] = '"filter"=>"'.$filter.'"' : '';
+        $order ? $params[] = '"order"=>"' . $order . '"' : '';
 
         $var     = Random::build('alnum', 10);
         $parse   = '<?php ';
@@ -158,9 +174,9 @@ class Bd extends TagLib
         $parse  .= '$page = $__' . $var . '__["page"];';
         $parse  .= ' ?>';
         $parse  .= '{volist name="$__' . $var . '__data__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
-        $parse .= '<?php $'.$alias.'["'.$key.'"]=$'.$key.';?>';
-        $parse .= '<?php $'.$alias.'["n"]=$'.$key.'-1;?>';
-        $parse .= '<?php $'.$alias.'["count"]=$__' . $var .'__["total"];?>';
+        $parse .= '<?php $' . $alias . '["' . $key . '"]=$' . $key . ';?>';
+        $parse .= '<?php $' . $alias . '["n"]=$' . $key . '-1;?>';
+        $parse .= '<?php $' . $alias . '["count"]=$__' . $var . '__["total"];?>';
         $parse  .= $content;
         $parse  .= '{/volist}';
         return $parse;
@@ -179,9 +195,9 @@ class Bd extends TagLib
         $empty = $tag['empty'] ?? '';
         $alias    = $tag['alias'] ?? 'content';
         $parse   = '<?php ';
-        $parse  .= '$' . $alias . ' = \app\index\model\cms\Content::getContent('.implode(',', $param).');';
+        $parse  .= '$' . $alias . ' = \app\index\model\cms\Content::getContent(' . implode(',', $param) . ');';
         $parse  .= ' ?>';
-        $parse .= '{if $' .$alias . '}';
+        $parse .= '{if $' . $alias . '}';
         $parse .= $content;
         $parse .= '{else /}';
         $parse .= '<?php echo "' . $empty . '" ;?>';
@@ -200,7 +216,7 @@ class Bd extends TagLib
         $mod     = $tag['mod'] ?? '2';
         $var     = Random::build('alnum', 10);
         $parse   = '<?php ';
-        $parse  .= '$__' . $var . '__ = \app\index\model\cms\Slide::slideList('.$gid.',"'.$num.'");';
+        $parse  .= '$__' . $var . '__ = \app\index\model\cms\Slide::slideList(' . $gid . ',"' . $num . '");';
         $parse  .= ' ?>';
         $parse  .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
         $parse  .= $content;
@@ -219,7 +235,7 @@ class Bd extends TagLib
         $mod     = $tag['mod'] ?? '2';
         $var     = Random::build('alnum', 10);
         $parse   = '<?php ';
-        $parse  .= '$__' . $var . '__ = \app\index\model\cms\Link::linkList('.$gid.',"'.$num.'");';
+        $parse  .= '$__' . $var . '__ = \app\index\model\cms\Link::linkList(' . $gid . ',"' . $num . '");';
         $parse  .= ' ?>';
         $parse  .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
         $parse  .= $content;
@@ -243,7 +259,7 @@ class Bd extends TagLib
         ];
 
         $parse   = '<?php ';
-        $parse  .= 'echo \app\index\model\cms\ContentSort::positionHtml(['.implode(',', $params).']);';
+        $parse  .= 'echo \app\index\model\cms\ContentSort::positionHtml([' . implode(',', $params) . ']);';
         $parse  .= ' ?>';
         return $parse;
     }
@@ -258,7 +274,7 @@ class Bd extends TagLib
         $mod    = $tag['mod'] ?? '2';
         $var    = Random::build('alnum', 10);
         $parse  = '<?php ';
-        $parse .= '$__' . $var . '__ = \app\index\model\cms\Extfield::getSelect("'.$field.'");';
+        $parse .= '$__' . $var . '__ = \app\index\model\cms\Extfield::getSelect("' . $field . '");';
         $parse .= ' ?>';
         $parse .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
         $parse .= $content;
@@ -281,7 +297,7 @@ class Bd extends TagLib
             "'active'=>'{$active}'",
         ];
         $parse   = '<?php ';
-        $parse  .= 'echo \app\index\model\cms\Extfield::getSelectAllLabel(['.implode(',', $params).']);';
+        $parse  .= 'echo \app\index\model\cms\Extfield::getSelectAllLabel([' . implode(',', $params) . ']);';
         $parse  .= ' ?>';
         return $parse;
     }
@@ -310,11 +326,11 @@ class Bd extends TagLib
             "'start'=>{$start}",
             "'fuzzy'=>{$fuzzy}",
         ];
-        isset($tag['num']) ? $params[] = '"num"=>'.$tag['num'] : '';
+        isset($tag['num']) ? $params[] = '"num"=>' . $tag['num'] : '';
 
-        $tags ? $params[] = '"tags"=>'.$tags : '';
-        $filter ? $params[] = '"filter"=>'.$filter : '';
-        $order ? $params[] = '"order"=>"'.$order.'"' : '';
+        $tags ? $params[] = '"tags"=>' . $tags : '';
+        $filter ? $params[] = '"filter"=>' . $filter : '';
+        $order ? $params[] = '"order"=>"' . $order . '"' : '';
 
         $var     = Random::build('alnum', 10);
         $parse   = '<?php ';
@@ -440,7 +456,7 @@ class Bd extends TagLib
     {
         $fcode = $tag['fcode'];
         $parse   = '<?php ';
-        $parse  .= 'echo (new \app\index\model\cms\Form())->getFormLink('.$fcode.');';
+        $parse  .= 'echo (new \app\index\model\cms\Form())->getFormLink(' . $fcode . ');';
         $parse  .= ' ?>';
         return $parse;
     }
@@ -495,7 +511,7 @@ class Bd extends TagLib
         $mod   = $tag['mod'] ?? '2';
         $var     = Random::build('alnum', 10);
         $parse   = '<?php ';
-        $parse  .= '$__' . $var . '__ = \app\index\model\cms\Content::getContentTags('.$id.','.$scode.','.$num.',"'.$target.'");';
+        $parse  .= '$__' . $var . '__ = \app\index\model\cms\Content::getContentTags(' . $id . ',' . $scode . ',' . $num . ',"' . $target . '");';
         $parse  .= '?>';
         $parse  .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
         $parse  .= $content;
@@ -515,7 +531,7 @@ class Bd extends TagLib
         $mod   = $tag['mod'] ?? '2';
         $var     = Random::build('alnum', 10);
         $parse   = '<?php ';
-        $parse  .= '$__' . $var . '__ = (new \app\index\model\cms\Content)->getContentPics('.$id.','.$field.','.$num.');';
+        $parse  .= '$__' . $var . '__ = (new \app\index\model\cms\Content)->getContentPics(' . $id . ',' . $field . ',' . $num . ');';
         $parse  .= '?>';
         $parse  .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
         $parse  .= $content;
@@ -527,7 +543,7 @@ class Bd extends TagLib
     {
         $string = $tag['string'] ?? '""';
         $string = $this->autoBuildVar($string);
-        $parse   = '<?php echo \'<img src="'.request()->domain(true). '/api/cms.qrcode/index?string=\'.'.$string.'.\'" class="qrcode" alt="二维码">\'; ?>';
+        $parse   = '<?php echo \'<img src="' . request()->domain(true) . '/api/cms.qrcode/index?string=\'.' . $string . '.\'" class="qrcode" alt="二维码">\'; ?>';
         return $parse;
     }
 
@@ -541,7 +557,7 @@ class Bd extends TagLib
         $end = $tag['end'] ?? 0;
         $parse = '<?php ';
         $parse .= '$loop = ["i"=>0, "index"=>1];';
-        $parse .= 'for($i='.$start.'; $i<='.$end.'; $i++):';
+        $parse .= 'for($i=' . $start . '; $i<=' . $end . '; $i++):';
         $parse .= '$loop["i"] = $i;';
         $parse .= '$loop["index"] = $i+1;';
         $parse .= '?>';
@@ -650,7 +666,7 @@ class Bd extends TagLib
                 $result['expression'] = trim($result['expression']);
             } elseif (empty($this->tags[$name]) || !empty($this->tags[$name]['attr'])) {
                 if (get_sys_config('tpl_error')) {
-                    throw new Exception('tag error:'. $name);
+                    throw new Exception('tag error:' . $name);
                 }
             }
         }
