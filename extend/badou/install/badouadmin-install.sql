@@ -537,6 +537,7 @@ CREATE TABLE `bd_cms_content` (
   `gid` varchar(20) NOT NULL DEFAULT '',
   `gnote` varchar(100) NOT NULL DEFAULT '',
   `aucode` int(10) DEFAULT NULL COMMENT '语言统一code',
+  `custom_tpl` varchar(255) DEFAULT '' COMMENT '详情页模版',
   PRIMARY KEY (`id`),
   KEY `ay_content_scode` (`scode`),
   KEY `ay_content_subscode` (`subscode`),
@@ -1265,6 +1266,12 @@ INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`,
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (39, 'close_site', 'basics', '网站状态', '', 'radio', '1', '[\"\\u5173\\u95ed\",\"\\u5f00\\u542f\"]', '', '', 1, 991);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (40, 'close_site_note', 'basics', '关站提示', '', 'textarea', '', '', '', '', 1, 990);
 INSERT INTO `bd_config` (`id`, `name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES (41, 'usercenter', 'user', '会员中心', '', 'switch', '1', '', '', '', 1, 0);
+INSERT INTO `bd_config` (`name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES ('content_keyword_replace', 'cms', '敏感词过滤', '注：多个敏感词之间用逗号隔开！', 'textarea', '最佳,最具,最爱,最赚,最优,最优秀,最好,最高,最高级,最高端,最奢侈,最低,最低级,最底,最便宜,史上最低价,最流行,最受欢迎,最时尚,最符合,最舒适,最先,国家级,全球级,宇宙级,世界级,顶级,顶尖,尖端,顶级工艺,顶级享受,极品,极佳,绝佳,绝对,终极,极致,首个,首选,独家,独家配方,首发,全网首发,全国首发,首家,全网首家,全国首家,首次,首款,全国销量冠军,国家级产品,国家免检,国家领导人,填补国内空白,中国驰名,驰名商标,国家品质,第一,中国第一,全网第一,销量第一,排名第一,唯一,第一品牌,NO.1,TOP.1,独一无二,全国第一,绝无,仅有,一流,仅此一款,中国驰名商标,专家推荐,质量免检,无需国家质量检测,免抽检,领导人推荐,机关推荐,史无前例,前无古人,永久,万能,祖传,无敌,纯天然,100%,超赚,精确,全民免单,抢爆,万人疯抢,全民疯抢,卖疯了,抢疯了,大牌,金牌,名牌,王牌,领袖品牌,世界领先,遥遥领先,领先,领导者,缔造者,创领品牌,领先上市,至尊,巅峰,优秀,领袖,之王,王者,冠军,抄底,限时,完美,国际品质,首位,百分百,权威,最全,最好', '', '', '', 1, 0);
+INSERT INTO `bd_config` (`name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES ('index_title', 'cms', '网页标题-首页', '网页标题格式（支持变量）全局变量{$bd.xxx}，默认：{$bd.sitetitle}-{$bd.sitesubtitle}', 'string', '','', '', '', 1, 0);
+INSERT INTO `bd_config` (`name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES ('list_title', 'cms', '网页标题-列表页', '网页标题格式（支持变量）栏目变量 {$sort.xxx}，默认：{$sorttitle}-{$bd.sitetitle}', 'string', '','', '', '', 1, 0);
+INSERT INTO `bd_config` (`name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES ('content_title', 'cms', '网页标题-内容页', '网页标题格式（支持变量）内容变量 {$content.xxx},默认：{$content.title}-{$sorttitle}-{$bd.sitetitle}', 'string', '','', '', '', 1, 0);
+INSERT INTO `bd_config` (`name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES ('search_title', 'cms', '网页标题-搜索页', '网页标题格式（支持变量）', 'string','', '', '', '', 1, 0);
+INSERT INTO `bd_config` (`name`, `group`, `title`, `tip`, `type`, `value`, `content`, `rule`, `extend`, `allow_del`, `weigh`) VALUES ('url_type', 'cms', 'url模式', '', 'radio', '1', '[\"\\u53bb\\u6389\\u540e\\u7f00\",\"\\u4fdd\\u7559\\u540e\\u7f00\"]', '', '', 1, 0);
 COMMIT;
 
 -- ----------------------------
