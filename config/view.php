@@ -25,7 +25,7 @@ return [
     'taglib_end'    => '}',
     // 视图输出字符串内容替换,留空则会自动进行计算
     'tpl_replace_string'  =>  [
-        '__PUBLIC__' => '',
+        '__PUBLIC__' => '/',
         '__ROOT__'   => '',
         '__CDN__'    => '',
     ],
