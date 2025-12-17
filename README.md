@@ -42,41 +42,42 @@ http://demo.badoucms.com/admin.php
 
 ### 功能列表
 
--   [x] 区域管理（多语言）
--   [x] 模型管理（自定义内容模型）
--   [x] 模型字段管理（自定义模型字段）
--   [x] 栏目管理
--   [x] 内容管理（单页内容、文章内容、产品内容...自定义内容模型）
--   [x] 站点配置、公司信息
--   [x] 定制标签（自定义前台标签）
--   [x] 前台模版标签
--   [x] 轮播图片
--   [x] 多条件筛选
--   [x] 网站地图（sitemap）
--   [x] 友情链接
--   [x] 自定义表单
--   [x] 留言信息
--   [x] 文章内链
--   [x] 多条件搜索
--   [x] 内容权限
--   [x] 会员功能(登录、注册、找回密码、修改密码、余额、积分、退出)
--   [x] 会员字段
--   [x] 会员等级(设置栏目与内容浏览权限)
--   [x] 文章评论(回复、审核)
--   [x] 我的评论
--   [x] 系统升级
--   [x] Api 接口
--   [x] 百度推送
--   [x] 跨语言复制数据
--   [x] API 翻译数据
--   [x] 短信发送
--   [x] 对象存储
--   [x] 缩略图水印（插件实现）
+- [x] 区域管理（多语言）
+- [x] 模型管理（自定义内容模型）
+- [x] 模型字段管理（自定义模型字段）
+- [x] 栏目管理
+- [x] 内容管理（单页内容、文章内容、产品内容...自定义内容模型）
+- [x] 站点配置、公司信息
+- [x] 定制标签（自定义前台标签）
+- [x] 前台模版标签
+- [x] 轮播图片
+- [x] 多条件筛选
+- [x] 网站地图（sitemap）
+- [x] 友情链接
+- [x] 自定义表单
+- [x] 留言信息
+- [x] 文章内链
+- [x] 多条件搜索
+- [x] 内容权限
+- [x] 会员功能(登录、注册、找回密码、修改密码、余额、积分、退出)
+- [x] 会员字段
+- [x] 会员等级(设置栏目与内容浏览权限)
+- [x] 文章评论(回复、审核)
+- [x] 我的评论
+- [x] 系统升级
+- [x] Api 接口
+- [x] 百度推送
+- [x] 跨语言复制数据
+- [x] API 翻译数据
+- [x] 短信发送
+- [x] 对象存储
+- [x] 缩略图水印（插件实现）
+- [x] 外贸 cms
 
 ### 特别鸣谢
 
--   [PearAdmin](https://gitee.com/pear-admin/pear-admin-layui)
--   [pbootcms](https://www.pbootcms.com/)
--   [layui](https://layui.dev/)
--   [buildadmin](https://doc.buildadmin.com/)
--   [fastadmin](https://www.fastadmin.net/)
+- [PearAdmin](https://gitee.com/pear-admin/pear-admin-layui)
+- [pbootcms](https://www.pbootcms.com/)
+- [layui](https://layui.dev/)
+- [buildadmin](https://doc.buildadmin.com/)
+- [fastadmin](https://www.fastadmin.net/)
