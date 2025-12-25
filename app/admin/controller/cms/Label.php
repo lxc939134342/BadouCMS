@@ -35,9 +35,9 @@ class Label extends Base
         $this->model = new \app\admin\model\cms\Label();
 
         $this->rules = [
-            'name|'.__('name') => 'require|unique:cms_label',
-            'type|'.__('type') => 'require',
-            'description|'.__('description') => 'require'
+            'name|' . __('name') => 'require|unique:cms_label',
+            'type|' . __('type') => 'require',
+            'description|' . __('description') => 'require'
         ];
         $typeListTextMap = $this->model->typeListTextMap();
         $this->assign('typeText', $typeListTextMap);
@@ -85,7 +85,7 @@ class Label extends Base
                 }
             }
             $this->model->saveAll($data);
-            Cache::delete('cms_label');
+            Cache::delete('cms_label_' . get_backend_lang());
             $this->success(__('Update successful'));
         }
         return $this->view->fetch();
@@ -100,13 +100,13 @@ class Label extends Base
             $data = $this->getPostData('row/a');
             // 构建数据
             $default = array(
-              'name' => '',
-              'description' => '',
-              'value' => '', // 添加时设置为空
-              'type' => '',
-              'create_user' => $this->auth->nickname,
-              'update_user' => $this->auth->nickname,
-              'acode' => get_backend_lang()
+                'name' => '',
+                'description' => '',
+                'value' => '', // 添加时设置为空
+                'type' => '',
+                'create_user' => $this->auth->nickname,
+                'update_user' => $this->auth->nickname,
+                'acode' => get_backend_lang()
             );
             $data = array_merge($default, $data);
             $data['value'] = $data['value'] ?? '';
@@ -117,6 +117,7 @@ class Label extends Base
                 $this->modelValidateFunction($data);
                 $result = $this->model->save($data);
                 $this->model->commit();
+                Cache::delete('cms_label_' . get_backend_lang());
             } catch (Throwable $e) {
                 $this->model->rollback();
                 $this->error($e->getMessage());
@@ -155,6 +156,7 @@ class Label extends Base
                 $this->modelValidateFunction($data);
                 $result = $row->save($data);
                 $this->model->commit();
+                Cache::delete('cms_label_' . get_backend_lang());
             } catch (Throwable $e) {
                 $this->model->rollback();
                 $this->error($e->getMessage());
@@ -181,15 +183,13 @@ class Label extends Base
         foreach ($fields as $k => $v) {
             $fields[$k]['component'] = $typeListComponentMap[$v['type']];
             $row[$v['name']] = $v['value'];
-            $fields[$k]['form_name'] = 'row['.$v['name'].']';
+            $fields[$k]['form_name'] = 'row[' . $v['name'] . ']';
             $fields[$k]['form_id'] = $v['name'];
             $fields[$k]['form_value'] = $row[$v['name']] ??  '';
             $fields[$k]['form_acode'] = '';
         }
         $this->view->assign('custom_fields', $fields);
         $this->view->assign('row', $row);
-
-
 
         $this->success('', null, ['html' => $this->view->fetch('cms/common/builder/fields')]);
     }
