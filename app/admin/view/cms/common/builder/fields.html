@@ -201,3 +201,65 @@
 
 {/switch}
 {/foreach}
+
+
+<!--{literal}-->
+<script>
+layui.use(['layer'], function(){
+    var layer = layui.layer;
+
+    // 为所有字段标签添加点击复制功能
+    $(document).on('click', '.layui-form-label', function(e) {
+        // 查找最近的字段容器，获取字段名
+        var $formItem = $(this).closest('.layui-form-item');
+        var fieldName = '';
+
+        // 尝试从输入元素中提取字段名
+        var $input = $formItem.find('input[name]:first, select[name]:first, textarea[name]:first');
+        if ($input.length > 0) {
+            var name = $input.attr('name');
+            // 处理可能包含数组格式的字段名
+            fieldName = name.replace(/^.*\[([^\]]+)\].*$/, '$1');
+        }
+
+        if (fieldName) {
+            // 格式化为 {$bd.字段名}
+            var copyText = '{$bd.' + fieldName + '}';
+            // 复制到剪贴板
+            var $temp = $('<textarea>');
+            $('body').append($temp);
+            $temp.val(copyText).select();
+            try {
+                document.execCommand('copy');
+                $temp.remove();
+                layer.msg('已复制: {$bd.' + fieldName + '}', {icon: 1});
+            } catch (err) {
+                $temp.remove();
+                layer.msg('复制失败，请手动复制: {$bd.' + fieldName + '}', {icon: 2});
+            }
+        }
+    });
+
+    // 添加鼠标悬停样式提示
+    $(document).on('mouseenter', '.layui-form-label', function() {
+        $(this).css('cursor', 'pointer');
+        var $formItem = $(this).closest('.layui-form-item');
+        var $input = $formItem.find('input[name]:first, select[name]:first, textarea[name]:first');
+        var fieldName = '';
+        if ($input.length > 0) {
+            var name = $input.attr('name');
+            fieldName = name.replace(/^.*\[([^\]]+)\].*$/, '$1');
+        }
+        if (fieldName) {
+            layer.tips('点击复制 {$bd.' + fieldName + '}', this, {
+                tips: 1,
+                time: 0,
+                area: 'auto'
+            });
+        }
+    }).on('mouseleave', '.layui-form-label', function() {
+        layer.closeAll('tips');
+    });
+});
+</script>
+<!--{/literal}-->
