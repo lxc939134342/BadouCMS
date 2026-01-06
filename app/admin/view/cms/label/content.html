@@ -53,9 +53,9 @@
             },
         });
 
-        function getFieldHtml(){
+        function getFieldHtml() {
             badou.api.ajax({
-                type:'get',
+                type: 'get',
                 url: 'cms.label/getFieldHtml'
             }, function (data) {
                 $("#extend").html(data.html)
@@ -79,10 +79,7 @@
             getFieldHtml()
         });
 
-
-
         getFieldHtml()
-
         bdForm.api.bindevent($("form.layui-form-content"));
     });
 </script>

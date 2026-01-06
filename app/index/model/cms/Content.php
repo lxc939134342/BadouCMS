@@ -988,7 +988,7 @@ class Content extends Model
 
         /* 任意搜索字段 */
         /* 排除字段 */
-        $exclude = ['page', 'start', 'lfield', 'keyword', 'fuzzy', 'scode', 'lg', 'searchtpl', 'field', 'num'];
+        $exclude = ['page', 'start', 'lfield', 'keyword', 'fuzzy', 'scode', 'lg', 'searchtpl', 'field', 'num', 'appid', 'timestamp', 'signature'];
         foreach (request()->param() as $key => $value) {
             if (in_array($key, $exclude)) {
                 continue;
