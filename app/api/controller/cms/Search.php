@@ -29,10 +29,9 @@ class Search extends Base
         $page = $this->request->param('page', 1);
         $fuzzy = $this->request->param('fuzzy', 1);
 
-        $params = [
-            'keyword' => $keyword,
-            'fuzzy' => $fuzzy
-        ];
+        $params = $this->request->param();
+        $params['page'] = $page;
+        $params['fuzzy'] = $fuzzy;
 
         // 读取数据
         $data = $this->model::searchList($params);
