@@ -2,102 +2,154 @@
 
 <!-- 表格 -->
 <div class="layui-card">
-    <div class="layui-card-body">
-        <table class="layui-hide" id="rule" data-operate-edit="{:$auth->check('auth.rule/edit')}" data-operate-del="{:$auth->check('auth.rule/del')}"></table>
-    </div>
+  <div class="layui-card-body">
+    <table
+      class="layui-hide"
+      id="rule"
+      data-operate-edit="{:$auth->check('auth.rule/edit')}"
+      data-operate-del="{:$auth->check('auth.rule/del')}"
+    ></table>
+  </div>
 </div>
 
 <!-- 表格左侧按钮 toolbar  -->
 <script type="text/html" id="toolbar">
-    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black"><i class="fa fa-refresh"></i></a>
-    <button class="layui-btn btn-theme-color {:$auth->check('auth.rule/add')?'':'hide'}" lay-event="add"><i class="fa fa-plus"></i> {:__('Add')}</button>
-    <button class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('auth.rule/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
-    <button class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('auth.rule/del')?'':'hide'}" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
-    <button class="layui-btn" id="expandAll"><i class="fa fa-plus"></i> {:__('Expendall')}</button>
+  <a
+    href="javascript:;"
+    lay-event="refresh"
+    class="layui-btn btn-refresh layui-bg-black"
+  >
+    <i class="fa fa-refresh"></i>
+  </a>
+  <button
+    class="layui-btn btn-theme-color {:$auth->check('auth.rule/add')?'':'hide'}"
+    lay-event="add"
+  >
+    <i class="fa fa-plus"></i>
+    {:__('Add')}
+  </button>
+  <button
+    class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('auth.rule/edit')?'':'hide'}"
+    lay-event="edit"
+  >
+    <i class="fa fa-pencil"></i>
+    {:__('Edit')}
+  </button>
+  <button
+    class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('auth.rule/del')?'':'hide'}"
+    lay-event="del"
+  >
+    <i class="fa fa-trash"></i>
+    {:__('Del')}
+  </button>
+  <button class="layui-btn" id="expandAll">
+    <i class="fa fa-plus"></i>
+    {:__('Expendall')}
+  </button>
 </script>
 
 <script>
-    layui.use(["badou"], function () {
-        var bdTable = layui.bdTable;
-        var treeTable = layui.treeTable;
-        var layer = layui.layer;
-        var dropdown = layui.dropdown;
-        bdTable.api.init({
-            table: treeTable,
-            extend: {
-                index_url: "auth.rule/index",
-                add_url: "auth.rule/add",
-                edit_url: "auth.rule/edit",
-                del_url: "auth.rule/del",
-                multi_url: "auth.rule/multi",
-                table: "auth_rule",
-            },
-        });
-        bdTable.render({
-            elem: "#rule",
-            url: "{:url('auth.rule/index')}",
-            pk: "id",
-            even: true,
-            toolbar: "#toolbar",
-            commonSearch: false,
-            reloadData: true,
-            tree: {
-                customName: {
-                    children: "childlist",
-                    pid: "pid",
-                    name: "title",
-                },
-                view: {
-                    showIcon: false,
-                },
-                // 取消联动
-                // data: {
-                //     cascade: "none",
-                // },
-            },
-            cols: [
-                [
-                    { type: "checkbox" },
-                    { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "title", title: "标题", operate: "like" },
-                    { field: "name", title: "规则", width: 300 },
-                    { field: "icon", title: "图标", width: 150, templet: bdTable.api.formatter.icon, operate: false },
-                    { field: "weigh", title: "权重", width: 100, operate: "BETWEEN",templet:bdTable.api.formatter.input },
-                    {
-                        field: "status",
-                        title: "状态",
-                        width: 100,
-                        searchList: { normal: "正常", hidden: "隐藏" },
-                        custom: { normal: "green", hidden: "orange" },
-                        templet: bdTable.api.formatter.status,
-                    },
-                    // {
-                    //     field: "ismenu",
-                    //     title: "菜单",
-                    //     width: 100,
-                    //     searchList: {
-                    //         0: "关闭",
-                    //         1: "开启",
-                    //     },
-                    //     templet: bdTable.api.formatter.switch,
-                    // },
-                    { title: "操作", width: 190, align: "center", templet: bdTable.api.formatter.operate },
-                ],
-            ],
-        });
-        // 展开全部
-        $(document).on("click", "#expandAll", function () {
-            var btn = $(this);
-            var isExpanded = btn.hasClass("expanded");
-            if (isExpanded) {
-                treeTable.expandAll("rule", false);
-                btn.removeClass("expanded");
-                btn.html('<i class="fa fa-plus"></i> {:__("Expendall")}');
-            } else {
-                treeTable.expandAll("rule", true);
-                btn.addClass("expanded");
-                btn.html('<i class="fa fa-minus"></i> {:__("Collapseall")}');
-            }
-        });
+  layui.use(["badou"], function () {
+    var bdTable = layui.bdTable;
+    var treeTable = layui.treeTable;
+    var layer = layui.layer;
+    var dropdown = layui.dropdown;
+    bdTable.api.init({
+      table: treeTable,
+      extend: {
+        index_url: "auth.rule/index",
+        add_url: "auth.rule/add",
+        edit_url: "auth.rule/edit",
+        del_url: "auth.rule/del",
+        multi_url: "auth.rule/multi",
+        table: "auth_rule",
+      },
     });
+    bdTable.render({
+      elem: "#rule",
+      url: "{:url('auth.rule/index')}",
+      pk: "id",
+      even: true,
+      toolbar: "#toolbar",
+      commonSearch: false,
+      reloadData: true,
+      tree: {
+        customName: {
+          children: "childlist",
+          pid: "pid",
+          name: "title",
+        },
+        view: {
+          showIcon: false,
+        },
+        // 取消联动
+        // data: {
+        //     cascade: "none",
+        // },
+      },
+      cols: [
+        [
+          { type: "checkbox" },
+          { field: "id", title: "ID", width: 80, sort: true },
+          { field: "title", title: "标题", operate: "like" },
+          { field: "name", title: "规则", width: 300 },
+          {
+            field: "icon",
+            title: "图标",
+            width: 100,
+            templet: bdTable.api.formatter.icon,
+            operate: false,
+          },
+          {
+            field: "type",
+            title: "类型",
+            width: 150,
+            searchList: {
+              0: "菜单目录",
+              1: "子菜单",
+              2: "按钮",
+            },
+            custom: { 0: "blue", 1: "green", 2: "orange" },
+            templet: bdTable.api.formatter.label,
+          },
+          {
+            field: "weigh",
+            title: "权重",
+            width: 100,
+            operate: "BETWEEN",
+            templet: bdTable.api.formatter.input,
+          },
+          {
+            field: "status",
+            title: "状态",
+            width: 120,
+            searchList: { normal: "正常", hidden: "隐藏" },
+            custom: { normal: "green", hidden: "orange" },
+            templet: bdTable.api.formatter.status,
+          },
+
+          {
+            title: "操作",
+            width: 190,
+            align: "center",
+            templet: bdTable.api.formatter.operate,
+          },
+        ],
+      ],
+    });
+    // 展开全部
+    $(document).on("click", "#expandAll", function () {
+      var btn = $(this);
+      var isExpanded = btn.hasClass("expanded");
+      if (isExpanded) {
+        treeTable.expandAll("rule", false);
+        btn.removeClass("expanded");
+        btn.html('<i class="fa fa-plus"></i> {:__("Expendall")}');
+      } else {
+        treeTable.expandAll("rule", true);
+        btn.addClass("expanded");
+        btn.html('<i class="fa fa-minus"></i> {:__("Collapseall")}');
+      }
+    });
+  });
 </script>
