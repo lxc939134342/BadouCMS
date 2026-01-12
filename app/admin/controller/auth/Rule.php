@@ -63,9 +63,9 @@ class Rule extends Backend
     {
         if ($this->isAjax()) {
             $res = $this->model
-                    ->withoutField('type,condition,remark,create_time,update_time')
-                    ->order('weigh DESC,id ASC')
-                    ->select()->toArray();
+                ->withoutField('condition,remark,create_time,update_time')
+                ->order('weigh DESC,id ASC')
+                ->select()->toArray();
             $total = count($res);
             foreach ($res as &$v) {
                 $v['title'] = __($v['title']);
