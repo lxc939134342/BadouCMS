@@ -308,7 +308,7 @@ class Content extends Model
         //替换链接
         foreach ($autolinkArr as $index => $item) {
             $content = preg_replace_callback('/(' . preg_quote($item['name'], '/') . ')/i', function ($match) use ($item, &$stages) {
-                $data = [$item['link'], $match[0]];
+                $data = [$item['link'], '', $match[0]];
                 return '<' . array_push($stages, $data) . '>';
             }, $content, $limit);
         }
@@ -319,7 +319,7 @@ class Content extends Model
                 return $data;
             }
             $url = $data[0];
-            return "<a href=\"{$url}\" target=\"_blank\" >{$data[1]}</a>";
+            return "<a href=\"{$url}\" target=\"_blank\"{$data[1]}>{$data[2]}</a>";
         }, $content);
         return $content;
     }
