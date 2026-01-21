@@ -13,22 +13,64 @@
 namespace app\index\model\cms;
 
 use think\Model;
-use think\facade\View;
+use think\facade\Db;
 
 class ContentSort extends Model
 {
     protected $name = 'cms_content_sort';
 
-    protected $append = ['ico','pic','link'];
+    protected $append = ['ico', 'pic', 'link'];
 
-    // 存储分类查询数据
-    protected $sorts = null;
+    public static function formatIco($value): string
+    {
+        return $value ? cdnurl($value) : '';
+    }
+    public static function formatUrl($value, $data)
+    {
+        if ($data['outlink']) {
+            return $data['outlink'];
+        }
+        return bdurl($data['type'], $data['urlname'], 'list', $data['scode'], $data['filename'], '', '');
+    }
 
-    // 存储分类及子编码
-    protected $scodes = [];
 
-    // 存储栏目位置
-    protected $position = [];
+    public function getIcoAttr($value, $data)
+    {
+        return self::formatIco($value);
+    }
+
+    public function getPicAttr($value, $data)
+    {
+        return self::formatIco($value);
+    }
+
+    public function getLinkAttr($value, $data)
+    {
+        return self::formatUrl($value, $data);
+    }
+
+    protected static function aucodeMapKey()
+    {
+        return 'aucodekey_' . get_frontend_lang();
+    }
+
+    /**
+     * 获取缓存标签和时长
+     * @param string $type
+     * @param array  $tag
+     * @return array
+     */
+    public static function getCacheKeyExpire($type, $tag = [])
+    {
+        $config = [
+            'cachelifetime' => 3600 * 24
+        ];
+        $cache = !isset($tag['cache']) ? $config['cachelifetime'] : $tag['cache'];
+        $cache = in_array($cache, ['true', 'false', true, false], true) ? (in_array($cache, ['true', true], true) ? 0 : -1) : (int)$cache;
+        $cacheKey = $cache > -1 ? "cms-taglib-{$type}-" . md5(serialize($tag)) : false;
+        $cacheExpire = $cache > -1 ? $cache : null;
+        return [$cacheKey, $cacheExpire];
+    }
 
     /**
      * 返回空数据
@@ -46,24 +88,6 @@ class ContentSort extends Model
             'toplink' => '',
             'toprows' => 0,
         ];
-    }
-
-    public function getIcoAttr($value, $data)
-    {
-        return $value ? cdnurl($value) : '';
-    }
-
-    public function getPicAttr($value, $data)
-    {
-        return $value ? cdnurl($value) : '';
-    }
-
-    public function getLinkAttr($value, $data)
-    {
-        if ($data['outlink']) {
-            return $data['outlink'];
-        }
-        return bdurl($data['type'], $data['urlname'], 'list', $data['scode'], $data['filename'], '', '');
     }
 
     /**
@@ -94,7 +118,8 @@ class ContentSort extends Model
     }
 
     // 获取默认语言的urlname
-    public function getSortNotLang($scode){
+    public function getSortNotLang($scode)
+    {
         $field = array(
             'a.*',
             'a.name AS parentname',
@@ -126,42 +151,33 @@ class ContentSort extends Model
      */
     public static function getMultSort($scodes = null, $aucodes = null): array
     {
-        $out_data = ContentSort::getSortsTree(false,0);
-
         if ($scodes) {
+            $out_data = ContentSort::getSortsTree(false, 0);
             $scode_arr = explode(',', $scodes);
-
-            // 读取指定分类
-            if ($scode_arr) {
-                foreach ($out_data as $index => $value) {
-                    if (!in_array($value['scode'], $scode_arr)) {
-                        unset($out_data[$index]);
-                    }
-                }
-                // 将数组按照scode_arr的顺序排序
-                usort($out_data, function ($a, $b) use ($scode_arr) {
-                    $pos_a = array_search($a['scode'], $scode_arr);
-                    $pos_b = array_search($b['scode'], $scode_arr);
-                    return $pos_a - $pos_b;
-                });
-            }
         } elseif ($aucodes) {
+            $out_data = ContentSort::getSortsTree(true, 0);
+            $aucodemap = cache(self::aucodeMapKey());
             $aucodes_arr = explode(',', $aucodes);
+            $scode_arr = [];
+            foreach ($aucodes_arr as $v) {
+                $scode_arr[] = $aucodemap[$v];
+            }
+        }
 
-            // 读取指定分类
-            if ($aucodes_arr) {
-                foreach ($out_data as $index => $value) {
-                    if (!in_array($value['aucode'], $aucodes_arr)) {
-                        unset($out_data[$index]);
-                    }
-                    if ($value['acode'] != get_frontend_lang()) {
-                        unset($out_data[$index]);
-                    }
-                }
-                // 将数组按照aucodes_arr的顺序排序
-                usort($out_data, function ($a, $b) use ($aucodes_arr) {
-                    $pos_a = array_search($a['aucode'], $aucodes_arr);
-                    $pos_b = array_search($b['aucode'], $aucodes_arr);
+        // 读取指定分类
+        if ($scode_arr) {
+            $filtered_data = [];
+            foreach ($scode_arr as $index => $value) {
+                $filtered_data[$value] = $out_data[$value];
+            }
+
+            if (count($filtered_data) > 1) {
+                $scode_pos_map = array_flip($scode_arr);
+                // 将数组按照scode_arr的顺序排序
+                usort($filtered_data, function ($a, $b) use ($scode_pos_map) {
+                    // 直接从映射表中获取位置，O(1) 复杂度
+                    $pos_a = $scode_pos_map[$a['scode']] ?? PHP_INT_MAX;
+                    $pos_b = $scode_pos_map[$b['scode']] ?? PHP_INT_MAX;
                     return $pos_a - $pos_b;
                 });
             }
@@ -169,9 +185,16 @@ class ContentSort extends Model
 
         $key = 0;
         $result = [];
-        foreach ($out_data as $index => $value) { // 按查询的数据条数循环
+        foreach ($filtered_data as $index => $value) { // 按查询的数据条数循环
+            $parent = $out_data[$value['pcode']];
+            $top = $out_data[$value['tcode']];
             $value['n'] = $key;
             $value['i'] = $key + 1;
+            $value['toplink'] = self::formatUrl($value['tcode'], $top);
+            $value['parentlink'] = self::formatUrl($value['pcode'],  $parent);
+            $value['ico'] = self::formatIco($value['ico']);
+            $value['pic'] = self::formatIco($value['pic']);
+            $value['link'] = self::formatUrl($value['link'], $value);
             $result[$index] = $value;
             $key++;
         }
@@ -185,7 +208,7 @@ class ContentSort extends Model
      * @param mixed $is_status    1:只获取状态为1的分类 0:获取所有分类
      * @return array
      */
-    public static function getSortsTree($filter_acode = true,$is_status = 1): array
+    public static function getSortsTree($filter_acode = true, $is_status = 1): array
     {
         $fields = array(
             'a.*',
@@ -193,19 +216,31 @@ class ContentSort extends Model
             'b.urlname'
         );
         $order = 'a.pcode,a.sorting,a.id desc';
+
         if ($filter_acode) {
-            $result = self::alias('a')
+            $cacheKey = 'sorts_tree_' . get_frontend_lang();
+            list($cacheKey, $cacheExpire) = self::getCacheKeyExpire($cacheKey);
+
+            $result = Db::name('cms_content_sort')->alias('a')
                 ->where('a.acode', get_frontend_lang())
                 ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
                 ->field($fields)
-                ->cache('cms_sorts_tree_' . get_frontend_lang(), 3600, 'cms_cache')
+                ->cache($cacheKey, $cacheExpire, 'cms_cache')
                 ->order($order)
                 ->select();
+            $aucodemap = cache(self::aucodeMapKey());
+            if (!$aucodemap) {
+                $aucodemap = $result->column('scode', 'aucode');
+                $aucodemap = array_filter($aucodemap, fn($key) => !empty($key), ARRAY_FILTER_USE_KEY);
+                cache(self::aucodeMapKey(), $aucodemap);
+            }
         } else {
-            $result = self::alias('a')
+            $cacheKey = 'cms_sorts_tree_all';
+            list($cacheKey, $cacheExpire) = self::getCacheKeyExpire($cacheKey);
+            $result =  Db::name('cms_content_sort')->alias('a')
                 ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
                 ->field($fields)
-                ->cache('cms_sorts_tree_all', 3600, 'cms_cache')
+                ->cache($cacheKey, $cacheExpire, 'cms_cache')
                 ->order($order)
                 ->select();
         }
@@ -213,19 +248,72 @@ class ContentSort extends Model
         if ($result->isEmpty()) {
             return [];
         }
+
         $result = $result->toArray();
+
         $nodes = [];
         $tree = [];
         $top = [];
-        $self = new self();
+
+        // 一次性获取所有栏目的内容数量，避免循环中重复查询
+        $allSortRows = self::getAllSortRows();
+        // 构建父子关系映射
+        $parentMap = [];
+        foreach ($result as $value) {
+            if ($value['pcode'] && $value['pcode'] != 0) {
+                $parentMap[$value['pcode']][] = $value['scode'];
+            }
+        }
+
+        // 递归获取所有子栏目（使用映射，避免重复遍历）
+        $subScodesMap = [];
+        foreach ($result as $value) {
+            $subscode = [];
+            $queue = [$value['scode']];
+            while (!empty($queue)) {
+                $current = array_shift($queue);
+                $subscode[] = $current;
+                if (isset($parentMap[$current])) {
+                    foreach ($parentMap[$current] as $child) {
+                        if (!in_array($child, $subscode)) {
+                            $queue[] = $child;
+                        }
+                    }
+                }
+            }
+            $subScodesMap[$value['scode']] = $subscode;
+        }
+
+        // 预计算所有栏目的顶级编码，避免重复递归
+        $topCodeMap = [];
+        foreach ($result as $value) {
+            $current = $value['scode'];
+            while ($current && $current != 0) {
+                $parent = null;
+                foreach ($result as $item) {
+                    if ($item['scode'] == $current) {
+                        $parent = $item['pcode'];
+                        break;
+                    }
+                }
+                if ($parent == 0 || $parent == $current) {
+                    $topCodeMap[$value['scode']] = $current;
+                    break;
+                }
+                $current = $parent;
+            }
+        }
+
         foreach ($result as $value) {
             // 过滤掉关闭的分类
-            if($is_status == 1 && $value['status'] != 1){
+            if ($is_status == 1 && $value['status'] != 1) {
                 continue;
             }
             $value['soncount'] = 0;
-            $sortrows = $self->getSortRows($value['scode']);
-            $value['rows'] = $sortrows ?? 0;
+            // 使用预计算的子栏目关系
+            $subscode = $subScodesMap[$value['scode']] ?? [];
+            $value['rows'] = array_sum(array_intersect_key($allSortRows, array_flip($subscode)));
+
             $nodes[$value['scode']] = $value;
         }
 
@@ -250,13 +338,11 @@ class ContentSort extends Model
             if (isset($node['pcode']) && $node['pcode']) {
                 /* 上级名称与链接 */
                 $node['parentname'] = $nodes[$node['pcode']]['name'];
-                $node['parentlink'] = $nodes[$node['pcode']]['link'];
                 $node['parentrows'] = $nodes[$node['pcode']]['rows'];
 
                 /* 顶级编号、名称与链接 */
-                $node['tcode'] = $self->getSortTopScode($node['scode']);
+                $node['tcode'] = $topCodeMap[$node['scode']] ?? $node['scode'];
                 $node['topname'] = $nodes[$node['tcode']]['name'];
-                $node['toplink'] = $nodes[$node['tcode']]['link'];
                 $node['toprows'] = $nodes[$node['tcode']]['rows'];
 
                 /* 统计子栏目数量 */
@@ -266,45 +352,44 @@ class ContentSort extends Model
                 $tree[$node['pcode']]['son'][] = &$node;
             }
         }
+
         unset($node);
         $nodes['top'] = $top;
         $nodes['tree'] = $tree;
+
         return $nodes;
     }
 
     public function getSortList(): array
     {
-        if (!$this->sorts) {
-            $fields = array(
-                'a.id',
-                'a.pcode',
-                'a.scode',
-                'a.name',
-                'a.filename',
-                'a.outlink',
-                'b.type',
-                'b.urlname'
-            );
-            $order = 'a.pcode,a.sorting,a.id desc';
-            $sorts = $this->alias('a')
-                ->where("a.acode='" . get_frontend_lang() . "'")
-                ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
-                ->field($fields)
-                ->order($order)
-                ->cache('__CACHE_CMS_SORTS_'. get_frontend_lang(), 3600, 'cms_cache')
-                ->select();
-            if ($sorts->isEmpty()) {
-                return [];
-            }
-
-            $sorts = $sorts->toArray();
-            $result = [];
-            foreach ($sorts as $key => $value) {
-                $result[$value['scode']] = $value;
-            }
-            $this->sorts = $result;
+        $fields = array(
+            'a.id',
+            'a.pcode',
+            'a.scode',
+            'a.name',
+            'a.filename',
+            'a.outlink',
+            'b.type',
+            'b.urlname'
+        );
+        $order = 'a.pcode,a.sorting,a.id desc';
+        $sorts = $this->alias('a')
+            ->where("a.acode='" . get_frontend_lang() . "'")
+            ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
+            ->field($fields)
+            ->order($order)
+            ->cache('__CACHE_CMS_SORTS_' . get_frontend_lang(), 3600, 'cms_cache')
+            ->select();
+        if ($sorts->isEmpty()) {
+            return [];
         }
-        return $this->sorts;
+
+        $sorts = $sorts->toArray();
+        $result = [];
+        foreach ($sorts as $key => $value) {
+            $result[$value['scode']] = $value;
+        }
+        return $result;
     }
 
     // 获取分类名称
@@ -317,71 +402,124 @@ class ContentSort extends Model
     // 分类顶级编码
     public function getTopParent($scode, $sorts): mixed
     {
-        if (! $scode || ! $sorts) {
+        if (!$scode || !$sorts) {
             return false;
         }
         if (!isset($sorts[$scode])) {
             return false;
         }
-        // 检查自引用（父级等于自己）
-        if ($sorts[$scode]['pcode'] == $scode) {
-            // 发现自引用，直接返回当前分类编码
-            $this->position[] = $sorts[$scode];
-            return $scode;
+
+        // 优化：使用迭代代替递归，避免递归栈开销
+        $visited = []; // 防止循环引用
+        $current = $scode;
+
+        while ($current && $current != 0) {
+            // 检查循环引用
+            if (isset($visited[$current])) {
+                return $current; // 发现循环，返回当前节点
+            }
+            $visited[$current] = true;
+
+            // 检查是否到达顶级
+            if (!isset($sorts[$current])) {
+                return $current;
+            }
+
+            $parent = $sorts[$current]['pcode'];
+
+            // 检查自引用或到达顶级
+            if ($parent == 0 || $parent == $current) {
+                return $current;
+            }
+
+            $current = $parent;
         }
 
-        $this->position[] = $sorts[$scode];
-        if ($sorts[$scode]['pcode']) {
-            return $this->getTopParent($sorts[$scode]['pcode'], $sorts);
-        } else {
-            return $sorts[$scode]['scode'];
-        }
+        return $current;
     }
 
     // 分类顶级编码
     public function getSortTopScode($scode)
     {
         $result = $this->getSortList();
-        return $this->getTopParent($scode, $result)?:$scode;
+        return $this->getTopParent($scode, $result) ?: $scode;
     }
 
     // 获取位置
     public function getPosition($scode)
     {
         $result = $this->getSortList();
-        $this->position = []; // 重置
-        $this->getTopParent($scode, $result);
-        return array_reverse($this->position);
+        $position = [];
+
+        // 优化：使用迭代代替递归，直接构建路径
+        $visited = []; // 防止循环引用
+        $current = $scode;
+
+        while ($current && $current != 0) {
+            // 检查循环引用
+            if (isset($visited[$current])) {
+                break;
+            }
+            $visited[$current] = true;
+
+            if (!isset($result[$current])) {
+                break;
+            }
+
+            $position[] = $result[$current];
+            $parent = $result[$current]['pcode'];
+
+            // 检查是否到达顶级
+            if ($parent == 0 || $parent == $current) {
+                break;
+            }
+
+            $current = $parent;
+        }
+
+        return array_reverse($position);
     }
 
     // 分类子类集
     public function getSubScodes($scode, $sorts = null)
     {
-        if (! $scode) {
-            return;
-        }
-        // 第一次调用时初始化
-        if ($sorts === null) {
-            $this->scodes = [];  // 重置结果数组
-            $sorts = $this->getSortList();
-        }
-        // 检查自引用（父级等于自己）
-        if (isset($sorts[$scode]) && $sorts[$scode]['pcode'] == $scode) {
-            // 发现自引用，只添加当前分类并返回，避免递归调用
-            if (!in_array($scode, $this->scodes)) {
-                $this->scodes[] = $scode;
-            }
-            return $this->scodes;
+        if (!$scode) {
+            return [];
         }
 
-        $this->scodes[] = $scode;
-        // 查找所有直接子分类
-        foreach ($sorts as $sort) {
-            if ($sort['pcode'] == $scode && empty($sort['outlink'])) {
-                $this->getSubScodes($sort['scode'], $sorts);
+        // 第一次调用时初始化
+        if ($sorts === null) {
+            $sorts = $this->getSortList();
+        }
+
+        // 检查自引用（父级等于自己）
+        if (isset($sorts[$scode]) && $sorts[$scode]['pcode'] == $scode) {
+            return [$scode];
+        }
+
+        // 优化：使用BFS遍历，避免递归和重复遍历
+        $scodes = [];
+        $queue = [$scode];
+        $visited = [$scode => true]; // 避免重复访问
+
+        while (!empty($queue)) {
+            $current = array_shift($queue);
+            $scodes[] = $current;
+
+            // 查找所有直接子分类
+            foreach ($sorts as $sort) {
+                if ($sort['pcode'] == $current && empty($sort['outlink'])) {
+                    $childScode = $sort['scode'];
+                    // 避免重复添加和循环
+                    if (!isset($visited[$childScode])) {
+                        $visited[$childScode] = true;
+                        $queue[] = $childScode;
+                    }
+                }
             }
         }
-        return $this->scodes;
+
+        return $scodes;
     }
 
     // 指定分类标签调用
@@ -413,14 +551,13 @@ class ContentSort extends Model
         return $result;
     }
 
-
     /**
      * 批量获取所有分类的内容数量
      */
-    protected function getAllSortRows()
+    protected static function getAllSortRows()
     {
-        // 使用缓存
-        $cacheKey = 'all_sort_rows_' . get_frontend_lang();
+        $cacheKey = 'sort_content_rows_' . get_frontend_lang();
+        list($cacheKey, $cacheExpire) = self::getCacheKeyExpire($cacheKey);
         $result = cache($cacheKey);
         if ($result) {
             return $result;
@@ -440,25 +577,26 @@ class ContentSort extends Model
 
         // 修改副分类统计，排除空值
         $subCounts = Content::where($where)
-            ->where('subscode', '<>', '')    // 添加这行
-            ->whereNotNull('subscode')       // 保留这行
+            ->where('subscode', '<>', '')
+            ->whereNotNull('subscode')
             ->group('subscode')
             ->column('count(*)', 'subscode');
 
         // 合并统计结果
         $result = [];
         foreach ($mainCounts as $scode => $count) {
-            if ($scode !== '' && $scode !== null) {  // 添加空值检查
+            if ($scode !== '' && $scode !== null) {
                 $result[$scode] = ($result[$scode] ?? 0) + $count;
             }
         }
         foreach ($subCounts as $scode => $count) {
-            if ($scode !== '' && $scode !== null) {  // 添加空值检查
+            if ($scode !== '' && $scode !== null) {
                 $result[$scode] = ($result[$scode] ?? 0) + $count;
             }
         }
+
         // 设置缓存
-        cache($cacheKey, $result, 3600, 'cms_cache');
+        cache($cacheKey, $result, $cacheExpire, 'cms_cache');
 
         return $result;
     }
@@ -472,6 +610,7 @@ class ContentSort extends Model
         }
 
         $subscode = $this->getSubScodes($scode);
+
         $subRows = array_sum(array_intersect_key($allCounts, array_flip($subscode)));
         return $subRows;
     }
@@ -526,6 +665,7 @@ class ContentSort extends Model
      */
     public static function navList($parent = 0, $scode = false, $num = false): array
     {
+        // 将scode转换为数组，避免重复调用explode
         $scode_arr = [];
         if ($scode) {
             $scode_arr = explode(',', $scode);
@@ -535,12 +675,21 @@ class ContentSort extends Model
         if ($parent) { // 非顶级栏目起始,调用子栏目
             $parent_arr = explode(',', $parent);
             $out_data = [];
+            // 优化：直接添加元素避免array_merge开销，缓存trim结果
             foreach ($parent_arr as $vp) {
-                if (isset($data['tree'][trim($vp)]['son'])) {
-                    $out_data = array_merge($out_data, $data['tree'][trim($vp)]['son']);
+                $trimmed_vp = trim($vp);
+                if (!empty($trimmed_vp) && isset($data['tree'][$trimmed_vp]['son']) && is_array($data['tree'][$trimmed_vp]['son'])) {
+                    // 直接添加元素，避免array_merge的开销
+                    foreach ($data['tree'][$trimmed_vp]['son'] as $son_item) {
+                        $out_data[] = $son_item;
+
+                        // 如果指定了数量限制，提前结束
+                        if ($num && count($out_data) >= (int)$num) {
+                            break 2; // 跳出两层循环
+                        }
+                    }
                 }
             }
-
         } else { // 顶级栏目起始
             $out_data = $data['top'];
         }
@@ -554,24 +703,49 @@ class ContentSort extends Model
 
         // 读取指定分类
         if ($scode_arr) {
-            foreach ($out_data as $index => $value) {
-                if (!in_array($value['scode'], $scode_arr)) {
-                    unset($out_data[$index]);
+            // 创建scode到位置的映射，提高查找效率
+            $scode_pos_map = array_flip($scode_arr);
+            // 创建scode的集合，提高查找效率
+            $scode_set = array_flip($scode_pos_map);
+
+            // 直接构建新数组，避免使用unset
+            $filtered_data = [];
+            foreach ($out_data as $value) {
+                if (isset($scode_set[$value['scode']])) {
+                    // 保存位置信息，用于后续排序
+                    $value['_sort_pos'] = $scode_pos_map[$value['scode']];
+                    $filtered_data[] = $value;
                 }
             }
-            // 将数组按照scode_arr的顺序排序
-            // 将数组按照scode_arr的顺序排序
-            usort($out_data, function ($a, $b) use ($scode_arr) {
-                $pos_a = array_search($a['scode'], $scode_arr);
-                $pos_b = array_search($b['scode'], $scode_arr);
-                return $pos_a - $pos_b;
-            });
+
+            // 只有当数组中有多个元素时才进行排序
+            if (count($filtered_data) > 1) {
+                // 使用位置信息进行排序，避免每次比较都调用array_search
+                usort($filtered_data, function ($a, $b) {
+                    return $a['_sort_pos'] - $b['_sort_pos'];
+                });
+            }
+
+            // 移除排序时添加的临时字段
+            foreach ($filtered_data as &$item) {
+                unset($item['_sort_pos']);
+            }
+
+            // 更新out_data为过滤和排序后的结果
+            $out_data = $filtered_data;
         }
         $key = 0;
         $result = [];
         foreach ($out_data as $index => $value) { // 按查询的数据条数循环
+            $parent = $data[$value['pcode']];
+            $top = $data[$value['tcode']];
+            $value['toplink'] = self::formatUrl($value['tcode'], $top);
+            $value['parentlink'] = self::formatUrl($value['pcode'],  $parent);
             $value['n'] = $key;
             $value['i'] = $key + 1;
+            $value['ico'] = self::formatIco($value['ico']);
+            $value['pic'] = self::formatIco($value['pic']);
+            $value['link'] = self::formatUrl($value['link'], $value);
             $result[$index] = $value;
             $key++;
         }
@@ -595,7 +769,7 @@ class ContentSort extends Model
             $indextext = '<i class="' . $indexicon . '"></i>';
         }
 
-        $out_html = '<a href="' .url('/'). '">' . $indextext . '</a> ';
+        $out_html = '<a href="' . url('/') . '">' . $indextext . '</a> ';
         $data = (new self())->getPosition($scode);
         foreach ($data as $key => $value) {
             if ($value['outlink']) {

@@ -109,6 +109,24 @@ class Content extends Model
         return (string) url('/do/oppose', ['id' => $data['id']]);
     }
 
+    /**
+     * 获取缓存标签和时长
+     * @param string $type
+     * @param array  $tag
+     * @return array
+     */
+    public static function getCacheKeyExpire($type, $tag = [])
+    {
+        $config = [
+            'cachelifetime' => 3600 * 24
+        ];
+        $cache = !isset($tag['cache']) ? $config['cachelifetime'] : $tag['cache'];
+        $cache = in_array($cache, ['true', 'false', true, false], true) ? (in_array($cache, ['true', true], true) ? 0 : -1) : (int)$cache;
+        $cacheKey = $cache > -1 ? "cms-taglib-{$type}-" . md5(serialize($tag)) : false;
+        $cacheExpire = $cache > -1 ? $cache : null;
+        return [$cacheKey, $cacheExpire];
+    }
+
     // 内容详情页图片
     public function getContentPics($id, $field, $num = 0, $onlypic = false)
     {
@@ -264,64 +282,38 @@ class Content extends Model
         $result->inc('visits')->save();
         $tagsModel = new Tags();
         if (! ! $tags = $tagsModel->getTags()) {
-            $result->content = self::autolinks($tags, $result->content);
+            // 将A链接保护起来,alt、titel保护起来
+            $rega = "/(<a .*?>.*?<\/a>)|([a-zA-Z-]+\s*=\s*['\"][^'\"]*['\"])/i";
+            preg_match_all($rega, $result->content, $matches1);
+            foreach ($matches1[0] as $key => $value) {
+                $result->content = str_replace($value, '#rega:' . $key . '#', $result->content);
+            }
+
+            // 去除包含关系的短tags,实现长关键字优先
+            foreach ($tags as $key => $value) {
+                foreach ($tags as $key2 => $value2) {
+                    if (strpos($value2['name'], $value['name']) !== false && $key != $key2) {
+                        unset($tags[$key]);
+                    }
+                }
+            }
+            // 执行内链替换
+            foreach ($tags as $value) {
+                $result->content = preg_replace('/' . $value['name'] . '/', '<a href="' . $value['link'] . '">' . $value['name'] . '</a>', $result->content, get_sys_config('content_tags_replace_num') ?: 3);
+            }
+
+            // 还原保护的内容
+            $pattern = '/\#rega:([0-9]+)\#/';
+            if (preg_match_all($pattern, $result->content, $matches2)) {
+                $count = count($matches2[0]);
+                for ($i = 0; $i < $count; $i++) {
+                    $result->content = str_replace($matches2[0][$i], $matches1[0][$matches2[1][$i]], $result->content);
+                }
+            }
         }
         $result->content = html_entity_decode($result->content);
 
         return $result;
-    }
-
-    /**
-     * 内容关键字自动加链接
-     */
-    public static function autolinks($tags, $content)
-    {
-        $stages = [];
-
-        //先移除已有的自动链接
-        $content = preg_replace_callback('/\<a\s*data\-rel="autolink".*?\>(.*?)\<\/a\>/i', function ($match) {
-            return $match[1];
-        }, $content);
-
-        //存储所有A标签
-        $content = preg_replace_callback('/\<a(.*?)href\s*=\s*(\'|")(.*?)(\'|")(.*?)\>(.*?)\<\/a\>/i', function ($match) use (&$stages) {
-            $data = [$match[3], $match[5], $match[6]];
-            return '<' . array_push($stages, $data) . '>';
-        }, $content);
-
-        //存在所有HTML标签
-        $content = preg_replace_callback('/(<(?!\d+).*?>)/i', function ($match) use (&$stages) {
-            return '<' . array_push($stages, $match[1]) . '>';
-        }, $content);
-
-        $autolinkArr = $tags;
-        $autolinkArr = array_values($autolinkArr);
-        //字符串长的优先替换
-        usort($autolinkArr, function ($a, $b) {
-            if ($a['name'] == $b['name']) {
-                return 0;
-            }
-            return (strlen($a['name']) > strlen($b['name'])) ? -1 : 1;
-        });
-        $limit = get_sys_config('content_tags_replace_num') ?: 3;
-
-        //替换链接
-        foreach ($autolinkArr as $index => $item) {
-            $content = preg_replace_callback('/(' . preg_quote($item['name'], '/') . ')/i', function ($match) use ($item, &$stages) {
-                $data = [$item['link'], '', $match[0]];
-                return '<' . array_push($stages, $data) . '>';
-            }, $content, $limit);
-        }
-
-        $content = preg_replace_callback('/<(\d+)>/', function ($match) use (&$stages) {
-            $data = $stages[$match[1] - 1];
-            if (!is_array($data)) {
-                return $data;
-            }
-            $url = $data[0];
-            return "<a href=\"{$url}\" target=\"_blank\"{$data[1]}>{$data[2]}</a>";
-        }, $content);
-        return $content;
     }
 
     // 上一篇或下一篇内容
@@ -595,18 +587,27 @@ class Content extends Model
             // 获取所有子类分类编码
             $arr = explode(',', $scode); // 传递有多个分类时进行遍历
             $contentSortModel = new ContentSort();
-            $scodes = [];
+            $scodes = [$scode];
             foreach ($arr as $value) {
-                $scodes = array_merge($scodes, $contentSortModel->getSubScodes(trim($value)));
+                $trimmedValue = trim($value);
+                if (!empty($trimmedValue)) {
+                    // 使用直接数组追加替代 array_merge
+                    foreach ($contentSortModel->getSubScodes($trimmedValue) as $subCode) {
+                        $scodes[] = $subCode;
+                    }
+                }
             }
-
-            $scode_arr = [
-                ['a.scode', 'in', $scodes],
-                ['a.subscode', '=', $scode]
-            ];
-            $where[] = function ($query) use ($scode_arr) {
-                $query->whereOr($scode_arr);
-            };
+            // 去重，避免重复的分类编码
+            $scodes = array_unique($scodes);
+            if (!empty($scodes)) {
+                $scode_arr = [
+                    ['a.scode', 'in', $scodes],
+                    ['a.subscode', '=', $scode]
+                ];
+                $where[] = function ($query) use ($scode_arr) {
+                    $query->whereOr($scode_arr);
+                };
+            }
         }
 
         if ($lg) {
@@ -677,8 +678,8 @@ class Content extends Model
                 $data['total'] = $res->total();
             }
         } else {
-
-            $res = $db->limit($start, $num)->select();
+            list($cacheKey, $exprie) = self::getCacheKeyExpire('contentList', $params);
+            $res = $db->limit($start, $num)->cache($cacheKey, $exprie)->select();
             if (!$res->isEmpty()) {
                 $data['total'] = $res->count();
                 $data['data'] = $res->toArray();
@@ -988,7 +989,7 @@ class Content extends Model
 
         /* 任意搜索字段 */
         /* 排除字段 */
-        $exclude = ['page', 'start', 'lfield', 'keyword', 'fuzzy', 'scode', 'lg', 'searchtpl', 'field', 'num', 'appid', 'timestamp', 'signature'];
+        $exclude = ['page', 'start', 'lfield', 'keyword', 'fuzzy', 'scode', 'lg', 'searchtpl', 'field', 'num'];
         foreach (request()->param() as $key => $value) {
             if (in_array($key, $exclude)) {
                 continue;
