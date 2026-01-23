@@ -38,7 +38,15 @@ class Search extends Base
             $this->error(__('No Data'));
         }
         $keyword = strip_tags($keyword);
-        $keyword = str_replace(strrchr($keyword, "."), "", $keyword);  //去掉带有后缀的关键词
+        // 处理关键词，区分文件后缀和数字中的小数点
+        $lastDotPos = strrpos($keyword, ".");
+        if ($lastDotPos !== false) {
+            $suffix = substr($keyword, $lastDotPos + 1);
+            // 如果后缀不是纯数字，则认为是文件后缀，去掉它
+            if (!is_numeric($suffix)) {
+                $keyword = substr($keyword, 0, $lastDotPos);
+            }
+        }
         $keyword = mb_substr($keyword, 0, 15);
         $this->view->assign('keyword', $keyword);
 
@@ -47,10 +55,10 @@ class Search extends Base
         if ($search_title) {
             $pagetitle = $this->view->display($search_title);
         } else {
-            $pagetitle = '搜索-'.$this->site['sitetitle'];
+            $pagetitle = '搜索-' . $this->site['sitetitle'];
         }
         $this->site['pagetitle'] = $pagetitle;
         $this->assignBd();
-        return $this->view->fetch('/'.basename($tpl, '.html'));
+        return $this->view->fetch('/' . basename($tpl, '.html'));
     }
 }
