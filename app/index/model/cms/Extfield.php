@@ -35,8 +35,11 @@ class Extfield extends Model
             if (isset($info['query'])) {
                 parse_str($info['query'], $query);
             }
+            // 去掉page参数
+            if (isset($query['page'])) {
+                unset($query['page']);
+            }
             $item = [];
-
             $data = parse_array($data);
             $key = 1;
             foreach ($data as $k => $value) {
@@ -45,7 +48,7 @@ class Extfield extends Model
                 $item['i'] = $key;
                 $item['value'] = $value;
                 $item['current'] = (request()->get($field) !== null && request()->get($field) == $value) ? 1 : 0;
-                $item['link'] = empty($query) ? $info['path'] : '?'.http_build_query($query);
+                $item['link'] = empty($query) ? $info['path'] : '?' . http_build_query($query);
                 $key++;
                 $result[] = $item;
             }
@@ -67,7 +70,7 @@ class Extfield extends Model
             parse_str($info['query'], $query);
             unset($query[$params['field']]);
         }
-        $link = empty($query) ? $info['path'] : '?'.http_build_query($query);
+        $link = empty($query) ? $info['path'] : '?' . http_build_query($query);
         $text = $params['text'] ?: __('All');
         $class = $params['class'] ?: 'btn btn-default btn-sm';
         $active = $params['active'] ?: 'active';
@@ -79,6 +82,4 @@ class Extfield extends Model
 
         return $out_html;
     }
-
-
 }
