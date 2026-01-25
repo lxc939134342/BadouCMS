@@ -2,6 +2,8 @@
 
 namespace modules\cms;
 
+use think\facade\Event;
+use think\facade\Route;
 use app\common\library\Menu;
 use app\admin\model\Config as ConfigModel;
 
@@ -11,6 +13,9 @@ class Cms
     {
         include_once __DIR__ . '/common.php';
         bind('think\Paginator', 'modules\cms\library\Bootstrap');
+        Event::listen('cms_route_before', function () {
+            Route::rule('index/:action', 'index/:action');
+        });
     }
 
     public function enable()
@@ -61,5 +66,4 @@ class Cms
 
         return true;
     }
-
 }

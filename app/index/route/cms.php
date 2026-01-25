@@ -1,11 +1,12 @@
 <?php
 
 use app\index\model\cms\Area;
-use think\facade\Db;
 use think\facade\Route;
 use think\facade\Config;
+use think\facade\Event;
 
 /* 变量规则 */
+
 Route::pattern([
     'category' => '\w+',
     'id'       => '[\w\-]+',
@@ -49,17 +50,18 @@ $route_arr = [
     'account/:action$' => 'account/:action',  // 账户中心
     'sitemap.xml$' => 'cms.sitemap/index', // sitemap路由
     'sitemap.txt$' => 'cms.sitemap/txt', // sitemap路由
-    'tag/:tag$' => 'cms.tag/index',// tag路由
+    'tag/:tag$' => 'cms.tag/index', // tag路由
     'ajax/:action$' => 'ajax/:action',
     'do/:action$' => 'cms.index/:action',
     'upload$' => 'cms.base/upload',
     'message$' => 'cms.message/index',
     'message/submit_form$' => 'cms.message/submitForm',
     'comment/:action$' => 'cms.comment/:action',
-    ':category$' => 'cms.lists/index',// 列表路由
-    ':category/:id$' => 'cms.detail/index',// 详情路由
+    ':category$' => 'cms.lists/index', // 列表路由
+    ':category/:id$' => 'cms.detail/index', // 详情路由
 ];
-
+/* cms事件执行前 */
+Event::trigger('cms_route_before');
 /* 设置普通路由 */
 foreach ($route_arr as $key => $value) {
     Route::rule($key, $value)->append($param);
@@ -75,6 +77,7 @@ if ($cms_domain) {
         set_forntend_lang($lg);
     }
     Route::domain(array_values($cms_domain), function () use ($route_arr) {
+        Event::trigger('cms_route_before');
         foreach ($route_arr as $key => $value) {
             Route::rule($key, $value);
         }
