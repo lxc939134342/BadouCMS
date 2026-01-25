@@ -132,12 +132,12 @@ class Content extends Model
      */
     public function copyContent($ids, $scode): int|string
     {
-        $mcode=ContentSort::where('scode',$scode)->value('mcode');
+        $mcode = ContentSort::where('scode', $scode)->value('mcode');
         // 查找出要复制的主内容
         $data = $this->where('id', 'in', $ids)->select();
-        $result=0;
+        $result = 0;
         foreach ($data as $key => $value) {
-            if($mcode!=ContentSort::where('scode',$value['scode'])->value('mcode')){
+            if ($mcode != ContentSort::where('scode', $value['scode'])->value('mcode')) {
                 continue;
             }
             $value = $value->toArray();
@@ -149,6 +149,7 @@ class Content extends Model
             // 去除主键并修改栏目
             unset($value['id']);
             $value['scode'] = $scode;
+            $value['aucode'] = $this->getUniqueAucode();
             $value['date'] = date('Y-m-d H:i:s');
             $value['create_time'] = date('Y-m-d H:i:s');
             $value['update_time'] = date('Y-m-d H:i:s');
@@ -171,14 +172,14 @@ class Content extends Model
     // 修改文章
     public function moveContent($id, $scode)
     {
-        $result=0;
-        $mcode=ContentSort::where('scode',$scode)->value('mcode');
-        $res=$this->where('id','in',$id)->select();
-        foreach($res as $item){
-            if($mcode!=ContentSort::where('scode',$item['scode'])->value('mcode')){
+        $result = 0;
+        $mcode = ContentSort::where('scode', $scode)->value('mcode');
+        $res = $this->where('id', 'in', $id)->select();
+        foreach ($res as $item) {
+            if ($mcode != ContentSort::where('scode', $item['scode'])->value('mcode')) {
                 continue;
             }
-            $item->scode=$scode;
+            $item->scode = $scode;
             $item->save();
             $result++;
         }
@@ -215,6 +216,4 @@ class Content extends Model
 
         return '';
     }
-
-
 }
