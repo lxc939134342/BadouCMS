@@ -188,10 +188,9 @@ class Bd extends TagLib
         $id = $tag['id'] ? $this->autoBuildVar($tag['id']) : null;
         $scode = $tag['scode'] ? $this->autoBuildVar($tag['scode']) : null;
 
-        $scode ? $param[] =  $scode : '';
-        $id ? $param[] = $id : '';
+        $param[] = $scode ?  $scode : 'null';
+        $param[] = $id ? $id : 'null';
 
-        // p($tag);
         $empty = $tag['empty'] ?? '';
         $alias    = $tag['alias'] ?? 'content';
         $parse   = '<?php ';
