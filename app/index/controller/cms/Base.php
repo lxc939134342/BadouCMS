@@ -40,9 +40,9 @@ class Base extends Frontend
     protected array $label;
 
     /**
-    * 公司信息
-    * @var array
-    */
+     * 公司信息
+     * @var array
+     */
     protected array $company;
 
     /**
@@ -102,7 +102,7 @@ class Base extends Frontend
 
             $this->contentSort = $contentSortModel->getSort($urlname);
             if (!$this->contentSort) {
-                $this->contentSort=$contentSortModel->getSortNotLang($urlname);
+                $this->contentSort = $contentSortModel->getSortNotLang($urlname);
             }
             /*内容不存在*/
             if (!$this->contentSort) {
@@ -167,7 +167,7 @@ class Base extends Frontend
             'scaction' => url('/search'),
             'sitemap' => url('/sitemap', [], 'xml'),
             'msgaction' => url('/message'),
-            'sitetplpath' => request()->domain().'/template/cms/'. $this->site['theme'],
+            'sitetplpath' => cdnurl('/template/cms/' . $this->site['theme']),
             'checkcode' => (string)url('index/captcha'),
             'islogin' => $this->auth->isLogin(),
             'registerstatus' => true,
@@ -185,7 +185,7 @@ class Base extends Frontend
             'pagetitle' => $this->site['sitetitle'],
             'pagedescription' => $this->site['sitedescription'],
             'pagekeywords' => $this->site['sitekeywords'],
-            'homeurl'=>(string)url('/')
+            'homeurl' => (string)url('/')
         ];
         $api_data = $this->apiSecret();
         $this->view->assign('bd', array_merge($bdassign, $api_data, $this->site, $this->company, $this->label));
@@ -217,7 +217,7 @@ class Base extends Frontend
                 $userInfo = $this->auth->getUserInfo();
             } else {
                 $userInfo = [
-                   'level' => 0
+                    'level' => 0
                 ];
             }
             switch ($gtype) {
@@ -265,7 +265,7 @@ class Base extends Frontend
     protected function apiSecret()
     {
         $timestamp = time();
-        $signature = md5(md5(get_sys_config('api_appid').get_sys_config('api_secret').$timestamp));
+        $signature = md5(md5(get_sys_config('api_appid') . get_sys_config('api_secret') . $timestamp));
         return [
             'appid' => get_sys_config('api_appid'),
             'timestamp' => $timestamp,
@@ -329,19 +329,20 @@ class Base extends Frontend
         $this->error('请勿重复操作');
     }
 
-    public function setTheme(){
+    public function setTheme()
+    {
         $theme = isset($this->site['theme']) && !empty($this->site['theme']) ? $this->site['theme'] : 'default';
 
         /* 设置模版路径 */
-        $view_path = root_path() . 'template' . DIRECTORY_SEPARATOR.'cms'.DIRECTORY_SEPARATOR. $theme. DIRECTORY_SEPARATOR;
+        $view_path = root_path() . 'template' . DIRECTORY_SEPARATOR . 'cms' . DIRECTORY_SEPARATOR . $theme . DIRECTORY_SEPARATOR;
         if (!is_dir($view_path)) {  //兼容public目录下的模版
             $tpl_html_dir = get_sys_config('tpl_html_dir') ?: 'html';
-            $view_path = public_path() . 'template' . DIRECTORY_SEPARATOR. $theme. DIRECTORY_SEPARATOR.$tpl_html_dir. DIRECTORY_SEPARATOR;
+            $view_path = public_path() . 'template' . DIRECTORY_SEPARATOR . $theme . DIRECTORY_SEPARATOR . $tpl_html_dir . DIRECTORY_SEPARATOR;
         }
 
         // 手机端模版
         if ($this->request->isMobile() && get_sys_config('open_wap') == 1) {
-            $view_path .= 'wap'.DIRECTORY_SEPARATOR;
+            $view_path .= 'wap' . DIRECTORY_SEPARATOR;
         }
 
         $this->view = View::instance();
