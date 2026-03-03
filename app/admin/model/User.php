@@ -12,9 +12,11 @@
 
 namespace app\admin\model;
 
-use app\common\library\FrontendAuth;
 use think\Model;
+use app\common\model\MoneyLog;
+use app\common\model\ScoreLog;
 use think\model\relation\BelongsTo;
+use app\common\library\FrontendAuth;
 
 class User extends Model
 {
@@ -39,6 +41,18 @@ class User extends Model
             } else {
                 unset($row->password);
             }
+        }
+    }
+
+    public static function onBeforeUpdate($row)
+    {
+        $changedata = $row->getChangedData();
+        $origin = $row->getOrigin();
+        if (isset($changedata['money']) && (function_exists('bccomp') ? bccomp($changedata['money'], $origin['money'], 2) !== 0 : (float)$changedata['money'] !== (float)$origin['money'])) {
+            MoneyLog::create(['user_id' => $row['id'], 'money' => $changedata['money'] - $origin['money'], 'before' => $origin['money'], 'after' => $changedata['money'], 'memo' => '管理员变更金额']);
+        }
+        if (isset($changedata['score']) && (int)$changedata['score'] !== (int)$origin['score']) {
+            ScoreLog::create(['user_id' => $row['id'], 'score' => $changedata['score'] - $origin['score'], 'before' => $origin['score'], 'after' => $changedata['score'], 'memo' => '管理员变更积分']);
         }
     }
 

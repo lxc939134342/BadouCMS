@@ -23,8 +23,8 @@ class ScoreLog extends Model
     protected $name = 'user_score_log';
     // 开启自动写入时间戳字段
     protected $autoWriteTimestamp = true;
+    protected $createTime = 'createtime';
     protected $updateTime = '';
     // 追加属性
-    protected $append = [
-    ];
+    protected $append = [];
 }
