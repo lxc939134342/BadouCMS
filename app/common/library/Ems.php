@@ -34,6 +34,21 @@ class Ems
      */
     protected static $maxCheckNums = 10;
 
+
+    /**
+     * 邮件发送异常的消息回执
+     * @var string
+     */
+    protected static $errorMessage = "";
+
+    private static function setErrorMessage($message)
+    {
+        self::$errorMessage = $message;
+    }
+    public static function getLastErrorMessage()
+    {
+        return self::$errorMessage;
+    }
     /**
      * 获取最后一次邮箱发送的数据
      *
@@ -80,6 +95,7 @@ class Ems
                         ->send();
                 } catch (PHPMailerException $e) {
                     $result = false;
+                    self::setErrorMessage($e->getMessage());
                 }
                 return $result;
             });

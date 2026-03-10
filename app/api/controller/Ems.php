@@ -77,7 +77,7 @@ class Ems extends Api
         if ($ret) {
             $this->success(__('发送成功'));
         } else {
-            $this->error(__('发送失败'));
+            $this->error(__('发送失败').' '.Emslib::getLastErrorMessage());
         }
     }
 

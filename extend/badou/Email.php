@@ -5,6 +5,7 @@ namespace badou;
 use Throwable;
 use think\facade\Lang;
 use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
 /**
  * 邮件类
@@ -54,16 +55,17 @@ class Email extends PHPMailer
                 $this->configured = false;
             }
         }
-        if ($this->configured) {
-            $this->Host       = $sysMailConfig['smtp_server'];
-            $this->SMTPAuth   = true;
-            $this->Username   = $sysMailConfig['smtp_user'];
-            $this->Password   = $sysMailConfig['smtp_pass'];
-            $this->SMTPSecure = $sysMailConfig['smtp_verification'] == 'SSL' ? self::ENCRYPTION_SMTPS : self::ENCRYPTION_STARTTLS;
-            $this->Port       = $sysMailConfig['smtp_port'];
-
-            $this->setFrom($sysMailConfig['smtp_sender_mail'], $sysMailConfig['smtp_user']);
+        if (!$this->configured) {
+            throw new PHPMailerException("邮箱配置信息邮件不完整，请先在管理后台配置好邮件服务");
         }
+        $this->Host       = $sysMailConfig['smtp_server'];
+        $this->SMTPAuth   = true;
+        $this->Username   = $sysMailConfig['smtp_user'];
+        $this->Password   = $sysMailConfig['smtp_pass'];
+        $this->SMTPSecure = $sysMailConfig['smtp_verification'] == 'SSL' ? self::ENCRYPTION_SMTPS : self::ENCRYPTION_STARTTLS;
+        $this->Port       = $sysMailConfig['smtp_port'];
+
+        $this->setFrom($sysMailConfig['smtp_sender_mail'], $sysMailConfig['smtp_user']);
     }
 
     /**
