@@ -84,7 +84,7 @@ class Ems
                 return $result;
             });
         }
-        $result = Event::trigger('ems_send', $ems);
+        $result = Event::trigger('ems_send', $ems, true);
         if (!$result) {
             $ems->delete();
             return false;
