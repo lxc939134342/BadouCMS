@@ -51,6 +51,9 @@ class Api extends BaseController
 
     public function initialize()
     {
+        //跨域请求检测
+        check_cors_request();
+
         //移除HTML标签
         $this->request->filter('trim,strip_tags,htmlspecialchars');
         $modulename     = app('http')->getName();
@@ -161,14 +164,14 @@ class Api extends BaseController
     }
 
     /**
-    * 操作成功
-    * @param string      $msg     提示消息
-    * @param mixed       $data    返回数据
-    * @param int         $code    错误码
-    * @param string|null $type    输出类型
-    * @param array       $header  发送的 header 信息
-    * @param array       $options Response 输出参数
-    */
+     * 操作成功
+     * @param string      $msg     提示消息
+     * @param mixed       $data    返回数据
+     * @param int         $code    错误码
+     * @param string|null $type    输出类型
+     * @param array       $header  发送的 header 信息
+     * @param array       $options Response 输出参数
+     */
     protected function success(string $msg = '', mixed $data = null, int $code = 1, ?string $type = null, array $header = [], array $options = []): void
     {
         $this->result($msg, $data, $code, $type, $header, $options);

@@ -55,6 +55,8 @@ class Frontend extends BaseController
 
     public function initialize()
     {
+        //跨域请求检测
+        check_cors_request();
         $colse_site = get_sys_config('close_site');
         if (!is_null($colse_site) && $colse_site == 0) {
             $this->error(get_sys_config('close_site_note') ?: '站点已关闭');
@@ -192,8 +194,10 @@ class Frontend extends BaseController
      */
     protected function isAjax()
     {
-        if ($this->request->param('view', 0) ||
-            (!$this->request->isAjax() && !$this->request->isJson())) {
+        if (
+            $this->request->param('view', 0) ||
+            (!$this->request->isAjax() && !$this->request->isJson())
+        ) {
             return false;
         }
         return true;
