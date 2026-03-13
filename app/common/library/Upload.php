@@ -17,6 +17,7 @@ use badou\Random;
 use app\common\model\Attachment;
 use app\common\exception\UploadException;
 use think\facade\Event;
+use think\exception\FileException;
 
 /**
  * 文件上传类
@@ -109,8 +110,10 @@ class Upload
             throw new UploadException(__('Uploaded file format is limited'));
         }
         //验证文件后缀
-        if (in_array($this->fileInfo['suffix'], $mimetypeArr) || in_array('.' . $this->fileInfo['suffix'], $mimetypeArr)
-            || in_array($typeArr[0] . "/*", $mimetypeArr) || (in_array($this->fileInfo['type'], $mimetypeArr) && stripos($this->fileInfo['type'], '/') !== false)) {
+        if (
+            in_array($this->fileInfo['suffix'], $mimetypeArr) || in_array('.' . $this->fileInfo['suffix'], $mimetypeArr)
+            || in_array($typeArr[0] . "/*", $mimetypeArr) || (in_array($this->fileInfo['type'], $mimetypeArr) && stripos($this->fileInfo['type'], '/') !== false)
+        ) {
             return true;
         }
         throw new UploadException(__('Uploaded file format is limited'));
@@ -152,8 +155,10 @@ class Upload
         if ($this->fileInfo['size'] > $size) {
             throw new UploadException(__(
                 'File is too big (%sMiB), Max filesize: %sMiB',
-                [round($this->fileInfo['size'] / pow(1024, 2), 2),
-                round($size / pow(1024, 2), 2)]
+                [
+                    round($this->fileInfo['size'] / pow(1024, 2), 2),
+                    round($size / pow(1024, 2), 2)
+                ]
             ));
         }
     }
@@ -216,7 +221,7 @@ class Upload
      * @return \app\common\model\attachment|\think\Model
      * @throws UploadException
      */
-    public function upload($savekey = null)
+    public function upload($savekey = null, $baseDir = 'public')
     {
         if (empty($this->file)) {
             throw new UploadException(__('No file upload or server upload limit exceeded'));
@@ -232,14 +237,14 @@ class Upload
         $uploadDir = substr($savekey, 0, strripos($savekey, '/') + 1);
         $fileName = substr($savekey, strripos($savekey, '/') + 1);
 
-        $destDir = root_path() . 'public' . str_replace('/', DS, $uploadDir);
+        $destDir = root_path() . $baseDir . str_replace('/', DS, $uploadDir);
 
         $sha1 = $this->file->hash();
-
-        $file = $this->file->move($destDir, $fileName);
-        if (!$file) {
+        try {
+            $file = $this->file->move($destDir, $fileName);
+        } catch (FileException $e) {
             // 上传失败获取错误信息
-            throw new UploadException($this->file->getError());
+            throw new UploadException($e->getMessage());
         }
 
         $this->file = $file;

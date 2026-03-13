@@ -1,20 +1,18 @@
 <?php
 
-declare (strict_types=1);
+declare(strict_types=1);
 
 namespace app;
 
 use think\Service;
+use think\facade\Event;
 
 /**
  * 应用服务类
  */
 class AppService extends Service
 {
-    public function register()
-    {
-        // 服务注册s
-    }
+    public function register() {}
 
     public function boot()
     {

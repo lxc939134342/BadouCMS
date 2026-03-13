@@ -105,7 +105,6 @@ class Ajax extends Backend
 
     public function upload()
     {
-
         $upload = \app\common\model\Config::upload();
 
         $attachment = null;

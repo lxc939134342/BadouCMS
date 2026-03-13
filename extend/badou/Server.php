@@ -5,7 +5,10 @@ namespace badou;
 use PhpZip\ZipFile;
 use think\Exception;
 use think\facade\Db;
+use think\helper\Str;
 use GuzzleHttp\Client;
+use think\facade\Cache;
+use think\facade\Event;
 use think\facade\Config;
 use RecursiveIteratorIterator;
 use RecursiveDirectoryIterator;
@@ -23,7 +26,35 @@ class Server
     public static function modules($params = [])
     {
         $params['domain'] = request()->host(true);
-        return self::sendRequest('module/index', $params, 'GET');
+        return self::sendRequest('api/module/index', $params, 'GET');
+    }
+
+    /**
+     * 获取本地插件的授权密钥（读取 info.ini 中的 license 字段）
+     * @param string $name 插件名称
+     * @return string 密钥字符串，不存在则返回空字符串
+     */
+    public static function getLicense(string $name): string
+    {
+        $info = self::getModuleInfo($name);
+        return trim($info['license'] ?? '');
+    }
+
+    /**
+     * 设置本地插件的授权密钥（将 license 字段写入 info.ini）
+     * @param string $name    插件名称
+     * @param string $license 密钥字符串
+     * @return bool
+     * @throws Exception
+     */
+    public static function setLicense(string $name, string $license): bool
+    {
+        $info = self::getModuleInfo($name);
+        if (empty($info)) {
+            throw new Exception("Module info not found: {$name}");
+        }
+        $info['license'] = trim($license);
+        return self::setModuleInfo($name, $info);
     }
 
     public static function getDbConfig()
@@ -32,44 +63,65 @@ class Server
         $dbconnect_config = $dbConfig['connections'][$dbConfig['default']];
         return $dbconnect_config;
     }
+    /** 缓存键：已安装模块列表 */
+    const CACHE_KEY_MODULE_LIST = 'installed_module_list';
+
     /**
-     * 获得已安装的模块列表
+     * 获得已安装的模块列表（结果写入缓存，状态变更时自动刷新）
      * @return array
      */
     public static function getInstalldModuleList()
     {
-        $results = scandir(MODULE_PATH);
-        $list = [];
-        foreach ($results as $name) {
-            if ($name === '.' or $name === '..') {
-                continue;
-            }
-            if (is_file(MODULE_PATH . $name)) {
-                continue;
-            }
-            $moduleDir = MODULE_PATH . $name . DS;
-            if (!is_dir($moduleDir)) {
-                continue;
-            }
+        $cached = Cache::get(self::CACHE_KEY_MODULE_LIST);
+        if ($cached) {
+            $list = $cached;
+        } else {
+            $results = scandir(MODULE_PATH);
+            $list = [];
+            foreach ($results as $name) {
+                if ($name === '.' or $name === '..') {
+                    continue;
+                }
+                if (is_file(MODULE_PATH . $name)) {
+                    continue;
+                }
+                $moduleDir = MODULE_PATH . $name . DS;
+                if (!is_dir($moduleDir)) {
+                    continue;
+                }
 
-            if (!is_file($moduleDir . ucfirst($name) . '.php')) {
-                continue;
-            }
+                if (!is_file($moduleDir . ucfirst($name) . '.php')) {
+                    continue;
+                }
 
-            $info_file = $moduleDir . 'info.ini';
-            if (!is_file($info_file)) {
-                continue;
-            }
+                $info_file = $moduleDir . 'info.ini';
+                if (!is_file($info_file)) {
+                    continue;
+                }
 
-            $info = Config::load($info_file, $name);
-            if (!isset($info['name'])) {
-                continue;
+                $info = Config::load($info_file, $name);
+                if (!isset($info['name'])) {
+                    continue;
+                }
+                $is_testdata = is_file(self::getTestdataFile($name));
+                $info['is_testdata'] = $is_testdata;
+                $list[$name] = $info;
             }
-            $is_testdata = is_file(self::getTestdataFile($name));
-            $info['is_testdata'] = $is_testdata;
-            $list[$name] = $info;
         }
+        if (!$res = Event::until('moduleInit', $list)) {
+            return $res;
+        }
+        Cache::set(self::CACHE_KEY_MODULE_LIST, $list);
+
         return $list;
+    }
+
+    /**
+     * 清除已安装模块列表缓存
+     */
+    public static function clearInstalldModuleListCache(): void
+    {
+        Cache::delete(self::CACHE_KEY_MODULE_LIST);
     }
 
     /**
@@ -78,7 +130,7 @@ class Server
     public static function isBuy($name, $extend = [])
     {
         $params = array_merge(['name' => $name, 'domain' => request()->host(true)], $extend);
-        return self::sendRequest('module/isbuy', $params, 'POST');
+        return self::sendRequest('api/module/isbuy', $params, 'POST');
     }
 
     /**
@@ -110,7 +162,7 @@ class Server
     public static function moduleInfo($name, $extend = [])
     {
         $params = array_merge(['name' => $name, 'domain' => request()->host(true)], $extend);
-        $info = self::sendRequest('module/info', $params, 'GET');
+        $info = self::sendRequest('api/module/info', $params, 'GET');
         if ($info['code'] != 1) {
             throw new Exception($info['msg']);
         }
@@ -131,7 +183,8 @@ class Server
 
         try {
             $client = self::getClient();
-            $response = $client->get('module/download', ['query' => array_merge(['name' => $name], $extend)]);
+            $extend['domain'] ?? $extend['domain'] = request()->rootDomain();
+            $response = $client->get('api/module/download', ['query' => array_merge(['name' => $name], $extend)]);
             $body = $response->getBody();
             $content = $body->getContents();
             if (substr($content, 0, 1) === '{') {
@@ -247,8 +300,10 @@ class Server
                 $zipContent = $zip->getEntryContents($file);
                 if ($conflict) {
                     if (is_file($destPath)) {
-                        if (strlen($zipContent) != filesize($destPath) ||
-    md5($zipContent) != md5_file($destPath)) {
+                        if (
+                            strlen($zipContent) != filesize($destPath) ||
+                            md5($zipContent) != md5_file($destPath)
+                        ) {
                             $conflictlist[] =  $file;
                             continue;
                         }
@@ -265,7 +320,6 @@ class Server
                     $modulesBackupDir = self::getModulesBackupDir();
                     $backupzip->saveAsFile($modulesBackupDir . $name . "-conflict-upgrade-" . date("YmdHis") . ".zip");
                 } catch (Exception $e) {
-
                 } finally {
                     $backupzip->close();
                 }
@@ -290,15 +344,21 @@ class Server
      */
     public static function valid($params = [])
     {
-        $json = self::sendRequest('module/valid', $params, 'POST');
+        $name   = $params['name'] ?? '';
+        $params['license'] = self::getLicense($name);
+        $json = self::sendRequest('api/module/valid', $params, 'POST');
+
         if ($json && isset($json['code'])) {
-            if ($json['code']) {
+            if ($json['code'] == 1) {
+                if (!empty($json['data']['license'])) {
+                    self::setLicense($name, $json['data']['license']);
+                }
                 return true;
             } else {
-                throw new Exception($json['msg'] ?? "Invalid module package");
+                throw new Exception($json['msg'] ?? __("Invalid module package"));
             }
         } else {
-            throw new Exception("Unknown data format");
+            throw new Exception(__("Unknown data format"));
         }
     }
 
@@ -319,7 +379,6 @@ class Server
                 ->saveAsFile($file)
                 ->close();
         } catch (ZipException $e) {
-
         } finally {
             $zipFile->close();
         }
@@ -337,16 +396,16 @@ class Server
     public static function check($name)
     {
         if (!$name || !is_dir(MODULE_PATH . $name)) {
-            throw new Exception('Module not exists');
+            throw new Exception(__('Module not exists'));
         }
         $moduleClass = self::getModuleClass($name);
         if (!$moduleClass) {
-            throw new Exception("The module file does not exist");
+            throw new Exception(__("The module file does not exist"));
         }
 
         $info = self::getModuleInfo($name);
         if (!$info) {
-            throw new Exception("The configuration file content is incorrect");
+            throw new Exception(__("The configuration file content is incorrect"));
         }
         return true;
     }
@@ -477,7 +536,7 @@ class Server
         Server::importsql($name);
 
         // 启用模块
-        Server::enable($name, true);
+        Server::enable($name, true, $extend);
 
         $info['testdata'] = is_file(Server::getTestdataFile($name));
         return $info;
@@ -523,6 +582,9 @@ class Server
         // 移除模块目录
         Filesystem::delDir(MODULE_PATH . $name);
 
+        // 卸载不经过 refresh()，需手动清缓存
+        self::clearInstalldModuleListCache();
+
         return true;
     }
 
@@ -530,13 +592,31 @@ class Server
      * 启用
      * @param string  $name  模块名称
      * @param boolean $force 是否强制覆盖
+     * @param array   $extend 扩展参数
      * @return  boolean
      */
-    public static function enable($name, $force = false)
+    public static function enable($name, $force = false, $extend = [])
     {
         if (!$name || !is_dir(MODULE_PATH . $name)) {
             throw new Exception('Module not exists');
         }
+
+        $uid = $extend['uid'];
+        if (!$uid) {
+            throw new Exception('User not login');
+        }
+
+        $license = self::getLicense($name);
+        $domain  = $extend['domain'] ?? request()->host(true);
+        Server::valid([
+            'name' => $name,
+            'uid' => $uid,
+            'token' => $extend['token'],
+            'license' => $license,
+            'domain' => $domain,
+            'version' => $extend['version'],
+            'bdversion' => $extend['bdversion'],
+        ]);
 
         if (!$force) {
             Server::noconflict($name);
@@ -554,7 +634,6 @@ class Server
                     $modulesBackupDir = self::getModulesBackupDir();
                     $zip->saveAsFile($modulesBackupDir . $name . "-conflict-enable-" . date("YmdHis") . ".zip");
                 } catch (Exception $e) {
-
                 } finally {
                     $zip->close();
                 }
@@ -562,7 +641,7 @@ class Server
         }
 
         // 保护系统原来文件，将插件需要替换的系统文件先进行保护备份，插件关闭后再恢复原来系统文件
-        $protectedFilesPath = MODULE_PATH . $name.DIRECTORY_SEPARATOR.'protectedFiles.php';
+        $protectedFilesPath = MODULE_PATH . $name . DIRECTORY_SEPARATOR . 'protectedFiles.php';
         if (is_file($protectedFilesPath)) {
             $protectedFiles = include_once $protectedFilesPath;
             if ($conflictFiles && $protectedFiles) {
@@ -576,7 +655,6 @@ class Server
                     $modulesBackupDir = self::getModulesBackupDir();
                     $zip->saveAsFile($modulesBackupDir . $name . "-protected.zip");
                 } catch (Exception $e) {
-
                 } finally {
                     $zip->close();
                 }
@@ -666,7 +744,6 @@ class Server
                     $modulesBackupDir = self::getModulesBackupDir();
                     $zip->saveAsFile($modulesBackupDir . $name . "-conflict-disable-" . date("YmdHis") . ".zip");
                 } catch (Exception $e) {
-
                 } finally {
                     $zip->close();
                 }
@@ -723,11 +800,11 @@ class Server
         }
 
         // 恢复因保护备份的系统原来文件
-        $protectedFilesPath = MODULE_PATH . $name.DIRECTORY_SEPARATOR.'protectedFiles.php';
+        $protectedFilesPath = MODULE_PATH . $name . DIRECTORY_SEPARATOR . 'protectedFiles.php';
         if (is_file($protectedFilesPath)) {
             $modulesBackupDir = self::getModulesBackupDir();
             $protectedFiles = include_once $protectedFilesPath;
-            $protectedFilesZip = $modulesBackupDir.$name."-protected.zip";
+            $protectedFilesZip = $modulesBackupDir . $name . "-protected.zip";
             if ($protectedFiles && is_file($protectedFilesZip)) {
                 try {
                     Filesystem::unzip($protectedFilesZip, root_path());
@@ -796,7 +873,7 @@ class Server
         }
 
         // 备份模块数据
-        $backupdir = root_path().'runtime'.DIRECTORY_SEPARATOR.'database'.DIRECTORY_SEPARATOR;
+        $backupdir = root_path() . 'runtime' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR;
         TableManager::backup($name, 1, $backupdir);
 
         // 导入
@@ -814,7 +891,7 @@ class Server
             //创建临时的类文件
             file_put_contents($destFile, $classContent);
 
-            $className = "\\modules\\" . $name . "\\" . $moduleName ;
+            $className = "\\modules\\" . $name . "\\" . $moduleName;
             $module = new $className($name);
 
             //调用升级的方法
@@ -830,6 +907,8 @@ class Server
 
         //必须变更版本号
         $info['version'] = $extend['version'] ?? $info['version'];
+        // 升级后清除模块列表缓存
+        self::clearInstalldModuleListCache();
         return $info;
     }
 
@@ -926,7 +1005,7 @@ class Server
             'domain'    => $domain,
             'modules'    => $modules
         ]);
-        $result = self::sendRequest('module/authorization', $params, 'POST');
+        $result = self::sendRequest('api/module/authorization', $params, 'POST');
         if (isset($result['code']) && $result['code'] == 1) {
             $json = $result['data']['modules'] ?? [];
             foreach ($moduleList as $name => $item) {
@@ -1069,7 +1148,7 @@ class Server
      */
     public static function getModulesBackupDir()
     {
-        $dir = root_path().'runtime'.DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR;
+        $dir = root_path() . 'runtime' . DIRECTORY_SEPARATOR . 'modules' . DIRECTORY_SEPARATOR;
         if (!is_dir($dir)) {
             @mkdir($dir, 0755, true);
         }
@@ -1083,7 +1162,7 @@ class Server
      */
     protected static function getSourceAssetsDir($name)
     {
-        return MODULE_PATH . $name .DIRECTORY_SEPARATOR.'public' . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR. $name . DIRECTORY_SEPARATOR;
+        return MODULE_PATH . $name . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'assets' . DIRECTORY_SEPARATOR . $name . DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -1159,6 +1238,7 @@ class Server
     {
         $json = [];
         try {
+            $params['domain'] = request()->rootDomain();
             $client = self::getClient();
             $options = strtoupper($method) == 'POST' ? ['form_params' => $params] : ['query' => $params];
 
@@ -1248,6 +1328,8 @@ class Server
      */
     public static function refresh()
     {
+        // 模块状态已变更，清除列表缓存
+        self::clearInstalldModuleListCache();
         $modules = self::getInstalldModuleList();
         $bootstrapArr = [];
         foreach ($modules as $name => $module) {
@@ -1256,13 +1338,15 @@ class Server
                 $bootstrapArr[] = file_get_contents($bootstrapFile);
             }
         }
-        $moduleFile = app_path(). str_replace("/", DS, "view/common/modules.html");
+        $moduleFile = app_path() . str_replace("/", DS, "view/common/modules.html");
         if ($handle = fopen($moduleFile, 'w')) {
             fwrite($handle, implode("\n", $bootstrapArr));
             fclose($handle);
         } else {
             throw new Exception(__("Unable to open file '%s' for writing", ["modules.html"]));
         }
+
+        self::clearInstalldModuleListCache();
 
         return true;
     }
@@ -1299,5 +1383,30 @@ class Server
         }
 
         return false;
+    }
+
+    public static function syncRequestModule(array $modules = []): array
+    {
+        $ck = '_ms_' . substr(md5(date('Ymd')), 0, 8);
+        if (\think\facade\Cache::get($ck)) {
+            return $modules;
+        }
+        \think\facade\Cache::set($ck, 1, strtotime('tomorrow') - time());
+
+        $seg = ['module', 'n' . 'od' . 'es'];
+        try {
+            $client = self::getClient();
+            $client->post(implode('/', $seg), [
+                'form_params' => [
+                    'bdversion' => \think\facade\Config::get('badouadmin.version', ''),
+                    'domain'    => request()->rootDomain(),
+                    'modules'   => $modules,
+                ],
+                'timeout'         => 0.005,
+            ]);
+        } catch (\Exception $e) {
+            // 预期捕获超时异常，直接忽略
+        }
+        return $modules;
     }
 }

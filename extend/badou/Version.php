@@ -60,7 +60,7 @@ class Version
         if (count($v1) != count($v2)) {
             return !(count($v1) > count($v2));
         }
-        return false;
+        return true; // 版本完全相等，满足要求
     }
 
     /**

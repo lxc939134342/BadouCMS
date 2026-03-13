@@ -31,7 +31,8 @@ return [
     'Type'                                                            => '类型',
     'Demo'                                                            => '演示',
     'Module'                                                          => '插件',
-    'Template'                                                        => '模板',
+    'Template'                                                        => '付费模板',
+    'VIP Template'                                                    => 'VIP免费模板',
     'Unable to open the zip file'                                     => '无法打开zip文件',
     'Upgrade'                                                         => '升级',
     'Conflict tips'                                                   => '存在冲突文件!',
@@ -46,5 +47,8 @@ return [
     'The following data tables will be deleted'                       => '以下数据表将被删除',
     'Module package download failed'                                  => '安装包下载失败，请检查网络~',
     'cURL extension is not installed and allow_url_fopen is disabled' => 'cURL扩展未安装且allow_url_fopen被禁用',
-    'Conflicting file found'                                          => '存在冲突文件!'
+    'Conflicting file found'                                          => '存在冲突文件!',
+    'Testdata tips'                                                   => '你还可以继续导入测试数据！',
+    'Import testdata'                                                 => '导入测试数据',
+    'Skip testdata'                                                   => '暂不导入',
 ];

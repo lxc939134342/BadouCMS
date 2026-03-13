@@ -15,7 +15,6 @@ namespace app\admin\controller;
 use badou\Server;
 use think\Exception;
 use think\facade\Db;
-use think\facade\Config;
 use badou\ModuleException;
 use app\common\controller\Backend;
 use badou\TableManager;
@@ -26,6 +25,7 @@ class Module extends Backend
     {
         if ($this->isAjax()) {
             $installedModules = Server::getInstalldModuleList();
+            $names = array_keys($installedModules);
             $list = [];
             $params = [];
             $page = $this->request->get('page', 1);
@@ -38,16 +38,16 @@ class Module extends Backend
             if ($uid) {
                 $params['uid'] = $uid;
                 $params['token'] = $token;
-                $params['bdversion'] = $bdversion;
-                $params['page'] = $page;
-                $params['limit'] = $limit;
-                $params['keyword'] = $keyword;
             }
-            if (in_array($type, ['template', 'module'])) {
+            $params['bdversion'] = $bdversion;
+            $params['page'] = $page;
+            $params['limit'] = $limit;
+            $params['keyword'] = $keyword;
+            $params['installed_names'] = implode(',', $names);
+            if (in_array($type, ['template', 'module', 'vip_template'])) {
                 $params['type'] = $type;
             }
             if ($type == 'installed') {
-                $names = array_keys($installedModules);
                 $params['names'] = implode(',', $names);
             }
 
@@ -113,7 +113,7 @@ class Module extends Backend
                 $info['module'] = $ini;
             }
         } catch (ModuleException $e) {
-            $this->result(__($e->getMessage()), $e->getData(), 0, $e->getCode(), );
+            $this->result(__($e->getMessage()), $e->getData(), 0, $e->getCode(),);
         } catch (Exception $e) {
             $this->error(__($e->getMessage()));
         }
@@ -153,7 +153,6 @@ class Module extends Backend
                 'bdversion' => $bdversion
             ];
             $info = Server::install($name, $force, $extend);
-
         } catch (ModuleException $e) {
             $getData = is_array($e->getData()) ? $e->getData() : [];
             $this->result(__($e->getMessage()), $getData, 0, $e->getCode());
@@ -198,7 +197,7 @@ class Module extends Backend
                 }
             }
         } catch (ModuleException $e) {
-            $this->result(__($e->getMessage()), $e->getData(), 0, $e->getCode(), );
+            $this->result(__($e->getMessage()), $e->getData(), 0, $e->getCode(),);
         } catch (Exception $e) {
             $this->error(__($e->getMessage()));
         }
@@ -213,18 +212,35 @@ class Module extends Backend
         $name = $this->request->post("name");
         $action = $this->request->post("action");
         $force = (int)$this->request->post("force");
+        $uid = $this->request->post("uid");
+        if (!$uid) {
+            throw new ModuleException("", 1);
+        }
+        $token = $this->request->post("token");
+        $version = $this->request->post("version", '');
+        $bdversion = $this->request->post("bdversion");
+        $extend = [
+            'uid'       => $uid,
+            'token'     => $token,
+            'version'   => $version,
+            'bdversion' => $bdversion
+        ];
         if (!$name) {
             $this->error(__('Parameter %s can not be empty', ['name']));
         }
         if (!preg_match("/^[a-zA-Z0-9]+$/", $name)) {
             $this->error(__('Module name incorrect'));
         }
+        if ($version == '') {
+            $info = Server::getModuleInfo($name);
+            $extend['version'] = $info['version'];
+        }
         try {
             $action = $action == 'enable' ? $action : 'disable';
             //调用启用、禁用的方法
-            Server::$action($name, $force);
+            Server::$action($name, $force, $extend);
         } catch (ModuleException $e) {
-            $this->result(__($e->getMessage()), $e->getData(), 0, $e->getCode(), );
+            $this->result(__($e->getMessage()), $e->getData(), 0, $e->getCode(),);
         } catch (Exception $e) {
             $this->error(__($e->getMessage()));
         }
@@ -270,7 +286,7 @@ class Module extends Backend
             //调用更新的方法
             $info = Server::upgrade($name, $extend);
         } catch (ModuleException $e) {
-            $this->result(__($e->getMessage()), $e->getData(), 0, $e->getCode(), );
+            $this->result(__($e->getMessage()), $e->getData(), 0, $e->getCode(),);
         } catch (Exception $e) {
             $this->error(__($e->getMessage()));
         }
@@ -292,12 +308,12 @@ class Module extends Backend
 
         try {
             // 备份模块数据
-            $backupdir = root_path().'runtime'.DIRECTORY_SEPARATOR.'database'.DIRECTORY_SEPARATOR;
+            $backupdir = root_path() . 'runtime' . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR;
             TableManager::backup('all', 1, $backupdir);
 
             Server::importsql($name, 'testdata.sql');
         } catch (ModuleException $e) {
-            $this->result(__($e->getMessage()), $e->getData(), 0, $e->getCode(), );
+            $this->result(__($e->getMessage()), $e->getData(), 0, $e->getCode(),);
         } catch (Exception $e) {
             $this->error(__($e->getMessage()), $e->getCode());
         }
