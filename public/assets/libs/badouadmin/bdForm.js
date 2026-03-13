@@ -1,5 +1,17 @@
-
-layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'colorpicker', 'bdTool', 'laytpl', 'Sortable'], function (exports) {
+layui.define(
+  [
+    "jquery",
+    "bdHttp",
+    "form",
+    "iconPicker",
+    "toast",
+    "bdUpload",
+    "colorpicker",
+    "bdTool",
+    "laytpl",
+    "Sortable",
+  ],
+  function (exports) {
     var $ = layui.jquery;
     var http = layui.bdHttp;
     var form = layui.form;
@@ -10,445 +22,618 @@ layui.define(['jquery', 'bdHttp', 'form', 'iconPicker', 'toast', 'bdUpload', 'co
     var bdTool = layui.bdTool;
     var laytpl = layui.laytpl;
     var bdForm = {
-        config: {
-            fieldlisttpl: '<dd class="layui-inline"><input type="text" name="{{=d.name}}[{{=d.index}}][key]" class="layui-input" value="{{=d.key}}" size="10" /> <input type="text" name="{{=d.name}}[{{=d.index}}][value]" class="layui-input" value="{{=d.value}}"  /> <span class="layui-btn layui-bg-red btn-remove"><i class="fa fa-times"></i></span><span class="layui-btn btn-dragsort"><i class="fa fa-arrows"></i></span></dd>'
+      config: {
+        fieldlisttpl:
+          '<dd class="layui-inline"><input type="text" name="{{=d.name}}[{{=d.index}}][key]" class="layui-input" value="{{=d.key}}" size="10" /> <input type="text" name="{{=d.name}}[{{=d.index}}][value]" class="layui-input" value="{{=d.value}}"  /> <span class="layui-btn layui-bg-red btn-remove"><i class="fa fa-times"></i></span><span class="layui-btn btn-dragsort"><i class="fa fa-arrows"></i></span></dd>',
+      },
+      events: {
+        //绑定事件
+        bindevent: function (layform) {
+          form.render();
+          //绑定上传组件
+          bdUpload.render();
+          //绑定颜色选择器事件
+          bdForm.events.colorpicker(layform);
+          //绑定图标选择器事件
+          bdForm.events.iconpicker(layform);
+          //绑定选择图片事件
+          bdForm.events.bdchoosefile(layform);
+          // 绑定远程下拉事件
+          bdTool.remoteSelect();
+          // 绑定时间选择器
+          bdTool.laydate();
+          //绑定fieldlist
+          bdForm.events.fieldlist(layform);
         },
-        events: {
-            //绑定事件
-            bindevent: function (layform) {
-                form.render()
-                //绑定上传组件
-                bdUpload.render()
-                //绑定颜色选择器事件
-                bdForm.events.colorpicker(layform);
-                //绑定图标选择器事件
-                bdForm.events.iconpicker(layform);
-                //绑定选择图片事件
-                bdForm.events.bdchoosefile(layform);
-                // 绑定远程下拉事件
-                bdTool.remoteSelect();
-                // 绑定时间选择器
-                bdTool.laydate();
-                //绑定fieldlist
-                bdForm.events.fieldlist(layform);
-            },
-            //表单校验事件
-            validator: function (layform, success, error, submit) {
-                if (!layform.is("form"))
-                    return;
-                var submitBtn = $("[lay-submit]", layform),
-                    filter = submitBtn.attr('lay-filter');
+        //表单校验事件
+        validator: function (layform, success, error, submit) {
+          if (!layform.is("form")) return;
+          var submitBtn = $("[lay-submit]", layform),
+            filter = submitBtn.attr("lay-filter");
 
-                $(".layer-footer [lay-submit],.fixed-footer [lay-submit],.normal-footer [lay-submit]", layform).removeClass("disabled");
-                //验证通过提交表单
-                form.on('submit(' + filter + ')', function (data) {
-                    submitBtn.addClass("disabled");
+          $(
+            ".layer-footer [lay-submit],.fixed-footer [lay-submit],.normal-footer [lay-submit]",
+            layform,
+          ).removeClass("disabled");
+          //验证通过提交表单
+          form.on("submit(" + filter + ")", function (data) {
+            submitBtn.addClass("disabled");
 
-                    var submitResult = bdForm.api.submit(layform, function (data, ret) {
-                        submitBtn.removeClass("disabled");
-                        if (false === $(this).triggerHandler("success.form", [data, ret])) {
-                            return false;
-                        }
-                        if (typeof success === 'function') {
-                            if (false === success.call($(this), data, ret)) {
-                                return false;
-                            }
-                        }
-                        //提示及关闭当前窗口
-                        var msg = ret.hasOwnProperty("msg") && ret.msg !== "" ? ret.msg : __('Operation completed');
-
-                        parent.layui.toast.success({ message: msg })
-                        parent.$(".btn-refresh").trigger("click");
-
-                        if (window.name) {
-                            var index = parent.layer.getFrameIndex(window.name);
-                            parent.layer.close(index);
-                        }
-                        return false;
-                    }, function (data, ret) {
-                        if (false === $(this).triggerHandler("error.form", [data, ret])) {
-                            return false;
-                        }
-                        submitBtn.removeClass("disabled");
-                        if (typeof error === 'function') {
-                            if (false === error.call($(this), data, ret)) {
-                                return false;
-                            }
-                        }
-                    }, submit);
-                    //如果提交失败则释放锁定
-                    if (!submitResult) {
-                        submitBtn.removeClass("disabled");
-                    }
+            var submitResult = bdForm.api.submit(
+              layform,
+              function (data, ret) {
+                submitBtn.removeClass("disabled");
+                if (
+                  false === $(this).triggerHandler("success.form", [data, ret])
+                ) {
+                  return false;
+                }
+                if (typeof success === "function") {
+                  if (false === success.call($(this), data, ret)) {
                     return false;
-                })
+                  }
+                }
+                //提示及关闭当前窗口
+                var msg =
+                  ret.hasOwnProperty("msg") && ret.msg !== ""
+                    ? ret.msg
+                    : __("Operation completed");
 
-                //自定义关闭按钮事件
-                layform.on("click", ".layer-close", function () {
-                    if (window.name) {
-                        var index = parent.layer.getFrameIndex(window.name);
-                        parent.layer.close(index);
-                    }
+                parent.layui.toast.success({ message: msg });
+                parent.$(".btn-refresh").trigger("click");
+
+                if (window.name) {
+                  var index = parent.layer.getFrameIndex(window.name);
+                  parent.layer.close(index);
+                }
+                return false;
+              },
+              function (data, ret) {
+                if (
+                  false === $(this).triggerHandler("error.form", [data, ret])
+                ) {
+                  return false;
+                }
+                submitBtn.removeClass("disabled");
+                if (typeof error === "function") {
+                  if (false === error.call($(this), data, ret)) {
                     return false;
-                });
-            },
-            //绑定图标选择器事件
-            iconpicker: function (form) {
-                //选择图标
-                if ($('.icon-select').length > 0) {
-                    $(".icon-select").each(function (i, j) {
-                        var that = this;
-                        iconPicker.render({
-                            elem: this,
-                            type: 'fontClass',
-                            search: true,
-                            page: true,
-                            limit: 16,
-                            click: function (data) {
-                                $(that).val(data.class);
-                            },
-                        });
-                    });
+                  }
                 }
-            },
-            //绑定颜色选择器事件
-            colorpicker: function (form) {
-                colorpicker.render({
-                    elem: '.colorpicker',
-                    done: function (color) {
-                        var elem = this.elem;
-                        var input_id = $(elem).data("input-id") ? $(elem).data("input-id") : '';
-                        if (input_id) {
-                            $('#' + input_id).val(color);
-                        }
-                    }
-                });
-            },
-            //绑定选择附件事件
-            bdchoosefile: function (form) {
-                if ($(".btn-bdchoose", form).length > 0) {
-                    $(".btn-bdchoose", form).off('click').on('click', function () {
-                        var that = this;
-                        var multiple = $(this).data("multiple") ? $(this).data("multiple") : false;
-                        var mimetype = $(this).data("mimetype") ? $(this).data("mimetype") : '';
-                        var admin_id = $(this).data("admin-id") ? $(this).data("admin-id") : '';
-                        var user_id = $(this).data("user-id") ? $(this).data("user-id") : '';
-                        mimetype = mimetype.replace(/\/\*/ig, '/');
-                        var url = $(this).data("url") ? $(this).data("url") : "general.attachment/select";
+              },
+              submit,
+            );
+            //如果提交失败则释放锁定
+            if (!submitResult) {
+              submitBtn.removeClass("disabled");
+            }
+            return false;
+          });
 
-                        parent.layui.badou.api.open(url + "?element_id=" + $(this).attr("id") + "&multiple=" + multiple + "&mimetype=" + mimetype + "&admin_id=" + admin_id + "&user_id=" + user_id, __('Choose'), {
-                            callback: function (data) {
-                                var button = $(that);
-                                var maxcount = $(button).data("maxcount");
-                                var input_id = $(button).data("input-id") ? $(button).data("input-id") : "";
-                                maxcount = typeof maxcount !== "undefined" ? maxcount : 0;
-                                if (input_id && data.multiple) {
-                                    var urlArr = [];
-                                    var inputObj = $("#" + input_id);
-                                    var value = $.trim(inputObj.val());
-                                    if (value !== "") {
-                                        urlArr.push(inputObj.val());
-                                    }
-                                    var nums = value === '' ? 0 : value.split(/\,/).length;
-                                    var files = data.url !== "" ? data.url.split(/\,/) : [];
-                                    $.each(files, function (i, j) {
-                                        var url = Config.upload.fullmode ? http.api.cdnurl(j) : j;
-                                        urlArr.push(url);
-                                    });
-                                    if (maxcount > 0) {
-                                        var remains = maxcount - nums;
-                                        if (files.length > remains) {
-                                            toast.error(__('You can choose up to %d file%s', remains));
-                                            return false;
-                                        }
-                                    }
-                                    var result = urlArr.join(",");
-                                    inputObj.val(result).trigger("change").trigger("validate");
-                                } else if (input_id) {
-                                    var url = Config.upload.fullmode ? http.api.cdnurl(data.url) : data.url;
-                                    $("#" + input_id).val(url).trigger("change").trigger("validate");
-                                }
-
-                            }
-                        });
-                        return false;
-                    });
-                }
-            },
-
-            fieldlist: function (form) {
-                //绑定fieldlist
-                if ($(".fieldlist", form).length > 0) {
-                    //刷新隐藏textarea的值
-                    var refresh = function (container) {
-                        var data = {};
-                        var name = container.data("name");
-                        var textarea = $("textarea[name='" + name + "']", form);
-                        var template = container.data("template");
-                        console.log(template);
-                        // 新的解析函数，能够处理任意层级的嵌套结构
-                        var parseFieldName = function (fieldName) {
-                            // 提取所有 [...] 中的内容
-                            var matches = fieldName.match(/\[([^\]]+)\]/g);
-                            if (!matches || matches.length < 2) {
-                                return null; // 至少需要两个层级才能处理
-                            }
-
-                            // 提取匹配的内容
-                            var parts = matches.map(function (match) {
-                                return match.substring(1, match.length - 1); // 去掉 [ 和 ]
-                            });
-
-                            // 最后一个部分是 key，倒数第二个部分是 index
-                            var key = parts[parts.length - 1];
-                            var index = parts[parts.length - 2];
-
-                            // 构建前缀路径，用于标识这个字段所属的数据结构
-                            var prefix = parts.slice(0, -2).join('[');
-                            if (prefix) prefix += ']';
-
-                            return {
-                                key: key,
-                                index: index,
-                                prefix: prefix
-                            };
-                        };
-
-                        $.each($("input,select,textarea", container).serializeArray(), function (i, j) {
-                            var parsed = parseFieldName(j.name);
-                            if (!parsed) {
-                                return true; // 跳过无法解析的字段名
-                            }
-
-                            // 构建数据结构的唯一标识
-                            var dataKey = parsed.prefix + '[x' + parseInt(parsed.index) + ']';
-
-                            if (typeof data[dataKey] == 'undefined') {
-                                data[dataKey] = {};
-                            }
-                            data[dataKey][parsed.key] = j.value;
-                        });
-
-                        //使用数组保存
-                        var usearray = container.data("usearray") || false;
-                        //保留空数据
-                        var keepempty = container.data("keepempty") || false;
-
-                        var result = template || usearray ? [] : {};
-                        var keys = Object.keys(Object.values(data)[0] || {});
-
-                        var isassociative = !usearray && keys.indexOf("value") > -1 && (keys.length === 1 || (keys.length === 2 && keys.indexOf("key") > -1));
-                        if (isassociative && keys.length === 2) {
-                            result = {};
-                        }
-
-                        $.each(data, function (i, j) {
-                            if (j) {
-                                if (isassociative) {
-                                    if (keys.length === 2) {
-                                        if (j.key != '' || keepempty) {
-                                            result['__PLACEHOLDKEY__' + j.key] = j.value;
-                                        }
-                                    } else {
-                                        //一维数组
-                                        result.push(j.value);
-                                    }
-                                } else {
-                                    result.push(j);
-                                }
-                            }
-                        });
-                        textarea.val(JSON.stringify(result).replace(/__PLACEHOLDKEY__/g, ''));
-                    };
-
-                    //追加一行数据
-                    var append = function (container, row, initial) {
-                        var tagName = container.data("tag") || (container.is("table") ? "tr" : "dd");
-                        var index = container.data("index");
-                        var name = container.data("name");
-                        var template = container.data("template");
-                        var data = container.data();
-                        index = index ? parseInt(index) : 0;
-                        container.data("index", index + 1);
-                        row = row ? row : {};
-                        row = typeof row.key === 'undefined' || typeof row.value === 'undefined' ? { key: '', value: row } : row;
-                        var options = container.data("fieldlist-options") || {};
-                        var vars = { index: index, name: name, data: data, options: options, key: row.key, value: row.value, row: row.value };
-
-                        if (template) {
-                            template = document.getElementById(template).innerHTML;
-                        }
-
-                        var html = template ? laytpl(template, { tagStyle: 'modern' }).render(vars) : laytpl(bdForm.config.fieldlisttpl, { tagStyle: 'modern' }).render(vars);
-                        var obj = $(html);
-                        if ((options.deleteBtn === false || options.removeBtn === false) && initial)
-                            obj.find(".btn-remove").remove();
-                        if (options.dragsortBtn === false && initial)
-                            obj.find(".btn-dragsort").remove();
-                        if ((options.readonlyKey === true || options.disableKey === true) && initial) {
-                            obj.find("input[name$='[key]']").prop("readonly", true);
-                        }
-                        obj.attr("fieldlist-item", true);
-                        obj.insertAfter($(tagName + "[fieldlist-item]", container).length > 0 ? $(tagName + "[fieldlist-item]:last", container) : $(tagName + ":first", container));
-                        if ($(".btn-append,.append", container).length > 0) {
-                            //兼容旧版本事件
-                            $(".btn-append,.append", container).trigger("badou.event.appendfieldlist", obj);
-                        } else {
-                            //新版本事件
-                            container.trigger("badou.event.appendfieldlist", obj);
-                        }
-                        return obj;
-                    };
-                    var fieldlist = $(".fieldlist", form);
-                    //表单重置
-                    form.on("reset", function () {
-                        setTimeout(function () {
-                            fieldlist.trigger("badou.event.refreshfieldlist");
-                        });
-                    });
-                    //监听文本框改变事件
-                    $(document).on('change keyup changed', ".fieldlist input,.fieldlist textarea,.fieldlist select", function () {
-                        var container = $(this).closest(".fieldlist");
-                        refresh(container);
-                    });
-                    //追加控制(点击按钮)
-                    fieldlist.on("click", ".btn-append,.append", function (e, row) {
-                        var container = $(this).closest(".fieldlist");
-                        append(container, row);
-                        refresh(container);
-                    });
-                    //移除控制(点击按钮)
-                    fieldlist.on("click", ".btn-remove", function () {
-                        var container = $(this).closest(".fieldlist");
-                        var tagName = container.data("tag") || (container.is("table") ? "tr" : "dd");
-                        $(this).closest(tagName).remove();
-                        refresh(container);
-                    });
-                    //追加控制(通过事件)
-                    fieldlist.on("badou.event.appendtofieldlist", function (e, row) {
-                        var container = $(this);
-                        append(container, row);
-                        refresh(container);
-                    });
-                    //根据textarea内容重新渲染
-                    fieldlist.on("badou.event.refreshfieldlist", function () {
-                        var container = $(this);
-                        var textarea = $("textarea[name='" + container.data("name") + "']", form);
-                        //先清空已有的数据
-                        $("[fieldlist-item]", container).remove();
-                        var json = {};
-                        try {
-                            var val = textarea.val().replace(/"(\d+)"\:/g, "\"__PLACEHOLDERKEY__$1\":");
-                            json = JSON.parse(val);
-                        } catch (e) {
-                        }
-
-                        $.each(json, function (i, j) {
-                            append(container, { key: i.toString().replace("__PLACEHOLDERKEY__", ""), value: j }, true);
-                        });
-                    });
-                    //拖拽排序
-                    new Sortable(fieldlist[0], {
-                        animation: 150,
-                        ghostClass: 'btn-dragsort', // 拖动时的样式类名
-                        onEnd: function (evt) {
-                            refresh($(evt.target));
-                        }
-                    });
-
-                    fieldlist.each(function () {
-                        var container = $(this);
-                        if (typeof container.data("options") === 'object' && container.data("options").appendBtn === false) {
-                            $(".btn-append,.append", container).hide();
-                        }
-                    });
-                    fieldlist.trigger("badou.event.refreshfieldlist");
-                }
-            },
+          //自定义关闭按钮事件
+          layform.on("click", ".layer-close", function () {
+            if (window.name) {
+              var index = parent.layer.getFrameIndex(window.name);
+              parent.layer.close(index);
+            }
+            return false;
+          });
         },
-        api: {
-            submit: function (form, success, error, submit) {
-                if (form.length === 0) {
-                    toast.error("表单未初始化完成,无法提交");
-                    return false;
-                }
-                if (typeof submit === 'function') {
-                    if (false === submit.call(form, success, error)) {
-                        return false;
-                    }
-                }
-                var type = form.attr("method") ? form.attr("method").toUpperCase() : 'POST';
-                type = type && (type === 'GET' || type === 'POST') ? type : 'POST';
-                url = form.attr("action");
-                url = url ? url : location.href;
-                //修复当存在多选项元素时提交的BUG
-                var params = {};
-                var multipleList = $("[name$='[]']", form);
-                if (multipleList.length > 0) {
-                    var postFields = form.serializeArray().map(function (obj) {
-                        return $(obj).prop("name");
-                    });
-                    $.each(multipleList, function (i, j) {
-                        if (postFields.indexOf($(this).prop("name")) < 0) {
-                            params[$(this).prop("name")] = '';
-                        }
-                    });
-                }
-                //调用Ajax请求方法
-                http.api.ajax({
-                    type: type,
-                    url: url,
-                    data: form.serialize() + (Object.keys(params).length > 0 ? '&' + $.param(params) : ''),
-                    dataType: 'json',
-                    complete: function (xhr) {
-                        var token = xhr.getResponseHeader('__token__');
-                        if (token) {
-                            $("input[name='__token__']").val(token);
-                        }
-                    }
-                }, function (data, ret) {
-                    //$('.form-group', form).removeClass('has-feedback has-success has-error');
-                    if (data && typeof data === 'object') {
-                        //刷新客户端token
-                        if (typeof data.token !== 'undefined') {
-                            $("input[name='__token__']").val(data.token);
-                        }
-                        //调用客户端事件
-                        if (typeof data.callback !== 'undefined' && typeof data.callback === 'function') {
-                            data.callback.call(form, data);
-                        }
-                    }
-                    if (typeof success === 'function') {
-                        if (false === success.call(form, data, ret)) {
-                            return false;
-                        }
-                    }
-                }, function (data, ret) {
-                    if (data && typeof data === 'object' && typeof data.token !== 'undefined') {
-                        $("input[name='__token__']").val(data.token);
-                    }
-                    if (typeof error === 'function') {
-                        if (false === error.call(form, data, ret)) {
-                            return false;
-                        }
-                    }
-                });
-                return true;
+        //绑定图标选择器事件
+        iconpicker: function (form) {
+          //选择图标
+          if ($(".icon-select").length > 0) {
+            $(".icon-select").each(function (i, j) {
+              var that = this;
+              iconPicker.render({
+                elem: this,
+                type: "fontClass",
+                search: true,
+                page: true,
+                limit: 16,
+                click: function (data) {
+                  $(that).val(data.class);
+                },
+              });
+            });
+          }
+        },
+        //绑定颜色选择器事件
+        colorpicker: function (form) {
+          colorpicker.render({
+            elem: ".colorpicker",
+            done: function (color) {
+              var elem = this.elem;
+              var input_id = $(elem).data("input-id")
+                ? $(elem).data("input-id")
+                : "";
+              if (input_id) {
+                $("#" + input_id).val(color);
+              }
             },
-            //这是一个函数，接收四个参数：form: 表单元素或表单的选择器。success: 成功回调函数。error: 错误回调函数。submit: 提交回调函数。
-            bindevent: function (form, success, error, submit) {
-                //如果传入的 form 不是对象，则将其转换为 jQuery 对象。这确保了后续操作可以直接使用 jQuery 方法。
-                form = typeof form === 'object' ? form : $(form);
+          });
+        },
+        //绑定选择附件事件
+        bdchoosefile: function (form) {
+          if ($(".btn-bdchoose", form).length > 0) {
+            $(".btn-bdchoose", form)
+              .off("click")
+              .on("click", function () {
+                var that = this;
+                var multiple = $(this).data("multiple")
+                  ? $(this).data("multiple")
+                  : false;
+                var mimetype = $(this).data("mimetype")
+                  ? $(this).data("mimetype")
+                  : "";
+                var admin_id = $(this).data("admin-id")
+                  ? $(this).data("admin-id")
+                  : "";
+                var user_id = $(this).data("user-id")
+                  ? $(this).data("user-id")
+                  : "";
+                mimetype = mimetype.replace(/\/\*/gi, "/");
+                var url = $(this).data("url")
+                  ? $(this).data("url")
+                  : "general.attachment/select";
 
-                //从 bdForm 对象中获取 events 对象，它包含了一些与表单相关的事件处理方法。
-                var events = bdForm.events;
-                //绑定表单事件,调用 events 对象中的 bindevent 方法，用于绑定表单的事件（例如图标选择器等）。
-                events.bindevent(form);
-                //绑定表单验证事件 调用 events 对象中的 validator 方法，用于绑定表单的验证逻辑。
-                //success, error, 和 submit 参数会被传递给验证逻辑，分别表示成功、错误和提交时的回调函数。
-                events.validator(form, success, error, submit);
+                parent.layui.badou.api.open(
+                  url +
+                    "?element_id=" +
+                    $(this).attr("id") +
+                    "&multiple=" +
+                    multiple +
+                    "&mimetype=" +
+                    mimetype +
+                    "&admin_id=" +
+                    admin_id +
+                    "&user_id=" +
+                    user_id,
+                  __("Choose"),
+                  {
+                    callback: function (data) {
+                      var button = $(that);
+                      var maxcount = $(button).data("maxcount");
+                      var input_id = $(button).data("input-id")
+                        ? $(button).data("input-id")
+                        : "";
+                      maxcount = typeof maxcount !== "undefined" ? maxcount : 0;
+                      if (input_id && data.multiple) {
+                        var urlArr = [];
+                        var inputObj = $("#" + input_id);
+                        var value = $.trim(inputObj.val());
+                        if (value !== "") {
+                          urlArr.push(inputObj.val());
+                        }
+                        var nums = value === "" ? 0 : value.split(/\,/).length;
+                        var files = data.url !== "" ? data.url.split(/\,/) : [];
+                        $.each(files, function (i, j) {
+                          var url = Config.upload.fullmode
+                            ? http.api.cdnurl(j)
+                            : j;
+                          urlArr.push(url);
+                        });
+                        if (maxcount > 0) {
+                          var remains = maxcount - nums;
+                          if (files.length > remains) {
+                            toast.error(
+                              __("You can choose up to %d file%s", remains),
+                            );
+                            return false;
+                          }
+                        }
+                        var result = urlArr.join(",");
+                        inputObj
+                          .val(result)
+                          .trigger("change")
+                          .trigger("validate");
+                      } else if (input_id) {
+                        var url = Config.upload.fullmode
+                          ? http.api.cdnurl(data.url)
+                          : data.url;
+                        $("#" + input_id)
+                          .val(url)
+                          .trigger("change")
+                          .trigger("validate");
+                      }
+                    },
+                  },
+                );
+                return false;
+              });
+          }
+        },
+        selectpage: function (form) {
+          //绑定selectpage元素事件
+          if ($(".selectpage", form).length > 0) {
+            require(["selectpage"], function () {
+              $(".selectpage", form).selectPage({
+                eAjaxSuccess: function (data) {
+                  data.list =
+                    typeof data.rows !== "undefined"
+                      ? data.rows
+                      : typeof data.list !== "undefined"
+                        ? data.list
+                        : [];
+                  data.totalRow =
+                    typeof data.total !== "undefined"
+                      ? data.total
+                      : typeof data.totalRow !== "undefined"
+                        ? data.totalRow
+                        : data.list.length;
+                  return data;
+                },
+              });
+            });
+            //给隐藏的元素添加上validate验证触发事件
+            $(document).on("change", ".sp_hidden", function () {
+              $(this).trigger("validate");
+            });
+            $(document).on("change", ".sp_input", function () {
+              $(this)
+                .closest(".sp_container")
+                .find(".sp_hidden")
+                .trigger("change");
+            });
+            $(form).on("reset", function () {
+              setTimeout(function () {
+                $(".selectpage", form).each(function () {
+                  var selectpage = $(this).data("selectPageObject");
+                  selectpage.elem.hidden.val($(this).val());
+                  $(this).selectPageRefresh();
+                });
+              }, 1);
+            });
+          }
+        },
+        fieldlist: function (form) {
+          //绑定fieldlist
+          if ($(".fieldlist", form).length > 0) {
+            //刷新隐藏textarea的值
+            var refresh = function (container) {
+              var data = {};
+              var name = container.data("name");
+              var textarea = $("textarea[name='" + name + "']", form);
+              var template = container.data("template");
+              // 新的解析函数，能够处理任意层级的嵌套结构
+              var parseFieldName = function (fieldName) {
+                // 提取所有 [...] 中的内容
+                var matches = fieldName.match(/\[([^\]]+)\]/g);
+                if (!matches || matches.length < 2) {
+                  return null; // 至少需要两个层级才能处理
+                }
+
+                // 提取匹配的内容
+                var parts = matches.map(function (match) {
+                  return match.substring(1, match.length - 1); // 去掉 [ 和 ]
+                });
+
+                // 最后一个部分是 key，倒数第二个部分是 index
+                var key = parts[parts.length - 1];
+                var index = parts[parts.length - 2];
+
+                // 构建前缀路径，用于标识这个字段所属的数据结构
+                var prefix = parts.slice(0, -2).join("[");
+                if (prefix) prefix += "]";
+
+                return {
+                  key: key,
+                  index: index,
+                  prefix: prefix,
+                };
+              };
+              $.each(
+                $("input,select,textarea", container).serializeArray(),
+                function (i, j) {
+                  var parsed = parseFieldName(j.name);
+                  if (!parsed) {
+                    return true; // 跳过无法解析的字段名
+                  }
+
+                  // 构建数据结构的唯一标识
+                  var dataKey =
+                    parsed.prefix + "[x" + parseInt(parsed.index) + "]";
+
+                  if (typeof data[dataKey] == "undefined") {
+                    data[dataKey] = {};
+                  }
+                  data[dataKey][parsed.key] = j.value;
+                },
+              );
+
+              console.log(data);
+
+              //使用数组保存
+              var usearray = container.data("usearray") || false;
+              //保留空数据
+              var keepempty = container.data("keepempty") || false;
+
+              var result = template || usearray ? [] : {};
+              var keys = Object.keys(Object.values(data)[0] || {});
+
+              var isassociative =
+                !usearray &&
+                keys.indexOf("value") > -1 &&
+                (keys.length === 1 ||
+                  (keys.length === 2 && keys.indexOf("key") > -1));
+              if (isassociative && keys.length === 2) {
+                result = {};
+              }
+
+              $.each(data, function (i, j) {
+                if (j) {
+                  if (isassociative) {
+                    if (keys.length === 2) {
+                      if (j.key != "" || keepempty) {
+                        result["__PLACEHOLDKEY__" + j.key] = j.value;
+                      }
+                    } else {
+                      //一维数组
+                      result.push(j.value);
+                    }
+                  } else {
+                    result.push(j);
+                  }
+                }
+              });
+              textarea.val(
+                JSON.stringify(result).replace(/__PLACEHOLDKEY__/g, ""),
+              );
+            };
+
+            //追加一行数据
+            var append = function (container, row, initial) {
+              var tagName =
+                container.data("tag") || (container.is("table") ? "tr" : "dd");
+              var index = container.data("index");
+              var name = container.data("name");
+              var template = container.data("template");
+              var data = container.data();
+              index = index ? parseInt(index) : 0;
+              container.data("index", index + 1);
+              row = row ? row : {};
+              row =
+                typeof row.key === "undefined" ||
+                typeof row.value === "undefined"
+                  ? { key: "", value: row }
+                  : row;
+              var options = container.data("fieldlist-options") || {};
+              var vars = {
+                index: index,
+                name: name,
+                data: data,
+                options: options,
+                key: row.key,
+                value: row.value,
+                row: row.value,
+              };
+
+              if (template) {
+                template = document.getElementById(template).innerHTML;
+              }
+
+              var html = template
+                ? laytpl(template, { tagStyle: "modern" }).render(vars)
+                : laytpl(bdForm.config.fieldlisttpl, {
+                    tagStyle: "modern",
+                  }).render(vars);
+              var obj = $(html);
+              if (
+                (options.deleteBtn === false || options.removeBtn === false) &&
+                initial
+              )
+                obj.find(".btn-remove").remove();
+              if (options.dragsortBtn === false && initial)
+                obj.find(".btn-dragsort").remove();
+              if (
+                (options.readonlyKey === true || options.disableKey === true) &&
+                initial
+              ) {
+                obj.find("input[name$='[key]']").prop("readonly", true);
+              }
+              obj.attr("fieldlist-item", true);
+              obj.insertAfter(
+                $(tagName + "[fieldlist-item]", container).length > 0
+                  ? $(tagName + "[fieldlist-item]:last", container)
+                  : $(tagName + ":first", container),
+              );
+              if ($(".btn-append,.append", container).length > 0) {
+                //兼容旧版本事件
+                $(".btn-append,.append", container).trigger(
+                  "badou.event.appendfieldlist",
+                  obj,
+                );
+              } else {
+                //新版本事件
+                container.trigger("badou.event.appendfieldlist", obj);
+              }
+              return obj;
+            };
+            var fieldlist = $(".fieldlist", form);
+            //表单重置
+            form.on("reset", function () {
+              setTimeout(function () {
+                fieldlist.trigger("badou.event.refreshfieldlist");
+              });
+            });
+            //监听文本框改变事件
+            $(document).on(
+              "change keyup changed",
+              ".fieldlist input,.fieldlist textarea,.fieldlist select",
+              function () {
+                var container = $(this).closest(".fieldlist");
+                refresh(container);
+              },
+            );
+            //追加控制(点击按钮)
+            fieldlist.on("click", ".btn-append,.append", function (e, row) {
+              var container = $(this).closest(".fieldlist");
+              append(container, row);
+              refresh(container);
+            });
+            //移除控制(点击按钮)
+            fieldlist.on("click", ".btn-remove", function () {
+              var container = $(this).closest(".fieldlist");
+              var tagName =
+                container.data("tag") || (container.is("table") ? "tr" : "dd");
+              $(this).closest(tagName).remove();
+              refresh(container);
+            });
+            //追加控制(通过事件)
+            fieldlist.on("badou.event.appendtofieldlist", function (e, row) {
+              var container = $(this);
+              append(container, row);
+              refresh(container);
+            });
+            //根据textarea内容重新渲染
+            fieldlist.on("badou.event.refreshfieldlist", function () {
+              var container = $(this);
+              var textarea = $(
+                "textarea[name='" + container.data("name") + "']",
+                form,
+              );
+
+              //先清空已有的数据
+              $("[fieldlist-item]", container).remove();
+              var json = {};
+              try {
+                var val = textarea
+                  .val()
+                  .replace(/"(\d+)"\:/g, '"__PLACEHOLDERKEY__$1":');
+                json = JSON.parse(val);
+              } catch (e) {}
+              $.each(json, function (i, j) {
+                append(
+                  container,
+                  {
+                    key: i.toString().replace("__PLACEHOLDERKEY__", ""),
+                    value: j,
+                  },
+                  true,
+                );
+              });
+            });
+            //拖拽排序
+            new Sortable(fieldlist[0], {
+              animation: 150,
+              ghostClass: "btn-dragsort", // 拖动时的样式类名
+              onEnd: function (evt) {
+                refresh($(evt.target));
+              },
+            });
+
+            fieldlist.each(function () {
+              var container = $(this);
+              if (
+                typeof container.data("options") === "object" &&
+                container.data("options").appendBtn === false
+              ) {
+                $(".btn-append,.append", container).hide();
+              }
+            });
+            fieldlist.trigger("badou.event.refreshfieldlist");
+          }
+        },
+      },
+      api: {
+        submit: function (form, success, error, submit) {
+          if (form.length === 0) {
+            toast.error("表单未初始化完成,无法提交");
+            return false;
+          }
+          if (typeof submit === "function") {
+            if (false === submit.call(form, success, error)) {
+              return false;
+            }
+          }
+          var type = form.attr("method")
+            ? form.attr("method").toUpperCase()
+            : "POST";
+          type = type && (type === "GET" || type === "POST") ? type : "POST";
+          url = form.attr("action");
+          url = url ? url : location.href;
+          //修复当存在多选项元素时提交的BUG
+          var params = {};
+          var multipleList = $("[name$='[]']", form);
+          if (multipleList.length > 0) {
+            var postFields = form.serializeArray().map(function (obj) {
+              return $(obj).prop("name");
+            });
+            $.each(multipleList, function (i, j) {
+              if (postFields.indexOf($(this).prop("name")) < 0) {
+                params[$(this).prop("name")] = "";
+              }
+            });
+          }
+          //调用Ajax请求方法
+          http.api.ajax(
+            {
+              type: type,
+              url: url,
+              data:
+                form.serialize() +
+                (Object.keys(params).length > 0 ? "&" + $.param(params) : ""),
+              dataType: "json",
+              complete: function (xhr) {
+                var token = xhr.getResponseHeader("__token__");
+                if (token) {
+                  $("input[name='__token__']").val(token);
+                }
+              },
             },
-        }
+            function (data, ret) {
+              //$('.form-group', form).removeClass('has-feedback has-success has-error');
+              if (data && typeof data === "object") {
+                //刷新客户端token
+                if (typeof data.token !== "undefined") {
+                  $("input[name='__token__']").val(data.token);
+                }
+                //调用客户端事件
+                if (
+                  typeof data.callback !== "undefined" &&
+                  typeof data.callback === "function"
+                ) {
+                  data.callback.call(form, data);
+                }
+              }
+              if (typeof success === "function") {
+                if (false === success.call(form, data, ret)) {
+                  return false;
+                }
+              }
+            },
+            function (data, ret) {
+              if (
+                data &&
+                typeof data === "object" &&
+                typeof data.token !== "undefined"
+              ) {
+                $("input[name='__token__']").val(data.token);
+              }
+              if (typeof error === "function") {
+                if (false === error.call(form, data, ret)) {
+                  return false;
+                }
+              }
+            },
+          );
+          return true;
+        },
+        //这是一个函数，接收四个参数：form: 表单元素或表单的选择器。success: 成功回调函数。error: 错误回调函数。submit: 提交回调函数。
+        bindevent: function (form, success, error, submit) {
+          //如果传入的 form 不是对象，则将其转换为 jQuery 对象。这确保了后续操作可以直接使用 jQuery 方法。
+          form = typeof form === "object" ? form : $(form);
+
+          //从 bdForm 对象中获取 events 对象，它包含了一些与表单相关的事件处理方法。
+          var events = bdForm.events;
+          //绑定表单事件,调用 events 对象中的 bindevent 方法，用于绑定表单的事件（例如图标选择器等）。
+          events.bindevent(form);
+          //绑定表单验证事件 调用 events 对象中的 validator 方法，用于绑定表单的验证逻辑。
+          //success, error, 和 submit 参数会被传递给验证逻辑，分别表示成功、错误和提交时的回调函数。
+          events.validator(form, success, error, submit);
+        },
+      },
     };
-    exports('bdForm', bdForm);
-});
+    exports("bdForm", bdForm);
+  },
+);
