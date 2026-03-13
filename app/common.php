@@ -147,7 +147,7 @@ if (!function_exists('xss_clean')) {
      */
     function xss_clean(string $string): string
     {
-        try{
+        try {
             $config = \HTMLPurifier_Config::createDefault();
 
             /* ---------- 1. 黑名单：禁用高危标签/属性 ---------- */
@@ -177,8 +177,8 @@ if (!function_exists('xss_clean')) {
                 ]);
 
                 /* ---------- 3. 一次性注册常用 HTML5 标签 ---------- */
-                $html5Block = ['section','article','aside','header','footer','nav','main','figure','figcaption','details','summary'];
-                $html5Inline = ['mark','time','wbr','meter','progress'];
+                $html5Block = ['section', 'article', 'aside', 'header', 'footer', 'nav', 'main', 'figure', 'figcaption', 'details', 'summary'];
+                $html5Inline = ['mark', 'time', 'wbr', 'meter', 'progress'];
 
                 foreach ($html5Block as $tag) {
                     $def->addElement($tag, 'Block', 'Flow', 'Common');
@@ -206,8 +206,8 @@ if (!function_exists('xss_clean')) {
             $purifier = new \HTMLPurifier($config);
 
             $clean_html = $purifier->purify($string);
-        }catch(Exception $e){
-            trace($e->getMessage(),'error');
+        } catch (Exception $e) {
+            trace($e->getMessage(), 'error');
             return '';
         }
         return $clean_html;
@@ -534,7 +534,7 @@ if (!function_exists('format_bytes')) {
         for ($i = 0; $data >= 1024 && $i < count($units); $i++) {
             $data /= 1024;
         }
-        return round($data, 2) .$units[$i];
+        return round($data, 2) . $units[$i];
     }
 }
 
@@ -637,20 +637,32 @@ if (!function_exists('url_clean')) {
 if (!function_exists('parse_array')) {
     /** 解析"1:1\r\n2:3"格式字符串为数组
      * @param $value
+     * @param bool $is_arr_kv 是否返回键值对数组
      * @return array
      */
-    function parse_array($value)
+    function parse_array($value, $is_arr_kv = false, $delimiter = '[,，;；\r\n]+')
     {
         $data = [];
-        // 去掉字符串两端的空白字符和指定的分隔符
-        $trimmed = preg_replace('/^[\s,，;；\r\n]+|[\s,，;；\r\n]+$/u', '', $value);
-        // 使用统一正则分割字符串
-        $array = preg_split('/\s*[,，;；\r\n]+\s*/u', $trimmed, -1, PREG_SPLIT_NO_EMPTY);
+
+        // 去掉前后空格
+        $trimmed = trim($value);
+
+        // 将两端的自定义分隔符也去掉（例如开头或者结尾刚好有逗号）
+        $trimmed = preg_replace('/^' . $delimiter . '|' . $delimiter . '$/u', '', $trimmed);
+
+        // 使用正则分割字符串
+        $array = preg_split('/\s*' . $delimiter . '\s*/u', $trimmed, -1, PREG_SPLIT_NO_EMPTY);
 
         foreach ($array as $val) {
+            // 将中文全角冒号统一替换为英文半角冒号，方便后续统一处理
+            $val = str_replace('：', ':', $val);
             if (strpos($val, ':') !== false) {
                 list($k, $v) = explode(':', $val, 2);
-                $data[$k] = $v;
+                if ($is_arr_kv) {
+                    $data[] = ['key' => $k, 'value' => $v];
+                } else {
+                    $data[] = $v;
+                }
             } else {
                 $data[$val] = $val;
             }
@@ -680,20 +692,21 @@ if (!function_exists('parse_array_string')) {
     }
 }
 
-if(!function_exists('array_to_value')){
+if (!function_exists('array_to_value')) {
     /**
      * 获取数组中指定元素的值
      * @param mixed $array
      * @param mixed $index
      */
-    function array_to_value($array,$index=0){
-        if(empty($array)){
+    function array_to_value($array, $index = 0)
+    {
+        if (empty($array)) {
             return '';
         }
-        if(!is_array($array)){
+        if (!is_array($array)) {
             return $array;
         }
-        if(isset($array[$index])){
+        if (isset($array[$index])) {
             return $array[$index];
         }
         return '';
