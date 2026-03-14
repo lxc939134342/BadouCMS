@@ -337,7 +337,7 @@ class Base extends Frontend
         $view_path = root_path() . 'template' . DIRECTORY_SEPARATOR . 'cms' . DIRECTORY_SEPARATOR . $theme . DIRECTORY_SEPARATOR;
         if (!is_dir($view_path)) {  //兼容public目录下的模版
             $tpl_html_dir = get_sys_config('tpl_html_dir') ?: 'html';
-            $view_path = public_path() . 'template' . DIRECTORY_SEPARATOR . $theme . DIRECTORY_SEPARATOR . $tpl_html_dir . DIRECTORY_SEPARATOR;
+            $view_path = public_path() . 'template' . DIRECTORY_SEPARATOR . 'cms' . DIRECTORY_SEPARATOR . $theme . DIRECTORY_SEPARATOR . $tpl_html_dir . DIRECTORY_SEPARATOR;
         }
 
         // 手机端模版
