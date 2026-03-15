@@ -598,24 +598,25 @@ class Server
     public static function enable($name, $force = false, $extend = [])
     {
         if (!$name || !is_dir(MODULE_PATH . $name)) {
-            throw new Exception('Module not exists');
+            throw new Exception(__('Module not exists'));
         }
 
         $uid = $extend['uid'];
         if (!$uid) {
-            throw new Exception('User not login');
+            throw new Exception(__('Please log in to Badou official website first'));
         }
 
         $license = self::getLicense($name);
         $domain  = $extend['domain'] ?? request()->host(true);
         Server::valid([
-            'name' => $name,
-            'uid' => $uid,
-            'token' => $extend['token'],
-            'license' => $license,
-            'domain' => $domain,
-            'version' => $extend['version'],
+            'name'      => $name,
+            'uid'       => $uid,
+            'token'     => $extend['token'],
+            'license'   => $license,
+            'domain'    => $domain,
+            'version'   => $extend['version'],
             'bdversion' => $extend['bdversion'],
+            'isdev'     => $extend['isdev'] ?? 0
         ]);
 
         if (!$force) {
