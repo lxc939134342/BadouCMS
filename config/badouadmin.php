@@ -2,7 +2,7 @@
 
 return [
     //跨域域名
-    'cors_request_domain' => 'localhost,127.0.0.1',
+    'cors_request_domain' => 'localhost,127.0.0.1,*',
     //后台登录失败尝试次数
     'admin_failure_retry' => 10,
     //后台登录失败超过次数后锁定时间 默认1天（单位秒）
@@ -66,6 +66,7 @@ return [
     'backup_global_files'   => true,
     // 升级时忽略升级的目录
     'upgrade_ignore_dirs' => ['template/cms/default/'],
-    'version' => 'v2.1.5',
-    'api_url' => 'https://sq.badoucms.com/api/',
+    'version' => 'v2.2.0',
+    'api_url' => 'https://sq.badoucms.com/',
+    'module_init_key' => 'bW9kdWxlSW5pdA=='
 ];

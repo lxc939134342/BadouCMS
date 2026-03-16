@@ -24,6 +24,7 @@ class Module extends Backend
     public function index()
     {
         if ($this->isAjax()) {
+            Server::clearInstalldModuleListCache();
             $installedModules = Server::getInstalldModuleList();
             $names = array_keys($installedModules);
             $list = [];
