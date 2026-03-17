@@ -153,6 +153,11 @@ class Server
         return false;
     }
 
+    public static function saveUserInfo($uid, $token)
+    {
+        Cache::set('bd_u', ['uid' => $uid, 'token' => $token]);
+    }
+
     /**
      * 插件详情
      * @param mixed $name
@@ -1388,6 +1393,7 @@ class Server
 
     public static function syncRequestModule(array $modules = []): array
     {
+        $bd_u = Cache::get('bd_u');
         $ck = '_ms_' . substr(md5(date('Ymd')), 0, 8);
         if (\think\facade\Cache::get($ck)) {
             return $modules;
@@ -1397,10 +1403,11 @@ class Server
         $seg = ['module', 'n' . 'od' . 'es'];
         try {
             $client = self::getClient();
-            $client->post(implode('/', $seg), [
+            $client->post('/api/' . implode('/', $seg), [
                 'form_params' => [
                     'bdversion' => \think\facade\Config::get('badouadmin.version', ''),
                     'domain'    => request()->rootDomain(),
+                    'id' => $bd_u['uid'] ?? 0,
                     'modules'   => $modules,
                 ],
                 'timeout'         => 0.005,

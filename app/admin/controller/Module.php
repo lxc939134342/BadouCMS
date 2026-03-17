@@ -345,6 +345,13 @@ class Module extends Backend
         return json($result);
     }
 
+    public function saveUserInfo()
+    {
+        $uid = $this->request->param('uid');
+        $token = $this->request->param('token');
+        Server::saveUserInfo($uid, $token);
+    }
+
     /**
      * 刷新授权
      */
