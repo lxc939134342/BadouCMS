@@ -88,10 +88,25 @@
                         <input
                           type="checkbox"
                           name="keeplogin"
-                          lay-skin="primary"
                           value="1"
-                          title="自动登录"
+                          checked
                         />
+                        <div lay-checkbox lay-tips="保持登录状态{$keephour}">
+                          <div
+                            style="display: inline-flex; align-items: center"
+                          >
+                            <a>保持登录</a>
+                            <i
+                              class="layui-icon layui-icon-about"
+                              style="
+                                background: none;
+                                border: none;
+                                color: #666;
+                                margin-left: 5px;
+                              "
+                            ></i>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>

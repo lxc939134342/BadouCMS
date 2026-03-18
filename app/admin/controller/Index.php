@@ -118,6 +118,7 @@ class Index extends Backend
         if ($this->auth->isLogin()) {
             $this->success(__("You've logged in, do not login again"), $url);
         }
+        $admin_keep_time = Config::get('badouadmin.admin_keep_time');
         if ($this->isAjax()) {
             $username = $this->request->post('username');
             $password = $this->request->post('password', '', null);
@@ -143,7 +144,6 @@ class Index extends Backend
             }
 
             Adminlog::instance()->setTitle(__('Login'));
-            $admin_keep_time = Config::get('badouadmin.admin_keep_time');
             $result = $this->auth->login($username, $password, $keeplogin ? $admin_keep_time : 0);
 
             if ($result === true) {
@@ -155,6 +155,7 @@ class Index extends Backend
                 $this->error($msg, $url, ['token' => $this->request->buildToken()]);
             }
         }
+        $this->view->assign('keephour', seconds_to_human($admin_keep_time, '小时'));
         return $this->view->fetch();
     }
 

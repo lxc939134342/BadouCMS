@@ -712,3 +712,56 @@ if (!function_exists('array_to_value')) {
         return '';
     }
 }
+
+if (!function_exists('seconds_to_human')) {
+    /**
+     * 将秒数转换为人易读的字符串（支持指定计算单位）
+     * @param int $seconds 秒数
+     * @param string $unit 指定单位（年, 月, 周, 天, 小时, 分钟, 秒）
+     * @return string
+     */
+    function seconds_to_human(int $seconds, $unit = ''): string
+    {
+        if ($seconds <= 0) {
+            return '0' . ($unit ?: '秒');
+        }
+
+        $units = [
+            '年'   => 31536000,
+            '月'   => 2592000,
+            '周'   => 604800,
+            '天'   => 86400,
+            '小时' => 3600,
+            '分钟' => 60,
+            '秒'   => 1,
+        ];
+
+        // 如果指定了单位且在列表中
+        if ($unit && isset($units[$unit])) {
+            $num = $seconds / $units[$unit];
+            // 如果是整数则输出整数，否则保留两位小数
+            $num = (floor($num) == $num) ? (int)$num : round($num, 2);
+            return $num . $unit;
+        }
+
+        // 默认逻辑：按最大单位递进
+        $units_desc = [
+            31536000 => '年',
+            2592000  => '月',
+            604800   => '周',
+            86400    => '天',
+            3600     => '小时',
+            60       => '分钟',
+            1        => '秒',
+        ];
+        $result = '';
+        foreach ($units_desc as $key => $value) {
+            if ($seconds >= $key) {
+                $num = floor($seconds / $key);
+                $seconds %= $key;
+                $result .= $num . $value;
+            }
+        }
+        return $result;
+    }
+}
