@@ -24,7 +24,7 @@ return [
     'usercenter' => true,
     'user_login_captcha' => true,
     //用户注册验证码类型email/mobile/wechat/text/false
-    'user_register_captcha' => 'mobile',
+    'user_register_captcha' => 'text',
     //发送验证码前验证
     'user_api_captcha' => false,
 

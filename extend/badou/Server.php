@@ -189,6 +189,7 @@ class Server
         try {
             $client = self::getClient();
             $extend['domain'] ?? $extend['domain'] = request()->rootDomain();
+            $extend['bdversion'] ?? $extend['bdversion'] = config('badouadmin.version');
             $response = $client->get('api/module/download', ['query' => array_merge(['name' => $name], $extend)]);
             $body = $response->getBody();
             $content = $body->getContents();
