@@ -27,9 +27,14 @@ class Content extends Model
     protected $autoWriteTimestamp = true;
 
     protected $dateFormat = 'Y-m-d H:i:s';
-
+    
+    public static function init()
+    {
+        \think\facade\Event::listen('app\admin\model\cms\Content.BeforeWrite', [self::class, '_onBeforeWrite']);
+        \think\facade\Event::listen('app\admin\model\cms\Content.AfterDelete', [self::class, '_onAfterDelete']);
+    }
     // 模型事件
-    public static function onBeforeWrite($model)
+    public static function _onBeforeWrite($model)
     {
         $data = $model->getData();
         if (empty($data['description']) && isset($data['content'])) {
@@ -42,11 +47,12 @@ class Content extends Model
         $model->data($data);
     }
 
-    public static function onAfterDelete($model)
+    public static function _onAfterDelete($model)
     {
         $data = $model->getData();
         Db::name('cms_content_ext')->where('contentid', $data['id'])->delete();
     }
+
 
     public function contentsort()
     {
