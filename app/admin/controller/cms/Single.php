@@ -123,7 +123,7 @@ class Single extends Base
 
                 // 检查自定义URL名称
                 if ($data['filename']) {
-                    $data['filename'] = $this->model->checkFilename($data['filename']);
+                    $data['filename'] = $this->model->checkFilename($data['filename'], [['id', '<>', $row['id']]]);
                 }
 
                 $result = $row->save($data);

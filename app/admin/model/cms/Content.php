@@ -98,12 +98,23 @@ class Content extends Model
     // 检查自定义URL名称
     public function checkFilename($filename, $where = [])
     {
+        $base = $filename;
+
+        $exists = $this->field('id')
+            ->where('filename', $filename)
+            ->where($where)
+            ->count();
+
+        if (!$exists) {
+            return $filename;
+        }
+
         do {
+            $filename = $base . '-' . mt_rand(1, 1000000);
             $exists = $this->field('id')
-                ->where("filename='$filename'")
+                ->where('filename', $filename)
                 ->where($where)
                 ->count();
-            $filename .= '-' . mt_rand(1, 20);
         } while ($exists);
 
         return $filename;
