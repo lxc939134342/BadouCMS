@@ -27,7 +27,7 @@ class Content extends Model
     protected $autoWriteTimestamp = true;
 
     protected $dateFormat = 'Y-m-d H:i:s';
-    
+
     public static function init()
     {
         \think\facade\Event::listen('app\admin\model\cms\Content.BeforeWrite', [self::class, '_onBeforeWrite']);
@@ -116,7 +116,7 @@ class Content extends Model
         }
 
         do {
-            $filename = $base . '-' . mt_rand(1, 1000000);
+            $filename = $base . '-' . mt_rand(1, 100);
             $exists = $this->field('id')
                 ->where('filename', $filename)
                 ->where($where)
