@@ -661,7 +661,7 @@ if (!function_exists('parse_array')) {
                 if ($is_arr_kv) {
                     $data[] = ['key' => $k, 'value' => $v];
                 } else {
-                    $data[] = $v;
+                    $data[$k] = $v;
                 }
             } else {
                 $data[$val] = $val;
