@@ -12,12 +12,14 @@
 
 namespace app\admin\controller;
 
+use Throwable;
 use badou\Server;
 use think\Exception;
 use think\facade\Db;
+use badou\TableManager;
 use badou\ModuleException;
 use app\common\controller\Backend;
-use badou\TableManager;
+use app\admin\model\Config as ConfigModel;
 
 class Module extends Backend
 {
@@ -69,10 +71,16 @@ class Module extends Backend
             $this->result('ok', $list, $res['total']);
         }
 
+        $config_keys = [];
+        $configGroup = get_sys_config('config_group');
+        if ($configGroup) {
+            $config_keys = array_column(json_decode($configGroup, true), 'key');
+        }
         $this->assignconfig([
-            'api_url' => config('badouadmin.api_url'),
-            'bdversion' => config('badouadmin.version'),
-            'domain' => request()->host(true)
+            'api_url'     => config('badouadmin.api_url'),
+            'bdversion'   => config('badouadmin.version'),
+            'domain'      => request()->host(true),
+            'config_keys' => $config_keys
         ]);
         return $this->view->fetch();
     }
@@ -390,5 +398,61 @@ class Module extends Backend
         }
         $tables = array_values($tables);
         $this->success('', null, ['tables' => $tables]);
+    }
+
+    /**
+     * 系统配置
+     */
+    public function config()
+    {
+        $name = $this->request->param('name');
+        $configModel = new ConfigModel();
+        $config      = $configModel->where('group', $name)
+            ->order('weigh desc,id asc')
+            ->select()->toArray();
+        $list           = [];
+
+        if ($this->request->isPost()) {
+            $data = $this->request->post('row/a');
+
+            if (!$data) {
+                $this->error(__('Parameter %s can not be empty', ['']));
+            }
+
+            $data = $this->preExcludeFields($data);
+            $configValue = [];
+            foreach ($config as $item) {
+                $configValue[] = [
+                    'id'     => $item['id'],
+                    'name'   => $item['name'],
+                    'type'   => $item['type'],
+                    'value'  => $data[$item['name']],
+                    'extend' => $item['extend'],
+                    'content' => $item['content'],
+                ];
+            }
+
+            $result = false;
+            $configModel->startTrans();
+            try {
+                $result = $configModel->saveAll($configValue);
+                $configModel->commit();
+            } catch (Throwable $e) {
+                $configModel->rollback();
+                $this->error($e->getMessage());
+            }
+            if ($result !== false) {
+                $this->success(__('Update successful'));
+            } else {
+                $this->error(__('No rows updated'));
+            }
+        } else {
+            foreach ($config as $item) {
+                $item['title']                  = __($item['title']);
+                $list[] = $item;
+            }
+            $this->view->assign('list', $list);
+            return $this->view->fetch();
+        }
     }
 }

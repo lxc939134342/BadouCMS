@@ -51,4 +51,5 @@ return [
     'Testdata tips'                                                   => '你还可以继续导入测试数据！',
     'Import testdata'                                                 => '导入测试数据',
     'Skip testdata'                                                   => '暂不导入',
+    'Config'                                                          => '配置'
 ];
