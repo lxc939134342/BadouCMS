@@ -68,7 +68,9 @@ class ContentSort extends Base
         $istop = $this->request->param('istop/d', 1);
 
         $where[] = [
-            'acode','=',get_backend_lang()
+            'acode',
+            '=',
+            get_backend_lang()
         ];
 
         $res = $this->model
@@ -100,13 +102,13 @@ class ContentSort extends Base
             Db::name('cms_site')->where('acode', $acode)->update(['theme' => 'default']);
         }
 
-        $path = root_path().'template'.DIRECTORY_SEPARATOR.'cms'.DIRECTORY_SEPARATOR.$template.DIRECTORY_SEPARATOR;
+        $path = root_path() . 'template' . DIRECTORY_SEPARATOR . 'cms' . DIRECTORY_SEPARATOR . $template . DIRECTORY_SEPARATOR;
         $list = [];
         if (is_dir($path)) {
             $files = Filesystem::getDirFiles($path, ['html']);
             $list = [];
             foreach ($files as $key => $value) {
-                $list[] = ['id' => $key,'name' => $value];
+                $list[] = ['id' => $key, 'name' => $value];
             }
         }
 
@@ -303,6 +305,8 @@ class ContentSort extends Base
             ->select();
 
         $list = $this->tree->init($res->toArray(), 'pcode', null, 'scode', 'children')->multipleChild();
-        $this->success('', '', ['list' => $list, 'total' => $res->count()]);
+        $top = ['scode' => 0, 'name' => '顶级栏目'];
+        array_unshift($list, $top);
+        $this->success('', '', ['list' => $list, 'total' => $res->count() + 1]);
     }
 }
