@@ -5,7 +5,6 @@ namespace badou;
 use PhpZip\ZipFile;
 use think\Exception;
 use think\facade\Db;
-use think\helper\Str;
 use GuzzleHttp\Client;
 use think\facade\Cache;
 use think\facade\Event;

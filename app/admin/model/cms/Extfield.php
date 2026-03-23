@@ -25,7 +25,7 @@ class Extfield extends Model
     protected $name = 'cms_extfield';
 
     // 自动写入时间戳字段
-    protected $autoWriteTimestamp = true;
+    protected $autoWriteTimestamp = false;
 
     protected $append = [
         'content'
@@ -58,7 +58,7 @@ class Extfield extends Model
             '7'  => ['text' => '日期选择', 'inputType' => 'datetime', 'type' => 'datetime', 'limit' => 0, 'default' => null],
             '8'  => ['text' => '编辑器', 'inputType' => 'editor', 'type' => 'text', 'limit' => 0, 'default' => null],
             '9'  => ['text' => '下拉选择', 'inputType' => 'select', 'type' => 'string', 'limit' => 255, 'default' => ''],
-            '11'  => ['text' => '多图标题(只增加字段)', 'inputType' => 'images_title', 'type' => 'string', 'limit' => 1000, 'default' => ''],
+            '11'  => ['text' => '多图标题(只增加字段)', 'inputType' => 'imagestitle', 'type' => 'string', 'limit' => 1000, 'default' => ''],
             '12'  => ['text' => '二列数组', 'inputType' => 'array', 'type' => 'text', 'limit' => 0, 'default' => null]
         ];
 
@@ -131,6 +131,24 @@ class Extfield extends Model
         $tableManager->update();
     }
 
+    /* 插入后 */
+    public static function onAfterInsert($model)
+    {
+        $data = $model->getData();
+        if ($data['type'] == '10') {
+            $name = $data['name'] . 'title';
+            $titleData = [
+                'mcode'       => $data['mcode'],
+                'name'        => $name,
+                'description' => $data['description'] . '标题',
+                'type'        => '11',
+                'value'       => '',
+                'sorting'     => $data['sorting'] + 1,
+            ];
+            (new self())->save($titleData);
+        }
+    }
+
     /* 更新前 */
     public static function onBeforeUpdate($model)
     {
@@ -175,16 +193,46 @@ class Extfield extends Model
         }
     }
 
+    /* 更新后 */
+    public static function onAfterUpdate($model)
+    {
+        $data = $model->getData();
+        $originData = $model->getOrigin();
+
+        if ($originData['type'] == '10') {
+            $oldTitleName = $originData['name'] . 'title';
+            $newTitleName = $data['name'] . 'title';
+
+            $titleField = self::where('name', $oldTitleName)->where('mcode', $data['mcode'])->find();
+            if ($titleField) {
+                $updateData = [];
+                if ($oldTitleName != $newTitleName) {
+                    $updateData['name'] = $newTitleName;
+                }
+                if ($originData['sorting'] != $data['sorting']) {
+                    $updateData['sorting'] = $data['sorting'] + 1;
+                }
+                if ($updateData) {
+                    $titleField->save($updateData);
+                }
+            }
+        }
+    }
+
     /* 删除后 */
     public static function onAfterDelete($model)
     {
         $data = $model->getData();
         $tableManager = self::tableManager();
-        if (!$tableManager->hasColumn($data['name'])) {
-            throw new \think\Exception('字段不存在');
+        if ($tableManager->hasColumn($data['name'])) {
+            $tableManager->removeColumn($data['name']);
+            $tableManager->update();
         }
-        $tableManager->removeColumn($data['name']);
-        $tableManager->update();
+
+        if ($data['type'] == '10') {
+            $titleName = $data['name'] . 'title';
+            self::where('name', $titleName)->where('mcode', $data['mcode'])->delete();
+        }
     }
 
     public function getModelFields(string $mcode): array
