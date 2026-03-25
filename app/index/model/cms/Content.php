@@ -586,15 +586,14 @@ class Content extends Model
         if ($scode && $scode != '*') {
             // 获取所有子类分类编码
             $arr = explode(',', $scode); // 传递有多个分类时进行遍历
+            $arr = array_map('trim', $arr);
+            $arr = array_filter($arr);
             $contentSortModel = new ContentSort();
-            $scodes = [$scode];
+            $scodes = $arr;
             foreach ($arr as $value) {
-                $trimmedValue = trim($value);
-                if (!empty($trimmedValue)) {
-                    // 使用直接数组追加替代 array_merge
-                    foreach ($contentSortModel->getSubScodes($trimmedValue) as $subCode) {
-                        $scodes[] = $subCode;
-                    }
+                // 使用直接数组追加替代 array_merge
+                foreach ($contentSortModel->getSubScodes($value) as $subCode) {
+                    $scodes[] = $subCode;
                 }
             }
             // 去重，避免重复的分类编码
@@ -602,7 +601,7 @@ class Content extends Model
             if (!empty($scodes)) {
                 $scode_arr = [
                     ['a.scode', 'in', $scodes],
-                    ['a.subscode', '=', $scode]
+                    ['a.subscode', 'find in set', implode(',', $scodes)]
                 ];
                 $where[] = function ($query) use ($scode_arr) {
                     $query->whereOr($scode_arr);
@@ -932,14 +931,17 @@ class Content extends Model
         if ($scode) {
             // 获取所有子类分类编码
             $arr = explode(',', $scode); // 传递有多个分类时进行遍历
+            $arr = array_map('trim', $arr);
+            $arr = array_filter($arr);
             $contentSortModel = new ContentSort();
-            $scodes = [];
+            $scodes = $arr;
             foreach ($arr as $value) {
-                $scodes = array_merge($scodes, $contentSortModel->getSubScodes(trim($value)));
+                $scodes = array_merge($scodes, $contentSortModel->getSubScodes($value));
             }
+            $scodes = array_unique($scodes);
             $scode_arr = [
                 ['a.scode', 'in', $scodes],
-                ['a.subscode', '=', $scode]
+                ['a.subscode', 'find in set', implode(',', $scodes)]
             ];
             $where[] = function ($query) use ($scode_arr) {
                 $query->whereOr($scode_arr);
