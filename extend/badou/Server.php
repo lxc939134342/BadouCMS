@@ -860,7 +860,6 @@ class Server
 
         // 远程下载模块(如果为本地文件则使用本地文件)
         $tmpFile = $tmpFile ? $tmpFile : Server::download($name, $extend);
-
         // 备份模块文件
         Server::backup($name);
 
@@ -892,17 +891,29 @@ class Server
             $sourceFile = $moduleDir . $moduleName . ".php";
             $destFile = $moduleDir . $moduleName . "Upgrade.php";
 
-            $classContent = str_replace("class {$moduleName} extends", "class {$moduleName}Upgrade extends", file_get_contents($sourceFile));
+            $classContent = file_get_contents($sourceFile);
+            // 兼容含有和不含有 extends 的类名替换
+            $count = 0;
+            $classContent = preg_replace("/class\s+{$moduleName}(\s|\{)/i", "class {$moduleName}Upgrade$1", $classContent, 1, $count);
 
             //创建临时的类文件
             file_put_contents($destFile, $classContent);
 
-            $className = "\\modules\\" . $name . "\\" . $moduleName;
-            $module = new $className($name);
+            if ($count > 0) {
+                // 必须包含这个临时文件以加载新的类定义
+                include_once $destFile;
+                $className = "\\modules\\" . $name . "\\" . $moduleName . "Upgrade";
+            } else {
+                // 如果没有找到类名（理论上不应该，除非文件结构异常），则回退原逻辑
+                $className = "\\modules\\" . $name . "\\" . $moduleName;
+            }
 
-            //调用升级的方法
-            if (method_exists($module, "upgrade")) {
-                $module->upgrade();
+            if (class_exists($className)) {
+                $module = new $className($name);
+                //调用升级的方法
+                if (method_exists($module, "upgrade")) {
+                    $module->upgrade();
+                }
             }
 
             //移除临时文件
