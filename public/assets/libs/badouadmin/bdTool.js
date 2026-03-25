@@ -247,7 +247,7 @@ layui.define(["bdHttp", "xmSelect"], function (exports) {
           // 如果开启搜索且有初始值，先请求初始值对应的完整数据
           var data = {
             pageNumber: 1,
-            pageSize: 1,
+            pageSize: 999,
             showField: config.field,
             keyField: config.key,
             orderBy: config.orderBy,
