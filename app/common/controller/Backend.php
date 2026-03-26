@@ -158,7 +158,7 @@ class Backend extends BaseController
                 Event::trigger('admin_nologin', $this);
                 $url = Session::get('refererd');
                 $url = $url ? $url : $this->request->url();
-                if (in_array($this->request->pathinfo(), ['','/', 'index/index'])) {
+                if (in_array($this->request->pathinfo(), ['', '/', 'index/index'])) {
                     $this->redirect((string)url('index/login', ['referer' => $url]), 302);
                 }
                 $this->error(__('Please login first'), (string)url('index/login', ['url' => $url]));
@@ -235,8 +235,10 @@ class Backend extends BaseController
      */
     protected function isAjax()
     {
-        if ($this->request->param('view', 0) ||
-            (!$this->request->isAjax() && !$this->request->isJson())) {
+        if (
+            $this->request->param('view', 0) ||
+            (!$this->request->isAjax() && !$this->request->isJson())
+        ) {
             return false;
         }
         return true;
@@ -300,7 +302,7 @@ class Backend extends BaseController
             $aliasName = $alias[$name] . '.';
         }
         $sortArr = explode(',', $sort);
-        foreach ($sortArr as $index => & $item) {
+        foreach ($sortArr as $index => &$item) {
             $item = stripos($item, ".") === false ? $aliasName . trim($item) : $item;
         }
         unset($item);
@@ -407,8 +409,10 @@ class Backend extends BaseController
                         $arr = $arr[0];
                     }
                     $tableArr = explode('.', $k);
-                    if (count($tableArr) > 1 && $tableArr[0] != $name && !in_array($tableArr[0], $alias)
-                        && !empty($this->model) && $this->relationSearch) {
+                    if (
+                        count($tableArr) > 1 && $tableArr[0] != $name && !in_array($tableArr[0], $alias)
+                        && !empty($this->model) && $this->relationSearch
+                    ) {
                         //修复关联模型下时间无法搜索的BUG
                         $relation = Str::camel($tableArr[0]);
                         $alias[$this->model->$relation()->getTable()] = $tableArr[0];
@@ -540,14 +544,16 @@ class Backend extends BaseController
             //如果有primaryvalue,说明当前是初始化传值,按照选择顺序排序
             if ($primaryvalue !== null && preg_match("/^[a-z0-9_\-]+$/i", $primarykey)) {
                 $primaryvalue = array_unique(is_array($primaryvalue) ? $primaryvalue : explode(',', $primaryvalue));
-                //修复自定义data-primary-key为字符串内容时，给排序字段添加上引号
-                $primaryvalue = array_map(function ($value) {
-                    return '\'' . $value . '\'';
-                }, $primaryvalue);
+                $bindings = [];
+                $placeholders = [];
+                foreach ($primaryvalue as $idx => $val) {
+                    $placeholder = ":pv_{$idx}";
+                    $placeholders[] = $placeholder;
+                    $bindings["pv_{$idx}"] = $val;
+                }
+                $placeholderStr = implode(',', $placeholders);
 
-                $primaryvalue = implode(',', $primaryvalue);
-
-                $this->model->orderRaw("FIELD(`{$primarykey}`, {$primaryvalue})");
+                $this->model->orderRaw("FIELD(`{$primarykey}`, {$placeholderStr})", $bindings);
             } else {
                 $this->model->order($order);
             }
