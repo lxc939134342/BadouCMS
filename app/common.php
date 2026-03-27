@@ -644,15 +644,18 @@ if (!function_exists('parse_array')) {
     {
         $data = [];
 
+        // 解码HTML实体，防止 &amp; 这里的分号被误当做分隔符
+        if (is_string($value)) {
+            $value = htmlspecialchars_decode_improve($value);
+        }
+
         // 去掉前后空格
         $trimmed = trim($value);
 
         // 将两端的自定义分隔符也去掉（例如开头或者结尾刚好有逗号）
         $trimmed = preg_replace('/^' . $delimiter . '|' . $delimiter . '$/u', '', $trimmed);
-
         // 使用正则分割字符串
         $array = preg_split('/\s*' . $delimiter . '\s*/u', $trimmed, -1, PREG_SPLIT_NO_EMPTY);
-
         foreach ($array as $val) {
             // 将中文全角冒号统一替换为英文半角冒号，方便后续统一处理
             $val = str_replace('：', ':', $val);
