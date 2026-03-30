@@ -3,18 +3,22 @@
   .layui-btn.active {
     background-color: #2a50c1 !important;
   }
+
   .layui-table-cell .layui-btn .fa {
     font-size: 13px !important;
   }
+
   td[data-field="intro"] .layui-table-cell {
     font-size: 13px !important;
     color: #666;
   }
+
   .table-image img {
     width: 100%;
     height: auto;
     object-fit: cover;
   }
+
   .layui-table-cell {
     max-height: 99px !important;
     height: auto !important;
@@ -27,51 +31,27 @@
   <div class="layui-card-body">
     <div class="d-flex mt-3 justify-content-between">
       <div class="d-flex-1">
-        <a
-          href="javascript:;"
-          lay-event="refresh"
-          class="layui-btn btn-refresh layui-bg-black"
-        >
+        <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black">
           <i class="fa fa-refresh"></i>
         </a>
         <div class="layui-btn-group">
-          <button
-            type="button"
-            class="layui-btn layui-bg-blue btn-type-action active"
-            data-type="all"
-          >
+          <button type="button" class="layui-btn layui-bg-blue btn-type-action active" data-type="all">
             <i class="fa fa-list"></i>
             {:__('All')}
           </button>
-          <button
-            type="button"
-            class="layui-btn layui-bg-blue btn-type-action"
-            data-type="module"
-          >
+          <button type="button" class="layui-btn layui-bg-blue btn-type-action" data-type="module">
             <i class="fa fa-cubes"></i>
             {:__('Module')}
           </button>
-          <button
-            type="button"
-            class="layui-btn layui-bg-blue btn-type-action"
-            data-type="template"
-          >
+          <button type="button" class="layui-btn layui-bg-blue btn-type-action" data-type="template">
             <i class="fa fa-laptop"></i>
             {:__('Template')}
           </button>
-          <button
-            type="button"
-            class="layui-btn layui-bg-blue btn-type-action"
-            data-type="vip_template"
-          >
+          <button type="button" class="layui-btn layui-bg-blue btn-type-action" data-type="vip_template">
             <i class="fa fa-laptop"></i>
             {:__('VIP Template')}
           </button>
-          <button
-            type="button"
-            class="layui-btn layui-bg-blue btn-type-action"
-            data-type="installed"
-          >
+          <button type="button" class="layui-btn layui-bg-blue btn-type-action" data-type="installed">
             <i class="fa fa-thumb-tack"></i>
             {:__('Installed')}
           </button>
@@ -85,22 +65,9 @@
         {/foreach}
       </div>
       <div class="d-flex-1">
-        <div
-          class="d-flex align-items-center"
-          style="gap: 8px; max-width: 420px"
-        >
-          <input
-            type="text"
-            id="module-search"
-            class="layui-input"
-            placeholder="搜索标题"
-            style="max-width: 320px"
-          />
-          <button
-            type="button"
-            class="layui-btn btn-theme-color"
-            id="btn-search"
-          >
+        <div class="d-flex align-items-center" style="gap: 8px; max-width: 420px">
+          <input type="text" id="module-search" class="layui-input" placeholder="搜索标题" style="max-width: 320px" />
+          <button type="button" class="layui-btn btn-theme-color" id="btn-search">
             <i class="layui-icon layui-icon-search"></i>
           </button>
         </div>
@@ -335,16 +302,16 @@
 
             return laytpl(
               '<input type="checkbox" title="开启|关闭"  name="' +
-                that.field +
-                '" value="' +
-                row.state +
-                '" lay-skin="switch" data-module="' +
-                row.name +
-                '" data-field="' +
-                that.field +
-                '" lay-filter="state" ' +
-                checked +
-                " >",
+              that.field +
+              '" value="' +
+              row.state +
+              '" lay-skin="switch" data-module="' +
+              row.name +
+              '" data-field="' +
+              that.field +
+              '" lay-filter="state" ' +
+              checked +
+              " >",
             ).render(data);
           },
           price: function (data) {
@@ -411,7 +378,7 @@
             templet: function (d) {
               return (
                 "<div style='line-height:20px;font-size:14px;color:#000'>" +
-                d.title +
+                "<span lay-tips='编号：" + d.name + "'>" + d.title + "</span>" +
                 "<br>" +
                 "<p style='color:#999;font-size:13px !important'>" +
                 d.intro +
@@ -449,8 +416,8 @@
             align: "left",
             templet: function (data) {
               return data.module && data.module.version != data.version
-                ? data.module.version +
-                    ' <span class="layui-badge-dot"> </span>'
+                ? '<p lay-tips="有新版本v' + data.version + '">' + data.module.version +
+                ' <span class="layui-badge-dot" > </span></p>'
                 : data.version;
             },
           },
@@ -473,13 +440,13 @@
           click: function (data, othis) {
             this.elem.data("operate") == "install"
               ? install(
-                  this.elem.parents(".operate").data("name"),
-                  data.version,
-                )
+                this.elem.parents(".operate").data("name"),
+                data.version,
+              )
               : upgrade(
-                  this.elem.parents(".operate").data("name"),
-                  data.version,
-                );
+                this.elem.parents(".operate").data("name"),
+                data.version,
+              );
           },
         });
 
@@ -597,7 +564,7 @@
                     });
                     return false;
                   },
-                  function (data, ret) {},
+                  function (data, ret) { },
                 );
               },
               success: function (layero, index) {
@@ -728,7 +695,7 @@
               area: area,
               title: __("Warning"),
               btn: [__("Continue operate"), __("Cancel")],
-              end: function () {},
+              end: function () { },
               yes: function () {
                 operate(name, action, true, success);
               },
@@ -767,7 +734,7 @@
           operate(data.module.name, "enable", false, function () {
             layer.alert(
               __("Online installed tips") +
-                (data.module.testdata ? __("Testdata tips") : ""),
+              (data.module.testdata ? __("Testdata tips") : ""),
               {
                 btn: data.module.testdata
                   ? [__("Import testdata"), __("Skip testdata")]
@@ -861,7 +828,7 @@
               area: area,
               title: __("Warning"),
               btn: [__("Continue install"), __("Cancel")],
-              end: function () {},
+              end: function () { },
               yes: function () {
                 install(name, version, true);
               },
@@ -910,7 +877,7 @@
               area: area,
               title: __("Warning"),
               btn: [__("Continue uninstall"), __("Cancel")],
-              end: function () {},
+              end: function () { },
               yes: function () {
                 uninstall(name, true, droptables);
               },
@@ -1070,13 +1037,13 @@
         html =
           tables.length > 0
             ? '<div class="alert alert-warning droptablestips" style="max-width:480px;max-height:300px;overflow-y: auto;">' +
-              __("The following data tables will be deleted") +
-              "：<br>" +
-              tables.join("<br>") +
-              "</div>"
+            __("The following data tables will be deleted") +
+            "：<br>" +
+            tables.join("<br>") +
+            "</div>"
             : '<div class="alert alert-warning droptablestips">' +
-              __("The Addon did not create a data table") +
-              "</div>";
+            __("The Addon did not create a data table") +
+            "</div>";
         $(html).insertAfter($(this).closest("p"));
       } else {
         $(".droptablestips").remove();

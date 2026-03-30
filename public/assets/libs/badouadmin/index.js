@@ -252,4 +252,19 @@ layui.use(["layer", "badou", "toast"], function () {
     }
     return false;
   });
+
+  $(document)
+    .on("mouseenter", "*[lay-tips]", function () {
+      var content = $(this).attr("lay-tips");
+      if (!content) {
+        return;
+      }
+      Layer.tips(content, this, {
+        tips: 1,
+        time: 0,
+      });
+    })
+    .on("mouseleave", "*[lay-tips]", function () {
+      Layer.closeAll("tips");
+    });
 });
