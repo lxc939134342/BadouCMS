@@ -36,7 +36,8 @@ http://demo.badoucms.com/admin.php
 
 ### QQ 群
 
-群号：963655847
+1群：963655847(已满)
+2群：1043747731
 
 ![QQ 群二维码](https://gitee.com/lande_admin/badoucms_doc/raw/master/docs/public/images/qrcode_qq.jpg)
 
