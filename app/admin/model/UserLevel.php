@@ -8,6 +8,7 @@ class UserLevel extends Model
 {
     protected $name = "user_level";
 
+
     public function getGtypeList()
     {
         $typeList = [

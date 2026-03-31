@@ -85,7 +85,7 @@ class Config extends Model
     }
 
 
-    public static function clear()
+    public static function clearCache()
     {
         Cache::tag(self::$cacheTag)->clear();
     }

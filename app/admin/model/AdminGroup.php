@@ -17,6 +17,11 @@ use think\Model;
 class AdminGroup extends Model
 {
     protected $autoWriteTimestamp  = true;
+    protected $type = [
+        'create_time' => 'int',
+        'update_time' => 'int',
+    ];
+
 
     public function getNameAttr($value, $data)
     {

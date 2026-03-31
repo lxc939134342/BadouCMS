@@ -198,20 +198,20 @@ class TableManager
 
     public static function backup($module = 'all', $type = 1, $backUpdir = '')
     {
-        self::$tables = array_keys(self::getTableList());
+        $tables = array_keys(self::getTableList());
         $config = self::getPhinxDbConfig();
         /* 单独备份模块数据 */
         if ($module != 'all') {
-            foreach (self::$tables as $key => $table) {
-                if (stripos($table, $config['table_prefix'].$module . '_') !== 0) {
-                    unset(self::$tables[$key]);
+            foreach ($tables as $key => $table) {
+                if (stripos($table, $config['table_prefix'] . $module . '_') !== 0) {
+                    unset($tables[$key]);
                 }
             }
             // 重新索引数组，防止后续遍历出错
-            self::$tables = array_values(self::$tables);
+            $tables = array_values($tables);
         }
 
-        $sql = self::createSql($type);
+        $sql = self::createSql($tables, $type);
         $zip = new ZipArchive();
         $date = date('YmdHis');
         if (!is_dir($backUpdir)) {
@@ -233,10 +233,12 @@ class TableManager
 
     /**
      * 将数据库的数据保存为sql文件
+     * @param array $tables 表名数组
      * @param mixed $type 0=只创建表字段 1=创建表字段与数据
+     * @param string $prefixPlaceholder 表前缀占位符，为空表示不替换
      * @return string
      */
-    private static function createSql($type)
+    public static function createSql($tables, $type = 1, $prefixPlaceholder = '')
     {
         # COUNT
         $ct = 0;
@@ -250,12 +252,17 @@ class TableManager
         $sqldump .= "SET SQL_MODE=\"NO_AUTO_VALUE_ON_ZERO\";";
         $sqldump .= "\n\n-- --------------------------------------------------------\n\n";
 
-        $tables = array_diff(self::$tables, self::$ignoreTables);
+        $tables = array_diff($tables, self::$ignoreTables);
         $config = self::getPhinxDbConfig();
         $db = $config['connection'];
+        $actualPrefix = $config['table_prefix'];
 
         # LOOP: Get the tables
         foreach ($tables as $table) {
+            $tableWithPlaceholder = $table;
+            if ($prefixPlaceholder && strpos($table, $actualPrefix) === 0) {
+                $tableWithPlaceholder = $prefixPlaceholder . substr($table, strlen($actualPrefix));
+            }
             # COUNT
             $ct++;
             /** ** ** ** ** **/
@@ -271,9 +278,9 @@ class TableManager
 
             # MYSQL DUMP: Remove tables if they exists
             $sqldump .= "--\n";
-            $sqldump .= "-- Table structure for table `" . $table . "`\n";
+            $sqldump .= "-- Table structure for table `" . $tableWithPlaceholder . "`\n";
             $sqldump .= "--\n\n";
-            $sqldump .= "DROP TABLE IF EXISTS `" . $table . "`;\n\n";
+            $sqldump .= "DROP TABLE IF EXISTS `" . $tableWithPlaceholder . "`;\n\n";
             /** ** ** ** ** **/
             # MYSQL DUMP: Create table if they do not exists
             $sqldump .= "--\n";
@@ -281,7 +288,11 @@ class TableManager
             $sqldump .= "--\n\n";
             # LOOP: Get the fields for the table
             foreach ($db->query("SHOW CREATE TABLE `" . $table . "`") as $field) {
-                $sqldump .= str_replace('CREATE TABLE', 'CREATE TABLE', $field['Create Table']);
+                $createSql = $field['Create Table'];
+                if ($prefixPlaceholder && strpos($table, $actualPrefix) === 0) {
+                    $createSql = str_replace("CREATE TABLE `{$table}`", "CREATE TABLE `{$tableWithPlaceholder}`", $createSql);
+                }
+                $sqldump .= $createSql;
             }
             # MYSQL DUMP: New rows
             $sqldump .= ";\n\n";
@@ -291,11 +302,11 @@ class TableManager
             if ($c_columns != 0 && $type != 0) {
                 # MYSQL DUMP: List the data for each table
                 $sqldump .= "--\n";
-                $sqldump .= "-- Dumping data for table `" . $table . "`\n";
+                $sqldump .= "-- Dumping data for table `" . $tableWithPlaceholder . "`\n";
                 $sqldump .= "--\n\n";
 
                 # MYSQL DUMP: Insert into each table
-                $sqldump .= "INSERT INTO `" . $table . "` (";
+                $sqldump .= "INSERT INTO `" . $tableWithPlaceholder . "` (";
                 # ARRAY
                 $rows = [];
                 $numeric = [];
@@ -339,7 +350,7 @@ class TableManager
                     }
                     # CHECK
                     if ($c % 600 == 0) {
-                        $sqldump .= "INSERT INTO `" . $table . "`(";
+                        $sqldump .= "INSERT INTO `" . $tableWithPlaceholder . "`(";
                         # ARRAY
                         $rows = [];
                         # LOOP: Get the tables

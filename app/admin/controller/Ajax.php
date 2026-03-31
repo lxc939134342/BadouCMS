@@ -84,7 +84,7 @@ class Ajax extends Backend
                             Db::startTrans();
                             try {
                                 \app\common\model\Config::where('name', 'version')->update(['value' => $newversion]);
-                                ConfigModel::clear();
+                                ConfigModel::clearCache();
                                 Db::commit();
                             } catch (\Exception $e) {
                                 Db::rollback();

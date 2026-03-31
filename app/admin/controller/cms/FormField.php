@@ -50,7 +50,9 @@ class FormField extends Base
             list($where, $sort, $order, $offset, $limit, $page, $alias, $bind) = $this->buildparams();
             if ($this->fcode) {
                 $where[] = [
-                    'fcode', '=', $this->fcode
+                    'fcode',
+                    '=',
+                    $this->fcode
                 ];
             }
             $res = $this->model
@@ -64,111 +66,4 @@ class FormField extends Base
         }
         return $this->view->fetch();
     }
-
-    /**
-    //  * 添加
-    //  */
-    // public function add()
-    // {
-    //     if ($this->request->isPost()) {
-    //         $post = $this->getOriginalInputData();
-    //         $post['acode'] = get_backend_lang();
-    //         $post['create_user'] = $this->auth->username;
-    //         $post['update_user'] = $this->auth->username;
-
-    //         if (empty($this->request->post('fcode'))) {
-    //             $formFieldModel = $this->model;
-    //             $fcode = $formFieldModel->order('fcode', 'desc')->value('fcode');
-    //             $post['fcode'] = $fcode + 1;
-    //         }
-    //         $this->request->withPost($post);
-    //         //重构，采用调用 Helper::handleTableDesign 方式创建 表 对应字段
-
-    //         parent::add();
-    //     }
-    //     return $this->view->fetch();
-    // }
-
-    /**
-     * 删除
-     * @param array $ids
-     * @throws Throwable
-     */
-    // public function del(array $ids = []): void
-    // {
-    //     if (!$this->request->isDelete() || !$ids) {
-    //         $this->error(__('Parameter error'));
-    //     }
-
-    //     $where             = [];
-    //     $dataLimitAdminIds = $this->getDataLimitAdminIds();
-    //     if ($dataLimitAdminIds) {
-    //         $where[] = [$this->dataLimitField, 'in', $dataLimitAdminIds];
-    //     }
-
-    //     $pk      = $this->model->getPk();
-    //     $where[] = [$pk, 'in', $ids];
-
-    //     $count = 0;
-    //     $data  = $this->model->where($where)->select();
-    //     $this->model->startTrans();
-    //     try {
-    //         foreach ($data as $v) {
-    //             $count += $v->delete();
-
-    //             $formModel = new \app\admin\model\cms\Form();
-    //             $form = $formModel->where('fcode', $v['fcode'])->find()->toArray();
-    //             //重构，采用调用 Helper::handleTableDesign 方式删除 字段
-    //             $table = [
-    //                 "name" => $form['table_name'],
-    //                 "comment" => $form['form_name'],
-    //                 "isCommonModel" => 0,
-    //                 "databaseConnection" => 'mysql',
-    //                 "rebuild" => 'Yes',
-    //                 "designChange" => [
-    //                     [
-    //                         "type" => "del-field",
-    //                         "oldName" => $v['name'],
-    //                         "newName" => '',
-    //                         "sync" => true,
-    //                     ]
-    //                 ]
-    //             ];
-    //             $fields  = [
-    //                 [
-    //                     "name" => "test2",
-    //                     "type" => "varchar",
-    //                     "dataType" => "varchar(50)",
-    //                     "default" => "",
-    //                     "defaultType" => "NONE",
-    //                     "null" => false,
-    //                     "primaryKey" => false,
-    //                     "unsigned" => false,
-    //                     "autoIncrement" => false,
-    //                     "comment" => "删除某一个字段",
-    //                     "designType" => "string",
-    //                 ],
-    //             ];
-
-    //             try {
-    //                 Helper::handleTableDesign($table, $fields);
-    //             } catch (Exception $e) {
-    //                 $this->error($e->getMessage());
-    //             } catch (Throwable $e) {
-    //                 $this->error($e->getMessage());
-    //             }
-
-    //         }
-    //         $this->model->commit();
-    //     } catch (Throwable $e) {
-    //         $this->model->rollback();
-    //         $this->error($e->getMessage());
-    //     }
-    //     if ($count) {
-    //         $this->success(__('Deleted successfully'));
-    //     } else {
-    //         $this->error(__('No rows were deleted'));
-    //     }
-    // }
-
 }

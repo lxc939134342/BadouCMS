@@ -320,9 +320,9 @@ class AdminAuth extends Auth
     }
 
     /**
-    * 检查当前用户是否超级管理员
-    * @return bool
-    */
+     * 检查当前用户是否超级管理员
+     * @return bool
+     */
     public function isSuperAdmin()
     {
         return in_array('*', $this->getRuleIds()) ? true : false;
@@ -336,6 +336,7 @@ class AdminAuth extends Auth
     public function getGroupIds($uid = null)
     {
         $groups = $this->getGroups($uid);
+
         $groupIds = [];
         foreach ($groups as $K => $v) {
             $groupIds[] = (int)$v['group_id'];

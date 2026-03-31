@@ -39,7 +39,8 @@ class Base extends Backend
         $currentArea = reset($currentArea);
         if (!$currentArea) {
             $currentArea = $areaModel->defaultArea();
-            set_backend_lang($currentArea['acode']);
+            $acode = $currentArea['acode'] ?? 'cn';
+            set_backend_lang($acode);
         }
 
         // 重新排序 areaList，将当前语言排在第一个

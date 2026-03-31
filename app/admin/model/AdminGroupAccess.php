@@ -16,4 +16,5 @@ use think\Model;
 
 class AdminGroupAccess extends Model
 {
+    protected $pk = ['uid', 'group_id'];
 }

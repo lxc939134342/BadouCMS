@@ -21,6 +21,11 @@ class Attachment extends Model
     // 开启自动写入时间戳字段
     protected $autoWriteTimestamp = true;
 
+    protected $type = [
+        'create_time' => 'int',
+        'update_time' => 'int'
+    ];
+
     protected $append = [
         'thumb_style'
     ];
@@ -50,8 +55,8 @@ class Attachment extends Model
             return '';
         } else {
             $config = get_sys_config('', $data['storage']);
-            if ($config && isset($config[$data['storage'].'_thumbstyle'])) {
-                return $config[$data['storage'].'_thumbstyle'];
+            if ($config && isset($config[$data['storage'] . '_thumbstyle'])) {
+                return $config[$data['storage'] . '_thumbstyle'];
             }
         }
         return '';

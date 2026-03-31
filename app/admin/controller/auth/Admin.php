@@ -109,7 +109,7 @@ class Admin extends Backend
                 $params['avatar']   = '/assets/img/avatar.png'; //设置新管理员默认头像。
                 $this->model->save($params);
 
-                $group = explode(',', $this->request->param("group"));
+                $group = explode(',', $params["group"]);
                 //过滤不允许的组别,避免越权
                 $group = array_intersect($this->childrenGroupIds, $group);
                 if (!$group) {
@@ -119,7 +119,8 @@ class Admin extends Backend
                 foreach ($group as $value) {
                     $dataset[] = ['uid' => $this->model->id, 'group_id' => $value];
                 }
-                (new AuthGroupAccess())->saveAll($dataset);
+                AuthGroupAccess::insertAll($dataset);
+
                 Db::commit();
             } catch (ValidateException | Exception $e) {
                 Db::rollback();
@@ -128,7 +129,6 @@ class Admin extends Backend
             $this->success("添加成功！", url('index'));
         }
         return $this->fetch();
-
     }
 
 
@@ -152,16 +152,16 @@ class Admin extends Backend
                 //密码为空，表示不修改密码
                 if (isset($params['password']) && $params['password']) {
                     $params['password'] = $this->auth->getEncryptPassword($params['password']);
-
                 } else {
                     unset($params['password']);
                 }
+
                 $row->save($params);
 
                 // 先移除所有权限
                 AuthGroupAccess::where('uid', $row->id)->delete();
 
-                $group = explode(',', $this->request->param("group"));
+                $group = explode(',', $params['group']);
 
                 // 过滤不允许的组别,避免越权
                 $group = array_intersect($this->childrenGroupIds, $group);
@@ -173,7 +173,7 @@ class Admin extends Backend
                 foreach ($group as $value) {
                     $dataset[] = ['uid' => $row->id, 'group_id' => $value];
                 }
-                (new AuthGroupAccess())->saveAll($dataset);
+                AuthGroupAccess::insertAll($dataset);
                 Db::commit();
             } catch (ValidateException | Exception $e) {
                 Db::rollback();
@@ -201,7 +201,7 @@ class Admin extends Backend
             $this->error('请指定需要删除的用户ID！');
         }
 
-        $ids = array_intersect($this->childrenAdminIds, array_filter(explode(',',$ids)));
+        $ids = array_intersect($this->childrenAdminIds, array_filter(explode(',', $ids)));
 
         // 避免越权删除管理员
         $childrenGroupIds = $this->childrenGroupIds;
@@ -209,7 +209,7 @@ class Admin extends Backend
             $query->name('admin_group_access')->where('group_id', 'in', $childrenGroupIds)->field('uid');
         })->select();
 
-        if ($adminList) {
+        if (!$adminList->isEmpty()) {
             $deleteIds = [];
             foreach ($adminList as $k => $v) {
                 $deleteIds[] = $v->id;

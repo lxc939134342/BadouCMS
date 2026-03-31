@@ -239,7 +239,7 @@ class Content extends Base
             /* 合并数据 */
             $extRowArr = $extRow->toArray();
             $extRowArr = $this->contentExtModel->formatValue($this->mcode, $extRowArr);
-            $row->appendData($extRowArr);
+            $row->setAttrs($extRowArr);
         }
 
         $dataLimitAdminIds = $this->getDataLimitAdminIds();
@@ -363,7 +363,7 @@ class Content extends Base
                 /* 合并数据 */
                 $extRowArr = $extRow->toArray();
                 $extRowArr = $this->contentExtModel->formatValue($mcode, $extRowArr);
-                $rowitem->appendData($extRowArr);
+                $rowitem->setAttrs($extRowArr);
             }
         }
 

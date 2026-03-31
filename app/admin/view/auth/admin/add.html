@@ -1,76 +1,135 @@
 {layout name="layout/form" /}
-<form class="layui-form" method="post" >
-    {:token_field()}
-    <div class="layui-form-item">
-        <label class="layui-form-label">所属组别</label>
-        <div class="layui-input-block">
-            <input type="hidden" id="c-group" name="group" value="" class="layui-input" />
-            <div
-                class="remoteSelect"
-                id="remoteSelect-group"
-                data-input-id="c-group"
-                data-field="name"
-                data-source="auth.admin/getGroupList"
-                data-multiple="true"
-                ></div>
-        </div>
+<form class="layui-form" method="post">
+  {:token_field()}
+  <div class="layui-form-item">
+    <label class="layui-form-label">所属组别</label>
+    <div class="layui-input-block">
+      <input
+        type="hidden"
+        id="c-group"
+        name="row[group]"
+        value=""
+        class="layui-input"
+      />
+      <div
+        class="remoteSelect"
+        id="remoteSelect-group"
+        data-input-id="c-group"
+        data-field="name"
+        data-source="auth.admin/getGroupList"
+        data-multiple="true"
+      ></div>
     </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">用户名</label>
-        <div class="layui-input-block">
-            <input type="text" name="row[username]" lay-verify="required" autocomplete="off" placeholder="用户名" class="layui-input">
-        </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">用户名</label>
+    <div class="layui-input-block">
+      <input
+        type="text"
+        name="row[username]"
+        lay-verify="required"
+        autocomplete="off"
+        placeholder="用户名"
+        class="layui-input"
+      />
     </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">密码</label>
-        <div class="layui-input-block">
-            <input type="password" name="row[password]" lay-verify="required" autocomplete="off" placeholder="密码" class="layui-input">
-        </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">密码</label>
+    <div class="layui-input-block">
+      <input
+        type="password"
+        name="row[password]"
+        lay-verify="required"
+        autocomplete="off"
+        placeholder="密码"
+        class="layui-input"
+      />
     </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">确认密码</label>
-        <div class="layui-input-block">
-            <input type="password" name="row[password_confirm]" lay-verify="required" autocomplete="off" placeholder="确认密码" class="layui-input">
-        </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">确认密码</label>
+    <div class="layui-input-block">
+      <input
+        type="password"
+        name="row[password_confirm]"
+        lay-verify="required"
+        autocomplete="off"
+        placeholder="确认密码"
+        class="layui-input"
+      />
     </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">邮箱</label>
-        <div class="layui-input-block">
-            <input type="text" name="row[email]" lay-verify="required|email" autocomplete="off" placeholder="邮箱" class="layui-input">
-        </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">邮箱</label>
+    <div class="layui-input-block">
+      <input
+        type="text"
+        name="row[email]"
+        lay-verify="required|email"
+        autocomplete="off"
+        placeholder="邮箱"
+        class="layui-input"
+      />
     </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">手机</label>
-        <div class="layui-input-block">
-            <input type="text" name="row[mobile]" autocomplete="off" placeholder="手机" class="layui-input">
-        </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">手机</label>
+    <div class="layui-input-block">
+      <input
+        type="text"
+        name="row[mobile]"
+        autocomplete="off"
+        placeholder="手机"
+        class="layui-input"
+      />
     </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">真实姓名</label>
-        <div class="layui-input-block">
-            <input type="text" name="row[nickname]" autocomplete="off" placeholder="真实姓名" class="layui-input">
-        </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">真实姓名</label>
+    <div class="layui-input-block">
+      <input
+        type="text"
+        name="row[nickname]"
+        autocomplete="off"
+        placeholder="真实姓名"
+        class="layui-input"
+      />
     </div>
-    <div class="layui-form-item">
-        <label class="layui-form-label">状态</label>
-        <div class="layui-input-inline">
-            <input type="radio" name="row[status]" value="normal" title="显示" checked>
-            <input type="radio" name="row[status]" value="hidden" title="禁止">
-        </div>
+  </div>
+  <div class="layui-form-item">
+    <label class="layui-form-label">状态</label>
+    <div class="layui-input-inline">
+      <input
+        type="radio"
+        name="row[status]"
+        value="normal"
+        title="显示"
+        checked
+      />
+      <input type="radio" name="row[status]" value="hidden" title="禁止" />
     </div>
+  </div>
 
-    <div class="layui-form-item layer-footer hide">
-        <div class="layui-input-block">
-            <button class="layui-btn pear-btn-primary layui-btn-sm disabled" lay-submit lay-filter="go">立即提交</button>
-            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
-        </div>
+  <div class="layui-form-item layer-footer hide">
+    <div class="layui-input-block">
+      <button
+        class="layui-btn pear-btn-primary layui-btn-sm disabled"
+        lay-submit
+        lay-filter="go"
+      >
+        立即提交
+      </button>
+      <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">
+        重置
+      </button>
     </div>
+  </div>
 </form>
 
 <script>
-layui.use(['badou'],function () {
+  layui.use(["badou"], function () {
     var bdForm = layui.bdForm;
     bdForm.api.bindevent($("form.layui-form"));
-})
-
+  });
 </script>

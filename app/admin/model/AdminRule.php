@@ -21,6 +21,11 @@ class AdminRule extends Model
     public const RULE_MAIN = 2; //主菜单
     protected $autoWriteTimestamp = true;
 
+    protected $type = [
+        'create_time' => 'int',
+        'update_time' => 'int'
+    ];
+
     public static function onAfterWrite($row)
     {
         Cache::delete('__menu__');
@@ -30,5 +35,4 @@ class AdminRule extends Model
     {
         return __($value);
     }
-
 }

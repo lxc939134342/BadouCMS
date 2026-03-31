@@ -22,6 +22,11 @@ class User extends Model
 {
     protected $autoWriteTimestamp = true;
 
+    protected $type = [
+        'create_time' => 'int',
+        'update_time' => 'int'
+    ];
+
     protected $append = [
         'prevtime_text',
         'logintime_text',

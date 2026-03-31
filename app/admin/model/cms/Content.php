@@ -28,8 +28,9 @@ class Content extends Model
 
     protected $dateFormat = 'Y-m-d H:i:s';
 
-    public static function init()
+    protected function init(): void
     {
+        parent::init();
         \think\facade\Event::listen('app\admin\model\cms\Content.BeforeWrite', [self::class, '_onBeforeWrite']);
         \think\facade\Event::listen('app\admin\model\cms\Content.AfterDelete', [self::class, '_onAfterDelete']);
     }

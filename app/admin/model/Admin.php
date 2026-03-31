@@ -22,6 +22,11 @@ class Admin extends Model
      */
     protected $autoWriteTimestamp = true;
 
+    protected $type = [
+        'create_time' => 'int',
+        'update_time' => 'int',
+    ];
+
     protected $name  = 'admin';
 
     protected $hidden = [

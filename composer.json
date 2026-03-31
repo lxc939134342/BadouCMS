@@ -21,7 +21,7 @@
     "topthink/think-multi-app": "1.1.1",
     "topthink/think-throttle": "2.0.2",
     "topthink/think-migration": "3.1.1",
-    "symfony/http-foundation": "^5.4|^6.4|^7.1",
+    "symfony/http-foundation": "^5.4.50",
     "phpmailer/phpmailer": "^6.8",
     "guzzlehttp/guzzle": "^7.8.1",
     "nelexa/zip": "^4.0.0",
@@ -34,7 +34,7 @@
     "phpoffice/phpspreadsheet": "^2.1",
     "overtrue/pinyin": "^5.0",
     "ezyang/htmlpurifier": "^4.18",
-    "symfony/var-exporter": "^6.0"
+    "symfony/var-exporter": "^5.4|^6.0"
   },
   "require-dev": {
     "symfony/var-dumper": "^5.4",

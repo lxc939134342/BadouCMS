@@ -148,6 +148,7 @@ class Auth
     public function getGroups($uid)
     {
         static $groups = [];
+
         if (isset($groups[$uid])) {
             return $groups[$uid];
         }
@@ -157,8 +158,10 @@ class Auth
             ->alias('aga')
             ->join($this->config['auth_group'] . ' ag', 'aga.group_id = ag.id', 'LEFT')
             ->field('aga.uid,aga.group_id,ag.id,ag.pid,ag.name,ag.rules')
-            ->where("aga.uid='{$uid}' and ag.status='normal'")
+            ->where("aga.uid", $uid)
+            ->where("ag.status", 'normal')
             ->select()->toArray();
+
         $groups[$uid] = $user_groups ?: [];
         return $groups[$uid];
     }
@@ -190,7 +193,7 @@ class Auth
             'status' => 'normal'
         ];
         if (!in_array('*', $ids)) {
-            $where[] = ['id','in', $ids];
+            $where[] = ['id', 'in', $ids];
         }
         //读取用户组所有权限规则
         $this->rules = Db::name($this->config['auth_rule'])->where($where)->field('id,pid,condition,icon,name,title,ismenu')->select();

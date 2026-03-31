@@ -16,7 +16,11 @@ use think\Model;
 
 class UserGroup extends Model
 {
-    protected $autoWriteTimestamp = 'int';
+    protected $autoWriteTimestamp = true;
+    protected $type = [
+        'create_time' => 'int',
+        'update_time' => 'int'
+    ];
 
     // 追加属性
     protected $append = [
@@ -34,6 +38,4 @@ class UserGroup extends Model
         $list = $this->getStatusList();
         return $list[$value] ?? '';
     }
-
-
 }

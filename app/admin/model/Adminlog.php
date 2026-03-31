@@ -27,6 +27,11 @@ class Adminlog extends Model
     protected $autoWriteTimestamp = true;
     protected $updateTime         = false;
 
+    protected $type = [
+        'create_time' => 'int'
+    ];
+
+
     /**
      * 自定义日志标题
      * @var string
@@ -37,7 +42,7 @@ class Adminlog extends Model
      * 自定义日志内容
      * @var string|array
      */
-    protected string|array $data = '';
+    protected string|array $logData = '';
 
     /**
      * 忽略的链接正则列表
@@ -73,9 +78,9 @@ class Adminlog extends Model
      * 设置日志内容
      * @param string|array $data
      */
-    public function setData(string|array $data): void
+    public function setLogData(string|array $data, $value = ''): void
     {
-        $this->data = $data;
+        $this->logData = $data;
     }
 
     /**
@@ -141,7 +146,7 @@ class Adminlog extends Model
                 }
             }
         }
-        $data = $data ?: $this->data;
+        $data = $data ?: $this->logData;
         if (!$data) {
             $data = request()->param('', null, 'trim,strip_tags,htmlspecialchars');
         }

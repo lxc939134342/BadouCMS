@@ -19,9 +19,9 @@ class Single extends Base
     protected $extfieldModel;
 
     /**
-    * Contentext模型对象
-    * @var \app\admin\model\cms\ContentExt
-    */
+     * Contentext模型对象
+     * @var \app\admin\model\cms\ContentExt
+     */
     protected $contentExtModel;
 
     protected $noNeedRight = ['getFieldHtml'];
@@ -67,10 +67,14 @@ class Single extends Base
         }
         unset($whereitem);
         $where[] = [
-            'contentsort.mcode','in',$mcodes
+            'contentsort.mcode',
+            'in',
+            $mcodes
         ];
         $where[] = [
-            'content.acode','=',get_backend_lang(),
+            'content.acode',
+            '=',
+            get_backend_lang(),
         ];
 
         /* 查询子栏目数据 */
@@ -97,7 +101,7 @@ class Single extends Base
             /* 合并数据 */
             $extRowArr = $extRow->toArray();
             $extRowArr = $this->contentExtModel->formatValue($this->mcode, $extRowArr);
-            $row->appendData($extRowArr);
+            $row->setAttrs($extRowArr);
         }
 
         $dataLimitAdminIds = $this->getDataLimitAdminIds();
@@ -174,7 +178,7 @@ class Single extends Base
                 /* 合并数据 */
                 $extRowArr = $extRow->toArray();
                 $extRowArr = $this->contentExtModel->formatValue($mcode, $extRowArr);
-                $rowitem->appendData($extRowArr);
+                $rowitem->setAttrs($extRowArr);
             }
         }
 
@@ -182,7 +186,7 @@ class Single extends Base
         $custom_fields = $this->extfieldModel->getModelFields($mcode);
         if ($custom_fields) {
             foreach ($custom_fields as $key => $field) {
-                $custom_fields[$key]['form_name'] = 'row['.$field['name'].']';
+                $custom_fields[$key]['form_name'] = 'row[' . $field['name'] . ']';
                 $custom_fields[$key]['form_id'] = $field['name'];
                 $custom_fields[$key]['form_value'] = $rowitem[$field['name']] ??  '';
                 $custom_fields[$key]['form_acode'] = $acode;

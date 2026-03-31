@@ -19,6 +19,11 @@ class UserRule extends Model
 {
     protected $autoWriteTimestamp = true;
 
+    protected $type = [
+        'create_time' => 'int',
+        'update_time' => 'int'
+    ];
+
     // 追加属性
     protected $append = [
         'status_text'
