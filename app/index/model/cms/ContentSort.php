@@ -670,7 +670,6 @@ class ContentSort extends Model
         if ($scode) {
             $scode_arr = explode(',', $scode);
         }
-
         $data = ContentSort::getSortsTree();
         if ($parent) { // 非顶级栏目起始,调用子栏目
             $parent_arr = explode(',', $parent);
@@ -711,7 +710,7 @@ class ContentSort extends Model
             // 直接构建新数组，避免使用unset
             $filtered_data = [];
             foreach ($out_data as $value) {
-                if (isset($scode_set[$value['scode']])) {
+                if (isset($scode_pos_map[$value['scode']])) {
                     // 保存位置信息，用于后续排序
                     $value['_sort_pos'] = $scode_pos_map[$value['scode']];
                     $filtered_data[] = $value;
