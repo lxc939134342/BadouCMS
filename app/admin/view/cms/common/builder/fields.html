@@ -198,6 +198,44 @@
     </div>
 </div>
 {/case}
+{case value="array3"}
+<div class="layui-form-item">
+    <label class="layui-form-label">{$field.description}</label>
+    <div class="layui-input-block">
+        <dl class="fieldlist" data-name="{$field.form_name|htmlentities}"
+            data-template="{$field.form_acode}array3tpl" data-usearray="true">
+            <dd>
+                <div class="layui-inline" style="width: 300px;"><ins style="width: 100%;">{:__('Column 1')}</ins></div>
+                <div class="layui-inline" style="width: 300px;"><ins style="width: 100%;">{:__('Column 2')}</ins></div>
+                <div class="layui-inline" style="width: 300px;"><ins style="width: 100%;">{:__('Column 3')}</ins></div>
+            </dd>
+            <dd>
+                <a href="javascript:;" class="layui-btn btn-append"><i class="fa fa-plus"></i>
+                    {:__('Append')}</a>
+            </dd>
+        </dl>
+        <textarea name="{$field.form_name|htmlentities}" class="form-control hide" cols="30"
+                rows="5">{$field.form_value}</textarea>
+        <script type="text/html" id="{$field.form_acode}array3tpl">
+            <dd>
+                <div class="layui-inline" style="width: 300px;">
+                    <input type="text" name="{{=d.name}}[{{=d.index}}][col1]" class="layui-input" value="{{=d.row.col1}}" >
+                </div>
+                <div class="layui-inline" style="width: 300px;">
+                    <input type="text" name="{{=d.name}}[{{=d.index}}][col2]" class="layui-input" value="{{=d.row.col2}}" >
+                </div>
+                <div class="layui-inline" style="width: 300px;">
+                    <input type="text" name="{{=d.name}}[{{=d.index}}][col3]" class="layui-input" value="{{=d.row.col3}}" >
+                </div>
+                <div class="layui-inline">
+                    <span class="layui-btn layui-bg-red btn-remove"><i class="fa fa-times"></i></span>
+                    <span class="layui-btn btn-dragsort"><i class="fa fa-arrows"></i></span>
+                </div>
+            </dd>
+        </script>
+    </div>
+</div>
+{/case}
 
 {/switch}
 {/foreach}

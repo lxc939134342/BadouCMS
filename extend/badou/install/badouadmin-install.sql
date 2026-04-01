@@ -938,7 +938,7 @@ CREATE TABLE `bd_cms_label` (
   `acode` varchar(100) DEFAULT 'cn',
   `name` varchar(100) NOT NULL COMMENT '名称',
   `value` varchar(500) NOT NULL COMMENT '值',
-  `type` char(1) NOT NULL DEFAULT '1' COMMENT '字段类型',
+  `type` char(3) NOT NULL DEFAULT '1' COMMENT '字段类型',
   `description` varchar(30) NOT NULL COMMENT '描述',
   `create_user` varchar(30) NOT NULL COMMENT '创建人员',
   `update_user` varchar(20) NOT NULL COMMENT '更新人员',

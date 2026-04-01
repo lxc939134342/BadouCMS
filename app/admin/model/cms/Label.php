@@ -1,5 +1,15 @@
 <?php
 
+// +----------------------------------------------------------------------
+// | BADOUCMS [ 八斗网站系统 ]
+// +----------------------------------------------------------------------
+// | Copyright (c) 2024-2030 http://doc.ldcode.com.cn All rights reserved.
+// +----------------------------------------------------------------------
+// | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
+// +----------------------------------------------------------------------
+// | Author: lande <939134342@qq.com>
+// +----------------------------------------------------------------------
+
 namespace app\admin\model\cms;
 
 use think\Model;
@@ -29,8 +39,10 @@ class Label extends Model
             '8' => ['text' => '单图', 'inputType' => 'image', 'type' => 'string', 'limit' => 255, 'default' => null],
             '9'  => ['text' => '下拉选择', 'inputType' => 'select', 'type' => 'string', 'limit' => 255, 'default' => ''],
             '11'  => ['text' => '多图标题(只增加字段)', 'inputType' => 'imagestitle', 'type' => 'string', 'limit' => 1000, 'default' => ''],
-            '12'  => ['text' => '二列数组', 'inputType' => 'array', 'type' => 'text', 'limit' => 0, 'default' => null]
-        ];
+            '12'  => ['text' => '二列数组', 'inputType' => 'array', 'type' => 'text', 'limit' => 0, 'default' => null],
+	    '15'  => ['text' => '三列数组', 'inputType' => 'array3', 'type' => 'text', 'limit' => 0, 'default' => null]
+        
+	];
 
         return $options;
     }
