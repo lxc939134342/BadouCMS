@@ -37,15 +37,13 @@ class Content extends Model
     // 模型事件
     public static function _onBeforeWrite($model)
     {
-        $data = $model->getData();
-        if (empty($data['description']) && isset($data['content'])) {
-            $data['description'] = self::extractDescription($data['content']);
+        if (empty($model->description) && !empty($model->content)) {
+            $model->description = self::extractDescription($model->content);
         }
 
-        if (empty($data['ico']) && isset($data['content'])) {
-            $data['ico'] = self::extractThumbnail($data['content']);
+        if (empty($model->ico) && !empty($model->content)) {
+            $model->ico = self::extractThumbnail($model->content);
         }
-        $model->data($data);
     }
 
     public static function _onAfterDelete($model)

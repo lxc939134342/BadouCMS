@@ -190,7 +190,7 @@ layui.define(["bdHttp", "xmSelect"], function (exports) {
               return item[config.key];
             });
             // 同步隐藏域
-            if (config.inputId && values.length) {
+            if (config.inputId) {
               $("#" + config.inputId)
                 .val(values.join(","))
                 .trigger("change");
