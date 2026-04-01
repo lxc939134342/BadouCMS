@@ -2,82 +2,124 @@
 
 <!-- 表格 -->
 <div class="layui-card">
-    <div class="layui-card-body">
-        <table class="layui-hide" id="admin" data-operate-edit="{:$auth->check('auth.admin/edit')}" data-operate-del="{:$auth->check('auth.admin/del')}"></table>
-    </div>
+  <div class="layui-card-body">
+    <table
+      class="layui-hide"
+      id="admin"
+      data-operate-edit="{:$auth->check('auth.admin/edit')}"
+      data-operate-del="{:$auth->check('auth.admin/del')}"
+    ></table>
+  </div>
 </div>
 
 <!-- 表格左侧按钮 toolbar  -->
 <script type="text/html" id="toolbar">
-	<a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	"><i class="fa fa-refresh"></i></a>
-	<button class="layui-btn layui-bg-green {:$auth->check('auth.admin/add')?'':'hide'}" lay-event="add"><i class="fa fa-plus"></i> {:__('Add')}</button>
-	<button class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('auth.admin/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
-	<button class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('auth.admin/del')?'':'hide'}" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
+  <a
+    href="javascript:;"
+    lay-event="refresh"
+    class="layui-btn btn-refresh layui-bg-black	"
+  >
+    <i class="fa fa-refresh"></i>
+  </a>
+  <button
+    class="layui-btn layui-bg-green {:$auth->check('auth.admin/add')?'':'hide'}"
+    lay-event="add"
+  >
+    <i class="fa fa-plus"></i>
+    {:__('Add')}
+  </button>
+  <button
+    class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('auth.admin/edit')?'':'hide'}"
+    lay-event="edit"
+  >
+    <i class="fa fa-pencil"></i>
+    {:__('Edit')}
+  </button>
+  <button
+    class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('auth.admin/del')?'':'hide'}"
+    lay-event="del"
+  >
+    <i class="fa fa-trash"></i>
+    {:__('Del')}
+  </button>
 </script>
 
 <script>
-    layui.use(["badou","table","form"], function () {
-        var bdTable = layui.bdTable;
-        var table = layui.table;
-        var layer = layui.layer;
-        var $ = layui.$;
-        var form = layui.form;
+  layui.use(["badou", "table", "form"], function () {
+    var bdTable = layui.bdTable;
+    var table = layui.table;
+    var layer = layui.layer;
+    var $ = layui.$;
+    var form = layui.form;
 
-        //初始化表格
-        bdTable.api.init({
-            table:table, // layui 表格对象，支持普通table与树结构table
-            extend: {
-                index_url: "auth.admin/index", //获取表格数据
-                add_url: "auth.admin/add", //添加数据
-                edit_url: "auth.admin/edit", //编辑数据
-                del_url: "auth.admin/del", //删除数据
-                multi_url: "auth.admin/multi", //批量处理
-                table: "admin", //数据表名称
-            },
-        });
-        // 创建渲染实例
-        bdTable.render({
-            elem: "#admin",
-            url: "{:url('auth.admin/index')}",
-            pk: "id",
-            even: true,
-            toolbar: "#toolbar",
-            cols: [
-                [
-                    { type: "checkbox" },
-                    { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "username", title: "登录名", width: 150, sort: true },
-                    { field: 'groups_text',  title: '所属角色', search: false,align: 'center', templet: bdTable.api.formatter.label ,
-                        extend: 'data-source="auth.admin/get_group_list" data-field="groups_text" data-multiple="true" data-is-tree="true"',
-                    },
-
-                    { field: 'last_login_ip', title: '最后登录IP', searchOp: 'like' },
-                    { field: 'last_login_time', width: 200, title: '最后登录时间', search: 'range' },
-                    { field: 'email', width: 200, title: '邮箱', searchOp: 'like' },
-                    { field: 'mobile', width: 200, title: '手机', searchOp: 'like' },
-
-                    {
-                        field: "status",
-                        title: "状态",
-                        width: 100,
-                        searchList: { normal: "正常", hidden: "禁用" },
-                        custom: { normal: "green", hidden: "orange" },
-                        templet: bdTable.api.formatter.status,
-                    },
-                    { title: "操作",
-                    width: 190,
-                    align: "center",
-                    templet: function(d) {
-                        if (d.id == Config.admin.id) {
-                            return '<a class="layui-btn layui-btn-xs layui-btn-danger layui-btn-disabled">不可操作</a>';
-                        } else {
-                            return bdTable.api.formatter.operate.call(this, d, this);
-                        }
-                    },
-                    operat: ['edit', 'delete']},
-                ],
-            ],
-        });
+    //初始化表格
+    bdTable.api.init({
+      table: table, // layui 表格对象，支持普通table与树结构table
+      extend: {
+        index_url: "auth.admin/index", //获取表格数据
+        add_url: "auth.admin/add", //添加数据
+        edit_url: "auth.admin/edit", //编辑数据
+        del_url: "auth.admin/del", //删除数据
+        multi_url: "auth.admin/multi", //批量处理
+        table: "admin", //数据表名称
+      },
     });
-</script>
+    // 创建渲染实例
+    bdTable.render({
+      elem: "#admin",
+      url: "{:url('auth.admin/index')}",
+      pk: "id",
+      even: true,
+      toolbar: "#toolbar",
+      cols: [
+        [
+          { type: "checkbox" },
+          { field: "id", title: "ID", width: 80, sort: true },
+          { field: "username", title: "登录名", width: 150, sort: true },
+          {
+            field: "groups_text",
+            title: "所属角色",
+            search: false,
+            align: "center",
+            templet: bdTable.api.formatter.label,
+            extend:
+              'data-source="auth.admin/get_group_list" data-field="groups_text" data-multiple="true" data-is-tree="true"',
+          },
 
+          { field: "login_ip", title: "最后登录IP", searchOp: "like" },
+          {
+            field: "login_time",
+            width: 200,
+            title: "最后登录时间",
+            search: "range",
+            templet: bdTable.api.formatter.datetime,
+          },
+          { field: "email", width: 200, title: "邮箱", searchOp: "like" },
+          { field: "mobile", width: 200, title: "手机", searchOp: "like" },
+
+          {
+            field: "status",
+            title: "状态",
+            width: 100,
+            searchList: { normal: "正常", hidden: "禁用" },
+            custom: { normal: "green", hidden: "orange" },
+            templet: bdTable.api.formatter.status,
+          },
+          {
+            title: "操作",
+            width: 190,
+            align: "center",
+            templet: function (d) {
+              if (d.id == Config.admin.id) {
+                return '<a class="layui-btn layui-btn-xs layui-btn-danger layui-btn-disabled">不可操作</a>';
+              } else {
+                return bdTable.api.formatter.operate.call(this, d, this);
+              }
+            },
+            operat: ["edit", "delete"],
+          },
+        ],
+      ],
+    });
+  });
+</script>
