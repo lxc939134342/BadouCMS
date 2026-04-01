@@ -51,7 +51,7 @@ class Email extends PHPMailer
         $sysMailConfig    = get_sys_config('', 'mail');
         $this->configured = true;
         foreach ($sysMailConfig as $item) {
-            if (!$item) {
+            if ($item === '' || is_null($item)) {
                 $this->configured = false;
             }
         }
