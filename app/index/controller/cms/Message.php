@@ -76,21 +76,19 @@ class Message extends Base
             }
             if ($send_email && get_sys_config('message_send_to')) {
                 $mail   = new Email();
-                if (!$mail->configured) {
-                    // 邮件发送服务不可用
-                    $this->error(__('Mail sending service unavailable'));
-                }
-                $mail_subject = "【" . get_sys_config('site_name') . "】您有新的". $value['form_name'] . "信息，请注意查收！";
-                $mail_body .= '<br>来自网站 ' . $this->request->domain() . ' （' . date('Y-m-d H:i:s') . '）';
-                try {
-                    $mail->isSMTP();
-                    $mail->addAddress(get_sys_config('message_send_to'));
-                    $mail->isHTML();
-                    $mail->setSubject($mail_subject);
-                    $mail->Body = $mail_body;
-                    $mail->send();
-                } catch (PHPMailerException) {
-                    $this->error($mail->ErrorInfo);
+                if ($mail->configured) {
+                    $mail_subject = "【" . get_sys_config('site_name') . "】您有新的". $value['form_name'] . "信息，请注意查收！";
+                    $mail_body .= '<br>来自网站 ' . $this->request->domain() . ' （' . date('Y-m-d H:i:s') . '）';
+                    try {
+                        $mail->isSMTP();
+                        $mail->addAddress(get_sys_config('message_send_to'));
+                        $mail->isHTML();
+                        $mail->setSubject($mail_subject);
+                        $mail->Body = $mail_body;
+                        $mail->send();
+                    } catch (PHPMailerException $e) {
+                        trace('邮件发送失败：' . $e->getMessage(), 'error');
+                    }
                 }
             }
 
