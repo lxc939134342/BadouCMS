@@ -12,6 +12,8 @@
 
 namespace modules\nkeditor;
 
+use think\facade\Event;
+
 class Nkeditor
 {
     /**
@@ -20,6 +22,7 @@ class Nkeditor
      */
     public function AppInit()
     {
+        Event::listen('editor', function () {});
         return [];
     }
 

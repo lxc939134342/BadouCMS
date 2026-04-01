@@ -937,7 +937,7 @@ CREATE TABLE `bd_cms_label` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT '编号',
   `acode` varchar(100) DEFAULT 'cn',
   `name` varchar(100) NOT NULL COMMENT '名称',
-  `value` varchar(500) NOT NULL COMMENT '值',
+  `value` text NOT NULL COMMENT '值',
   `type` char(3) NOT NULL DEFAULT '1' COMMENT '字段类型',
   `description` varchar(30) NOT NULL COMMENT '描述',
   `create_user` varchar(30) NOT NULL COMMENT '创建人员',

@@ -133,7 +133,11 @@
 <div class="layui-form-item">
     <label class="layui-form-label">{$field.description}</label>
     <div class="layui-input-block">
+        {if has_hook('editor')}
         <textarea class="layui-textarea editor" name="{$field.form_name}" rows="5">{$field.form_value}</textarea>
+        {else} 
+        <div class="alert alert-danger" style="width: 40%;">请先到插件市场安装《富文本编辑器》插件</div>
+        {/if}
     </div>
 </div>
 {/case}
