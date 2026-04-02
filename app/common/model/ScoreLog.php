@@ -25,6 +25,11 @@ class ScoreLog extends Model
     protected $autoWriteTimestamp = true;
     protected $createTime = 'createtime';
     protected $updateTime = '';
+
+    protected $type = [
+        'createtime' => 'int',
+    ];
+
     // 追加属性
     protected $append = [];
 }

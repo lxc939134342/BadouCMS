@@ -66,7 +66,7 @@ return [
     'backup_global_files'   => true,
     // 升级时忽略升级的目录
     'upgrade_ignore_dirs' => ['template/cms/default/'],
-    'version' => 'v2.2.1',
+    'version' => 'v2.2.2',
     'api_url' => 'https://sq.badoucms.com/',
     'module_init_key' => 'bW9kdWxlSW5pdA=='
 ];

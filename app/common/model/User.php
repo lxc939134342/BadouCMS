@@ -27,6 +27,10 @@ use think\facade\Db;
  */
 class User extends Model
 {
+    protected $type = [
+        'create_time' => 'int',
+        'update_time' => 'int'
+    ];
     // 追加属性
     protected $append = [
         'url'
@@ -153,5 +157,4 @@ class User extends Model
         }
         return $level;
     }
-
 }

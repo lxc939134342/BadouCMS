@@ -20,8 +20,11 @@ class UserGroup extends Model
     protected $name = 'user_group';
     // 自动写入时间戳字段
     protected $autoWriteTimestamp = true;
-    // 追加属性
-    protected $append = [
-    ];
 
+    protected $type = [
+        'create_time' => 'int',
+        'update_time' => 'int'
+    ];
+    // 追加属性
+    protected $append = [];
 }

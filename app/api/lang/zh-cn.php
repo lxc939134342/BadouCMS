@@ -173,5 +173,6 @@ return [
     'Parameter %s can not be empty'                                                       => '参数%s不能为空',
     'Token verification error'                                                            => 'Token验证错误！',
     'An unexpected error occurred'                                                        => '发生了一个意外错误,程序猿正在紧急处理中',
-
+    'Logged in successful'                                                                => '登录成功',
+    'Logout successful'                                                                   => '退出成功',
 ];

@@ -16,4 +16,10 @@ use think\Model;
 
 class UserRule extends Model
 {
+
+    protected $autoWriteTimestamp = true;
+    protected $type = [
+        'create_time' => 'int',
+        'update_time' => 'int'
+    ];
 }
