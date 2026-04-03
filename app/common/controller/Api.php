@@ -124,7 +124,12 @@ class Api extends BaseController
         Config::set(array_merge(Config::get('upload'), $upload), 'upload');
 
         // 配置信息后
-        Event::trigger("config_init", $config);
+        $results = Event::trigger("config_init", $config);
+        foreach ($results as $res) {
+            if (is_array($res)) {
+                $config = array_merge($config, $res);
+            }
+        }
         // 加载当前控制器语言包
         $this->loadlang($controllername);
     }
