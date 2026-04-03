@@ -241,6 +241,8 @@
 </div>
 {/case}
 
+{default /}
+    {:hook('cms_field_custom', ['field' => $field, 'row' => $row], true, true)}
 {/switch}
 {/foreach}
 

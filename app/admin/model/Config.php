@@ -26,6 +26,8 @@ use InvalidArgumentException;
  */
 class Config extends Model
 {
+    protected $name = 'config';
+
     public static string $cacheTag = 'sys_config';
 
     protected $append = [
@@ -83,7 +85,6 @@ class Config extends Model
         // 清理配置缓存
         Cache::tag(self::$cacheTag)->clear();
     }
-
 
     public static function clearCache()
     {

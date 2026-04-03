@@ -63,6 +63,15 @@ class Extfield extends Model
             '15'  => ['text' => '三列数组', 'inputType' => 'array3', 'type' => 'text', 'limit' => 0, 'default' => null],
         ];
 
+        $result = hook('cms_extfield_type', $options, true);
+        if ($result && is_array($result)) {
+            foreach ($result as $pluginOptions) {
+                if (is_array($pluginOptions)) {
+                    $options = array_replace($options, $pluginOptions);
+                }
+            }
+        }
+
         return $options;
     }
 
