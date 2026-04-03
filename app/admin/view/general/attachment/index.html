@@ -60,13 +60,13 @@
             '" alt="" style="max-height:30px;max-width:120px"></a>';
         } else {
           html =
-            '<a href="' +
-            row.fullurl +
-            '" target="_blank"><img src="' +
+            '<img src="' +
             badou.api.fixurl("ajax/icon") +
             "?suffix=" +
-            row.imagetype +
-            '" alt="" style="max-height:30px;max-width:120px"></a>';
+            (row.filename
+              ? row.filename.split(".").pop()
+              : row.mimetype.split("/").pop()) +
+            '" alt="" style="max-height:30px;max-width:120px">';
         }
         return (
           '<div style="width:120px;margin:0 auto;text-align:center;overflow:hidden;white-space: nowrap;text-overflow: ellipsis;">' +
@@ -168,26 +168,6 @@
             },
           },
           {
-            field: "imagewidth",
-            width: 100,
-            title: __("Imagewidth"),
-            sortable: true,
-          },
-          {
-            field: "imageheight",
-            width: 100,
-            title: __("Imageheight"),
-            sortable: true,
-          },
-          {
-            field: "imagetype",
-            width: 100,
-            title: __("Imagetype"),
-            sortable: true,
-            templet: bdTable.api.formatter.search,
-            operate: "like",
-          },
-          {
             field: "storage",
             width: 100,
             title: __("Storage"),
@@ -196,7 +176,7 @@
           },
           {
             field: "mimetype",
-            width: 100,
+            width: 150,
             title: __("Mimetype"),
             templet: bdTable.api.formatter.mimetype,
           },
@@ -206,7 +186,7 @@
             templet: bdTable.api.formatter.datetime,
             operate: "RANGE",
             searchType: "time",
-            width: 150,
+            width: 180,
           },
           {
             field: "operate",

@@ -118,4 +118,20 @@ class Ajax extends Backend
         }
         $this->result(__('Uploaded successful'), ['url' => $attachment->url, 'fullurl' => cdnurl($attachment->url, true)]);
     }
+
+    /**
+     * 生成后缀图标
+     */
+    public function icon()
+    {
+        $suffix = $this->request->request("suffix");
+        $suffix = $suffix ? $suffix : "FILE";
+        $data = build_suffix_image($suffix);
+        $header = ['Content-Type' => 'image/svg+xml'];
+        $offset = 30 * 60 * 60 * 24; // 缓存一个月
+        $header['Cache-Control'] = 'public';
+        $header['Pragma'] = 'cache';
+        $header['Expires'] = gmdate("D, d M Y H:i:s", time() + $offset) . " GMT";
+        return response($data, 200)->header($header);
+    }
 }
