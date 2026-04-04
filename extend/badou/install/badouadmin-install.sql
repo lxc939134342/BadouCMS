@@ -1003,7 +1003,7 @@ CREATE TABLE `bd_cms_member_comment` (
   `likes` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '点赞数',
   `oppose` int(10) unsigned NOT NULL DEFAULT '0' COMMENT '反对数',
   `status` char(1) NOT NULL DEFAULT '' COMMENT '状态',
-  `user_ip` varchar(11) NOT NULL DEFAULT '' COMMENT '用户IP',
+  `user_ip` varchar(45) NOT NULL DEFAULT '' COMMENT '用户IP',
   `user_os` varchar(30) NOT NULL DEFAULT '' COMMENT '操作系统',
   `user_bs` varchar(30) NOT NULL DEFAULT '' COMMENT '浏览器',
   `create_time` datetime NOT NULL COMMENT '创建时间',
