@@ -13,6 +13,7 @@
 namespace app\index\controller\cms;
 
 use badou\Email;
+use think\facade\Db;
 use app\index\model\cms\Form;
 use PHPMailer\PHPMailer\Exception as PHPMailerException;
 
@@ -66,18 +67,25 @@ class Message extends Base
             }
         }
 
+        // 获取表字段并判断 acode 是否存在
+        $tableName = $form[0]['table_name'];
+        $tableFields = Db::name($tableName)->getTableFields();
+        if (!in_array('acode', $tableFields)) {
+            unset($data['acode']);
+        }
+
         if ($this->model->addTableData($fcode, $data)) {
             session('lastsub', time()); // 记录最后提交时间
-            $send_email=false;
-            if($fcode==1){
-                $send_email=get_sys_config('message_send_mail');
-            }else{
-                $send_email=get_sys_config('form_send_mail');
+            $send_email = false;
+            if ($fcode == 1) {
+                $send_email = get_sys_config('message_send_mail');
+            } else {
+                $send_email = get_sys_config('form_send_mail');
             }
             if ($send_email && get_sys_config('message_send_to')) {
                 $mail   = new Email();
                 if ($mail->configured) {
-                    $mail_subject = "【" . get_sys_config('site_name') . "】您有新的". $value['form_name'] . "信息，请注意查收！";
+                    $mail_subject = "【" . get_sys_config('site_name') . "】您有新的" . $value['form_name'] . "信息，请注意查收！";
                     $mail_body .= '<br>来自网站 ' . $this->request->domain() . ' （' . date('Y-m-d H:i:s') . '）';
                     try {
                         $mail->isSMTP();
@@ -94,7 +102,7 @@ class Message extends Base
 
             $this->success(__('SubmitSuccess'));
         } else {
-            trace($formTypeText.'提交失败！', 'error');
+            trace($formTypeText . '提交失败！', 'error');
             $this->error(__('SubmitFailed'));
         }
     }
