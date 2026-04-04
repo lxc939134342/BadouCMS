@@ -32,17 +32,17 @@ class Label extends Model
             '1' => ['text' => '单行文本', 'inputType' => 'string', 'type' => 'string', 'limit' => 100, 'default' => ''],
             '7' => ['text' => '多行文本', 'inputType' => 'textarea', 'type' => 'string', 'limit' => 1000, 'default' => ''],
             '2' => ['text' => '日期选择', 'inputType' => 'datetime', 'type' => 'datetime', 'limit' => 0, 'default' => null],
-            '3' => ['text' => '多图上传', 'inputType' => 'images', 'type' => 'string', 'limit' => 1000, 'default' => ''],
+            '3' => ['text' => '单图', 'inputType' => 'image', 'type' => 'string', 'limit' => 255, 'default' => null],
             '4' => ['text' => '附件上传', 'inputType' => 'files', 'type' => 'string', 'limit' => 255, 'default' => ''],
             '5' => ['text' => '编辑器', 'inputType' => 'editor', 'type' => 'text', 'limit' => 0, 'default' => ''],
             '6' => ['text' => '开关', 'inputType' => 'switch', 'type' => 'string', 'limit' => 255, 'default' => ''],
-            '8' => ['text' => '单图', 'inputType' => 'image', 'type' => 'string', 'limit' => 255, 'default' => null],
+            '8' => ['text' => '多图上传', 'inputType' => 'images', 'type' => 'string', 'limit' => 1000, 'default' => ''],
             '9'  => ['text' => '下拉选择', 'inputType' => 'select', 'type' => 'string', 'limit' => 255, 'default' => ''],
             '11'  => ['text' => '多图标题(只增加字段)', 'inputType' => 'imagestitle', 'type' => 'string', 'limit' => 1000, 'default' => ''],
             '12'  => ['text' => '二列数组', 'inputType' => 'array', 'type' => 'text', 'limit' => 0, 'default' => null],
-	    '15'  => ['text' => '三列数组', 'inputType' => 'array3', 'type' => 'text', 'limit' => 0, 'default' => null]
-        
-	];
+            '15'  => ['text' => '三列数组', 'inputType' => 'array3', 'type' => 'text', 'limit' => 0, 'default' => null]
+
+        ];
 
         return $options;
     }
