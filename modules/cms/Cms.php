@@ -39,7 +39,7 @@ class Cms
         $configModel = new ConfigModel();
         $configModel->setGroup('cms', 'CMS配置');
         $configModel->setSysConfig($config, false);
-        $configModel::clear();
+        $configModel::clearCache();
 
         return true;
     }
@@ -50,7 +50,7 @@ class Cms
         $configModel = new ConfigModel();
         $configModel->setGroup('cms', 'CMS配置');
         $configModel->setSysConfig($config, false);
-        $configModel::clear();
+        $configModel::clearCache();
 
         return true;
     }
@@ -62,7 +62,7 @@ class Cms
         $configModel = new ConfigModel();
         $configModel->delGroup('cms');
         $configModel->where('group', 'cms')->delete();
-        $configModel::clear();
+        $configModel::clearCache();
 
         return true;
     }
