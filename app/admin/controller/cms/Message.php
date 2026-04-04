@@ -56,10 +56,6 @@ class Message extends Backend
         if ($this->isAjax()) {
             list($where, $sort, $order, $offset, $limit, $page, $alias, $bind) = $this->buildparams();
 
-            $where[] = [
-                'acode', '=',get_backend_lang()
-            ];
-
             $res = $this->model
                 ->withJoin($this->withJoinTable, $this->withJoinType)
                 ->alias($alias)
@@ -72,5 +68,4 @@ class Message extends Backend
 
         return $this->view->fetch();
     }
-
 }

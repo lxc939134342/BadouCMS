@@ -58,14 +58,11 @@ class FormData extends Base
         if ($this->isAjax()) {
             list($where, $sort, $order, $offset, $limit, $page, $alias, $bind) = $this->buildparams();
 
-            $where[] = [
-                'acode', '=', get_backend_lang()
-            ];
             $res = $this->model
                 ->withJoin($this->withJoinTable, $this->withJoinType)
                 ->alias($alias)
                 ->where($where)
-                ->order($sort, $order, )
+                ->order($sort, $order)
                 ->paginate($limit);
 
             $this->result('ok', $res->items(), $res->total());
