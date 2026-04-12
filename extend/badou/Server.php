@@ -289,14 +289,16 @@ class Server
             @mkdir($dir, 0755);
         }
         $conflictlist = [];
-        $ignoreDirs = config('badouadmin.upgrade_ignore_dirs'); // 需忽略的目录前缀
+        $ignoreDirs = (array)config('badouadmin.upgrade_ignore_dirs'); 
+        $ignoreFiles = (array)config('badouadmin.upgrade_ignore_files');
+        $ignoreList = array_merge($ignoreDirs, $ignoreFiles);
         $extractlist = [];
         // 解压模块压缩包
         try {
             $fileList = $zip->getListFiles();
             foreach ($fileList as $file) {
                 $destPath = $dir . $file;
-                if ($ignoreDirs && self::isIgnoreDirs($ignoreDirs, $file)) {
+                if ($ignoreList && self::isIgnoreDirs($ignoreList, $file)) {
                     continue;
                 }
                 // 需要解压的文件
@@ -682,10 +684,14 @@ class Server
             Filesystem::copydirs($sourceAssetsDir, $destAssetsDir);
         }
 
+        $ignoreDirs = (array)config('badouadmin.upgrade_ignore_dirs');
+        $ignoreFiles = (array)config('badouadmin.upgrade_ignore_files');
+        $ignoreList = array_merge($ignoreDirs, $ignoreFiles);
+
         // 复制app和public到全局
         foreach (self::getCheckDirs() as $k => $dir) {
             if (is_dir($moduleDir . $dir)) {
-                Filesystem::copydirs($moduleDir . $dir, root_path() . $dir);
+                Filesystem::copydirs($moduleDir . $dir, root_path() . $dir, $ignoreList);
             }
         }
 
@@ -1391,7 +1397,7 @@ class Server
     }
 
     //是否忽略目录
-    protected static function isIgnoreDirs($ignoreDirs, $relativePath)
+    public static function isIgnoreDirs($ignoreDirs, $relativePath)
     {
         foreach ($ignoreDirs as $token) {
             if (static::ignoreMatch($token, $relativePath)) {

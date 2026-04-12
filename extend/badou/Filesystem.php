@@ -18,8 +18,9 @@ class Filesystem
      * 复制文件夹
      * @param string $source 源文件夹
      * @param string $dest   目标文件夹
+     * @param array  $ignore 忽略列表
      */
-    public static function copyDirs($source, $dest)
+    public static function copyDirs($source, $dest, $ignore = [])
     {
         if (!is_dir($dest)) {
             @mkdir($dest, 0755, true);
@@ -30,13 +31,17 @@ class Filesystem
                 RecursiveIteratorIterator::SELF_FIRST
             ) as $item
         ) {
+            $relativePath = $iterator->getSubPathname();
+            if ($ignore && Server::isIgnoreDirs($ignore, $relativePath)) {
+                continue;
+            }
             if ($item->isDir()) {
-                $sontDir = $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathname();
+                $sontDir = $dest . DIRECTORY_SEPARATOR . $relativePath;
                 if (!is_dir($sontDir)) {
                     @mkdir($sontDir, 0755, true);
                 }
             } else {
-                @copy($item, $dest . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
+                @copy($item, $dest . DIRECTORY_SEPARATOR . $relativePath);
             }
         }
     }
