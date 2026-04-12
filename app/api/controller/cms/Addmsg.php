@@ -21,11 +21,25 @@ class Addmsg extends Base
         if (!$this->request->isPost()) {
             $this->error('留言提交失败，请使用POST方式提交！');
         }
-        $this->request->filter('clean_xss');
+        $this->request->filter('xss_clean');
         $post = $this->request->post();
         // 开启留言
         if (!get_sys_config('message_status')) {
             $this->error(__('%s StatusClose', [__('Message')]));
+        }
+
+        // 提交频率检测 (60秒冷却)
+        $lastsub = session('lastsub');
+        if ($lastsub && (time() - $lastsub) < 60) {
+            $this->error('操作过于频繁，请稍后再试！');
+        }
+
+        // 验证码检测
+        if (get_sys_config('message_check_code')) {
+            $captcha = $this->request->post('captcha');
+            if (!$captcha || !captcha_check($captcha)) {
+                $this->error('验证码错误！');
+            }
         }
 
         // 读取字段

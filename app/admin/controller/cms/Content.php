@@ -93,9 +93,10 @@ class Content extends Base
             }
 
             // 因为date是时间格式 所以要进行处理
-            if ($whereitem[0] == 'content.date') {
+            if ($whereitem[0] == 'content.date' && is_array($whereitem[2])) {
                 foreach ($whereitem[2] as $key => $value) {
-                    $whereitem[2][$key] = date('Y-m-d H:i:s', $value);
+                    // 如果不是数字（即是日期字符串），则尝试转换为时间戳再格式化，或者如果是合法的日期字符串则直接使用
+                    $whereitem[2][$key] = is_numeric($value) ? date('Y-m-d H:i:s', (int)$value) : $value;
                 }
             }
         }

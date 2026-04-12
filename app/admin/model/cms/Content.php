@@ -159,7 +159,7 @@ class Content extends Model
             $value = $value->toArray();
             // 查找扩展内容
             $extdata = Db::name('cms_content_ext')
-                ->where('contentid=' . $value['id'])
+                ->where('contentid', $value['id'])
                 ->find();
 
             // 去除主键并修改栏目

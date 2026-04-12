@@ -23,6 +23,8 @@ class Base extends Backend
      */
     protected array $rules = [];
     protected $noNeedRight = ['changelang'];
+    protected $noNeedToken = []; // 子类中定义的无需令牌验证的方法
+    protected $csrfCheck = true; // 是否开启CSRF校验
 
     public function initialize()
     {
@@ -60,6 +62,12 @@ class Base extends Backend
         $this->assignconfig('acode', $acode);
         $this->assignconfig('alist', $areaList);
         $this->assignconfig('atitle', $currentArea['name']);
+
+        // 自动开启令牌验证 (合并基类默认排除与子类排除列表)
+        $noNeedToken = array_unique(array_merge(['selectpage', 'changelang', 'multi', 'del', 'sortable', 'getFieldHtml', 'getContentSort'], (array)$this->noNeedToken));
+        if ($this->csrfCheck && $this->request->isPost() && !in_array($this->request->action(), $noNeedToken)) {
+            $this->token();
+        }
     }
 
     /**
@@ -198,10 +206,15 @@ class Base extends Backend
             $this->error(__('Parameter %s can not be empty', ['']));
         }
 
-        // 将 null 值转换为空字符串
-        array_walk_recursive($data, function (&$value) {
+        // 将 null 值转换为空字符串，并进行基础安全清洗
+        array_walk_recursive($data, function (&$value, $key) {
             if ($value === null) {
                 $value = '';
+            }
+            // 对非富文本字段（字段名非content/description等）进行基础清洗
+            // 注意：富文本字段建议在具体的控制器中手动调用 xss_clean
+            if (is_string($value) && !in_array($key, ['content', 'description'])) {
+                $value = xss_clean($value);
             }
         });
 

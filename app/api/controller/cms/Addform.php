@@ -21,7 +21,7 @@ class Addform extends Base
         if (!$this->request->isPost()) {
             $this->error('表单提交失败，请使用POST方式提交！');
         }
-        $this->request->filter('clean_xss');
+        $this->request->filter('xss_clean');
         $post = $this->request->post();
 
         // 开启表单

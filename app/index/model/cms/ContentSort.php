@@ -374,7 +374,7 @@ class ContentSort extends Model
         );
         $order = 'a.pcode,a.sorting,a.id desc';
         $sorts = $this->alias('a')
-            ->where("a.acode='" . get_frontend_lang() . "'")
+            ->where('a.acode', get_frontend_lang())
             ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
             ->field($fields)
             ->order($order)
