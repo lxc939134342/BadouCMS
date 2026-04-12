@@ -47,16 +47,21 @@ class Sitemap extends Base
             }
         }
 
-        return response($list, 200, [], 'xml');
+        return response($list, 200, [], 'xml')->options([
+            'root_node' => 'urlset',
+            'item_node' => 'url',
+            'root_attr' => ['xmlns' => 'http://www.sitemaps.org/schemas/sitemap/0.9'],
+            'item_key'  => ''
+        ]);
     }
 
     private function makeNode($link, $date, $priority = 0.60, $changefreq = 'always')
     {
         return [
-            'loc'      => empty($link) ? $this->request->domain() : $this->domainurl(htmlspecialchars($link, ENT_XML1 | ENT_QUOTES, 'UTF-8')),
-            'priority' => $priority,
-            'lastmod' => $date,
-            'changefreq' => $changefreq
+            'loc'        => empty($link) ? $this->request->domain() : $this->domainurl(htmlspecialchars($link, ENT_XML1 | ENT_QUOTES, 'UTF-8')),
+            'lastmod'    => $date,
+            'changefreq' => $changefreq,
+            'priority'   => $priority,
         ];
     }
 
@@ -77,23 +82,21 @@ class Sitemap extends Base
         $sortModel = new ContentSort();
         $contentModel = new Content();
         $sorts = $sortModel->getSortList();
-        $str = "";
+        $str = $this->request->domain() . PHP_EOL; // 根目录
         foreach ($sorts as $value) {
             if ($value['outlink']) {
                 continue;
-            } elseif ($value['type'] == 1) {
-                $str .= $value['link'] . PHP_EOL;
-            } else {
-                $link = $value['link'];
-                $str .= $link . PHP_EOL;
+            }
+
+            $str .= $this->domainurl($value['link']) . PHP_EOL;
+
+            if ($value['type'] != 1) {
                 $contents = $contentModel->getSortContent($value['scode']);
                 foreach ($contents as $value2) {
                     if ($value2['outlink']) { // 外链
                         continue;
-                    } else {
-                        $link = $value2['link'];
                     }
-                    $str .= $link . PHP_EOL;
+                    $str .= $this->domainurl($value2['link']) . PHP_EOL;
                 }
             }
         }
