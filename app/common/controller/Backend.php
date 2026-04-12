@@ -81,6 +81,18 @@ class Backend extends BaseController
     protected $dataLimit = false;
 
     /**
+     * 是否开启令牌验证
+     * @var bool
+     */
+    protected $csrfCheck = true;
+
+    /**
+     * 无需令牌验证的方法
+     * @var array
+     */
+    protected $noNeedToken = [];
+
+    /**
      * 数据限制字段
      */
     protected $dataLimitField = 'admin_id';
@@ -198,6 +210,7 @@ class Backend extends BaseController
             'language'       => $lang,
             'referer'        => Session::get("referer"),
             'app_url'        => $this->request->root(true),
+            'token'          => '',
         ];
         $config = array_merge($config, Config::get("view_replace_str"));
 
@@ -221,6 +234,27 @@ class Backend extends BaseController
 
         //加载当前控制器语言包
         $this->loadlang($controllername, $lang);
+
+        // 自动开启令牌验证 (合并基类默认排除与子类排除列表)
+        $noNeedToken = array_unique(array_merge(['login', 'selectpage', 'changelang', 'index', 'logout', 'wipecache', 'getgrouplist', 'roletree', 'multi'], (array)$this->noNeedToken));
+
+        // 令牌稳定性保护：严禁 GET 请求意外刷新令牌
+        if ($this->request->isGet()) {
+            $token = \think\facade\Session::get('__token__');
+            if (!$token) {
+                // 只有在完全没有令牌时才生成，生成后不再随后的 GET 请求中轮换
+                $token = $this->request->buildToken();
+            }
+        }
+        
+        // 无论何种请求，都确保 Config.token 能获取到当前 Session 中的最新令牌
+        $config['token'] = \think\facade\Session::get('__token__');
+        // 确保前端 Config 和视图变量同步
+        $this->assign('config', $config);
+
+        if ($this->csrfCheck && $this->request->isPost() && !in_array($actionname, $noNeedToken)) {
+            $this->token();
+        }
     }
 
     //加载语言包
@@ -597,14 +631,28 @@ class Backend extends BaseController
 
     protected function token()
     {
-        $check = $this->request->checkToken('__token__');
-        // 刷新token
-        $token = $this->request->buildToken();
-        if ($this->request->isAjax()) {
-            header('__token__: ' . $token);
-        }
-        if (false === $check) {
-            $this->error('令牌错误！', '', ['__token__' => $token]);
+        $tokenName = '__token__';
+        $token = $this->request->param($tokenName);
+        $sessionToken = \think\facade\Session::get($tokenName);
+
+        // 验证令牌是否一致
+        $check = $token && $sessionToken && $token === $sessionToken;
+
+        if ($this->isAjax()) {
+            // AJAX 请求：如果验证通过，不刷新令牌，防止同页面后续操作（如修改后再删除）失效
+            if ($check) {
+                header($tokenName . ': ' . $sessionToken);
+            } else {
+                // 验证失败则刷新并返回新令牌
+                $newToken = $this->request->buildToken();
+                $this->error('令牌错误，请重试~', '', [$tokenName => $newToken]);
+            }
+        } else {
+            // 非 AJAX 请求（普通表单）：强制刷新令牌保证安全性
+            $this->request->buildToken();
+            if (!$check) {
+                $this->error('令牌错误，请重试~');
+            }
         }
     }
 }

@@ -578,6 +578,9 @@ layui.define(
                 var token = xhr.getResponseHeader("__token__");
                 if (token) {
                   $("input[name='__token__']").val(token);
+                  if (typeof Config !== "undefined") Config.token = token;
+                  if (typeof parent !== "undefined" && parent.Config) parent.Config.token = token;
+                  if (typeof top !== "undefined" && top.Config) top.Config.token = token;
                 }
               },
             },
@@ -587,6 +590,9 @@ layui.define(
                 //刷新客户端token
                 if (typeof data.token !== "undefined") {
                   $("input[name='__token__']").val(data.token);
+                  if (typeof Config !== "undefined") Config.token = data.token;
+                  if (typeof parent !== "undefined" && parent.Config) parent.Config.token = data.token;
+                  if (typeof top !== "undefined" && top.Config) top.Config.token = data.token;
                 }
                 //调用客户端事件
                 if (
@@ -603,12 +609,11 @@ layui.define(
               }
             },
             function (data, ret) {
-              if (
-                data &&
-                typeof data === "object" &&
-                typeof data.token !== "undefined"
-              ) {
+              if (data && typeof data === "object" && typeof data.token !== "undefined") {
                 $("input[name='__token__']").val(data.token);
+                if (typeof Config !== "undefined") Config.token = data.token;
+                if (typeof parent !== "undefined" && parent.Config) parent.Config.token = data.token;
+                if (typeof top !== "undefined" && top.Config) top.Config.token = data.token;
               }
               if (typeof error === "function") {
                 if (false === error.call(form, data, ret)) {

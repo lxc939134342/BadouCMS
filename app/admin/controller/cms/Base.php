@@ -23,7 +23,7 @@ class Base extends Backend
      */
     protected array $rules = [];
     protected $noNeedRight = ['changelang'];
-    protected $noNeedToken = []; // 子类中定义的无需令牌验证的方法
+    protected $noNeedToken = ['getFieldHtml', 'getContentSort']; // 子类中定义的无需令牌验证的方法
     protected $csrfCheck = true; // 是否开启CSRF校验
 
     public function initialize()
@@ -62,12 +62,6 @@ class Base extends Backend
         $this->assignconfig('acode', $acode);
         $this->assignconfig('alist', $areaList);
         $this->assignconfig('atitle', $currentArea['name']);
-
-        // 自动开启令牌验证 (合并基类默认排除与子类排除列表)
-        $noNeedToken = array_unique(array_merge(['selectpage', 'changelang', 'multi', 'del', 'sortable', 'getFieldHtml', 'getContentSort'], (array)$this->noNeedToken));
-        if ($this->csrfCheck && $this->request->isPost() && !in_array($this->request->action(), $noNeedToken)) {
-            $this->token();
-        }
     }
 
     /**

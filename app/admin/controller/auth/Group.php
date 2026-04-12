@@ -37,7 +37,8 @@ class Group extends Backend
     protected $groupdata = [];
 
     //无需要权限判断的方法
-    protected $noNeedRight = ['roletree','roletrees'];
+    protected $noNeedRight = ['roletree', 'roletrees'];
+    protected $noNeedToken = ['roletree'];
 
     public function initialize()
     {
@@ -124,7 +125,6 @@ class Group extends Backend
             $this->error();
         }
         return $this->fetch();
-
     }
 
     //编辑管理员用户组
@@ -236,7 +236,6 @@ class Group extends Backend
         if ($count) {
             $this->success();
         }
-
     }
 
     /**

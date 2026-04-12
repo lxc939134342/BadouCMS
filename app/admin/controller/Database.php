@@ -179,7 +179,7 @@ class Database extends Backend
     public function restore()
     {
         if ($this->request->isPost()) {
-            $file = $this->request->request('file');
+            $file = basename($this->request->request('file'));
             if (!preg_match("/\.(zip|sql?)$/", $file)) {
                 $this->error(__("Invalid parameters"));
             }
@@ -274,15 +274,16 @@ class Database extends Backend
         return $this->view->fetch();
     }
 
-    /* 删除备份 */
     public function backupdel()
     {
-        $file = $this->request->request('file');
+        $file = basename($this->request->request('file'));
         if (!preg_match("/\.(zip|sql?)$/", $file)) {
             $this->error(__("Invalid parameters"));
         }
         $file = $this->backupDir . $file;
-        unlink($file);
+        if (is_file($file)) {
+            unlink($file);
+        }
         $this->success(__('Delete successful'));
     }
 }

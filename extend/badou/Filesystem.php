@@ -20,7 +20,7 @@ class Filesystem
      * @param string $dest   目标文件夹
      * @param array  $ignore 忽略列表
      */
-    public static function copyDirs($source, $dest, $ignore = [])
+    public static function copyDirs($source, $dest, $ignore = [], $parentPath = '')
     {
         if (!is_dir($dest)) {
             @mkdir($dest, 0755, true);
@@ -32,7 +32,8 @@ class Filesystem
             ) as $item
         ) {
             $relativePath = $iterator->getSubPathname();
-            if ($ignore && Server::isIgnoreDirs($ignore, $relativePath)) {
+            $checkPath = $parentPath ? $parentPath . '/' . $relativePath : $relativePath;
+            if ($ignore && Server::isIgnoreDirs($ignore, $checkPath)) {
                 continue;
             }
             if ($item->isDir()) {

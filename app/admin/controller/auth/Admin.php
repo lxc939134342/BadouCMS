@@ -34,6 +34,7 @@ class Admin extends Backend
     protected $childrenAdminIds = [];
     //无需要权限判断的方法
     protected $noNeedRight = ['getGroupList'];
+    protected $noNeedToken = ['getGroupList'];
 
 
     public function initialize()
@@ -100,7 +101,6 @@ class Admin extends Backend
     public function add()
     {
         if ($this->request->isPost()) {
-            $this->token();
             $params = $this->request->param('row/a');
             Db::startTrans();
             try {
@@ -144,7 +144,6 @@ class Admin extends Backend
             $this->error('没有权限操作！');
         }
         if ($this->request->isPost()) {
-            $this->token();
             $params = $this->request->param('row/a');
             Db::startTrans();
             try {

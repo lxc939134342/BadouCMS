@@ -267,27 +267,29 @@ class TableManager
             $ct++;
             /** ** ** ** ** **/
             # DATABASE: Count the rows in each tables
-            $count_rows = $db->prepare("SELECT * FROM `" . $table . "`");
+            $safeTable = str_replace('`','``', $table);
+            $count_rows = $db->prepare("SELECT * FROM `" . $safeTable . "`");
             $count_rows->execute();
             $c_rows = $count_rows->columnCount();
             # DATABASE: Count the columns in each tables
-            $count_columns = $db->prepare("SELECT COUNT(*) FROM `" . $table . "`");
+            $count_columns = $db->prepare("SELECT COUNT(*) FROM `" . $safeTable . "`");
             $count_columns->execute();
             $c_columns = $count_columns->fetchColumn();
             /** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** ** **/
 
             # MYSQL DUMP: Remove tables if they exists
             $sqldump .= "--\n";
-            $sqldump .= "-- Table structure for table `" . $tableWithPlaceholder . "`\n";
+            $safeTableWithPlaceholder = str_replace('`','``', $tableWithPlaceholder);
+            $sqldump .= "-- Table structure for table `" . $safeTableWithPlaceholder . "`\n";
             $sqldump .= "--\n\n";
-            $sqldump .= "DROP TABLE IF EXISTS `" . $tableWithPlaceholder . "`;\n\n";
+            $sqldump .= "DROP TABLE IF EXISTS `" . $safeTableWithPlaceholder . "`;\n\n";
             /** ** ** ** ** **/
             # MYSQL DUMP: Create table if they do not exists
             $sqldump .= "--\n";
             $sqldump .= "-- Create the table if it not exists\n";
             $sqldump .= "--\n\n";
             # LOOP: Get the fields for the table
-            foreach ($db->query("SHOW CREATE TABLE `" . $table . "`") as $field) {
+            foreach ($db->query("SHOW CREATE TABLE `" . $safeTable . "`") as $field) {
                 $createSql = $field['Create Table'];
                 if ($prefixPlaceholder && strpos($table, $actualPrefix) === 0) {
                     $createSql = str_replace("CREATE TABLE `{$table}`", "CREATE TABLE `{$tableWithPlaceholder}`", $createSql);
@@ -297,22 +299,22 @@ class TableManager
             # MYSQL DUMP: New rows
             $sqldump .= ";\n\n";
             /** ** ** ** ** **/
-
+ 
             # CHECK: There are one or more columns
             if ($c_columns != 0 && $type != 0) {
                 # MYSQL DUMP: List the data for each table
                 $sqldump .= "--\n";
-                $sqldump .= "-- Dumping data for table `" . $tableWithPlaceholder . "`\n";
+                $sqldump .= "-- Dumping data for table `" . $safeTableWithPlaceholder . "`\n";
                 $sqldump .= "--\n\n";
-
+ 
                 # MYSQL DUMP: Insert into each table
-                $sqldump .= "INSERT INTO `" . $tableWithPlaceholder . "` (";
+                $sqldump .= "INSERT INTO `" . $safeTableWithPlaceholder . "` (";
                 # ARRAY
                 $rows = [];
                 $numeric = [];
                 # LOOP: Get the tables
-                foreach ($db->query("DESCRIBE `" . $table . "`") as $row) {
-                    $rows[] = "`" . $row[0] . "`";
+                foreach ($db->query("DESCRIBE `" . $safeTable . "`") as $row) {
+                    $rows[] = "`" . str_replace('`','``', $row[0]) . "`";
                     $numeric[] = (bool) preg_match('#^[^(]*(BYTE|COUNTER|SERIAL|INT|LONG$|CURRENCY|REAL|MONEY|FLOAT|DOUBLE|DECIMAL|NUMERIC|NUMBER)#i', $row[1]);
                 }
                 $sqldump .= implode(', ', $rows);
@@ -320,7 +322,7 @@ class TableManager
                 # COUNT
                 $c = 0;
                 # LOOP: Get the tables
-                foreach ($db->query("SELECT * FROM `" . $table . "`") as $data) {
+                foreach ($db->query("SELECT * FROM `" . $safeTable . "`") as $data) {
                     # COUNT
                     $c++;
                     /** ** ** ** ** **/
