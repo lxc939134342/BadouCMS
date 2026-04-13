@@ -30,9 +30,19 @@ class Content extends Model
 
     public function getContentAttr($value): string
     {
+        if (!$value) {
+            return '';
+        }
+
         $value = replace_keyword($value);
-        /* 替换富文本中的图片域名 */
-        return !$value ? '' : html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        // 移除危险的事件属性和 script 标签
+        $value = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $value);
+        $value = preg_replace('/\s(on\w+)\s*=\s*["\']?[^"\']*["\']?/i', '', $value);
+        $value = preg_replace('/javascript:/i', '', $value);
+
+        return $value;
     }
 
     public function getIcoAttr($value, $data)
@@ -93,9 +103,25 @@ class Content extends Model
 
     public function getEnclosureSizeAttr($value, $data)
     {
-        if ($data['enclosure'] && file_exists(public_path() . $data['enclosure'])) {
-            return filesize(public_path() . $data['enclosure']);
+        if (empty($data['enclosure'])) {
+            return '';
         }
+
+        // 移除路径穿越字符
+        $enclosure = str_replace(['../', '..\\', '..'], '', $data['enclosure']);
+
+        // 构建完整路径
+        $fullPath = public_path() . $enclosure;
+
+        // 使用 realpath 获取真实路径
+        $realPath = realpath($fullPath);
+        $publicPath = realpath(public_path());
+
+        // 验证文件必须在 public 目录内
+        if ($realPath && $publicPath && strpos($realPath, $publicPath) === 0 && file_exists($realPath)) {
+            return filesize($realPath);
+        }
+
         return '';
     }
 
@@ -125,6 +151,31 @@ class Content extends Model
         $cacheKey = $cache > -1 ? "cms-taglib-{$type}-" . md5(serialize($tag)) : false;
         $cacheExpire = $cache > -1 ? $cache : null;
         return [$cacheKey, $cacheExpire];
+    }
+
+    /**
+     * 获取 cms_content 表的所有字段（用于白名单验证）
+     * @return array
+     */
+    protected static function getAllowedFields()
+    {
+        static $fields = null;
+
+        if ($fields === null) {
+            try {
+                // 获取 cms_content 表的所有字段
+                $columns = Db::query("SHOW COLUMNS FROM " . config('database.connections.mysql.prefix') . "cms_content");
+                $fields = array_column($columns, 'Field');
+            } catch (\Exception $e) {
+                // 如果查询失败，使用默认白名单
+                $fields = ['id', 'title', 'author', 'source', 'keywords', 'description', 'content',
+                          'ico', 'pics', 'date', 'istop', 'isrecommend', 'isheadline', 'visits',
+                          'likes', 'oppose', 'status', 'outlink', 'type', 'scode', 'subscode',
+                          'filename', 'urlname', 'create_time', 'update_time', 'sorting', 'enclosure'];
+            }
+        }
+
+        return $fields;
     }
 
     // 内容详情页图片
@@ -460,16 +511,39 @@ class Content extends Model
                             break;
                         default:
                             if ($value) {
+                                // 白名单：从数据库动态获取允许的排序字段
+                                $allowedFields = self::getAllowedFields();
+                                $allowedDirections = ['ASC', 'DESC', 'asc', 'desc'];
+
                                 $orders = explode(',', $value);
-                                foreach ($orders as $k => $v) {
-                                    if (strpos($v, 'ext_') === 0) {
-                                        $orders[$k] = 'e.' . $v;
-                                    } else {
-                                        $orders[$k] = 'a.' . $v;
+                                $validOrders = [];
+
+                                foreach ($orders as $v) {
+                                    $v = trim($v);
+                                    // 分离字段名和排序方向
+                                    $parts = preg_split('/\s+/', $v);
+                                    $field = $parts[0];
+                                    $direction = strtoupper($parts[1] ?? 'DESC');
+
+                                    // 验证排序方向
+                                    if (!in_array($direction, $allowedDirections)) {
+                                        $direction = 'DESC';
+                                    }
+
+                                    // 处理扩展字段 ext_
+                                    if (strpos($field, 'ext_') === 0) {
+                                        $fieldName = substr($field, 4); // 移除 ext_ 前缀
+                                        if (preg_match('/^[a-zA-Z0-9_]+$/', $fieldName)) {
+                                            $validOrders[] = 'e.' . $field . ' ' . $direction;
+                                        }
+                                    } elseif (in_array($field, $allowedFields)) {
+                                        $validOrders[] = 'a.' . $field . ' ' . $direction;
                                     }
                                 }
-                                $value = implode(',', $orders);
-                                $order = $value . ',a.istop DESC,a.isrecommend DESC,a.isheadline DESC,a.sorting ASC,a.date DESC,a.id DESC';
+
+                                if (!empty($validOrders)) {
+                                    $order = implode(',', $validOrders) . ',a.istop DESC,a.isrecommend DESC,a.isheadline DESC,a.sorting ASC,a.date DESC,a.id DESC';
+                                }
                             }
                     }
                     break;
@@ -546,10 +620,22 @@ class Content extends Model
             $lfield .= ',id,outlink,type,scode,sortfilename,filename,urlname'; // 附加必须字段
             $fields = explode(',', $lfield);
             $fields = array_unique($fields); // 去重
+
+            // 白名单：从数据库动态获取允许的字段
+            $allowedFields = self::getAllowedFields();
+
             foreach ($fields as $key => $value) {
+                $value = trim($value);
+
                 if (strpos($value, 'ext_') === 0) {
-                    $ext_table = true;
-                    $fields[$key] = 'e.' . $value;
+                    // 扩展字段：验证字段名格式
+                    $extFieldName = substr($value, 4);
+                    if (preg_match('/^[a-zA-Z0-9_]+$/', $extFieldName)) {
+                        $ext_table = true;
+                        $fields[$key] = 'e.' . $value;
+                    } else {
+                        unset($fields[$key]); // 非法字段移除
+                    }
                 } elseif ($value == 'sortname') {
                     $fields[$key] = 'b.name as sortname';
                 } elseif ($value == 'sortfilename') {
@@ -562,8 +648,10 @@ class Content extends Model
                     $fields[$key] = 'd.' . $value;
                 } elseif ($value == 'modelname') {
                     $fields[$key] = 'd.name as modelname';
-                } else {
+                } elseif (in_array($value, $allowedFields)) {
                     $fields[$key] = 'a.' . $value;
+                } else {
+                    unset($fields[$key]); // 非白名单字段移除
                 }
             }
         } else {
@@ -815,16 +903,39 @@ class Content extends Model
                             break;
                         default:
                             if ($value) {
+                                // 白名单：从数据库动态获取允许的排序字段
+                                $allowedFields = self::getAllowedFields();
+                                $allowedDirections = ['ASC', 'DESC', 'asc', 'desc'];
+
                                 $orders = explode(',', $value);
-                                foreach ($orders as $k => $v) {
-                                    if (strpos($v, 'ext_') === 0) {
-                                        $orders[$k] = 'e.' . $v;
-                                    } else {
-                                        $orders[$k] = 'a.' . $v;
+                                $validOrders = [];
+
+                                foreach ($orders as $v) {
+                                    $v = trim($v);
+                                    // 分离字段名和排序方向
+                                    $parts = preg_split('/\s+/', $v);
+                                    $field = $parts[0];
+                                    $direction = strtoupper($parts[1] ?? 'DESC');
+
+                                    // 验证排序方向
+                                    if (!in_array($direction, $allowedDirections)) {
+                                        $direction = 'DESC';
+                                    }
+
+                                    // 处理扩展字段 ext_
+                                    if (strpos($field, 'ext_') === 0) {
+                                        $fieldName = substr($field, 4); // 移除 ext_ 前缀
+                                        if (preg_match('/^[a-zA-Z0-9_]+$/', $fieldName)) {
+                                            $validOrders[] = 'e.' . $field . ' ' . $direction;
+                                        }
+                                    } elseif (in_array($field, $allowedFields)) {
+                                        $validOrders[] = 'a.' . $field . ' ' . $direction;
                                     }
                                 }
-                                $value = implode(',', $orders);
-                                $order = $value . ',a.istop DESC,a.isrecommend DESC,a.isheadline DESC,a.sorting ASC,a.date DESC,a.id DESC';
+
+                                if (!empty($validOrders)) {
+                                    $order = implode(',', $validOrders) . ',a.istop DESC,a.isrecommend DESC,a.isheadline DESC,a.sorting ASC,a.date DESC,a.id DESC';
+                                }
                             }
                     }
                     break;
@@ -886,10 +997,22 @@ class Content extends Model
             $lfield .= ',id,outlink,type,scode,sortfilename,filename,urlname'; // 附加必须字段
             $fields = explode(',', $lfield);
             $fields = array_unique($fields); // 去重
+
+            // 白名单：从数据库动态获取允许的字段
+            $allowedFields = self::getAllowedFields();
+
             foreach ($fields as $key => $value) {
+                $value = trim($value);
+
                 if (strpos($value, 'ext_') === 0) {
-                    $ext_table = true;
-                    $fields[$key] = 'e.' . $value;
+                    // 扩展字段：验证字段名格式
+                    $extFieldName = substr($value, 4);
+                    if (preg_match('/^[a-zA-Z0-9_]+$/', $extFieldName)) {
+                        $ext_table = true;
+                        $fields[$key] = 'e.' . $value;
+                    } else {
+                        unset($fields[$key]); // 非法字段移除
+                    }
                 } elseif ($value == 'sortname') {
                     $fields[$key] = 'b.name as sortname';
                 } elseif ($value == 'sortfilename') {
@@ -902,8 +1025,10 @@ class Content extends Model
                     $fields[$key] = 'd.' . $value;
                 } elseif ($value == 'modelname') {
                     $fields[$key] = 'd.name as modelname';
-                } else {
+                } elseif (in_array($value, $allowedFields)) {
                     $fields[$key] = 'a.' . $value;
+                } else {
+                    unset($fields[$key]); // 非白名单字段移除
                 }
             }
         } else {
@@ -992,19 +1117,21 @@ class Content extends Model
         /* 任意搜索字段 */
         /* 排除字段 */
         $exclude = ['page', 'start', 'lfield', 'keyword', 'fuzzy', 'scode', 'lg', 'searchtpl', 'field', 'num'];
+        // 白名单：从数据库动态获取允许搜索的字段
+        $allowedSearchFields = self::getAllowedFields();
+
         foreach (request()->param() as $key => $value) {
             if (in_array($key, $exclude)) {
                 continue;
             }
             if (!!$value = request()->param($key)) {
-                if ($key == 'title') {
-                    $key = 'a.title';
-                }
-                if (preg_match('/^[\w\-\.]+$/', $key)) { // 带有违规字符时不带入查询
+                // 严格白名单验证
+                if (in_array($key, $allowedSearchFields)) {
+                    $fieldName = ($key == 'title') ? 'a.title' : 'a.' . $key;
                     if ($params['fuzzy']) {
-                        $where[] = [$key, 'like', '%' . $value . '%'];
+                        $where[] = [$fieldName, 'like', '%' . $value . '%'];
                     } else {
-                        $where[] = [$key, '=', $value];
+                        $where[] = [$fieldName, '=', $value];
                     }
                 }
             }

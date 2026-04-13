@@ -57,10 +57,13 @@ class MemberComment extends Model
             return '';
         }
 
-        // 多重解码，处理可能多次编码的情况
+        // 解码一次，恢复正常文本
         $comment = $data['comment'];
         $comment = html_entity_decode($comment, ENT_QUOTES, 'UTF-8');
-        $comment = htmlspecialchars_decode($comment, ENT_QUOTES);
+
+        // 使用 strip_tags 移除所有 HTML 标签，保留纯文本和符号
+        // 这样既能显示 & < > 等符号，又能防止 <script> 执行
+        $comment = strip_tags($comment);
 
         return $comment;
     }

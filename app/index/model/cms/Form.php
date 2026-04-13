@@ -53,7 +53,29 @@ class Form extends Model
     public function addTableData($fcode, $data)
     {
         $table_name = $this->where('fcode', $fcode)->value('table_name');
-        return Db::name($table_name)->insert($data) > 0 ? true : false;
+
+        // 获取该表单允许的字段列表（白名单）
+        $allowedFields = Db::name('cms_form_field')
+            ->where('fcode', $fcode)
+            ->column('name');
+
+        if (empty($allowedFields)) {
+            return false;
+        }
+
+        // 只保留白名单中的字段
+        $filteredData = [];
+        foreach ($data as $key => $value) {
+            if (in_array($key, $allowedFields)) {
+                $filteredData[$key] = $value;
+            }
+        }
+
+        // 添加系统字段
+        $filteredData['create_time'] = time();
+        $filteredData['acode'] = get_frontend_lang();
+
+        return Db::name($table_name)->insert($filteredData) > 0 ? true : false;
     }
 
     // 获取表单列表

@@ -207,8 +207,21 @@ class Bd extends TagLib
     /* 轮播图 */
     public function tagSlide($tag, $content): string
     {
-        $gid = $tag['gid'] ?? 0;
-        $num = $tag['num'] ?? 5;
+        $gid = $tag['gid'] ?? '0';
+        $this->autoBuildVar($gid);
+
+        // 如果不是变量，进行安全处理
+        if (!$this->isVar($gid)) {
+            // 如果是纯数字，转为整数
+            if (is_numeric($gid)) {
+                $gid = intval($gid);
+            } else {
+                // 如果是字符串，用引号包裹并转义
+                $gid = '"' . addslashes($gid) . '"';
+            }
+        }
+
+        $num = intval($tag['num'] ?? 5);
         $alias      = $tag['alias'] ?? 'slide';
         $empty   = $tag['empty'] ?? '';
         $key     = !empty($tag['key']) ? $tag['key'] : 'i';
@@ -226,8 +239,21 @@ class Bd extends TagLib
     /* 友情链接 */
     public function tagLink($tag, $content): string
     {
-        $gid = $tag['gid'] ?? 0;
-        $num = $tag['num'] ?? 10;
+        $gid = $tag['gid'] ?? '0';
+        $this->autoBuildVar($gid);
+
+        // 如果不是变量，进行安全处理
+        if (!$this->isVar($gid)) {
+            // 如果是纯数字，转为整数
+            if (is_numeric($gid)) {
+                $gid = intval($gid);
+            } else {
+                // 如果是字符串，用引号包裹并转义
+                $gid = '"' . addslashes($gid) . '"';
+            }
+        }
+
+        $num = intval($tag['num'] ?? 10);
         $alias      = $tag['alias'] ?? 'link';
         $empty   = $tag['empty'] ?? '';
         $key     = !empty($tag['key']) ? $tag['key'] : 'i';
@@ -245,10 +271,10 @@ class Bd extends TagLib
     /* 面包屑 */
     public function tagPosition($tag, $content): string
     {
-        $separator = $tag['separator'] ?? '>>';
-        $separatoricon = $tag['separatoricon'] ?? '';
-        $indextext = $tag['indextext'] ?? null;
-        $indexicon = $tag['indexicon'] ?? '';
+        $separator     = addslashes($tag['separator'] ?? '>>');
+        $separatoricon = addslashes($tag['separatoricon'] ?? '');
+        $indextext     = addslashes($tag['indextext'] ?? '');
+        $indexicon     = addslashes($tag['indexicon'] ?? '');
         $params = [
             "'scode'=>\$sort['scode']",
             "'separator'=>'{$separator}'",
@@ -327,8 +353,25 @@ class Bd extends TagLib
         ];
         isset($tag['num']) ? $params[] = '"num"=>' . $tag['num'] : '';
 
-        $tags ? $params[] = '"tags"=>' . $tags : '';
-        $filter ? $params[] = '"filter"=>' . $filter : '';
+        if ($tags) {
+            $params[] = '"tags"=>"' . $tags . '"';
+        }
+
+        if ($filter) {
+            if (strpos($filter, '|') !== false) {
+                list($field, $value) = explode('|', $filter, 2);
+                $this->autoBuildVar($value);
+                if ($this->isVar($value)) {
+                    $filter = '"' . $field . '|".' . $value;
+                } else {
+                    $filter = '"' . $field . '|' . $value . '"';
+                }
+            } else {
+                $this->autoBuildVar($filter);
+            }
+            $params[] = '"filter"=>' . $filter;
+        }
+
         $order ? $params[] = '"order"=>"' . $order . '"' : '';
 
         $var     = Random::build('alnum', 10);
@@ -454,6 +497,7 @@ class Bd extends TagLib
     public function tagForm($tag, $content): string
     {
         $fcode = $tag['fcode'];
+        $this->autoBuildVar($fcode);
         $parse   = '<?php ';
         $parse  .= 'echo (new \app\index\model\cms\Form())->getFormLink(' . $fcode . ');';
         $parse  .= ' ?>';
@@ -469,6 +513,7 @@ class Bd extends TagLib
     public function tagFormlist($tag, $content): string
     {
         $fcode = $tag['fcode'];
+        $this->autoBuildVar($fcode);
         $alias    = $tag['alias'] ?? 'form';
         $empty = $tag['empty'] ?? __('No Data');
         $key   = !empty($tag['key']) ? $tag['key'] : 'i';
@@ -542,7 +587,7 @@ class Bd extends TagLib
     {
         $string = $tag['string'] ?? '""';
         $string = $this->autoBuildVar($string);
-        $parse   = '<?php echo \'<img src="' . request()->domain(true) . '/api/cms.qrcode/index?string=\'.' . $string . '.\'" class="qrcode" alt="二维码">\'; ?>';
+        $parse   = '<?php echo \'<img src="' . request()->domain(true) . '/api/cms.qrcode/index?string=\'.urlencode(' . $string . ').\'\" class="qrcode" alt="二维码">\'; ?>';
         return $parse;
     }
 
@@ -552,8 +597,16 @@ class Bd extends TagLib
      */
     public function tagLoop($tag, $content): string
     {
-        $start = $tag['start'] ?? 1;
-        $end = $tag['end'] ?? 0;
+        $start = $tag['start'] ?? '1';
+        $end   = $tag['end'] ?? '0';
+        $this->autoBuildVar($start);
+        $this->autoBuildVar($end);
+        if (!$this->isVar($start)) {
+            $start = intval($start);
+        }
+        if (!$this->isVar($end)) {
+            $end = intval($end);
+        }
         $parse = '<?php ';
         $parse .= '$loop = ["i"=>0, "index"=>1];';
         $parse .= 'for($i=' . $start . '; $i<=' . $end . '; $i++):';
@@ -597,9 +650,12 @@ class Bd extends TagLib
         }
         $default_filter = $this->tpl->getConfig('default_filter');
         $this->tpl->config(['default_filter' => '']);
-        $this->tpl->parseVar($name);
-        $this->tpl->parseVarFunction($name);
-        $this->tpl->config(['default_filter' => $default_filter]);
+        try {
+            $this->tpl->parseVar($name);
+            $this->tpl->parseVarFunction($name);
+        } finally {
+            $this->tpl->config(['default_filter' => $default_filter]);
+        }
         return $name;
     }
 
