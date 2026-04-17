@@ -601,16 +601,16 @@ function preg_replace_r($search, $replace, $subject)
 // 获取字符串型自动编码
 function get_auto_code($string, $start = '1')
 {
-    if (! $string) {
+    if (!$string) {
         return $start;
     }
     if (is_numeric($string)) { // 如果纯数字则直接加1
-        return sprintf('%0' . strlen($string) . 's', $string + 1);
+        return sprintf('%0' . strlen($string) . 's', $string + $start);
     } else { // 非纯数字则先分拆
         $reg = '/^([a-zA-Z-_]+)([0-9]+)$/';
         $str = preg_replace($reg, '$1', $string); // 字母部分
         $num = preg_replace($reg, '$2', $string); // 数字部分
-        return $str . sprintf('%0' . (strlen($string) - strlen($str)) . 's', $num + 1);
+        return $str . sprintf('%0' . (strlen($string) - strlen($str)) . 's', $num + $start);
     }
 }
 
@@ -690,39 +690,39 @@ function bdurl($type, $urlname, $pagetype, $scode, $sortfilename, $id = '', $con
     $url_break_char = '_';
     $url_rule_content_path = false;
     /* url模型 0去掉后缀 1携带.html后缀 */
-    $url_type=get_sys_config('url_type')==1 ?true:false;
+    $url_type = get_sys_config('url_type') == 1 ? true : false;
 
     if ($type == 1 || $pagetype == 'about') {
         $urlname = $urlname ?: 'about';
         if ($sortfilename) {
-            $link = url('/'.$sortfilename,[],$url_type);
+            $link = url('/' . $sortfilename, [], $url_type);
         } else {
-            $link = url('/'.$urlname . $url_break_char . $scode,[],$url_type);
+            $link = url('/' . $urlname . $url_break_char . $scode, [], $url_type);
         }
     } else {
         $urlname = $urlname ?: 'list';
         if ($pagetype == 'list') {
             if ($sortfilename) {
-                $link = url('/'.$sortfilename,[],$url_type);
+                $link = url('/' . $sortfilename, [], $url_type);
             } else {
-                $link = url('/'.$urlname . $url_break_char . $scode,[],$url_type);
+                $link = url('/' . $urlname . $url_break_char . $scode, [], $url_type);
             }
         } elseif ($pagetype == 'content') {
             if ($url_rule_content_path) {
                 if ($contentfilename) {
-                    $link = url('/'.$contentfilename, [], $url_type);
+                    $link = url('/' . $contentfilename, [], $url_type);
                 } else {
-                    $link = url('/'.$id, [], $url_type);
+                    $link = url('/' . $id, [], $url_type);
                 }
             } else {
                 if ($sortfilename && $contentfilename) {
-                    $link = url('/'.$sortfilename . '/' . $contentfilename, [], $url_type);
+                    $link = url('/' . $sortfilename . '/' . $contentfilename, [], $url_type);
                 } elseif ($sortfilename) {
-                    $link = url('/'.$sortfilename . '/' . $id, [], $url_type);
+                    $link = url('/' . $sortfilename . '/' . $id, [], $url_type);
                 } elseif ($contentfilename) {
-                    $link = url('/'.$urlname . $url_break_char . $scode . '/' . $contentfilename, [], $url_type);
+                    $link = url('/' . $urlname . $url_break_char . $scode . '/' . $contentfilename, [], $url_type);
                 } else {
-                    $link = url('/'.$urlname . $url_break_char . $scode . '/' . $id, [], $url_type);
+                    $link = url('/' . $urlname . $url_break_char . $scode . '/' . $id, [], $url_type);
                 }
             }
         } else {
@@ -750,7 +750,7 @@ function resize_img(string|null $src_image, int $max_width = 0, int $max_height 
     /* 原图片物理路径 */
     $src_image_path = public_path() . $src_image;
 
-    $out_file = dirname($src_image).DIRECTORY_SEPARATOR.'mw' . $max_width . '_mh' . $max_height . '_' . basename($src_image);
+    $out_file = dirname($src_image) . DIRECTORY_SEPARATOR . 'mw' . $max_width . '_mh' . $max_height . '_' . basename($src_image);
     /* 输出物理路径 */
     $max_out_file = public_path() . $out_file;
 
