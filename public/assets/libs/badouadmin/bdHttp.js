@@ -80,6 +80,11 @@ layui.define(["toast"], function (exports) {
               }
               ret = bdHttp.events.onAjaxResponse(ret);
               if (ret.code === 1) {
+                // 运行全局钩子
+                var hookName = options.hook || (typeof options.url === 'string' ? options.url.replace(/\//g, '.') : null);
+                if (hookName && layui.badou && layui.badou.hooks) {
+                  layui.badou.hooks.run(hookName, ret.data);
+                }
                 bdHttp.events.onAjaxSuccess(ret, success);
               } else {
                 bdHttp.events.onAjaxError(ret, error);
