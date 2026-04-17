@@ -645,7 +645,13 @@ class Backend extends BaseController
             } else {
                 // 验证失败则刷新并返回新令牌
                 $newToken = $this->request->buildToken();
-                $this->error('令牌错误，请重试~', '', [$tokenName => $newToken]);
+                // 同时在响应头和返回数据中提供新令牌，确保前端能够捕获并更新
+                $this->error('令牌错误，请重试~', '', [
+                    $tokenName => $newToken,
+                    'token'    => $newToken
+                ], 3, [
+                    $tokenName => $newToken
+                ]);
             }
         } else {
             // 非 AJAX 请求（普通表单）：强制刷新令牌保证安全性

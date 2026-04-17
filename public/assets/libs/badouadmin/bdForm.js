@@ -577,7 +577,7 @@ layui.define(
               complete: function (xhr) {
                 var token = xhr.getResponseHeader("__token__");
                 if (token) {
-                  $("input[name='__token__']").val(token);
+                  $("input[name='__token__'],input[name='token']").val(token);
                   if (typeof Config !== "undefined") Config.token = token;
                   if (typeof parent !== "undefined" && parent.Config) parent.Config.token = token;
                   if (typeof top !== "undefined" && top.Config) top.Config.token = token;
@@ -589,7 +589,7 @@ layui.define(
               if (data && typeof data === "object") {
                 //刷新客户端token
                 if (typeof data.token !== "undefined") {
-                  $("input[name='__token__']").val(data.token);
+                    $("input[name='__token__'],input[name='token']").val(data.token);
                   if (typeof Config !== "undefined") Config.token = data.token;
                   if (typeof parent !== "undefined" && parent.Config) parent.Config.token = data.token;
                   if (typeof top !== "undefined" && top.Config) top.Config.token = data.token;
@@ -610,7 +610,7 @@ layui.define(
             },
             function (data, ret) {
               if (data && typeof data === "object" && typeof data.token !== "undefined") {
-                $("input[name='__token__']").val(data.token);
+                $("input[name='__token__'],input[name='token']").val(data.token);
                 if (typeof Config !== "undefined") Config.token = data.token;
                 if (typeof parent !== "undefined" && parent.Config) parent.Config.token = data.token;
                 if (typeof top !== "undefined" && top.Config) top.Config.token = data.token;
