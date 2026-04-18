@@ -1,99 +1,154 @@
 {layout name="layout/form" /}
 <form class="layui-form" method="post">
-    {:token_field()}
-    <div class="layui-row layui-col-space20">
-        <div class="layui-col-xs12">
-            <div class="layui-form-item">
-                <label class="layui-form-label">父栏目</label>
-                <div class="layui-input-block">
-                    <input type="hidden" id="c-pcode" name="row[pcode]" class="layui-input" value="0" />
-                    <div class="remoteSelect" id="remoteSelect-pcode"       data-input-id="c-pcode" data-field="name"
-                        data-primary-key="scode"
-                        data-is-tree="true" data-pidname="pcode" data-params='{"acode":"{$acode}"}'
-                        data-source="cms.content_sort/selectpage"></div>
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">栏目名称</label>
-                <div class="layui-input-block">
-                    <input type="text" name="row[name]" lay-verify="required" autocomplete="off" placeholder="多个栏目请用逗号隔开"
-                        class="layui-input" />
-                </div>
-            </div>
+  {:token_field()}
+  <div class="layui-row layui-col-space20">
+    <div class="layui-col-xs12">
+      {if isset($view_hooks.main_top)}{$view_hooks.main_top|raw}{/if}
 
-            <div class="layui-form-item">
-                <label class="layui-form-label">模型</label>
-                <div class="layui-input-block">
-                    <select name="row[mcode]" id="c-mcode" class="layui-select" lay-search="" lay-verify="required">
-                        <option value="">请选择</option>
-                        {foreach $models as $model}
-                        <option value="{$model.mcode}">{$model.name}</option>
-                        {/foreach}
-                    </select>
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">列表页模板</label>
-                <div class="layui-input-block">
-                    <select name="row[listtpl]" id="c-listtpl" class="layui-select" lay-search="">
-                        <option value="">请选择</option>
-                        {foreach $tpls as $tpl}
-                        <option >{$tpl.name}</option>
-                        {/foreach}
-                    </select>
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">详情页模板</label>
-                <div class="layui-input-block">
-                    <select name="row[contenttpl]" id="c-contenttpl" class="layui-select" lay-search="">
-                        <option value="">请选择</option>
-                        {foreach $tpls as $tpl }
-                        <option >{$tpl.name}</option>
-                        {/foreach}
-                    </select>
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">状态</label>
-                <div class="layui-input-block">
-                    <input type="radio" name="row[status]" value="1" title="显示" checked>
-                    <input type="radio" name="row[status]" value="0" title="隐藏">
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <div class="layui-form-item layer-footer hide">
+      <div class="layui-form-item">
+        <label class="layui-form-label">父栏目</label>
         <div class="layui-input-block">
-            <button class="layui-btn pear-btn-primary layui-btn-sm disabled" lay-submit>保存</button>
-            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
+          <input
+            type="hidden"
+            id="c-pcode"
+            name="row[pcode]"
+            class="layui-input"
+            value="0"
+          />
+          <div
+            class="remoteSelect"
+            id="remoteSelect-pcode"
+            data-input-id="c-pcode"
+            data-field="name"
+            data-primary-key="scode"
+            data-is-tree="true"
+            data-pidname="pcode"
+            data-params='{"acode":"{$acode}"}'
+            data-source="cms.content_sort/selectpage"
+          ></div>
         </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">栏目名称</label>
+        <div class="layui-input-block">
+          <input
+            type="text"
+            name="row[name]"
+            lay-verify="required"
+            autocomplete="off"
+            placeholder="多个栏目请用逗号隔开"
+            class="layui-input"
+          />
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">模型</label>
+        <div class="layui-input-block">
+          <select
+            name="row[mcode]"
+            id="c-mcode"
+            class="layui-select"
+            lay-search=""
+            lay-verify="required"
+          >
+            <option value="">请选择</option>
+            {foreach $models as $model}
+            <option value="{$model.mcode}">{$model.name}</option>
+            {/foreach}
+          </select>
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">列表页模板</label>
+        <div class="layui-input-block">
+          <select
+            name="row[listtpl]"
+            id="c-listtpl"
+            class="layui-select"
+            lay-search=""
+          >
+            <option value="">请选择</option>
+            {foreach $tpls as $tpl}
+            <option>{$tpl.name}</option>
+            {/foreach}
+          </select>
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">详情页模板</label>
+        <div class="layui-input-block">
+          <select
+            name="row[contenttpl]"
+            id="c-contenttpl"
+            class="layui-select"
+            lay-search=""
+          >
+            <option value="">请选择</option>
+            {foreach $tpls as $tpl }
+            <option>{$tpl.name}</option>
+            {/foreach}
+          </select>
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+          <input
+            type="radio"
+            name="row[status]"
+            value="1"
+            title="显示"
+            checked
+          />
+          <input type="radio" name="row[status]" value="0" title="隐藏" />
+        </div>
+      </div>
     </div>
+    {if isset($view_hooks.main_bottom)}{$view_hooks.main_bottom|raw}{/if}
+  </div>
+  <div class="layui-form-item layer-footer hide">
+    <div class="layui-input-block">
+      <button
+        class="layui-btn pear-btn-primary layui-btn-sm disabled"
+        lay-submit
+      >
+        保存
+      </button>
+      <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">
+        重置
+      </button>
+    </div>
+  </div>
+  {if isset($view_hooks.footer)}{$view_hooks.footer|raw}{/if}
 </form>
 
 <script>
-    layui.use(['badou'], function () {
-        var bdForm = layui.bdForm;
-        var form = layui.form;
-        bdForm.api.bindevent($("form.layui-form"));
+  layui.use(["badou"], function () {
+    var bdForm = layui.bdForm;
+    var form = layui.form;
+    bdForm.api.bindevent($("form.layui-form"));
 
-        form.on('select', function(data){
-            if(data.elem.id === 'c-mcode'){
-                var mcode = data.value;
-                if (!mcode || !Config.models) return;
+    form.on("select", function (data) {
+      if (data.elem.id === "c-mcode") {
+        var mcode = data.value;
+        if (!mcode || !Config.models) return;
 
-                var model = Config.models.find(function (m) { return m.mcode == mcode; });
-                if (model) {
-                    $("#c-listtpl").val(model.listtpl);
-                    $("#c-contenttpl").val(model.contenttpl);
-                    // 重新渲染 select
-                    form.render("select");
-                }
-            }
+        var model = Config.models.find(function (m) {
+          return m.mcode == mcode;
         });
+        if (model) {
+          $("#c-listtpl").val(model.listtpl);
+          $("#c-contenttpl").val(model.contenttpl);
+          // 重新渲染 select
+          form.render("select");
+        }
+      }
     });
+    /* prettier-ignore */
+    {if isset($view_hooks.scripts)}{$view_hooks.scripts|raw}{/if}
+  });
 </script>

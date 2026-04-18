@@ -18,6 +18,7 @@ use badou\Tree;
 use think\facade\Db;
 use badou\Filesystem;
 use app\admin\model\cms\Models;
+use badou\EventContext;
 
 /**
  * 栏目管理
@@ -61,6 +62,7 @@ class ContentSort extends Base
     public function index()
     {
         if (!$this->isAjax()) {
+            $this->assignHook('index');
             return $this->view->fetch();
         }
 
@@ -88,6 +90,47 @@ class ContentSort extends Base
         $list = $this->tree->init($res, 'pcode', null, 'scode')->multipleChild();
 
         $this->result('', $list);
+    }
+
+    /**
+     * 删除
+     * @throws Throwable
+     */
+    public function del()
+    {
+        $where             = [];
+        $dataLimitAdminIds = $this->getDataLimitAdminIds();
+        if ($dataLimitAdminIds) {
+            $where[] = [$this->dataLimitField, 'in', $dataLimitAdminIds];
+        }
+
+        $ids = $this->request->param('ids');
+        
+        // 触发观察者 - 删除前
+        $res = $this->triggerObserver('BeforeDel', $ids, $this);
+        if (is_array($res)) {
+            $ids = $res;
+        }
+
+        $where[] = [$this->pk, 'in', $ids];
+        $data    = $this->model->where($where)->select();
+
+        $count = 0;
+        $this->model->startTrans();
+        try {
+            foreach ($data as $v) {
+                $count += $v->delete();
+            }
+            $this->model->commit();
+        } catch (Throwable $e) {
+            $this->model->rollback();
+            $this->error($e->getMessage());
+        }
+        if ($count) {
+            $this->success(__('Delete successful'));
+        } else {
+            $this->error(__('No rows were deleted'));
+        }
     }
 
     /**
@@ -120,11 +163,24 @@ class ContentSort extends Base
      */
     public function add()
     {
+        if (!$this->isAjax()) {
+            $this->assignHook('add', ['main_top', 'main_mid', 'main_bottom', 'side_top', 'side_bottom', 'footer', 'scripts'], []);
+            return $this->view->fetch();
+        }
+
         if ($this->request->isPost()) {
             $data = $this->getPostData('row/a');
             $result = false;
             $this->model->startTrans();
             try {
+                // 触发观察者 - 添加前
+                $context = new EventContext($data);
+                $this->triggerObserver('BeforeAdd', $context, $this);
+                if ($context->isIntercepted()) {
+                    $this->error($context->getMessage());
+                }
+                $data = $context->getData();
+
                 // 模型验证
                 $this->modelValidateFunction($data);
                 $lastcode = $this->model->getLastCode();
@@ -159,6 +215,9 @@ class ContentSort extends Base
                 $data = array_merge($default, $data);
 
                 $result = $this->model->save($data);
+                if ($result !== false) {
+                    $this->triggerObserver('AfterAdd', $data, $this);
+                }
                 $this->model->commit();
             } catch (Throwable $e) {
                 $this->model->rollback();
@@ -170,6 +229,7 @@ class ContentSort extends Base
                 $this->error(__('No rows were added'));
             }
         }
+        $this->assignHook('add', ['main_top', 'main_mid', 'main_bottom', 'side_top', 'side_bottom', 'footer', 'scripts'], []);
         return $this->view->fetch();
     }
 
@@ -208,7 +268,16 @@ class ContentSort extends Base
                     $this->modelValidateFunction($data);
                 }
 
+                // 触发观察者 - 修改前
+                $context = new EventContext($data, ['row' => $row]);
+                $this->triggerObserver('BeforeEdit', $context, $this);
+                if ($context->isIntercepted()) {
+                    $this->error($context->getMessage());
+                }
+                $data = $context->getData();
+
                 $result = $row->save($data);
+                $this->triggerObserver('AfterEdit', $row, $data, $this);
                 $this->model->commit();
             } catch (Throwable $e) {
                 $this->model->rollback();
@@ -221,6 +290,7 @@ class ContentSort extends Base
             }
         }
         $this->view->assign('row', $row);
+        $this->assignHook('edit', ['main_top', 'main_mid', 'main_bottom', 'side_top', 'side_bottom', 'footer', 'scripts'], $row->toArray());
         return $this->view->fetch();
     }
 
@@ -234,11 +304,18 @@ class ContentSort extends Base
             $result = false;
             $this->model->startTrans();
             try {
+                // 触发观察者 - 添加前
+                $context = new EventContext($data);
+                $this->triggerObserver('BeforeBatchAdd', $context, $this);
+                if ($context->isIntercepted()) {
+                    $this->error($context->getMessage());
+                }
+                $data = $context->getData();
+
                 // 模型验证
                 $this->modelValidateFunction($data);
                 $multiplename = str_replace('，', ',', $data['name']);
                 $names = explode(',', $multiplename);
-                // Ensure template fields are not null
                 $listtpl    = isset($data['listtpl']) ? $data['listtpl'] : '';
                 $contenttpl = isset($data['contenttpl']) ? $data['contenttpl'] : '';
 
@@ -275,6 +352,7 @@ class ContentSort extends Base
                     $scode = get_auto_code($scode);
                 }
                 $result = $this->model->saveAll($datalist);
+                $this->triggerObserver('AfterBatchAdd', $datalist, $this);
                 $this->model->commit();
             } catch (Throwable $e) {
                 $this->model->rollback();
@@ -286,6 +364,7 @@ class ContentSort extends Base
                 $this->error(__('No rows were added'));
             }
         }
+        $this->assignHook('batchadd', ['main_top',  'main_bottom',  'footer', 'scripts'], []);
         return $this->view->fetch();
     }
 

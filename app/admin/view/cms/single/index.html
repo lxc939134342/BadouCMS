@@ -1,6 +1,9 @@
 {layout name="layout/default" /}
 <script src="__CDN__/modules/cms/js/change_lang.js"></script>
 
+{if isset($view_hooks.main_top)}
+    {$view_hooks.main_top|raw}
+{/if}
 <div class="layui-card">
     <div class="layui-card-body">
         <table
@@ -10,6 +13,9 @@
             data-operate-del="{:$auth->check('cms.single/del')}"></table>
     </div>
 </div>
+{if isset($view_hooks.main_bottom)}
+    {$view_hooks.main_bottom|raw}
+{/if}
 <!-- 表格左侧按钮 toolbar  -->
 <script type="text/html" id="toolbar">
     <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black	">
@@ -88,3 +94,12 @@
         });
     });
 </script>
+{if isset($view_hooks.scripts)}
+<script>
+    layui.use(['badou', 'bdTable'], function() {
+        var badou = layui.badou;
+        var bdTable = layui.bdTable;
+        {$view_hooks.scripts|raw}
+    });
+</script>
+{/if}

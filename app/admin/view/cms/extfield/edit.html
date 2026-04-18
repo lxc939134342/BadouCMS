@@ -28,7 +28,7 @@
     <div class="layui-form-item">
         <label class="layui-form-label"><span style="color: red">*</span> 字段类型</label>
         <div class="layui-input-block">
-            <select name="row[type]" required lay-verify="required" placeholder="请选择" autocomplete="off" class="layui-input">
+            <select name="row[type]" required lay-verify="required" lay-filter="type" placeholder="请选择" autocomplete="off" class="layui-input">
                 <option value="">请选择</option>
                 {foreach name="typeText" item="type"}
                 <option value="{$key}" {if condition="$row.type eq $key"}selected{/if}>{$type}</option>
@@ -43,6 +43,7 @@
             <span class="layui-form-mid layui-word-aux">多个选项用逗号隔开或者回车，支持key:value格式</span>
         </div>
     </div>
+    {if isset($view_hooks.fields)}{$view_hooks.fields|raw}{/if}
     <div class="layui-form-item">
         <label class="layui-form-label">排序</label>
         <div class="layui-input-block">
@@ -62,5 +63,7 @@
     layui.use(['badou'],function () {
         var bdForm = layui.bdForm;
         bdForm.api.bindevent($("form.layui-form"));
+        
+        {if isset($view_hooks.scripts)}{$view_hooks.scripts|raw}{/if}
     })
 </script>

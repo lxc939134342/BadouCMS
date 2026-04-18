@@ -15,6 +15,7 @@ namespace app\admin\controller\cms;
 use Throwable;
 use badou\TableManager;
 use think\facade\Cache;
+use badou\EventContext;
 
 /**
  * 公司信息
@@ -50,6 +51,7 @@ class Company extends Base
             }
         }
         $this->assign('row', $config);
+        $this->assignHook('index', ['main_top', 'main_mid', 'main_bottom', 'side_top', 'side_bottom', 'footer', 'scripts'], $config->toArray());
         return $this->view->fetch();
     }
 
@@ -67,7 +69,20 @@ class Company extends Base
             try {
                 // 模型验证
                 $this->modelValidateFunction($data);
+
+                // 触发观察者 - 添加前
+                $context = new EventContext($data);
+                $this->triggerObserver('BeforeAdd', $context, $this);
+                if ($context->isIntercepted()) {
+                    $this->error($context->getMessage());
+                }
+                $data = $context->getData();
+
                 $result = $this->model->save($data);
+
+                // 触发观察者 - 添加后
+                $this->triggerObserver('AfterAdd', $data, $this);
+
                 $this->model->commit();
                 Cache::tag('cms_cache')->clear();
             } catch (Throwable $e) {
@@ -100,7 +115,20 @@ class Company extends Base
                 try {
                     // 模型验证
                     $this->modelValidateFunction($data);
+
+                    // 触发观察者 - 修改前
+                    $context = new EventContext($data, ['row' => $row]);
+                    $this->triggerObserver('BeforeEdit', $context, $this);
+                    if ($context->isIntercepted()) {
+                        $this->error($context->getMessage());
+                    }
+                    $data = $context->getData();
+
                     $result = $row->save($data);
+
+                    // 触发观察者 - 修改后
+                    $this->triggerObserver('AfterEdit', $row, $data, $this);
+
                     $this->model->commit();
                     Cache::tag('cms_cache')->clear();
                 } catch (Throwable $e) {

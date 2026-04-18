@@ -4,6 +4,7 @@ namespace app\admin\controller\cms;
 
 use Throwable;
 use think\Exception;
+use badou\EventContext;
 
 class Single extends Base
 {
@@ -11,7 +12,7 @@ class Single extends Base
      * 模型ID
      * @var string
      */
-    protected $mcode = 0;
+    public int $mcode = 0;
 
     /**
      * @var \app\admin\model\cms\Extfield
@@ -40,6 +41,7 @@ class Single extends Base
     public function index()
     {
         if (!$this->request->isAjax()) {
+            $this->assignHook('index');
             return $this->view->fetch();
         }
 
@@ -123,6 +125,14 @@ class Single extends Base
             $this->model->startTrans();
             try {
                 $data['id'] = $row['id'];
+                // 触发观察者 - 修改前
+                $context = new EventContext($data, ['row' => $row]);
+                $this->triggerObserver('BeforeEdit', $context, $this);
+                if ($context->isIntercepted()) {
+                    $this->error($context->getMessage());
+                }
+                $data = $context->getData();
+
                 $this->modelValidateFunction($data);
 
                 // 检查自定义URL名称
@@ -141,6 +151,8 @@ class Single extends Base
                     $this->contentExtModel->save($extdata);
                 }
 
+                // 触发观察者 - 修改后
+                $this->triggerObserver('AfterEdit', $row, $data, $this);
                 $this->model->commit();
             } catch (Throwable $e) {
                 $this->model->rollback();
@@ -154,6 +166,7 @@ class Single extends Base
         }
 
         $this->assign('row', $row);
+        $this->assignHook('edit', ['main_top', 'main_mid', 'main_bottom', 'side_top', 'side_bottom', 'footer', 'scripts'], $row->toArray());
         return $this->view->fetch();
     }
 

@@ -28,6 +28,8 @@ class Ajax extends Backend
     protected $noNeedLogin = ['lang'];
     protected $noNeedRight = ['*'];
 
+    protected $noNeedToken = ['upload', 'lang', 'icon', 'wipecache'];
+
     public function lang()
     {
         $this->request->get(['callback' => 'define']);

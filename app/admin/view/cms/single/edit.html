@@ -3,6 +3,7 @@
     {:token_field()}
     <div class="layui-row layui-col-space20">
         <div class="layui-col-xs8">
+            {if isset($view_hooks.main_top)}{$view_hooks.main_top|raw}{/if}
             <div class="layui-form-item">
                 <label class="layui-form-label">标题</label>
                 <div class="layui-input-block">
@@ -86,6 +87,7 @@
                 </div>
             </div>
 
+            {if isset($view_hooks.main_mid)}{$view_hooks.main_mid|raw}{/if}
             <div id="extend"></div>
 
             <div class="layui-form-item">
@@ -140,8 +142,10 @@
                     <input type="radio" name="row[status]" value="0" title="隐藏" {if$row.status==0} checked="checked"{/if}>
                 </div>
             </div>
+            {if isset($view_hooks.main_bottom)}{$view_hooks.main_bottom|raw}{/if}
         </div>
         <div class="layui-col-xs4">
+            {if isset($view_hooks.side_top)}{$view_hooks.side_top|raw}{/if}
             <div class="layui-card layui-bg-gray">
                 <div class="layui-card-header">高级内容</div>
                 <div class="layui-card-body">
@@ -240,6 +244,7 @@
                     </div>
                 </div>
             </div>
+            {if isset($view_hooks.side_bottom)}{$view_hooks.side_bottom|raw}{/if}
         </div>
     </div>
 
@@ -250,6 +255,7 @@
             <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
         </div>
     </div>
+    {if isset($view_hooks.footer)}{$view_hooks.footer|raw}{/if}
 </form>
 
 <script>
@@ -280,5 +286,6 @@
             getFieldHtml('',scode);
         })
         bdForm.api.bindevent($("form.layui-form"));
+        {if isset($view_hooks.scripts)}{$view_hooks.scripts|raw}{/if}
     });
 </script>

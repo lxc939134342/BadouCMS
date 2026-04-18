@@ -14,6 +14,7 @@ namespace app\admin\controller\cms;
 
 use think\facade\Cache;
 use Throwable;
+use badou\EventContext;
 
 /**
  * 定制标签
@@ -55,6 +56,7 @@ class Label extends Base
                 ->paginate($limit);
             $this->result('', $res->items(), $res->total());
         }
+        $this->assignHook('index');
         return $this->view->fetch();
     }
 
@@ -115,7 +117,20 @@ class Label extends Base
             try {
                 // 模型验证
                 $this->modelValidateFunction($data);
+
+                // 触发观察者 - 添加前
+                $context = new EventContext($data);
+                $this->triggerObserver('BeforeAdd', $context, $this);
+                if ($context->isIntercepted()) {
+                    $this->error($context->getMessage());
+                }
+                $data = $context->getData();
+
                 $result = $this->model->save($data);
+                
+                // 触发观察者 - 添加后
+                $this->triggerObserver('AfterAdd', $data, $this);
+
                 $this->model->commit();
                 Cache::delete('cms_label_' . get_backend_lang());
             } catch (Throwable $e) {
@@ -154,7 +169,20 @@ class Label extends Base
             try {
                 // 模型验证
                 $this->modelValidateFunction($data);
+
+                // 触发观察者 - 修改前
+                $context = new EventContext($data, ['row' => $row]);
+                $this->triggerObserver('BeforeEdit', $context, $this);
+                if ($context->isIntercepted()) {
+                    $this->error($context->getMessage());
+                }
+                $data = $context->getData();
+
                 $result = $row->save($data);
+                
+                // 触发观察者 - 修改后
+                $this->triggerObserver('AfterEdit', $row, $data, $this);
+
                 $this->model->commit();
                 Cache::delete('cms_label_' . get_backend_lang());
             } catch (Throwable $e) {

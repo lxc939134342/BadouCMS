@@ -6,6 +6,7 @@ use Throwable;
 use think\Exception;
 use think\facade\Db;
 use badou\Filesystem;
+use badou\EventContext;
 
 class Models extends Base
 {
@@ -47,7 +48,20 @@ class Models extends Base
                 $data['mcode'] = get_auto_code($this->model->getLastCode());
                 // 模型验证
                 $this->modelValidateFunction($data);
+
+                // 触发观察者 - 添加前
+                $context = new EventContext($data);
+                $this->triggerObserver('BeforeAdd', $context, $this);
+                if ($context->isIntercepted()) {
+                    $this->error($context->getMessage());
+                }
+                $data = $context->getData();
+
                 $result = $this->model->save($data);
+                
+                // 触发观察者 - 添加后
+                $this->triggerObserver('AfterAdd', $data, $this);
+
                 $this->model->commit();
             } catch (Throwable $e) {
                 $this->model->rollback();
@@ -66,6 +80,12 @@ class Models extends Base
     public function del()
     {
         $ids = $this->request->param('ids');
+
+        // 触发观察者 - 删除前
+        $res = $this->triggerObserver('BeforeDel', $ids, $this);
+        if (is_array($res)) {
+            $ids = $res;
+        }
 
         $where             = [];
         $dataLimitAdminIds = $this->getDataLimitAdminIds();

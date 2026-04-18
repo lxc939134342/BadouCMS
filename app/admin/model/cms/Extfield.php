@@ -31,6 +31,17 @@ class Extfield extends Model
         'content'
     ];
 
+    protected function init(): void
+    {
+        parent::init();
+        // // 监听自身事件
+        // \think\facade\Event::listen(static::class . '.BeforeInsert', [self::class, '_onBeforeInsert']);
+        // \think\facade\Event::listen(static::class . '.AfterInsert', [self::class, '_onAfterInsert']);
+        // \think\facade\Event::listen(static::class . '.BeforeUpdate', [self::class, '_onBeforeUpdate']);
+        // \think\facade\Event::listen(static::class . '.AfterUpdate', [self::class, '_onAfterUpdate']);
+        // \think\facade\Event::listen(static::class . '.AfterDelete', [self::class, '_onAfterDelete']);
+    }
+
     public function getContentAttr($value, $data)
     {
         if (!$data['value']) {
@@ -113,7 +124,7 @@ class Extfield extends Model
     }
 
     /* 插入前 */
-    public static function onBeforeInsert($model)
+    public static function _onBeforeInsert($model)
     {
         $data = $model->getData();
         $value = $data['value'] ?? '';
@@ -142,7 +153,7 @@ class Extfield extends Model
     }
 
     /* 插入后 */
-    public static function onAfterInsert($model)
+    public static function _onAfterInsert($model)
     {
         $data = $model->getData();
         if ($data['type'] == '10') {
@@ -163,6 +174,7 @@ class Extfield extends Model
     public static function onBeforeUpdate($model)
     {
         $data = $model->getData();
+
         $value = $data['value'] ?? '';
         $sorting = $data['sorting'] ?? 0;
         $model->set('value', $value);
@@ -204,7 +216,7 @@ class Extfield extends Model
     }
 
     /* 更新后 */
-    public static function onAfterUpdate($model)
+    public static function _onAfterUpdate($model)
     {
         $data = $model->getData();
         $originData = $model->getOrigin();
@@ -220,7 +232,7 @@ class Extfield extends Model
                     $updateData['name'] = $newTitleName;
                 }
                 if ($originData['sorting'] != $data['sorting']) {
-                    $updateData['sorting'] = $data['sorting'] + 1;
+                    $updateData['sorting'] = $updateData['sorting'] + 1;
                 }
                 if ($updateData) {
                     $titleField->save($updateData);
@@ -230,7 +242,7 @@ class Extfield extends Model
     }
 
     /* 删除后 */
-    public static function onAfterDelete($model)
+    public static function _onAfterDelete($model)
     {
         $data = $model->getData();
         $tableManager = self::tableManager();

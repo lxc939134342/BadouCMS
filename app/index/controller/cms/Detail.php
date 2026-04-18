@@ -33,10 +33,12 @@ class Detail extends Base
     public function index()
     {
         $id = $this->request->param('id');
-        $this->contentInfo = $this->model::getContent($this->contentSort['scode'], $id);
         if (!$this->contentInfo) {
-            /*内容不存在*/
-            abort(404, __("Not found"));
+            $this->contentInfo = $this->model::getContent($this->contentSort['scode'], $id);
+            if (!$this->contentInfo) {
+                /*内容不存在*/
+                abort(404, __("Not found"));
+            }
         }
         /*验证内容权限*/
         if ($this->contentInfo['gid']) {

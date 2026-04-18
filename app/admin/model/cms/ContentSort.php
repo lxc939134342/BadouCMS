@@ -149,7 +149,7 @@ class ContentSort extends Model
     // 获取最后一个code
     public function getLastCode()
     {
-        return $this->order('id DESC')->value('scode');
+        return $this->orderRaw('CAST(scode AS UNSIGNED) DESC')->value('scode');
     }
 
     /**

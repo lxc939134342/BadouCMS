@@ -16,6 +16,7 @@ use badou\Filesystem;
 use Throwable;
 use badou\TableManager;
 use think\facade\Cache;
+use badou\EventContext;
 
 /**
  * 站点配置
@@ -38,8 +39,8 @@ class Site extends Base
     }
 
     /**
-    * 若需重写查看、编辑、删除等方法，请复制 @see \app\admin\library\traits\Backend 中对应的方法至此进行重写
-    */
+     * 若需重写查看、编辑、删除等方法，请复制 @see \app\admin\library\traits\Backend 中对应的方法至此进行重写
+     */
     public function index()
     {
         $config      = $this->model->where('acode', get_backend_lang())->find();
@@ -53,14 +54,15 @@ class Site extends Base
 
         $template_path = root_path() . 'template' . DIRECTORY_SEPARATOR;
         if (!is_dir($template_path)) {  //兼容public目录下的模版
-            $template_path = public_path() . 'template'.DIRECTORY_SEPARATOR;
+            $template_path = public_path() . 'template' . DIRECTORY_SEPARATOR;
         }
 
-        $template_path .= 'cms'.DIRECTORY_SEPARATOR;
+        $template_path .= 'cms' . DIRECTORY_SEPARATOR;
         $dirs = Filesystem::getDirs($template_path);
 
         $this->assign('row', $config);
         $this->assign('template_dirs', $dirs);
+        $this->assignHook('index', ['main_top', 'main_mid', 'main_bottom', 'side_top', 'side_bottom', 'footer', 'scripts'], $config->toArray());
         return $this->view->fetch();
     }
 
@@ -78,7 +80,20 @@ class Site extends Base
             try {
                 // 模型验证
                 $this->modelValidateFunction($data);
+
+                // 触发观察者 - 添加前
+                $context = new EventContext($data);
+                $this->triggerObserver('BeforeAdd', $context, $this);
+                if ($context->isIntercepted()) {
+                    $this->error($context->getMessage());
+                }
+                $data = $context->getData();
+
                 $result = $this->model->save($data);
+
+                // 触发观察者 - 添加后
+                $this->triggerObserver('AfterAdd', $data, $this);
+
                 Cache::tag('cms_cache')->clear();
                 $this->model->commit();
             } catch (Throwable $e) {
@@ -111,7 +126,20 @@ class Site extends Base
                 try {
                     // 模型验证
                     $this->modelValidateFunction($data);
+
+                    // 触发观察者 - 修改前
+                    $context = new EventContext($data, ['row' => $row]);
+                    $this->triggerObserver('BeforeEdit', $context, $this);
+                    if ($context->isIntercepted()) {
+                        $this->error($context->getMessage());
+                    }
+                    $data = $context->getData();
+
                     $result = $row->save($data);
+
+                    // 触发观察者 - 修改后
+                    $this->triggerObserver('AfterEdit', $row, $data, $this);
+
                     Cache::tag('cms_cache')->clear();
                     $this->model->commit();
                 } catch (Throwable $e) {

@@ -13,6 +13,8 @@
         </div>
     </div>
 
+    {if isset($view_hooks.main_mid)}{$view_hooks.main_mid|raw}{/if}
+
     <div class="layui-form-item">
         <label class="layui-form-label">图片</label>
         <div class="layui-input-block">
@@ -93,5 +95,6 @@
     layui.use(["badou"], function () {
         var bdForm = layui.bdForm;
         bdForm.api.bindevent($("form.layui-form"));
+        {if isset($view_hooks.scripts)}{$view_hooks.scripts|raw}{/if}
     });
 </script>

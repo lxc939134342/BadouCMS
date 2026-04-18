@@ -36,6 +36,7 @@ class Link extends Base
     public function index()
     {
         if (!$this->request->isAjax()) {
+            $this->assignHook('index');
             return $this->view->fetch();
         }
 
@@ -82,12 +83,106 @@ class Link extends Base
                 $gid = $LinkModel->where('acode', get_backend_lang())->order('gid', 'desc')->value('gid');
                 $post['gid'] = $gid + 1;
             }
-            $newPost['row'] = $post;
-            $this->request->withPost($newPost);
+            $result = false;
+            $this->model->startTrans();
+            try {
+                $context = new \badou\EventContext($post);
+                $this->triggerObserver('BeforeAdd', $context, $this);
+                if ($context->isIntercepted()) {
+                    $this->error($context->getMessage());
+                }
+                $post = $context->getData();
 
-            parent::add();
+                $result = $this->model->save($post);
+                $this->triggerObserver('AfterAdd', $post, $this);
+                $this->model->commit();
+            } catch (\Throwable $e) {
+                $this->model->rollback();
+                $this->error($e->getMessage());
+            }
+
+            if ($result !== false) {
+                $this->success(__('Add successful'));
+            } else {
+                $this->error(__('No rows were added'));
+            }
         }
+        $this->assignHook('add', ['main_top', 'main_mid', 'main_bottom', 'side_top', 'side_bottom', 'footer', 'scripts'], []);
         return $this->view->fetch();
+    }
+
+    public function edit()
+    {
+        $ids = $this->request->param('ids');
+        $row = $this->model->find($ids);
+        if (!$row) {
+            $this->error(__('Record not found'));
+        }
+        
+        if ($this->request->isPost()) {
+            $post = $this->getPostData('row/a', true);
+            
+            $result = false;
+            $this->model->startTrans();
+            try {
+                $context = new \badou\EventContext($post, ['row' => $row]);
+                $this->triggerObserver('BeforeEdit', $context, $this);
+                if ($context->isIntercepted()) {
+                    $this->error($context->getMessage());
+                }
+                $post = $context->getData();
+
+                $result = $row->save($post);
+                $this->triggerObserver('AfterEdit', $row, $post, $this);
+                $this->model->commit();
+            } catch (\Throwable $e) {
+                $this->model->rollback();
+                $this->error($e->getMessage());
+            }
+
+            if ($result !== false) {
+                $this->success(__('Update successful'));
+            } else {
+                $this->error(__('No rows updated'));
+            }
+        }
+        $this->assign('row', $row);
+        $this->assignHook('edit', ['main_top', 'main_mid', 'main_bottom', 'side_top', 'side_bottom', 'footer', 'scripts'], $row->toArray());
+        return $this->view->fetch();
+    }
+
+    public function del($ids = '')
+    {
+        $ids = $this->request->param('ids');
+        if (!$ids) {
+            $this->error(__('Parameter error'));
+        }
+
+        $res = $this->triggerObserver('BeforeDel', $ids, $this);
+        if (is_array($res)) {
+            $ids = $res;
+        }
+
+        $pk = $this->model->getPk();
+        $list = $this->model->where($pk, 'in', $ids)->select();
+
+        $count = 0;
+        $this->model->startTrans();
+        try {
+            foreach ($list as $k => $v) {
+                $count += $v->delete();
+            }
+            $this->model->commit();
+        } catch (\Throwable $e) {
+            $this->model->rollback();
+            $this->error($e->getMessage());
+        }
+
+        if ($count) {
+            $this->success(__('Delete successful'));
+        } else {
+            $this->error(__('No rows were deleted'));
+        }
     }
 
 }

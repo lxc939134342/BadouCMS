@@ -8,5 +8,5 @@ return [
     'Login successful'                      => '登录成功',
     'You\'ve logged in, do not login again' => '你已经登录，无需重复登录',
     'Logout successful'                     => '退出成功!',
-    'Security tips'                         => '<strong>安全提示：</strong>为了你的后台安全，请勿将后台管理入口设置为admin或admin.php'
+    'Security tips'                         => '<strong>警报：</strong>快修改你的后台地址，admin.php 都烂大街了，容易被黑 ~'
 ];

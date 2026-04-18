@@ -18,6 +18,7 @@ use badou\Tree;
 use think\facade\Db;
 use app\admin\model\UserLevel;
 use badou\Filesystem;
+use badou\EventContext;
 
 
 /**
@@ -55,7 +56,7 @@ class Content extends Base
      * 模型ID
      * @var string
      */
-    protected int $mcode = 0;
+    public int $mcode = 0;
 
     public function initialize(): void
     {
@@ -74,6 +75,7 @@ class Content extends Base
     public function index()
     {
         if (!$this->request->isAjax()) {
+            $this->assignHook('index');
             return $this->view->fetch();
         }
 
@@ -147,6 +149,7 @@ class Content extends Base
     public function add()
     {
         if (!$this->isAjax()) {
+            $this->assignHook('add', ['main_top', 'main_mid', 'main_bottom', 'side_top', 'side_bottom', 'footer', 'scripts'], []);
             return $this->view->fetch();
         }
         $data = $this->getPostData('row/a');
@@ -195,6 +198,14 @@ class Content extends Base
         $result = false;
         Db::startTrans();
         try {
+            // 触发观察者 - 添加前
+            $context = new EventContext($data);
+            $this->triggerObserver('BeforeAdd', $context, $this);
+            if ($context->isIntercepted()) {
+                $this->error($context->getMessage());
+            }
+            $data = $context->getData();
+
             // 模型验证
             $this->modelValidateFunction($data);
 
@@ -211,6 +222,8 @@ class Content extends Base
 
             $this->contentExtModel->save($extdata);
 
+            // 触发观察者 - 添加后
+            $this->triggerObserver('AfterAdd', $data, $this);
             Db::commit();
         } catch (Throwable $e) {
             Db::rollback();
@@ -220,6 +233,47 @@ class Content extends Base
             $this->success(__('Added successful'));
         } else {
             $this->error(__('No rows were added'));
+        }
+    }
+
+    public function del()
+    {
+        $where             = [];
+        $dataLimitAdminIds = $this->getDataLimitAdminIds();
+        if ($dataLimitAdminIds) {
+            $where[] = [$this->dataLimitField, 'in', $dataLimitAdminIds];
+        }
+
+        $ids     = $this->request->param('ids');
+        $all     = $this->request->param('all'); // 保留参数接收，供钩子逻辑使用
+
+        // 触发观察者 - 删除前
+        $res = $this->triggerObserver('BeforeDel', $ids, $this);
+        if (is_array($res)) {
+            $ids = $res;
+        }
+
+        $where[] = [$this->pk, 'in', $ids];
+        $data    = $this->model->where($where)->select();
+
+        $count = 0;
+        $this->model->startTrans();
+        try {
+            if ($data) {
+                foreach ($data as $v) {
+                    $count += $v->delete();
+                }
+            }
+            $this->model->commit();
+        } catch (Throwable $e) {
+            $this->model->rollback();
+            $this->error($e->getMessage());
+        }
+
+        if ($count) {
+            $this->success(__('Delete successful'));
+        } else {
+            $this->error(__('No rows were deleted'));
         }
     }
 
@@ -263,6 +317,13 @@ class Content extends Base
             $this->model->startTrans();
             try {
                 $data['id'] = $row['id'];
+                // 触发观察者 - 修改前
+                $context = new EventContext($data, ['row' => $row]);
+                $this->triggerObserver('BeforeEdit', $context, $this);
+                if ($context->isIntercepted()) {
+                    $this->error($context->getMessage());
+                }
+                $data = $context->getData();
                 $this->modelValidateFunction($data);
 
                 // 检查自定义URL名称
@@ -279,7 +340,8 @@ class Content extends Base
                 } else {
                     $this->contentExtModel->save($extdata);
                 }
-
+                // 触发观察者 - 修改后
+                $this->triggerObserver('AfterEdit', $row, $data, $this);
                 $this->model->commit();
             } catch (Throwable $e) {
                 $this->model->rollback();
@@ -293,6 +355,7 @@ class Content extends Base
         }
 
         $this->assign('row', $row);
+        $this->assignHook('edit', ['main_top', 'main_mid', 'main_bottom', 'side_top', 'side_bottom', 'footer', 'scripts'], $row->toArray());
         return $this->view->fetch();
     }
 

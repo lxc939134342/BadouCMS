@@ -3,6 +3,7 @@
     {:token_field()}
     <div class="layui-row layui-col-space20">
         <div class="layui-col-xs7">
+            {if isset($view_hooks.main_top)}{$view_hooks.main_top|raw}{/if}
             <div class="layui-form-item">
                 <label class="layui-form-label">父栏目</label>
                 <div class="layui-input-block">
@@ -23,7 +24,8 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">通用编码</label>
                 <div class="layui-input-block">
-                    <input type="text" id="c-aucode" name="row[aucode]"  class="layui-input" value="{$row.aucode}" placeholder="通用编码" />
+                    <input type="text" id="c-aucode" name="row[aucode]" class="layui-input" value="{$row.aucode}"
+                        placeholder="通用编码" />
                     <p class="help-block">语言通用调用编码，多个语言设置同一个调用编码</p>
                 </div>
             </div>
@@ -98,19 +100,15 @@
             <div class="layui-form-item">
                 <label class="layui-form-label">权限不足提示</label>
                 <div class="layui-input-block">
-                    <input type="text" name="row[gnote]" placeholder="请输入权限不足提示语" class="layui-input" value="{$row.gnote}" />
+                    <input type="text" name="row[gnote]" placeholder="请输入权限不足提示语" class="layui-input"
+                        value="{$row.gnote}" />
                 </div>
             </div>
 
             <div class="layui-form-item">
                 <label class="layui-form-label">排序</label>
                 <div class="layui-input-block">
-                    <input
-                        type="text"
-                        name="row[sorting]"
-                        value="{$row.sorting}"
-                        placeholder="请输入排序"
-                        autocomplete="off"
+                    <input type="text" name="row[sorting]" value="{$row.sorting}" placeholder="请输入排序" autocomplete="off"
                         class="layui-input" />
                 </div>
             </div>
@@ -123,9 +121,11 @@
                         checked="checked" {/if}>
                 </div>
             </div>
+            {if isset($view_hooks.main_bottom)}{$view_hooks.main_bottom|raw}{/if}
         </div>
         <div class="layui-col-xs5">
-             <div class="layui-collapse">
+            {if isset($view_hooks.side_top)}{$view_hooks.side_top|raw}{/if}
+            <div class="layui-collapse">
                 <div class="layui-colla-item">
                     <div class="layui-colla-title">高级内容</div>
                     <div class="layui-colla-content layui-show">
@@ -134,8 +134,8 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">栏目副名称</label>
                                     <div class="layui-input-block">
-                                        <input type="text" name="row[subname]" value="{$row.subname}" placeholder="请输入栏目副名称"
-                                            class="layui-input" />
+                                        <input type="text" name="row[subname]" value="{$row.subname}"
+                                            placeholder="请输入栏目副名称" class="layui-input" />
                                     </div>
                                 </div>
                                 <div class="layui-form-item">
@@ -162,14 +162,15 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">跳转链接</label>
                                     <div class="layui-input-block">
-                                        <input type="text" name="row[outlink]" placeholder="跳转链接" class="layui-input" value="{$row.outlink}" />
+                                        <input type="text" name="row[outlink]" placeholder="跳转链接" class="layui-input"
+                                            value="{$row.outlink}" />
                                     </div>
                                 </div>
                                 <div class="layui-form-item">
                                     <label class="layui-form-label"> 栏目缩略图</label>
                                     <div class="layui-input-block">
-                                        <input type="text" id="c-ico" name="row[ico]" style="width: 60%;" class="layui-input"
-                                            value="{$row.ico}" />
+                                        <input type="text" id="c-ico" name="row[ico]" style="width: 60%;"
+                                            class="layui-input" value="{$row.ico}" />
                                         <div class="layui-input-suffix" style="width: 40%;">
                                             <button type="button" data-input-id="c-ico" data-preview-id="p-ico"
                                                 class="layui-btn btn-bdupload">
@@ -189,8 +190,8 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label"> 栏目大图</label>
                                     <div class="layui-input-block">
-                                        <input type="text" id="c-pic" name="row[pic]" style="width: 60%;" class="layui-input"
-                                            value="{$row.pic}" />
+                                        <input type="text" id="c-pic" name="row[pic]" style="width: 60%;"
+                                            class="layui-input" value="{$row.pic}" />
                                         <div class="layui-input-suffix" style="width: 40%;">
                                             <button type="button" data-input-id="c-pic" data-preview-id="p-pic"
                                                 class="layui-btn btn-bdupload">
@@ -209,23 +210,24 @@
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">SEO标题</label>
                                     <div class="layui-input-block">
-                                        <input type="text" name="row[title]" value="{$row.title}" placeholder="请输入详情页SEO标题"
-                                            class="layui-input" />
+                                        <input type="text" name="row[title]" value="{$row.title}"
+                                            placeholder="请输入详情页SEO标题" class="layui-input" />
                                     </div>
                                 </div>
 
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">SEO关键字</label>
                                     <div class="layui-input-block">
-                                        <input type="text" name="row[keywords]" value="{$row.keywords}" placeholder="请输入详情页SEO关键字"
-                                            class="layui-input" />
+                                        <input type="text" name="row[keywords]" value="{$row.keywords}"
+                                            placeholder="请输入详情页SEO关键字" class="layui-input" />
                                     </div>
                                 </div>
 
                                 <div class="layui-form-item">
                                     <label class="layui-form-label">SEO描述</label>
                                     <div class="layui-input-block">
-                                        <textarea name="row[description]" placeholder="请输入详情页SEO描述" class="layui-textarea">{$row.description}</textarea>
+                                        <textarea name="row[description]" placeholder="请输入详情页SEO描述"
+                                            class="layui-textarea">{$row.description}</textarea>
                                     </div>
                                 </div>
                             </div>
@@ -233,8 +235,11 @@
                     </div>
                 </div>
             </div>
+                {if isset($view_hooks.side_bottom)}{$view_hooks.side_bottom|raw}{/if}
+
         </div>
     </div>
+    
     <div class="layui-form-item layer-footer hide">
         <div class="layui-input-block">
             <input type="hidden" name="row[id]" value="{$row.id}" />
@@ -242,6 +247,8 @@
             <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
         </div>
     </div>
+    {if isset($view_hooks.footer)}{$view_hooks.footer|raw}{/if}
+
 </form>
 
 <script>
@@ -249,8 +256,8 @@
         var bdForm = layui.bdForm;
         var form = layui.form;
         bdForm.api.bindevent($("form.layui-form"));
-        form.on('select', function(data){
-            if(data.elem.id === 'c-mcode'){
+        form.on('select', function (data) {
+            if (data.elem.id === 'c-mcode') {
                 var mcode = data.value;
                 if (!mcode || !Config.models) return;
 
@@ -263,5 +270,8 @@
                 }
             }
         });
+
+        /* prettier-ignore */
+        {if isset($view_hooks.scripts)} {$view_hooks.scripts | raw} {/if}
     });
 </script>

@@ -1,293 +1,399 @@
 {layout name="layout/form" /}
 
 <form class="layui-form" method="post">
-    {:token_field()}
-    <div class="layui-row layui-col-space20">
-        <div class="layui-col-xs7">
-            <div class="layui-form-item">
-                <label class="layui-form-label">父栏目</label>
-                <div class="layui-input-block">
-                    <input type="hidden" id="c-pcode" name="row[pcode]" class="layui-input" value="0" />
-                    <div
-                        class="remoteSelect"
-                        id="remoteSelect-pcode"
-                        data-input-id="c-pcode"
-                        data-field="name"
-                        data-primary-key="scode"
-                        data-is-tree="true"
-                        data-pidname="pcode"
-                        data-params='{"acode":"{$acode}"}'
-                        data-source="cms.content_sort/selectpage"></div>
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">栏目名称</label>
-                <div class="layui-input-block">
-                    <input
-                        type="text"
-                        name="row[name]"
-                        lay-verify="required"
-                        autocomplete="off"
-                        placeholder="标题"
-                        class="layui-input" />
-                </div>
-            </div>
-            <div class="layui-form-item">
-                <label class="layui-form-label">通用编码</label>
-                <div class="layui-input-block">
-                    <input type="text" id="c-aucode" name="row[aucode]"  class="layui-input" placeholder="通用编码" />
-                    <p class="help-block">语言通用调用编码，多个语言设置同一个调用编码</p>
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">URL名称</label>
-                <div class="layui-input-block">
-                    <input type="text" id="c-filename" name="row[filename]" class="layui-input" placeholder="URL名称" />
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">模型</label>
-                <div class="layui-input-block">
-                    <select name="row[mcode]" id="c-mcode" class="layui-select" lay-search="" lay-verify="required">
-                        <option value="">请选择</option>
-                        {foreach $models as $model}
-                        <option value="{$model.mcode}">{$model.name}</option>
-                        {/foreach}
-                    </select>
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">列表页模板</label>
-                <div class="layui-input-block">
-                    <select name="row[listtpl]" id="c-listtpl" class="layui-select" lay-search="">
-                        <option value="">请选择</option>
-                        {foreach $tpls as $tpl}
-                        <option value="{$tpl.id}" >{$tpl.name}</option>
-                        {/foreach}
-                    </select>
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">详情页模板</label>
-                <div class="layui-input-block">
-                    <select name="row[contenttpl]" id="c-contenttpl" class="layui-select" lay-search="">
-                        <option value="">请选择</option>
-                        {foreach $tpls as $tpl }
-                        <option value="{$tpl.id}">{$tpl.name}</option>
-                        {/foreach}
-                    </select>
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">浏览权限</label>
-                <div class="layui-input-block">
-                    <select name="row[gid]" id="c-gid" class="layui-select">
-                        <option value="">请选择</option>
-                        {foreach $levellist as $level}
-                        <option value="{$level.gcode}">{$level.gname}</option>
-                        {/foreach}
-                    </select>
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">权限类型</label>
-                <div class="layui-input-block">
-                    <select name="row[gtype]" id="c-gtype" class="layui-select">
-                        <option value="">请选择</option>
-                        {foreach $gtypelist as $type}
-                        <option value="{$level.value}">{$type.label}</option>
-                        {/foreach}
-                    </select>
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">权限不足提示</label>
-                <div class="layui-input-block">
-                    <input type="text" name="row[gnote]" placeholder="请输入权限不足提示语" class="layui-input" />
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">排序</label>
-                <div class="layui-input-block">
-                    <input
-                        type="text"
-                        name="row[sorting]"
-                        value="255"
-                        placeholder="请输入排序"
-                        autocomplete="off"
-                        class="layui-input" />
-                </div>
-            </div>
-
-            <div class="layui-form-item">
-                <label class="layui-form-label">状态</label>
-                <div class="layui-input-block">
-                    <input type="radio" name="row[status]" value="1" title="显示" checked />
-                    <input type="radio" name="row[status]" value="0" title="隐藏" />
-                </div>
-            </div>
-        </div>
-        <div class="layui-col-xs5">
-            <div class="layui-collapse">
-                <div class="layui-colla-item">
-                    <div class="layui-colla-title">高级内容</div>
-                    <div class="layui-colla-content layui-show">
-                        <div class="layui-card ">
-                            <div class="layui-card-body form-label-width-short">
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">栏目副名称</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" name="row[subname]" placeholder="请输入栏目副名称" class="layui-input" />
-                                    </div>
-                                </div>
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">栏目描述1</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" name="row[def1]" placeholder="请输入栏目描述1" class="layui-input" />
-                                    </div>
-                                </div>
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">栏目描述2</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" name="row[def2]" placeholder="请输入栏目描述2" class="layui-input" />
-                                    </div>
-                                </div>
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">栏目描述3</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" name="row[def3]" placeholder="请输入栏目描述2" class="layui-input" />
-                                    </div>
-                                </div>
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">跳转链接</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" name="row[outlink]" placeholder="跳转链接" class="layui-input" />
-                                    </div>
-                                </div>
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">栏目缩略图</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" id="c-ico" name="row[ico]" style="width: 60%" class="layui-input" />
-                                        <div class="layui-input-suffix" style="width: 40%">
-                                            <button
-                                                type="button"
-                                                data-input-id="c-ico"
-                                                data-preview-id="p-ico"
-                                                class="layui-btn btn-bdupload">
-                                                <i class="fa fa-upload"></i>
-                                                上传
-                                            </button>
-                                            <button
-                                                type="button"
-                                                data-input-id="c-ico"
-                                                class="layui-btn layui-bg-green btn-bdchoose">
-                                                <i class="fa fa-list"></i>
-                                                选择
-                                            </button>
-                                        </div>
-                                        <div class="layui-upload-list" id="p-ico"></div>
-                                    </div>
-                                </div>
-
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">栏目大图</label>
-                                    <div class="layui-input-block">
-                                        <input type="text" id="c-pic" name="row[pic]" style="width: 60%" class="layui-input" />
-                                        <div class="layui-input-suffix" style="width: 40%">
-                                            <button
-                                                type="button"
-                                                data-input-id="c-pic"
-                                                data-preview-id="p-pic"
-                                                class="layui-btn btn-bdupload">
-                                                <i class="fa fa-upload"></i>
-                                                上传
-                                            </button>
-                                            <button
-                                                type="button"
-                                                data-input-id="c-pic"
-                                                class="layui-btn layui-bg-green btn-bdchoose">
-                                                <i class="fa fa-list"></i>
-                                                选择
-                                            </button>
-                                        </div>
-                                        <div class="layui-upload-list" id="p-pic"></div>
-                                    </div>
-                                </div>
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">SEO标题</label>
-                                    <div class="layui-input-block">
-                                        <input
-                                            type="text"
-                                            name="row[title]"
-                                            placeholder="请输入详情页SEO标题"
-                                            class="layui-input" />
-                                    </div>
-                                </div>
-
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">SEO关键字</label>
-                                    <div class="layui-input-block">
-                                        <input
-                                            type="text"
-                                            name="row[keywords]"
-                                            placeholder="请输入详情页SEO关键字"
-                                            class="layui-input" />
-                                    </div>
-                                </div>
-
-                                <div class="layui-form-item">
-                                    <label class="layui-form-label">SEO描述</label>
-                                    <div class="layui-input-block">
-                                        <textarea
-                                            name="row[description]"
-                                            placeholder="请输入详情页SEO描述"
-                                            class="layui-textarea"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-        </div>
-    </div>
-    <div class="layui-form-item layer-footer hide">
+  {:token_field()}
+  <div class="layui-row layui-col-space20">
+    <div class="layui-col-xs7">
+      {if isset($view_hooks.main_top)}{$view_hooks.main_top|raw}{/if}
+      <div class="layui-form-item">
+        <label class="layui-form-label">父栏目</label>
         <div class="layui-input-block">
-            <button class="layui-btn pear-btn-primary layui-btn-sm disabled" lay-submit>保存</button>
-            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
+          <input
+            type="hidden"
+            id="c-pcode"
+            name="row[pcode]"
+            class="layui-input"
+            value="0"
+          />
+          <div
+            class="remoteSelect"
+            id="remoteSelect-pcode"
+            data-input-id="c-pcode"
+            data-field="name"
+            data-primary-key="scode"
+            data-is-tree="true"
+            data-pidname="pcode"
+            data-params='{"acode":"{$acode}"}'
+            data-source="cms.content_sort/selectpage"
+          ></div>
         </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">栏目名称</label>
+        <div class="layui-input-block">
+          <input
+            type="text"
+            name="row[name]"
+            lay-verify="required"
+            autocomplete="off"
+            placeholder="标题"
+            class="layui-input"
+          />
+        </div>
+      </div>
+      <div class="layui-form-item">
+        <label class="layui-form-label">通用编码</label>
+        <div class="layui-input-block">
+          <input
+            type="text"
+            id="c-aucode"
+            name="row[aucode]"
+            class="layui-input"
+            placeholder="通用编码"
+          />
+          <p class="help-block">语言通用调用编码，多个语言设置同一个调用编码</p>
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">URL名称</label>
+        <div class="layui-input-block">
+          <input
+            type="text"
+            id="c-filename"
+            name="row[filename]"
+            class="layui-input"
+            placeholder="URL名称"
+          />
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">模型</label>
+        <div class="layui-input-block">
+          <select
+            name="row[mcode]"
+            id="c-mcode"
+            class="layui-select"
+            lay-search=""
+            lay-verify="required"
+          >
+            <option value="">请选择</option>
+            {foreach $models as $model}
+            <option value="{$model.mcode}">{$model.name}</option>
+            {/foreach}
+          </select>
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">列表页模板</label>
+        <div class="layui-input-block">
+          <select
+            name="row[listtpl]"
+            id="c-listtpl"
+            class="layui-select"
+            lay-search=""
+          >
+            <option value="">请选择</option>
+            {foreach $tpls as $tpl}
+            <option value="{$tpl.id}">{$tpl.name}</option>
+            {/foreach}
+          </select>
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">详情页模板</label>
+        <div class="layui-input-block">
+          <select
+            name="row[contenttpl]"
+            id="c-contenttpl"
+            class="layui-select"
+            lay-search=""
+          >
+            <option value="">请选择</option>
+            {foreach $tpls as $tpl }
+            <option value="{$tpl.id}">{$tpl.name}</option>
+            {/foreach}
+          </select>
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">浏览权限</label>
+        <div class="layui-input-block">
+          <select name="row[gid]" id="c-gid" class="layui-select">
+            <option value="">请选择</option>
+            {foreach $levellist as $level}
+            <option value="{$level.gcode}">{$level.gname}</option>
+            {/foreach}
+          </select>
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">权限类型</label>
+        <div class="layui-input-block">
+          <select name="row[gtype]" id="c-gtype" class="layui-select">
+            <option value="">请选择</option>
+            {foreach $gtypelist as $type}
+            <option value="{$level.value}">{$type.label}</option>
+            {/foreach}
+          </select>
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">权限不足提示</label>
+        <div class="layui-input-block">
+          <input
+            type="text"
+            name="row[gnote]"
+            placeholder="请输入权限不足提示语"
+            class="layui-input"
+          />
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">排序</label>
+        <div class="layui-input-block">
+          <input
+            type="text"
+            name="row[sorting]"
+            value="255"
+            placeholder="请输入排序"
+            autocomplete="off"
+            class="layui-input"
+          />
+        </div>
+      </div>
+
+      <div class="layui-form-item">
+        <label class="layui-form-label">状态</label>
+        <div class="layui-input-block">
+          <input
+            type="radio"
+            name="row[status]"
+            value="1"
+            title="显示"
+            checked
+          />
+          <input type="radio" name="row[status]" value="0" title="隐藏" />
+        </div>
+      </div>
+      {if isset($view_hooks.main_bottom)}{$view_hooks.main_bottom|raw}{/if}
     </div>
+    <div class="layui-col-xs5">
+      {if isset($view_hooks.side_top)}{$view_hooks.side_top|raw}{/if}
+      <div class="layui-collapse">
+        <div class="layui-colla-item">
+          <div class="layui-colla-title">高级内容</div>
+          <div class="layui-colla-content layui-show">
+            <div class="layui-card">
+              <div class="layui-card-body form-label-width-short">
+                <div class="layui-form-item">
+                  <label class="layui-form-label">栏目副名称</label>
+                  <div class="layui-input-block">
+                    <input
+                      type="text"
+                      name="row[subname]"
+                      placeholder="请输入栏目副名称"
+                      class="layui-input"
+                    />
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">栏目描述1</label>
+                  <div class="layui-input-block">
+                    <input
+                      type="text"
+                      name="row[def1]"
+                      placeholder="请输入栏目描述1"
+                      class="layui-input"
+                    />
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">栏目描述2</label>
+                  <div class="layui-input-block">
+                    <input
+                      type="text"
+                      name="row[def2]"
+                      placeholder="请输入栏目描述2"
+                      class="layui-input"
+                    />
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">栏目描述3</label>
+                  <div class="layui-input-block">
+                    <input
+                      type="text"
+                      name="row[def3]"
+                      placeholder="请输入栏目描述2"
+                      class="layui-input"
+                    />
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">跳转链接</label>
+                  <div class="layui-input-block">
+                    <input
+                      type="text"
+                      name="row[outlink]"
+                      placeholder="跳转链接"
+                      class="layui-input"
+                    />
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">栏目缩略图</label>
+                  <div class="layui-input-block">
+                    <input
+                      type="text"
+                      id="c-ico"
+                      name="row[ico]"
+                      style="width: 60%"
+                      class="layui-input"
+                    />
+                    <div class="layui-input-suffix" style="width: 40%">
+                      <button
+                        type="button"
+                        data-input-id="c-ico"
+                        data-preview-id="p-ico"
+                        class="layui-btn btn-bdupload"
+                      >
+                        <i class="fa fa-upload"></i>
+                        上传
+                      </button>
+                      <button
+                        type="button"
+                        data-input-id="c-ico"
+                        class="layui-btn layui-bg-green btn-bdchoose"
+                      >
+                        <i class="fa fa-list"></i>
+                        选择
+                      </button>
+                    </div>
+                    <div class="layui-upload-list" id="p-ico"></div>
+                  </div>
+                </div>
+
+                <div class="layui-form-item">
+                  <label class="layui-form-label">栏目大图</label>
+                  <div class="layui-input-block">
+                    <input
+                      type="text"
+                      id="c-pic"
+                      name="row[pic]"
+                      style="width: 60%"
+                      class="layui-input"
+                    />
+                    <div class="layui-input-suffix" style="width: 40%">
+                      <button
+                        type="button"
+                        data-input-id="c-pic"
+                        data-preview-id="p-pic"
+                        class="layui-btn btn-bdupload"
+                      >
+                        <i class="fa fa-upload"></i>
+                        上传
+                      </button>
+                      <button
+                        type="button"
+                        data-input-id="c-pic"
+                        class="layui-btn layui-bg-green btn-bdchoose"
+                      >
+                        <i class="fa fa-list"></i>
+                        选择
+                      </button>
+                    </div>
+                    <div class="layui-upload-list" id="p-pic"></div>
+                  </div>
+                </div>
+                <div class="layui-form-item">
+                  <label class="layui-form-label">SEO标题</label>
+                  <div class="layui-input-block">
+                    <input
+                      type="text"
+                      name="row[title]"
+                      placeholder="请输入详情页SEO标题"
+                      class="layui-input"
+                    />
+                  </div>
+                </div>
+
+                <div class="layui-form-item">
+                  <label class="layui-form-label">SEO关键字</label>
+                  <div class="layui-input-block">
+                    <input
+                      type="text"
+                      name="row[keywords]"
+                      placeholder="请输入详情页SEO关键字"
+                      class="layui-input"
+                    />
+                  </div>
+                </div>
+
+                <div class="layui-form-item">
+                  <label class="layui-form-label">SEO描述</label>
+                  <div class="layui-input-block">
+                    <textarea
+                      name="row[description]"
+                      placeholder="请输入详情页SEO描述"
+                      class="layui-textarea"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {if isset($view_hooks.side_bottom)}{$view_hooks.side_bottom|raw}{/if}
+    </div>
+  </div>
+
+  <div class="layui-form-item layer-footer hide">
+    <div class="layui-input-block">
+      <button
+        class="layui-btn pear-btn-primary layui-btn-sm disabled"
+        lay-submit
+      >
+        保存
+      </button>
+      <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">
+        重置
+      </button>
+    </div>
+  </div>
+
+  {if isset($view_hooks.footer)}{$view_hooks.footer|raw}{/if}
 </form>
 
 <script>
-    layui.use(["badou", "form"], function () {
-        var bdForm = layui.bdForm;
-        var form = layui.form;
-        bdForm.api.bindevent($("form.layui-form"));
+  layui.use(["badou", "form"], function () {
+      var bdForm = layui.bdForm;
+      var form = layui.form;
+      bdForm.api.bindevent($("form.layui-form"));
 
-        form.on('select', function(data){
-            if(data.elem.id === 'c-mcode'){
-                var mcode = data.value;
-                if (!mcode || !Config.models) return;
+      form.on('select', function (data) {
+          if (data.elem.id === 'c-mcode') {
+              var mcode = data.value;
+              if (!mcode || !Config.models) return;
 
-                var model = Config.models.find(function (m) { return m.mcode == mcode; });
-                if (model) {
-                    $("#c-listtpl").val(model.listtpl);
-                    $("#c-contenttpl").val(model.contenttpl);
-                    // 重新渲染 select
-                    form.render("select");
-                }
-            }
-        });
-    });
+              var model = Config.models.find(function (m) { return m.mcode == mcode; });
+              if (model) {
+                  $("#c-listtpl").val(model.listtpl);
+                  $("#c-contenttpl").val(model.contenttpl);
+                  // 重新渲染 select
+                  form.render("select");
+              }
+          }
+      });
+      /* prettier-ignore */
+      {if isset($view_hooks.scripts)}{$view_hooks.scripts|raw}{/if}
+  });
 </script>

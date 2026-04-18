@@ -12,12 +12,12 @@
 
 namespace app\admin\controller\cms;
 
-use app\common\controller\Backend;
+
 
 /**
  * 留言信息
  */
-class Message extends Backend
+class Message extends Base
 {
     /**
      * Message模型对象
@@ -66,6 +66,43 @@ class Message extends Backend
             $this->result('ok', $res->items(), $res->total());
         }
 
+        $this->assignHook('index');
         return $this->view->fetch();
+    }
+    public function del($ids = '')
+    {
+        $where = [];
+        $dataLimitAdminIds = $this->getDataLimitAdminIds();
+        if ($dataLimitAdminIds) {
+            $where[] = [$this->dataLimitField, 'in', $dataLimitAdminIds];
+        }
+
+        $ids = $this->request->param('ids');
+
+        // 触发观察者 - 删除前
+        $res = $this->triggerObserver('BeforeDel', $ids, $this);
+        if (is_array($res)) {
+            $ids = $res;
+        }
+
+        $where[] = [$this->pk, 'in', $ids];
+
+        $list = $this->model->where($where)->select();
+        $count = 0;
+        $this->model->startTrans();
+        try {
+            foreach ($list as $k => $v) {
+                $count += $v->delete();
+            }
+            $this->model->commit();
+        } catch (\Throwable $e) {
+            $this->model->rollback();
+            $this->error($e->getMessage());
+        }
+        if ($count) {
+            $this->success(__('Delete successful'));
+        } else {
+            $this->error(__('No rows were deleted'));
+        }
     }
 }

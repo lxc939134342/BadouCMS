@@ -87,6 +87,9 @@
     }
 </style>
 <script src="__CDN__/modules/cms/js/change_lang.js"></script>
+{if isset($view_hooks.main_top)}
+    {$view_hooks.main_top|raw}
+{/if}
 <div class="layui-row layui-col-space10 d-flex">
     <div class="layui-col-md2">
         <div class="layui-card h-100">
@@ -114,6 +117,9 @@
         </div>
     </div>
 </div>
+{if isset($view_hooks.main_bottom)}
+    {$view_hooks.main_bottom|raw}
+{/if}
 <!-- 表格左侧按钮 toolbar  -->
 <script type="text/html" id="toolbar">
     <a
@@ -413,6 +419,7 @@
         };
         contentSortTreeRender();
 
+
         // 移动&复制
         $(document).on("click", ".btn-copy,.btn-move", function () {
             var that = this;
@@ -474,3 +481,12 @@
         });
     });
 </script>
+{if isset($view_hooks.scripts)}
+<script>
+    layui.use(['badou', 'bdTable'], function() {
+        var badou = layui.badou;
+        var bdTable = layui.bdTable;
+        {$view_hooks.scripts|raw}
+    });
+</script>
+{/if}

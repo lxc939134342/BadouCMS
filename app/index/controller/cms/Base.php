@@ -86,6 +86,9 @@ class Base extends Frontend
         $controllername = strtolower($this->request->controller());
         $this->loadlang('cms.index', get_frontend_lang());
         $this->loadlang($controllername, get_frontend_lang());
+
+        // 初始化钩子：允许插件在此注入视图变量或执行初始化逻辑
+        $this->triggerObserver('Init', $this);
     }
 
     /*获取分类信息*/
@@ -93,6 +96,17 @@ class Base extends Frontend
     {
         $contentSortModel = new ContentSort();
         $urlname = $this->request->param('category');
+
+        // BeforeGetSort 钩子：允许插件接管分类解析逻辑
+        $hookRes = $this->triggerObserver('BeforeGetSort', $urlname);
+        if ($hookRes === false) return; // 被插件拦截
+        if (is_array($hookRes)) {
+            $this->contentSort = $hookRes['contentSort'] ?? $this->contentSort;
+            $this->contentInfo = $hookRes['contentInfo'] ?? $this->contentInfo;
+            if (isset($hookRes['abort'])) abort($hookRes['abort'], $hookRes['msg'] ?? '');
+            return;
+        }
+
         if (!empty($urlname)) {
             /* 获取当前栏目信息 */
             $regex = '/^(\w+)_(\d+)$/';
@@ -100,9 +114,20 @@ class Base extends Frontend
                 $urlname = $match[2];
             }
 
-            $this->contentSort = $contentSortModel->getSort($urlname);
-            if (!$this->contentSort) {
-                $this->contentSort = $contentSortModel->getSortNotLang($urlname);
+            //如果id存在，则先获取内容再获取栏目信息，防止因为栏目名称相同而获取到别的语言导致内容不存在
+            if ($id = $this->request->param('id')) {
+                $contentModel = new Content();
+                $this->contentInfo = $contentModel::getContent('', $id);
+                if (!$this->contentInfo) {
+                    abort(404, __('Not found'));
+                }
+                set_forntend_lang($this->contentInfo['acode']);
+                $this->contentSort = $contentSortModel->getSort($this->contentInfo['scode']);
+            } else {
+                $this->contentSort = $contentSortModel->getSort($urlname);
+                if (!$this->contentSort) {
+                    $this->contentSort = $contentSortModel->getSortNotLang($urlname);
+                }
             }
             /*内容不存在*/
             if (!$this->contentSort) {
@@ -123,12 +148,12 @@ class Base extends Frontend
             if ($this->contentSort['pcode']) {
                 $parent_sort = $contentSortModel->getSort($this->contentSort['pcode']);
             } else {
-                $parent_sort = $top_sort;
+                $parent_sort = $top_sort ?? null;
             }
 
             $this->contentSort['parentname'] = $parent_sort['name'] ?? '';
             $this->contentSort['parentlink'] = $parent_sort['link'] ?? '';
-            $this->contentSort['parentrows'] = $contentSortModel->getSortRows($parent_sort['scode']);
+            $this->contentSort['parentrows'] = $contentSortModel->getSortRows($parent_sort['scode'] ?? 0);
 
             $this->view->assign('sort', $this->contentSort);
             $this->view->assign('listsort', $this->contentSort);
@@ -155,6 +180,8 @@ class Base extends Frontend
             $this->view->assign('sort', $this->contentSort);
             $this->view->assign('listsort', $this->contentSort);
         }
+
+        $this->triggerObserver('AfterGetSort', $this->contentSort);
     }
 
     /**
@@ -185,8 +212,16 @@ class Base extends Frontend
             'pagetitle' => $this->site['sitetitle'],
             'pagedescription' => $this->site['sitedescription'],
             'pagekeywords' => $this->site['sitekeywords'],
-            'homeurl' => (string)url('/')
+            'homeurl' => (string)homeurl(),
+            'is_home' => 0
         ];
+
+        // BeforeAssignBd 钩子：允许修改全局变量数组
+        $hookRes = $this->triggerObserver('BeforeAssignBd', $bdassign);
+        if (is_array($hookRes)) {
+            $bdassign = array_merge($bdassign, $hookRes);
+        }
+
         $api_data = $this->apiSecret();
         $this->view->assign('bd', array_merge($bdassign, $api_data, $this->site, $this->company, $this->label));
     }
@@ -281,6 +316,15 @@ class Base extends Frontend
     {
         $lg = $this->request->param('lg');
 
+        // BeforeArea 钩子：允许插件拦截或修改语言代码
+        $hookRes = $this->triggerObserver('BeforeArea', $lg);
+        if ($hookRes === false) {
+            return;
+        }
+        if (is_array($hookRes)) {
+            $lg = $hookRes[0] ?? $lg;
+        }
+
         if (!$lg) {
             $this->redirect('/');
         }
@@ -296,6 +340,12 @@ class Base extends Frontend
         // 使用简化的正则表达式只检查是否包含 http 或 https 前缀
         if (!preg_match('/^https?:\/\//i', $domain)) {
             $domain = $this->request->scheme() . '://' . $domain;
+        }
+
+        // AfterArea 钩子：允许最终跳转前修改域名
+        $hookRes = $this->triggerObserver('AfterArea', $domain, $cms_area);
+        if (is_array($hookRes)) {
+            $domain = $hookRes[0] ?? $domain;
         }
 
         $this->redirect($domain);
@@ -350,5 +400,38 @@ class Base extends Frontend
             'view_path' => $view_path,
             'taglib_pre_load' => Bd::class
         ]);
+    }
+
+    /**
+     * 触发观察者事件
+     * @param string $event 事件名称
+     * @param mixed ...$params 参数
+     * @return bool|array 返回 false 表示拦截，返回 array 表示修改后的数据，返回 true 表示通过
+     */
+    protected function triggerObserver(string $event, ...$params)
+    {
+        // 自动触发基于控制器类名的系统事件
+        // 例如：app\admin\controller\cms\Content.BeforeEdit
+        $eventName = static::class . '.' . $event;
+        $res1 = Event::trigger($eventName,  $params);
+        // 触发高性能通用观察者事件，方便模块进行统一监听
+        $res2 = Event::trigger('index_cms_observer.' . $event, ['class' => $eventName, 'params' => $params]);
+
+        // 合并执行结果
+        $eventResults = array_merge($res1, $res2);
+
+        // 如果有监听者返回 false，则认为操作被截断
+        if (in_array(false, $eventResults, true)) {
+            return false;
+        }
+
+        // 匹配修改数据的逻辑：寻找返回结果中的第一个数组作为修改后的数据
+        foreach ($eventResults as $res) {
+            if (is_array($res)) {
+                return $res;
+            }
+        }
+
+        return true;
     }
 }

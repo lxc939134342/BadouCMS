@@ -73,6 +73,7 @@ class FormData extends Base
         $formFields = $formFieldsModel->where('fcode', $this->fcode)->select();
 
         $this->assignconfig('formFields', $formFields);
+        $this->assignHook('index');
         return $this->view->fetch();
     }
 
@@ -85,6 +86,13 @@ class FormData extends Base
         }
 
         $ids = $this->request->param('ids');
+
+        // 触发观察者 - 删除前
+        $res = $this->triggerObserver('BeforeDel', $ids, $this);
+        if (is_array($res)) {
+            $ids = $res;
+        }
+
         $where[] = [$this->pk, 'in', $ids];
 
         $this->model->startTrans();
