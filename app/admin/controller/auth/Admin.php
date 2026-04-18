@@ -33,7 +33,7 @@ class Admin extends Backend
     protected $childrenGroupIds = [];
     protected $childrenAdminIds = [];
     //无需要权限判断的方法
-    protected $noNeedRight = ['getGroupList'];
+    protected $noNeedRight = ['getGroupList', 'selectpage'];
     protected $noNeedToken = ['getGroupList'];
 
 
@@ -266,5 +266,10 @@ class Admin extends Backend
             }
         }
         $this->result('ok', ['count' => count($groupdata), 'list' => $groupdata]);
+    }
+
+    public function selectpage()
+    {
+        return parent::selectpage();
     }
 }

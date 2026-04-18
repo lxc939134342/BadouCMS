@@ -26,7 +26,7 @@ class Extfield extends Base
      */
     protected $model;
 
-    protected string $weighField = 'sorting';
+    protected $multiFields = 'sorting';
 
     public function initialize(): void
     {

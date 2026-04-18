@@ -27,6 +27,7 @@ class Base extends Backend
     protected $noNeedRight = ['changelang'];
     protected $noNeedToken = ['getFieldHtml', 'getContentSort']; // 子类中定义的无需令牌验证的方法
     protected $csrfCheck = true; // 是否开启CSRF校验
+    protected $multiFields = 'status,sorting';
 
     protected $defaultArea = null;
 

@@ -42,8 +42,6 @@ class Content extends Base
      */
     protected $extfieldModel;
 
-    protected $weighField = 'sorting';
-
     protected $quickSearchField = ['id', 'title'];
     // 开启关联查询
     protected $relationSearch = true;

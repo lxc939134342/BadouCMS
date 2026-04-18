@@ -24,7 +24,7 @@ class Slide extends Base
     protected $model;
 
 
-    protected string $weighField = 'sorting';
+    protected $multiFields = 'sorting';
 
     public function initialize(): void
     {
@@ -36,7 +36,7 @@ class Slide extends Base
     public function index()
     {
         if (!$this->request->isAjax()) {
-            $this->assignHook('index');
+            $this->assignHook('index', []);
             return $this->view->fetch();
         }
 
@@ -46,7 +46,9 @@ class Slide extends Base
 
         list($where, $sort, $order, $offset, $limit, $page, $alias, $bind) = $this->buildparams();
         $where[] = [
-            'acode','=',get_backend_lang()
+            'acode',
+            '=',
+            get_backend_lang()
         ];
 
         $res = $this->model
@@ -65,15 +67,15 @@ class Slide extends Base
             $post = $this->getPostData('row/a', true);
             // 构建数据
             $default = [
-               'acode' => get_backend_lang(),
-               'gid' => 0,
-               'pic' => '',
-               'link' => '',
-               'title' => '',
-               'subtitle' => '',
-               'sorting' => 255,
-               'create_user' => $this->auth->username,
-               'update_user' => $this->auth->username
+                'acode' => get_backend_lang(),
+                'gid' => 0,
+                'pic' => '',
+                'link' => '',
+                'title' => '',
+                'subtitle' => '',
+                'sorting' => 255,
+                'create_user' => $this->auth->username,
+                'update_user' => $this->auth->username
             ];
             $post = array_merge($default, $post);
 
@@ -117,10 +119,10 @@ class Slide extends Base
         if (!$row) {
             $this->error(__('Record not found'));
         }
-        
+
         if ($this->request->isPost()) {
             $post = $this->getPostData('row/a', true);
-            
+
             $result = false;
             $this->model->startTrans();
             try {
@@ -183,5 +185,4 @@ class Slide extends Base
             $this->error(__('No rows were deleted'));
         }
     }
-
 }

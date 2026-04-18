@@ -21,6 +21,8 @@ class User extends Backend
     protected $modelValidate = true;
     protected $groupList = [];
 
+    protected $noNeedRight = ['selectpage'];
+
     public function initialize()
     {
         parent::initialize();
@@ -56,4 +58,8 @@ class User extends Backend
         return $this->view->fetch();
     }
 
+    public function selectpage()
+    {
+        return parent::selectpage();
+    }
 }

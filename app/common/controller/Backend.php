@@ -246,7 +246,7 @@ class Backend extends BaseController
                 $token = $this->request->buildToken();
             }
         }
-        
+
         // 无论何种请求，都确保 Config.token 能获取到当前 Session 中的最新令牌
         $config['token'] = \think\facade\Session::get('__token__');
         // 确保前端 Config 和视图变量同步
