@@ -209,7 +209,7 @@ class Backend extends BaseController
             'moduleurl'      => rtrim(url("/", [], false), '/'),
             'language'       => $lang,
             'referer'        => Session::get("referer"),
-            'app_url'        => $this->request->root(true),
+            'app_url'        => $this->request->scheme() . '://' . $this->request->host() . $this->request->root(),
             'token'          => '',
         ];
         $config = array_merge($config, Config::get("view_replace_str"));

@@ -117,7 +117,7 @@ class Api extends BaseController
             'jsname'         => 'frontend/' . str_replace('.', '/', $controllername),
             'moduleurl'      => rtrim(url("/{$modulename}", [], false), '/'),
             'language'       => $lang,
-            'app_url'        => $this->request->root(true),
+            'app_url'        => $this->request->scheme() . '://' . $this->request->host() . $this->request->root(),
         ];
         $config = array_merge($config, Config::get("view_replace_str"));
 
