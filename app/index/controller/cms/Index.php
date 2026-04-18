@@ -30,6 +30,7 @@ class Index extends Base
         $this->site['pagetitle'] = $pagetitle;
         $this->site['pagedescription'] = $this->site['sitedescription'];
         $this->site['pagekeywords'] = $this->site['sitekeywords'];
+        $this->site['is_home'] = 1;
         $this->assignBd();
 
         return $this->view->fetch('/index');
