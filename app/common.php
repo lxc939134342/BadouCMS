@@ -273,13 +273,14 @@ if (!function_exists('cdnurl')) {
      * 获取上传资源的CDN的地址
      * @param string  $url    资源相对地址
      * @param boolean $domain 是否显示域名 或者直接传入域名
+     * @param boolean $cdn    是否使用CDN地址
      * @return string
      */
-    function cdnurl($url, $domain = false)
+    function cdnurl($url, $domain = false, $cdn = true)
     {
         $regex = "/^((?:[a-z]+:)?\/\/|data:image\/)(.*)/i";
-        $cdnurl = Config::get('upload.cdnurl');
-        if (is_bool($domain) || stripos($cdnurl, '/') === 0) {
+        $cdnurl = $cdn ? Config::get('upload.cdnurl') : '';
+        if (is_bool($domain) || (isset($cdnurl) && stripos($cdnurl, '/') === 0)) {
             $url = preg_match($regex, $url) || ($cdnurl && stripos($url, $cdnurl) === 0) ? $url : $cdnurl . $url;
         }
         if ($domain && !preg_match($regex, $url)) {

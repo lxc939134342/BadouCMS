@@ -16,6 +16,7 @@ use Throwable;
 use think\facade\Db;
 use think\facade\View;
 use think\facade\Event;
+use think\facade\Config;
 use app\index\model\cms\Site;
 use app\index\model\cms\Label;
 use app\index\model\cms\Company;
@@ -194,7 +195,7 @@ class Base extends Frontend
             'scaction' => url('/search'),
             'sitemap' => url('/sitemap', [], 'xml'),
             'msgaction' => url('/message'),
-            'sitetplpath' => cdnurl('/template/cms/' . $this->site['theme']),
+            'sitetplpath' => cdnurl('/template/cms/' . $this->site['theme'], true, false),
             'checkcode' => (string)url('index/captcha'),
             'islogin' => $this->auth->isLogin(),
             'registerstatus' => true,
@@ -398,7 +399,8 @@ class Base extends Frontend
         $this->view = View::instance();
         $this->view->config([
             'view_path' => $view_path,
-            'taglib_pre_load' => Bd::class
+            'taglib_pre_load' => Bd::class,
+            'tpl_replace_string' => array_merge(Config::get('view.tpl_replace_string'), ['__CDN__' => cdnurl('')])
         ]);
     }
 
