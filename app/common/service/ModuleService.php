@@ -35,7 +35,7 @@ class ModuleService extends Service
     {
         $installed = Server::getInstalldModuleList();
 
-        // 先筛选出所有需要执行 AppInit 的模块类，再统一注册一个 listener
+        // 先筛选出所有需要执行 AppInit 的模块类，并记录权重
         $appInitClasses = [];
         foreach ($installed as $item) {
             if ($item['state'] != 1) {
@@ -43,14 +43,26 @@ class ModuleService extends Service
             }
             $moduleClass = Server::getModuleClass($item['name']);
             if ($moduleClass && method_exists($moduleClass, 'AppInit')) {
-                $appInitClasses[] = $moduleClass;
+                $appInitClasses[] = [
+                    'name'  => $item['name'],
+                    'class' => $moduleClass,
+                    'order' => (int)($item['order'] ?? 0),
+                ];
             }
         }
 
         if ($appInitClasses) {
+            // 对模块加载顺序进行排序
+            usort($appInitClasses, function ($a, $b) {
+                if ($a['order'] === $b['order']) {
+                    return $a['class'] <=> $b['class'];
+                }
+                return $b['order'] <=> $a['order'];
+            });
+
             Event::listen('AppInit', function () use ($appInitClasses) {
-                foreach ($appInitClasses as $moduleClass) {
-                    (new $moduleClass())->AppInit();
+                foreach ($appInitClasses as $item) {
+                    (new $item['class']())->AppInit();
                 }
             });
         }
