@@ -674,64 +674,68 @@ function set_forntend_lang(string $lg): void
     cookie('f_lg', $lg);
 }
 
-/**
- * 生成url
- * @param mixed $type               模型类型：1-单页，2-列表
- * @param mixed $urlname            模型urlname
- * @param mixed $pagetype           页面类型：list-列表，content-内容
- * @param mixed $scode              分类scode
- * @param mixed $sortfilename       分类定义的urlname
- * @param mixed $id                 内容id
- * @param mixed $contentfilename    内容定义的urlname
- * @return string|think\route\Url
- */
-function bdurl($type, $urlname, $pagetype, $scode, $sortfilename, $id = '', $contentfilename = '')
-{
-    $url_break_char = '_';
-    $url_rule_content_path = false;
-    /* url模型 0去掉后缀 1携带.html后缀 */
-    $url_type = get_sys_config('url_type') == 1 ? true : false;
 
-    if ($type == 1 || $pagetype == 'about') {
-        $urlname = $urlname ?: 'about';
-        if ($sortfilename) {
-            $link = url('/' . $sortfilename, [], $url_type);
-        } else {
-            $link = url('/' . $urlname . $url_break_char . $scode, [], $url_type);
-        }
-    } else {
-        $urlname = $urlname ?: 'list';
-        if ($pagetype == 'list') {
+if (!function_exists('bdurl')) {
+    /**
+     * 生成url
+     * @param mixed $type               模型类型：1-单页，2-列表
+     * @param mixed $urlname            模型urlname
+     * @param mixed $pagetype           页面类型：list-列表，content-内容
+     * @param mixed $scode              分类scode
+     * @param mixed $sortfilename       分类定义的urlname
+     * @param mixed $id                 内容id
+     * @param mixed $contentfilename    内容定义的urlname
+     * @return string|think\route\Url
+     */
+    function bdurl($type, $urlname, $pagetype, $scode, $sortfilename, $id = '', $contentfilename = '')
+    {
+        $url_break_char = '_';
+        $url_rule_content_path = false;
+        /* url模型 0去掉后缀 1携带.html后缀 */
+        $url_type = get_sys_config('url_type') == 1 ? true : false;
+
+        if ($type == 1 || $pagetype == 'about') {
+            $urlname = $urlname ?: 'about';
             if ($sortfilename) {
                 $link = url('/' . $sortfilename, [], $url_type);
             } else {
                 $link = url('/' . $urlname . $url_break_char . $scode, [], $url_type);
             }
-        } elseif ($pagetype == 'content') {
-            if ($url_rule_content_path) {
-                if ($contentfilename) {
-                    $link = url('/' . $contentfilename, [], $url_type);
+        } else {
+            $urlname = $urlname ?: 'list';
+            if ($pagetype == 'list') {
+                if ($sortfilename) {
+                    $link = url('/' . $sortfilename, [], $url_type);
                 } else {
-                    $link = url('/' . $id, [], $url_type);
+                    $link = url('/' . $urlname . $url_break_char . $scode, [], $url_type);
+                }
+            } elseif ($pagetype == 'content') {
+                if ($url_rule_content_path) {
+                    if ($contentfilename) {
+                        $link = url('/' . $contentfilename, [], $url_type);
+                    } else {
+                        $link = url('/' . $id, [], $url_type);
+                    }
+                } else {
+                    if ($sortfilename && $contentfilename) {
+                        $link = url('/' . $sortfilename . '/' . $contentfilename, [], $url_type);
+                    } elseif ($sortfilename) {
+                        $link = url('/' . $sortfilename . '/' . $id, [], $url_type);
+                    } elseif ($contentfilename) {
+                        $link = url('/' . $urlname . $url_break_char . $scode . '/' . $contentfilename, [], $url_type);
+                    } else {
+                        $link = url('/' . $urlname . $url_break_char . $scode . '/' . $id, [], $url_type);
+                    }
                 }
             } else {
-                if ($sortfilename && $contentfilename) {
-                    $link = url('/' . $sortfilename . '/' . $contentfilename, [], $url_type);
-                } elseif ($sortfilename) {
-                    $link = url('/' . $sortfilename . '/' . $id, [], $url_type);
-                } elseif ($contentfilename) {
-                    $link = url('/' . $urlname . $url_break_char . $scode . '/' . $contentfilename, [], $url_type);
-                } else {
-                    $link = url('/' . $urlname . $url_break_char . $scode . '/' . $id, [], $url_type);
-                }
+                $link = 'javascript:;';
             }
-        } else {
-            $link = 'javascript:;';
         }
+        $link = preg_replace("/\/((?!index)[\w]+)\.php\//i", "/", (string)$link);
+        return $link;
     }
-    $link = preg_replace("/\/((?!index)[\w]+)\.php\//i", "/", (string)$link);
-    return $link;
 }
+
 
 /**
  * 缩放图片
