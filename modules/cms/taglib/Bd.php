@@ -293,13 +293,15 @@ class Bd extends TagLib
     public function tagSelect($tag, $content): string
     {
         $field  = $tag['field'];
+        $multiple = $tag['multiple'] ?? '0'; // 支持模板中传入 multiple=1 表示多选
         $alias  = $tag['alias'] ?? 'select';
         $empty  = $tag['empty'] ?? '';
         $key    = !empty($tag['key']) ? $tag['key'] : 'i';
         $mod    = $tag['mod'] ?? '2';
         $var    = Random::build('alnum', 10);
         $parse  = '<?php ';
-        $parse .= '$__' . $var . '__ = \app\index\model\cms\Extfield::getSelect("' . $field . '");';
+        // 将 multiple 参数传入模型方法
+        $parse .= '$__' . $var . '__ = \app\index\model\cms\Extfield::getSelect("' . $field . '", ' . $multiple . ');';
         $parse .= ' ?>';
         $parse .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
         $parse .= $content;

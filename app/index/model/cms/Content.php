@@ -168,10 +168,35 @@ class Content extends Model
                 $fields = array_column($columns, 'Field');
             } catch (\Exception $e) {
                 // 如果查询失败，使用默认白名单
-                $fields = ['id', 'title', 'author', 'source', 'keywords', 'description', 'content',
-                          'ico', 'pics', 'date', 'istop', 'isrecommend', 'isheadline', 'visits',
-                          'likes', 'oppose', 'status', 'outlink', 'type', 'scode', 'subscode',
-                          'filename', 'urlname', 'create_time', 'update_time', 'sorting', 'enclosure'];
+                $fields = [
+                    'id',
+                    'title',
+                    'author',
+                    'source',
+                    'keywords',
+                    'description',
+                    'content',
+                    'ico',
+                    'pics',
+                    'date',
+                    'istop',
+                    'isrecommend',
+                    'isheadline',
+                    'visits',
+                    'likes',
+                    'oppose',
+                    'status',
+                    'outlink',
+                    'type',
+                    'scode',
+                    'subscode',
+                    'filename',
+                    'urlname',
+                    'create_time',
+                    'update_time',
+                    'sorting',
+                    'enclosure'
+                ];
             }
         }
 
@@ -433,6 +458,80 @@ class Content extends Model
     }
 
     /**
+     * 构建/解析扩展字段的查询条件
+     * 提取出通用方法，并开放完整的查询生成机制由外部事件接管
+     * @param array $get
+     * @param array $params
+     * @return array
+     */
+    public static function buildExtWhere($get, $params = []): array
+    {
+        // 1. 触发事件：无限制全面接管扩展条件生成权
+        // 如果有钩子监听并赋值了 `ext_where`，则直接使用钩子的返回结果并结束本方法
+        $eventObj = (object)['get' => $get, 'params' => $params, 'ext_where' => null];
+        \think\facade\Event::trigger(static::class . '.BuildExtWhere', $eventObj);
+
+        if ($eventObj->ext_where !== null && is_array($eventObj->ext_where)) {
+            return $eventObj->ext_where;
+        }
+
+        $ext_where = [];
+        $fuzzy = isset($params['fuzzy']) ? $params['fuzzy'] : false;
+
+        // 获取所有的扩展字段配置，用来判断哪些是多选字段（如 4 多选按钮, 14 关联表多选）
+        $extFieldTypes = \app\index\model\cms\Extfield::column('type', 'name');
+
+        foreach ($get as $key => $value) {
+            if (preg_match('/^ext_[\w\-]+$/', $key)) { // 其他字段不加入
+                // 获取当前字段的类型，判断在数据库中它存的是不是多值（逗号分隔）
+                $fieldType = $extFieldTypes[$key] ?? 1;
+                $isMultiDbField = in_array($fieldType, [4, 14]); // type=4 是 checkbox, type=14 是多选关联
+
+                // 2. 默认：处理区间查询
+                if (strpos($value, '-') !== false) {
+                    $range = explode('-', $value);
+                    if ($range[0] !== '') {
+                        $ext_where[] = [$key, '>', $range[0]];
+                    }
+                    if (isset($range[1]) && $range[1] !== '') {
+                        $ext_where[] = [$key, '<=', $range[1]];
+                    }
+                }
+                // 3. 默认：处理多选入参（入参含有逗号）
+                elseif (strpos($value, ',') !== false) {
+                    $multiValues = array_filter(array_map('trim', explode(',', $value)));
+                    if ($multiValues) {
+                        if ($isMultiDbField) {
+                            // 入参是多选，且数据库此字段格式也是逗号分隔的多值，则必须使用多个 FIND_IN_SET 的 OR 逻辑
+                            $ext_where[] = function ($query) use ($key, $multiValues) {
+                                foreach ($multiValues as $v) {
+                                    $query->whereOr($key, 'find in set', $v);
+                                }
+                            };
+                        } else {
+                            // 数据库存的是单值（但筛选器允许勾选多个去找），安全使用 IN 查询
+                            $ext_where[] = [$key, 'in', $multiValues];
+                        }
+                    }
+                }
+                // 4. 默认：普通单值入参查询
+                elseif ($fuzzy) {
+                    $ext_where[] = [$key, 'like', '%' . $value . '%'];
+                } else {
+                    if ($isMultiDbField) {
+                        // 传入单个值，由于数据库里它是多值字段，这里也需要用 FIND_IN_SET 查找
+                        $ext_where[] = [$key, 'find in set', $value];
+                    } else {
+                        // 正常单值精确等于
+                        $ext_where[$key] = $value;
+                    }
+                }
+            }
+        }
+        return $ext_where;
+    }
+
+    /**
      * 内容列表
      * @param mixed $params
      * @return array
@@ -508,6 +607,7 @@ class Content extends Model
                             break;
                         case 'random': // 随机取数
                             $order = Db::raw("RAND()");
+                            $params['cache'] = false;
                             break;
                         default:
                             if ($value) {
@@ -733,22 +833,12 @@ class Content extends Model
         if ($ext_table) {
             $db->join('cms_content_ext e', 'a.id=e.contentid', 'LEFT');
         }
+
         $db->order($order);
         if ($page) {
             // 扩展字段数据筛选
-            $get = request()->get();
-            $ext_where = [];
-            foreach ($get as $key => $value) {
-                if (preg_match('/^ext_[\w\-]+$/', $key)) { // 其他字段不加入
-                    if ($params['fuzzy']) {
-                        $ext_where[] = [$key, 'like', '%' . $value . '%'];
-                    } else {
-                        $ext_where[$key] = $value;
-                    }
-                }
-            }
+            $ext_where = self::buildExtWhere(request()->get(), $params);
             $db->where($ext_where);
-
             $res = $db->paginate([
                 'query' => request()->get(),
                 'list_rows' => $num,
@@ -1153,20 +1243,11 @@ class Content extends Model
         if ($ext_table) {
             $db->join('cms_content_ext e', 'a.id=e.contentid', 'LEFT');
         }
+
         $db->order($order);
         if ($page) {
             // 扩展字段数据筛选
-            $get = request()->get();
-            $ext_where = [];
-            foreach ($get as $key => $value) {
-                if (preg_match('/^ext_[\w\-]+$/', $key)) { // 其他字段不加入
-                    if ($params['fuzzy']) {
-                        $ext_where[] = [$key, 'like', '%' . $value . '%'];
-                    } else {
-                        $ext_where[$key] = $value;
-                    }
-                }
-            }
+            $ext_where = self::buildExtWhere(request()->get(), $params);
             $db->where($ext_where);
 
             $res = $db->paginate([
