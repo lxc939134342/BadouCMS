@@ -114,6 +114,17 @@ layui.define(["toast"], function (exports) {
               options.data +=
                 (options.data ? "&" : "") + "__token__=" + Config.token;
             }
+          } else if (Array.isArray(options.data)) {
+            var hasToken = false;
+            for (var i = 0; i < options.data.length; i++) {
+              if (options.data[i] && options.data[i].name === "__token__") {
+                hasToken = true;
+                break;
+              }
+            }
+            if (!hasToken) {
+              options.data.push({ name: "__token__", value: Config.token });
+            }
           } else {
             var tokenData = {};
             if (
