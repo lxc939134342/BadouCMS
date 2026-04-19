@@ -53,36 +53,26 @@ class Form extends Model
     public function addTableData($fcode, $data)
     {
         $table_name = $this->where('fcode', $fcode)->value('table_name');
+        if (!$table_name) return false;
 
-        // 获取该表单允许的字段列表（白名单）
-        $allowedFields = Db::name('cms_form_field')
-            ->where('fcode', $fcode)
-            ->column('name');
+        // 补齐系统默认字段
+        if (!isset($data['create_time'])) $data['create_time'] = date('Y-m-d H:i:s');
+        if (!isset($data['acode'])) $data['acode'] = get_frontend_lang();
+        if (!isset($data['user_ip'])) $data['user_ip'] = request()->ip();
 
-        if (empty($allowedFields)) {
-            return false;
-        }
+        // TP8 Query Builder 不支持 field(true) 在 insert 时自动过滤
+        // 我们通过获取表字段并使用 array_intersect_key 进行交集过滤，确保数据安全
+        $tableFields = Db::name($table_name)->getTableFields();
+        $finalData = array_intersect_key($data, array_flip($tableFields));
 
-        // 只保留白名单中的字段
-        $filteredData = [];
-        foreach ($data as $key => $value) {
-            if (in_array($key, $allowedFields)) {
-                $filteredData[$key] = $value;
-            }
-        }
-
-        // 添加系统字段
-        $filteredData['create_time'] = time();
-        $filteredData['acode'] = get_frontend_lang();
-
-        return Db::name($table_name)->insert($filteredData) > 0 ? true : false;
+        return Db::name($table_name)->strict(false)->insert($finalData) > 0;
     }
 
     // 获取表单列表
     public function getFormList($fcode, $num, $order = 'id DESC', $page = false, $start = 1)
     {
         $table_name = $this->where('fcode', $fcode)->value('table_name');
-        $simple = false;//简洁分页
+        $simple = false; //简洁分页
         $where = [
             'acode' => get_frontend_lang()
         ];
@@ -165,5 +155,4 @@ class Form extends Model
     {
         return url('/message/submit_form', ['fcode' => $fcode])->build();
     }
-
 }

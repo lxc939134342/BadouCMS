@@ -34,12 +34,12 @@ class Extfield extends Model
     protected function init(): void
     {
         parent::init();
-        // // 监听自身事件
-        // \think\facade\Event::listen(static::class . '.BeforeInsert', [self::class, '_onBeforeInsert']);
-        // \think\facade\Event::listen(static::class . '.AfterInsert', [self::class, '_onAfterInsert']);
-        // \think\facade\Event::listen(static::class . '.BeforeUpdate', [self::class, '_onBeforeUpdate']);
-        // \think\facade\Event::listen(static::class . '.AfterUpdate', [self::class, '_onAfterUpdate']);
-        // \think\facade\Event::listen(static::class . '.AfterDelete', [self::class, '_onAfterDelete']);
+        // 监听自身事件
+        \think\facade\Event::listen(static::class . '.BeforeInsert', [self::class, '_onBeforeInsert']);
+        \think\facade\Event::listen(static::class . '.AfterInsert', [self::class, '_onAfterInsert']);
+        \think\facade\Event::listen(static::class . '.BeforeUpdate', [self::class, '_onBeforeUpdate']);
+        \think\facade\Event::listen(static::class . '.AfterUpdate', [self::class, '_onAfterUpdate']);
+        \think\facade\Event::listen(static::class . '.AfterDelete', [self::class, '_onAfterDelete']);
     }
 
     public function getContentAttr($value, $data)

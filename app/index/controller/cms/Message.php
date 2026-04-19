@@ -51,7 +51,6 @@ class Message extends Base
             $this->error(__('%s does not exist any field, please check and try again!', [$formTypeText]));
         }
 
-
         // 接收数据
         $mail_body = '';
         foreach ($form as $value) {
@@ -65,13 +64,6 @@ class Message extends Base
                 $data[$value['name']] = $field_data;
                 $mail_body .= $value['description'] . '：' . $field_data . '<br>';
             }
-        }
-
-        // 获取表字段并判断 acode 是否存在
-        $tableName = $form[0]['table_name'];
-        $tableFields = Db::name($tableName)->getTableFields();
-        if (!in_array('acode', $tableFields)) {
-            unset($data['acode']);
         }
 
         if ($this->model->addTableData($fcode, $data)) {
