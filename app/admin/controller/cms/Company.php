@@ -42,13 +42,11 @@ class Company extends Base
 
     public function index()
     {
-        $config      = $this->model->where('acode', get_backend_lang())->find();
+        $config = $this->model->where('acode', get_backend_lang())->findOrEmpty();
 
-        if (!$config) {
+        if ($config->isEmpty()) {
             $columns = TableManager::getTableColumns('cms_company', false, 'mysql');
-            foreach ($columns as $key => $value) {
-                $config[$key] = '';
-            }
+            $config->setAttrs(array_fill_keys(array_keys($columns), ''));
         }
         $this->assign('row', $config);
         $this->assignHook('index', ['main_top', 'main_mid', 'main_bottom', 'side_top', 'side_bottom', 'footer', 'scripts'], $config->toArray());

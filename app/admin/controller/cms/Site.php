@@ -43,13 +43,11 @@ class Site extends Base
      */
     public function index()
     {
-        $config      = $this->model->where('acode', get_backend_lang())->find();
+        $config = $this->model->where('acode', get_backend_lang())->findOrEmpty();
 
-        if (!$config) {
+        if ($config->isEmpty()) {
             $columns = TableManager::getTableColumns('cms_site', false, 'mysql');
-            foreach ($columns as $key => $value) {
-                $config[$key] = '';
-            }
+            $config->setAttrs(array_fill_keys(array_keys($columns), ''));
         }
 
         $template_path = root_path() . 'template' . DIRECTORY_SEPARATOR;
