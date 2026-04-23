@@ -46,11 +46,36 @@ class Area extends Model
     public static function onBeforeDelete($model): void
     {
         $data = $model->getData();
-        if ($data['acode'] == 'cn') {
-            throw new \Exception(__('The Chinese area is not allowed to be deleted'));
-        }
+        
+        // 检测是否为默认区域
         if ($data['is_default'] == 1) {
             throw new \Exception(__('The default region is not allowed for deletion'));
+        }
+        
+        // 检测区域是否处于开启状态
+        if ($data['status'] == 1) {
+            throw new \Exception(__('Cannot delete area that is currently enabled'));
+        }
+        
+        // 检测是否为中文区域
+        if ($data['acode'] == 'cn') {
+            // 检测是否有其他区域存在
+            $otherAreasCount = self::where('acode', '<>', 'cn')->count();
+            if ($otherAreasCount == 0) {
+                throw new \Exception(__('Chinese area cannot be deleted when there are no other areas'));
+            }
+        }
+        
+        // 检测该区域下是否有栏目
+        $contentSortCount = \app\admin\model\cms\ContentSort::where('acode', $data['acode'])->count();
+        if ($contentSortCount > 0) {
+            throw new \Exception(__('Cannot delete area with existing categories'));
+        }
+        
+        // 检测该区域下是否有内容
+        $contentCount = \app\admin\model\cms\Content::where('acode', $data['acode'])->count();
+        if ($contentCount > 0) {
+            throw new \Exception(__('Cannot delete area with existing content'));
         }
     }
 
@@ -64,5 +89,16 @@ class Area extends Model
     {
         $area = $this->where('is_default', 1)->field('id,acode,name')->find();
         return $area;
+    }
+    
+    public static function onAfterDelete($model): void
+    {
+        $data = $model->getData();
+        
+        // 清空该区域的站点配置
+        \app\admin\model\cms\Site::where('acode', $data['acode'])->delete();
+        
+        // 清空该区域的公司信息
+        \app\admin\model\cms\Company::where('acode', $data['acode'])->delete();
     }
 }
