@@ -14,6 +14,7 @@ namespace app\admin\model\cms;
 
 use think\Model;
 use think\facade\Db;
+use think\facade\Cache;
 
 /**
  * Content
@@ -32,6 +33,7 @@ class Content extends Model
     {
         parent::init();
         \think\facade\Event::listen('app\admin\model\cms\Content.BeforeWrite', [self::class, '_onBeforeWrite']);
+        \think\facade\Event::listen('app\admin\model\cms\Content.AfterWrite', [self::class, '_onAfterWrite']);
         \think\facade\Event::listen('app\admin\model\cms\Content.AfterDelete', [self::class, '_onAfterDelete']);
     }
     // 模型事件
@@ -46,10 +48,18 @@ class Content extends Model
         }
     }
 
+    public static function _onAfterWrite($model)
+    {
+        // 清除缓存
+        Cache::tag('cms_cache')->clear();
+    }
+
     public static function _onAfterDelete($model)
     {
         $data = $model->getData();
         Db::name('cms_content_ext')->where('contentid', $data['id'])->delete();
+        // 清除缓存
+        Cache::tag('cms_cache')->clear();
     }
 
 
@@ -182,6 +192,7 @@ class Content extends Model
             }
         }
 
+        Cache::tag('cms_cache')->clear();
         return $result;
     }
 

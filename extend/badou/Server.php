@@ -289,7 +289,7 @@ class Server
             @mkdir($dir, 0755);
         }
         $conflictlist = [];
-        $ignoreDirs = (array)config('badouadmin.upgrade_ignore_dirs'); 
+        $ignoreDirs = (array)config('badouadmin.upgrade_ignore_dirs');
         $ignoreFiles = (array)config('badouadmin.upgrade_ignore_files');
         $ignoreList = array_merge($ignoreDirs, $ignoreFiles);
         $extractlist = [];

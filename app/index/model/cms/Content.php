@@ -856,7 +856,7 @@ class Content extends Model
             }
         } else {
             list($cacheKey, $exprie) = self::getCacheKeyExpire('contentList', $params);
-            $res = $db->limit($start, $num)->cache($cacheKey, $exprie)->select();
+            $res = $db->limit($start, $num)->cache($cacheKey, $exprie, 'cms_cache')->select();
             if (!$res->isEmpty()) {
                 $data['total'] = $res->count();
                 $data['data'] = $res->toArray();

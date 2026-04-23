@@ -13,6 +13,7 @@
 namespace app\admin\model\cms;
 
 use think\Model;
+use think\facade\Cache;
 
 /**
  * Company
@@ -25,4 +26,13 @@ class Company extends Model
     // 自动写入时间戳字段
     protected $autoWriteTimestamp = false;
 
+    public static function onAfterWrite($model)
+    {
+        Cache::tag('cms_cache')->clear();
+    }
+
+    public static function onAfterDelete($model)
+    {
+        Cache::tag('cms_cache')->clear();
+    }
 }

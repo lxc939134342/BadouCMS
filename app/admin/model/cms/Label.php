@@ -14,6 +14,7 @@ namespace app\admin\model\cms;
 
 use think\Model;
 use think\facade\Db;
+use think\facade\Cache;
 
 /**
  * Label
@@ -88,6 +89,7 @@ class Label extends Model
             ];
             (new self())->save($titleData);
         }
+        Cache::tag('cms_cache')->clear();
     }
 
     /* 更新后 */
@@ -115,6 +117,7 @@ class Label extends Model
                 }
             }
         }
+        Cache::tag('cms_cache')->clear();
     }
 
     /* 删除后 */
@@ -126,6 +129,7 @@ class Label extends Model
             $acode = $data['acode'] ?? get_backend_lang();
             self::where('name', $titleName)->where('acode', $acode)->delete();
         }
+        Cache::tag('cms_cache')->clear();
     }
 
     public function getValueAttr($value, $data)
