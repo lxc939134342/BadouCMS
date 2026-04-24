@@ -1,16 +1,22 @@
-<link rel="stylesheet" href="__CDN__/assets/libs/bootstrap/bootstrap.min.css">
+<link rel="stylesheet" href="__CDN__/assets/libs/bootstrap/bootstrap.min.css" />
 <link rel="stylesheet" href="__CDN__/assets/libs/layui/css/layui.css" />
 <link rel="stylesheet" href="__CDN__/assets/libs/pear/dist/css/pear.css" />
 <link rel="stylesheet" href="__CDN__/assets/libs/pear/dist/css/loader.css" />
-<link rel="stylesheet" href="__CDN__/assets/libs/font-awesome/css/font-awesome.min.css" />
+<link
+  rel="stylesheet"
+  href="__CDN__/assets/libs/font-awesome/css/font-awesome.min.css"
+/>
 <link rel="stylesheet" href="__CDN__/assets/css/admin.css" />
 <link rel="stylesheet" href="__CDN__/assets/css/admin.dark.css" />
 <!-- <link rel="stylesheet" href="__CDN__/assets/css/variables.css" /> -->
 <!-- <link rel="stylesheet" href="__CDN__/assets/css/reset.css" /> -->
 <link rel="stylesheet" href="__CDN__/assets/css/badouadmin.min.css" />
-<link rel="stylesheet" href="__CDN__/assets/libs/jstree/themes/default/style.min.css" />
+<link
+  rel="stylesheet"
+  href="__CDN__/assets/libs/jstree/themes/default/style.min.css"
+/>
 <script type="text/javascript">
-	var Config = {$config|raw|json_encode};
+  var Config = {$config|raw|json_encode};
 </script>
 <!-- 依 赖 脚 本 -->
 <script src="__CDN__/assets/libs/jquery.min.js"></script>
@@ -18,5 +24,27 @@
 <script src="__CDN__/assets/libs/pear/dist/pear.js"></script>
 <script src="__CDN__/assets/libs/badouadmin/index.js"></script>
 <script src="__CDN__/assets/libs/jstree/jstree.min.js"></script>
+<script type="text/javascript">
+  if (!window.__badouAjaxTokenPrefilterInstalled) {
+    window.__badouAjaxTokenPrefilterInstalled = true;
+    $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
+      if (options.noToken || options.crossDomain) {
+        return;
+      }
+
+      var method = (options.type || options.method || "GET").toUpperCase();
+      if (method === "GET") {
+        return;
+      }
+
+      if (typeof Config === "undefined" || !Config.token) {
+        return;
+      }
+
+      jqXHR.setRequestHeader("__token__", Config.token);
+      jqXHR.setRequestHeader("X-CSRF-TOKEN", Config.token);
+    });
+  }
+</script>
 <!-- 加载插件模块的css 与 js 文件 -->
 {include file="common/modules" }
