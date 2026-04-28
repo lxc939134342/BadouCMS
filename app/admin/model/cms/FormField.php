@@ -98,6 +98,7 @@ class FormField extends Model
 
         if (isset($changeData['name'])) {
             $tableManager->renameColumn($oldname, $field);
+            $tableManager->update();
         }
     }
 
@@ -126,5 +127,4 @@ class FormField extends Model
             throw new \think\Exception('请先创建扩展表');
         }
     }
-
 }

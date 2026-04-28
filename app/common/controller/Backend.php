@@ -633,6 +633,12 @@ class Backend extends BaseController
     {
         $tokenName = '__token__';
         $token = $this->request->param($tokenName);
+        if (!$token) {
+            $token = $this->request->header($tokenName);
+        }
+        if (!$token) {
+            $token = $this->request->header('x-csrf-token');
+        }
         $sessionToken = \think\facade\Session::get($tokenName);
 
         // 验证令牌是否一致

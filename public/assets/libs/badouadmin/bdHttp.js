@@ -1,6 +1,7 @@
 layui.define(["toast"], function (exports) {
   var Layer = layui.layer;
   var toast = layui.toast;
+
   var bdHttp = {
     config: {
       open: {
