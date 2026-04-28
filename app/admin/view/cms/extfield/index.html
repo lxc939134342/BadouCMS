@@ -2,10 +2,7 @@
 <!-- 表格 -->
 <div class="layui-card">
     <div class="layui-card-body">
-        <table
-            class="layui-hide"
-            id="models"
-            data-operate-edit="{:$auth->check('cms.extfield/edit')}"
+        <table class="layui-hide" id="models" data-operate-edit="{:$auth->check('cms.extfield/edit')}"
             data-operate-del="{:$auth->check('cms.extfield/del')}"></table>
     </div>
 </div>
@@ -47,23 +44,23 @@
                 table: "cms_extfield",
             },
         });
-        console.log(Config);
         bdTable.render({
             elem: "#models",
             url: "{:url('cms.extfield/index')}",
             pk: "id",
             even: true,
+            sortName: "sorting asc,id desc",
             toolbar: "#toolbar",
             page: true,
             cols: [
                 [
                     { type: "checkbox" },
                     { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "mcode", title: __("Mcode"), width: 180,templet:bdTable.api.formatter.label,searchList:Config.models },
+                    { field: "mcode", title: __("Mcode"), width: 180, templet: bdTable.api.formatter.label, searchList: Config.models },
                     { field: "description", title: __("Description"), width: 300 },
                     { field: "name", title: __("Name"), width: 300, operate: "LIKE" },
-                    { field: "type", title: __("Type"), width: 180,templet:bdTable.api.formatter.label,searchList:Config.typeText },
-                    { field: "sorting", title: __("Sorting"), width: 180 },
+                    { field: "type", title: __("Type"), width: 180, templet: bdTable.api.formatter.label, searchList: Config.typeText },
+                    { field: "sorting", title: __("Sorting"), width: 180, templet: bdTable.api.formatter.input },
                     { title: __("Operate"), align: "center", templet: bdTable.api.formatter.operate },
                 ],
             ],
