@@ -160,8 +160,10 @@ class Comment extends Base
         if ($this->request->isPost()) {
             $id = $this->request->param('id/d', 0);
             if ($id) {
-                $this->model->where('id', $id)->delete();
-                $this->success(__('DeleteSuccess'));
+                $res = $this->model->where('id', $id)->where('uid', $this->auth->id)->delete();
+                if ($res) {
+                    $this->success(__('DeleteSuccess'));
+                }
             }
         }
         $this->error(__('DeleteFailed'));
