@@ -40,6 +40,35 @@
                 table: "cms_message",
             },
         });
+        var cols=[
+            { type: "checkbox" },
+            { field: "id", title: "ID", width: 80, sort: true },
+        ];
+
+        Config.formFields.forEach(function (item) {
+            cols.push({ field: item.name, title: __(item.description), operate: 'like' });
+        });
+
+        cols.push({ field: "content", title: __("Content") });
+        cols.push({ field: "recontent", title: __("Reply content") });
+        cols.push({ field: "user_ip", title: __("User ip"), operate: false, width: 140 });
+        cols.push({ field: "status", title: __("Status"), templet: bdTable.api.formatter.switch, width: 90 });
+        cols.push({ field: "create_time", title: __("Create time"), width: 180 });
+        cols.push({
+            title: __("Operate"),
+            width: 150,
+            templet: bdTable.api.formatter.operate,
+            buttons: [
+                {
+                    name: 'edit',
+                    text: __("Reply"),
+                    icon: 'fa fa-reply',
+                    extend: "lay-event='btn-editone'",
+                    classname: "layui-btn layui-btn-sm",
+                }
+            ]
+        });
+
         bdTable.render({
             elem: "#message",
             url: bdTable.extend.index_url,
@@ -48,31 +77,9 @@
             toolbar: "#toolbar",
             page: true,
             cols: [
-                [
-                    { type: "checkbox" },
-                    { field: "id", title: "ID", width: 80, sort: true },
-                    { field: "content", title: __("Content") },
-
-                    { field: "recontent", title: __("Reply content") },
-                    { field: "user_ip", title: __("User ip"), operate: false,width:140 },
-                    { field: "status", title: __("Status"),templet: bdTable.api.formatter.switch ,width: 90},
-                    { field: "create_time", title: __("Create time"),width:180 },
-                    {
-                        title: __("Operate"),
-                        width: 150,
-                        templet: bdTable.api.formatter.operate,
-                        buttons:[
-                            {
-                                name:'edit',
-                                text: __("Reply"),
-                                icon:'fa fa-reply',
-                                extend: "lay-event='btn-editone'",
-                                classname: "layui-btn layui-btn-sm",
-                            }
-                        ]
-                    },
-                ],
+                cols
             ],
         });
+
     });
 </script>

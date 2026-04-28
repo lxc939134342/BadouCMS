@@ -38,6 +38,7 @@ class Message extends Base
             $formFields = $formFields->toArray();
         }
         $this->view->assign('formFields', $formFields);
+        $this->assignconfig('formFields', $formFields);
     }
 
 
