@@ -18,8 +18,8 @@
     <label class="layui-form-label">{$field.description}</label>
     <div class="layui-input-block">
         {volist name="$field.content" id="item" key="k" }
-        <input type="checkbox" id="c-{$field.form_id}-{$k}" name="{$field.form_name}[]" title="{$item}" value="{$key}" {in
-            name="key" value="$field.form_value" } checked {/in}>
+        <input type="checkbox" id="c-{$field.form_id}-{$k}" name="{$field.form_name}[]" title="{$item}" value="{$key}"
+            {in name="key" value="$field.form_value" } checked {/in}>
         {/volist}
     </div>
 </div>
@@ -31,8 +31,8 @@
     <label class="layui-form-label">{$field.description}</label>
     <div class="layui-input-block">
         {volist name="$field.content" id="item" key="k" }
-        <input type="radio" id="c-{$field.form_id}-{$k}" name="{$field.form_name}" title="{$item}" value="{$key}" {in name="key"
-            value="$field.form_value" } checked {/in}>
+        <input type="radio" id="c-{$field.form_id}-{$k}" name="{$field.form_name}" title="{$item}" value="{$key}" {in
+            name="key" value="$field.form_value" } checked {/in}>
         {/volist}
     </div>
 </div>
@@ -43,7 +43,8 @@
 <div class="layui-form-item">
     <label class="layui-form-label">{$field.description}</label>
     <div class="layui-input-block">
-        <input type="checkbox" id="c-{$field.form_id}" name="{$field.form_name}" {in name="1" value="$field.form_value" } checked {/in} value="1" lay-skin="switch">
+        <input type="checkbox" id="c-{$field.form_id}" name="{$field.form_name}" {in name="1" value="$field.form_value"
+            } checked {/in} value="1" lay-skin="switch">
     </div>
 </div>
 {/case}
@@ -56,15 +57,15 @@
     <div class="layui-input-block">
         <div class="layui-input-group" style="width: 100%">
             <input type="text" id="c-{$field.form_id}" name="{$field.form_name}" class="layui-input"
-        value="{$field.form_value}" />
+                value="{$field.form_value}" />
             <div class="layui-input-suffix" style="width: 30%">
-                <button type="button" data-input-id="c-{$field.form_id}" {if $field.component=='images' }data-multiple="true" {/if}
-                    data-preview-id="p-{$field.form_id}" class="layui-btn btn-bdupload">
+                <button type="button" data-input-id="c-{$field.form_id}" {if $field.component=='images'
+                    }data-multiple="true" {/if} data-preview-id="p-{$field.form_id}" class="layui-btn btn-bdupload">
                     <i class="fa fa-upload"></i>
                     上传
                 </button>
-                <button type="button" data-input-id="c-{$field.form_id}" {if $field.component=='images' }data-multiple="true" {/if}
-                    class="layui-btn layui-bg-green btn-bdchoose">
+                <button type="button" data-input-id="c-{$field.form_id}" {if $field.component=='images'
+                    }data-multiple="true" {/if} class="layui-btn layui-bg-green btn-bdchoose">
                     <i class="fa fa-list"></i>
                     选择
                 </button>
@@ -102,13 +103,13 @@
             <input type="text" id="c-{$field.form_id}" name="{$field.form_name}" class="layui-input"
                 value="{$field.form_value}" />
             <div class="layui-input-suffix" style="width: 30%">
-                <button type="button" {if $field.component=='images' }data-multiple="true" {/if} data-input-id="c-{$field.form_id}"
-                    class="layui-btn btn-bdupload">
+                <button type="button" {if $field.component=='images' }data-multiple="true" {/if}
+                    data-input-id="c-{$field.form_id}" class="layui-btn btn-bdupload">
                     <i class="fa fa-upload"></i>
                     上传
                 </button>
-                <button type="button" data-input-id="c-{$field.form_id}" {if $field.component=='files' }data-multiple="true" {/if}
-                    class="layui-btn layui-bg-green btn-bdchoose">
+                <button type="button" data-input-id="c-{$field.form_id}" {if $field.component=='files'
+                    }data-multiple="true" {/if} class="layui-btn layui-bg-green btn-bdchoose">
                     <i class="fa fa-list"></i>
                     选择
                 </button>
@@ -135,7 +136,7 @@
     <div class="layui-input-block">
         {if has_hook('editor')}
         <textarea class="layui-textarea editor" name="{$field.form_name}" rows="5">{$field.form_value}</textarea>
-        {else} 
+        {else}
         <div class="alert alert-danger" style="width: 40%;">请先到插件市场安装《富文本编辑器》插件</div>
         {/if}
     </div>
@@ -172,11 +173,11 @@
 <div class="layui-form-item">
     <label class="layui-form-label">{$field.description}</label>
     <div class="layui-input-block">
-        <dl class="fieldlist" data-name="{$field.form_name|htmlentities}"
-            data-template="{$field.form_acode}arraytpl" data-usearray="true">
+        <dl class="fieldlist" data-name="{$field.form_name|htmlentities}" data-template="{$field.form_acode}arraytpl"
+            data-usearray="true">
             <dd>
-                <ins>{:__('Array key')}</ins>
-                <ins>{:__('Array value')}</ins>
+                <ins style="width: 300px;">{:__('Array key')}</ins>
+                <ins style="width: 300px;">{:__('Array value')}</ins>
             </dd>
             <dd>
                 <a href="javascript:;" class="layui-btn btn-append"><i class="fa fa-plus"></i>
@@ -184,13 +185,13 @@
             </dd>
         </dl>
         <textarea name="{$field.form_name|htmlentities}" class="form-control hide" cols="30"
-                rows="5">{$field.form_value}</textarea>
+            rows="5">{$field.form_value}</textarea>
         <script type="text/html" id="{$field.form_acode}arraytpl">
             <dd>
-                <div class="layui-inline">
+                <div class="layui-inline" style="width: 300px;">
                     <input type="text" name="{{=d.name}}[{{=d.index}}][key]" class="layui-input" value="{{=d.row.key}}" size="10">
                 </div>
-                    <div class="layui-inline">
+                    <div class="layui-inline" style="width: 300px;">
                     <input type="text" name="{{=d.name}}[{{=d.index}}][value]" class="layui-input" value="{{=d.row.value}}" >
                 </div>
                 <div class="layui-inline">
@@ -206,8 +207,8 @@
 <div class="layui-form-item">
     <label class="layui-form-label">{$field.description}</label>
     <div class="layui-input-block">
-        <dl class="fieldlist" data-name="{$field.form_name|htmlentities}"
-            data-template="{$field.form_acode}array3tpl" data-usearray="true">
+        <dl class="fieldlist" data-name="{$field.form_name|htmlentities}" data-template="{$field.form_acode}array3tpl"
+            data-usearray="true">
             <dd>
                 <div class="layui-inline" style="width: 300px;"><ins style="width: 100%;">{:__('Column 1')}</ins></div>
                 <div class="layui-inline" style="width: 300px;"><ins style="width: 100%;">{:__('Column 2')}</ins></div>
@@ -219,7 +220,7 @@
             </dd>
         </dl>
         <textarea name="{$field.form_name|htmlentities}" class="form-control hide" cols="30"
-                rows="5">{$field.form_value}</textarea>
+            rows="5">{$field.form_value}</textarea>
         <script type="text/html" id="{$field.form_acode}array3tpl">
             <dd>
                 <div class="layui-inline" style="width: 300px;">
@@ -242,68 +243,68 @@
 {/case}
 
 {default /}
-    {:hook('cms_field_custom', ['field' => $field, 'row' => $row], true, true)}
+{:hook('cms_field_custom', ['field' => $field, 'row' => $row], true, true)}
 {/switch}
 {/foreach}
 
 
 <!--{literal}-->
 <script>
-layui.use(['layer'], function(){
-    var layer = layui.layer;
+    layui.use(['layer'], function () {
+        var layer = layui.layer;
 
-    // 为所有字段标签添加点击复制功能
-    $(document).on('click', '.layui-form-label', function(e) {
-        // 查找最近的字段容器，获取字段名
-        var $formItem = $(this).closest('.layui-form-item');
-        var fieldName = '';
+        // 为所有字段标签添加点击复制功能
+        $(document).on('click', '.layui-form-label', function (e) {
+            // 查找最近的字段容器，获取字段名
+            var $formItem = $(this).closest('.layui-form-item');
+            var fieldName = '';
 
-        // 尝试从输入元素中提取字段名
-        var $input = $formItem.find('input[name]:first, select[name]:first, textarea[name]:first');
-        if ($input.length > 0) {
-            var name = $input.attr('name');
-            // 处理可能包含数组格式的字段名
-            fieldName = name.replace(/^.*\[([^\]]+)\].*$/, '$1');
-        }
-
-        if (fieldName) {
-            // 格式化为 {$bd.字段名}
-            var copyText = '{$bd.' + fieldName + '}';
-            // 复制到剪贴板
-            var $temp = $('<textarea>');
-            $('body').append($temp);
-            $temp.val(copyText).select();
-            try {
-                document.execCommand('copy');
-                $temp.remove();
-                layer.msg('已复制: {$bd.' + fieldName + '}', {icon: 1});
-            } catch (err) {
-                $temp.remove();
-                layer.msg('复制失败，请手动复制: {$bd.' + fieldName + '}', {icon: 2});
+            // 尝试从输入元素中提取字段名
+            var $input = $formItem.find('input[name]:first, select[name]:first, textarea[name]:first');
+            if ($input.length > 0) {
+                var name = $input.attr('name');
+                // 处理可能包含数组格式的字段名
+                fieldName = name.replace(/^.*\[([^\]]+)\].*$/, '$1');
             }
-        }
-    });
 
-    // 添加鼠标悬停样式提示
-    $(document).on('mouseenter', '.layui-form-label', function() {
-        $(this).css('cursor', 'pointer');
-        var $formItem = $(this).closest('.layui-form-item');
-        var $input = $formItem.find('input[name]:first, select[name]:first, textarea[name]:first');
-        var fieldName = '';
-        if ($input.length > 0) {
-            var name = $input.attr('name');
-            fieldName = name.replace(/^.*\[([^\]]+)\].*$/, '$1');
-        }
-        if (fieldName) {
-            layer.tips('点击复制 {$bd.' + fieldName + '}', this, {
-                tips: 1,
-                time: 0,
-                area: 'auto'
-            });
-        }
-    }).on('mouseleave', '.layui-form-label', function() {
-        layer.closeAll('tips');
+            if (fieldName) {
+                // 格式化为 {$bd.字段名}
+                var copyText = '{$bd.' + fieldName + '}';
+                // 复制到剪贴板
+                var $temp = $('<textarea>');
+                $('body').append($temp);
+                $temp.val(copyText).select();
+                try {
+                    document.execCommand('copy');
+                    $temp.remove();
+                    layer.msg('已复制: {$bd.' + fieldName + '}', { icon: 1 });
+                } catch (err) {
+                    $temp.remove();
+                    layer.msg('复制失败，请手动复制: {$bd.' + fieldName + '}', { icon: 2 });
+                }
+            }
+        });
+
+        // 添加鼠标悬停样式提示
+        $(document).on('mouseenter', '.layui-form-label', function () {
+            $(this).css('cursor', 'pointer');
+            var $formItem = $(this).closest('.layui-form-item');
+            var $input = $formItem.find('input[name]:first, select[name]:first, textarea[name]:first');
+            var fieldName = '';
+            if ($input.length > 0) {
+                var name = $input.attr('name');
+                fieldName = name.replace(/^.*\[([^\]]+)\].*$/, '$1');
+            }
+            if (fieldName) {
+                layer.tips('点击复制 {$bd.' + fieldName + '}', this, {
+                    tips: 1,
+                    time: 0,
+                    area: 'auto'
+                });
+            }
+        }).on('mouseleave', '.layui-form-label', function () {
+            layer.closeAll('tips');
+        });
     });
-});
 </script>
 <!--{/literal}-->
