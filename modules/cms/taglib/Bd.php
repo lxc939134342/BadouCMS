@@ -231,6 +231,8 @@ class Bd extends TagLib
         $parse  .= '$__' . $var . '__ = \app\index\model\cms\Slide::slideList(' . $gid . ',"' . $num . '");';
         $parse  .= ' ?>';
         $parse  .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
+        $parse .= '<?php $' . $alias . '["' . $key . '"]=$' . $key . ';?>';
+        $parse .= '<?php $' . $alias . '["n"]=$' . $key . '-1;?>';
         $parse  .= $content;
         $parse  .= '{/volist}';
         return $parse;
@@ -263,6 +265,8 @@ class Bd extends TagLib
         $parse  .= '$__' . $var . '__ = \app\index\model\cms\Link::linkList(' . $gid . ',"' . $num . '");';
         $parse  .= ' ?>';
         $parse  .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
+        $parse .= '<?php $' . $alias . '["' . $key . '"]=$' . $key . ';?>';
+        $parse .= '<?php $' . $alias . '["n"]=$' . $key . '-1;?>';
         $parse  .= $content;
         $parse  .= '{/volist}';
         return $parse;
