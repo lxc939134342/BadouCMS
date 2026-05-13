@@ -592,8 +592,12 @@ class Bd extends TagLib
     public function tagQrcode($tag, $content): string
     {
         $string = $tag['string'] ?? '""';
-        $string = $this->autoBuildVar($string);
-        $parse   = '<?php echo \'<img src="' . request()->domain(true) . '/api/cms.qrcode/index?string=\'.urlencode(' . $string . ').\'\" class="qrcode" alt="二维码">\'; ?>';
+        if ($this->isVar($string)) {
+            $string = $this->autoBuildVar($string);
+        } else {
+            $string = '"' . $string . '"';
+        }
+        $parse   = '<?php echo \'<img src="' . request()->domain(true) . '/api/cms.qrcode/index?string=\'.urlencode(' . $string . ').\'" class="qrcode" alt="二维码">\'; ?>';
         return $parse;
     }
 
