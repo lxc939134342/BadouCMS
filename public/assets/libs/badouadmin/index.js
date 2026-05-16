@@ -107,13 +107,29 @@ layui.use(["layer", "badou", "toast"], function () {
       return false;
     }
     var url = $(that).attr("href");
-    var id =
-      $(that).data("id") || $(that).attr("id") || "addtab" + Math.random();
+    var id = $(that).data("id") || $(that).attr("id");
     var title =
       $(that).attr("title") ||
       $(that).data("title") ||
       $(that).data("original-title") ||
       $(that).text();
+
+    if (!id && url) {
+      // 尝试从侧边栏菜单中查找对应的 ID 和 Title
+      var $menuLink = top.$("#sideMenu").find('a[menu-url="' + url + '"]');
+      if ($menuLink.length > 0) {
+        id = $menuLink.attr("menu-id");
+        if (!$(that).attr("title") && !$(that).data("title")) {
+          title = $menuLink.attr("menu-title");
+        }
+      }
+    }
+
+    if (!id && url) {
+      id = url.replace(/[\/\.#]/g, "_").replace(/^_|_$/g, "");
+    }
+    id = id || "addtab" + Math.random();
+
     top.layui.admin.jump(id, title, url);
     return false;
   });
