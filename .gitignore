@@ -23,3 +23,6 @@ moduledev
 !/modules/upgrade
 .cursor/
 .roo/
+.claude/
+CLAUDE.md
+AGENTS.md
