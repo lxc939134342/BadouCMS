@@ -6,7 +6,7 @@
         <div class="layui-input-block">
             <select name="row[group_id]" lay-verify="required">
                 {foreach name="$groupdata" item="vo"}
-                <option value="{$key}">{$vo}</option>
+                <option value="{$key}" {if $row.group_id==$key} selected{/if}>{$vo}</option>
                 {/foreach}
             </select>
         </div>
