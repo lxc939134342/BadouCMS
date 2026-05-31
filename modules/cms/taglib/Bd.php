@@ -553,6 +553,20 @@ class Bd extends TagLib
     {
         $id = $tag['id'] ?? '""';
         $scode = $tag['scode'] ?? '""';
+
+        // 支持变量和函数调用
+        if ($id !== '""') {
+            $this->autoBuildVar($id);
+            if (!$this->isVar($id)) {
+                $id = '"' . $id . '"';
+            }
+        }
+        if ($scode !== '""') {
+            $this->autoBuildVar($scode);
+            if (!$this->isVar($scode)) {
+                $scode = '"' . $scode . '"';
+            }
+        }
         $target = $tag['target'] ?? '';
         $alias    = $tag['alias'] ?? 'tags';
         $empty = $tag['empty'] ?? '';
