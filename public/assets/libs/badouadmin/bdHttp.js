@@ -26,6 +26,26 @@ layui.define(["toast"], function (exports) {
       //请求错误的回调
       onAjaxError: function (ret, onAjaxError) {
         var data = typeof ret.data !== "undefined" ? ret.data : null;
+
+        // 错误响应中如果包含新的 token，需要更新到全局配置
+        if (data && typeof data === "object") {
+          var newToken = data.__token__ || data.token;
+          if (newToken) {
+            if (typeof Config !== "undefined") {
+              Config.token = newToken;
+            }
+            // 同步到父窗口和顶层窗口
+            if (typeof parent !== "undefined" && parent.Config) {
+              parent.Config.token = newToken;
+            }
+            if (typeof top !== "undefined" && top.Config) {
+              top.Config.token = newToken;
+            }
+            // 同步到隐藏的 token 输入框
+            $("input[name='__token__'],input[name='token']").val(newToken);
+          }
+        }
+
         if (typeof onAjaxError === "function") {
           var result = onAjaxError.call(this, data, ret);
           if (result === false) {
@@ -78,6 +98,8 @@ layui.define(["toast"], function (exports) {
                 if (typeof top !== "undefined" && top.Config && typeof top.Config !== "undefined") {
                   top.Config.token = token;
                 }
+                // 同步到隐藏的 token 输入框
+                $("input[name='__token__'],input[name='token']").val(token);
               }
               ret = bdHttp.events.onAjaxResponse(ret);
               if (ret.code === 1) {

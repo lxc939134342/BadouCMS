@@ -484,6 +484,13 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                             __('Are you sure you want to delete the %s selected item?', ids.length),
                             { icon: 3, title: __('Warning'), offset: 0, shadeClose: true, btn: [__('OK'), __('Cancel')] },
                             function (index) {
+                                // 在确认删除时，同步最新的 token（从父窗口和顶层窗口）
+                                if (typeof parent !== "undefined" && parent.Config && parent.Config.token) {
+                                    Config.token = parent.Config.token;
+                                }
+                                if (typeof top !== "undefined" && top.Config && top.Config.token) {
+                                    Config.token = top.Config.token;
+                                }
                                 bdTable.api.multi("del", idarr, table, that);
                                 Layer.close(index);
                             }
@@ -519,6 +526,13 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         }
                         Layer.confirm(__('Are you sure you want to delete this item?'), { icon: 3, title: __('Warning'), offset: [top, left], shadeClose: true, btn: [__('OK'), __('Cancel')] },
                             function (index) {
+                                // 在确认删除时，同步最新的 token（从父窗口和顶层窗口）
+                                if (typeof parent !== "undefined" && parent.Config && parent.Config.token) {
+                                    Config.token = parent.Config.token;
+                                }
+                                if (typeof top !== "undefined" && top.Config && top.Config.token) {
+                                    Config.token = top.Config.token;
+                                }
                                 bdTable.api.multi("del", data[table.config.pk], table, this);
                                 Layer.close(index);
                             }

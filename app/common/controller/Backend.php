@@ -238,17 +238,15 @@ class Backend extends BaseController
         // 自动开启令牌验证 (合并基类默认排除与子类排除列表)
         $noNeedToken = array_unique(array_merge(['login', 'selectpage', 'changelang', 'index', 'logout', 'wipecache', 'getgrouplist', 'roletree', 'multi'], (array)$this->noNeedToken));
 
-        // 令牌稳定性保护：严禁 GET 请求意外刷新令牌
-        if ($this->request->isGet()) {
-            $token = \think\facade\Session::get('__token__');
-            if (!$token) {
-                // 只有在完全没有令牌时才生成，生成后不再随后的 GET 请求中轮换
-                $token = $this->request->buildToken();
-            }
+        // 令牌初始化：确保 Session 中始终有 token
+        $token = \think\facade\Session::get('__token__');
+        if (!$token) {
+            // 只有在完全没有令牌时才生成新令牌
+            $token = $this->request->buildToken();
         }
 
         // 无论何种请求，都确保 Config.token 能获取到当前 Session 中的最新令牌
-        $config['token'] = \think\facade\Session::get('__token__');
+        $config['token'] = $token;
         // 确保前端 Config 和视图变量同步
         $this->assign('config', $config);
 
@@ -647,6 +645,7 @@ class Backend extends BaseController
         if ($this->isAjax()) {
             // AJAX 请求：如果验证通过，不刷新令牌，防止同页面后续操作（如修改后再删除）失效
             if ($check) {
+                // 验证通过时，在响应头返回当前 token，确保前端能够同步
                 header($tokenName . ': ' . $sessionToken);
             } else {
                 // 验证失败则刷新并返回新令牌

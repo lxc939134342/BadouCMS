@@ -546,6 +546,14 @@ layui.define(
               return false;
             }
           }
+
+          // 在提交前，从顶层窗口同步最新的 token（解决 iframe 多标签页 token 不同步问题）
+          if (typeof top !== "undefined" && top.Config && top.Config.token) {
+            Config.token = top.Config.token;
+            // 同时更新表单中的隐藏字段
+            $("input[name='__token__'],input[name='token']", form).val(top.Config.token);
+          }
+
           var type = form.attr("method")
             ? form.attr("method").toUpperCase()
             : "POST";
