@@ -207,6 +207,22 @@ layui.define(["bdHttp", "xmSelect"], function (exports) {
           remoteMethod: fetchData,
         };
 
+        // 开启搜索时，监听下拉面板打开事件，刷新数据
+        // 解决：关闭面板后再打开，搜索框清空但结果仍为上次搜索结果的问题
+        if (config.filterable) {
+          options.show = function () {
+            fetchData(
+              "",
+              function (list, totalPages) {
+                selectInstance.update({ data: list, autoRow: true });
+              },
+              undefined,
+              1,
+            );
+            return 1; // 允许面板打开
+          };
+        }
+
         // 单选/多选特殊配置
         if (!config.multiple) {
           options.radio = true;
