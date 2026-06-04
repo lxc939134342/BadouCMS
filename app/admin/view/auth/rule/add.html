@@ -70,6 +70,13 @@
             <textarea name="row[extend]" placeholder="扩展属性" class="layui-textarea"></textarea>
         </div>
     </div>
+    <div class="layui-form-item" data-quick-menu>
+        <label class="layui-form-label">快捷菜单</label>
+        <div class="layui-input-block">
+            <input type="radio" name="row[is_quick]" value="1" title="是">
+            <input type="radio" name="row[is_quick]" value="0" title="否" checked>
+        </div>
+    </div>
     <div class="layui-form-item">
         <label class="layui-form-label">备注</label>
         <div class="layui-input-block">
@@ -100,15 +107,21 @@
 <script>
     layui.use(['badou'],function () {
         var bdForm = layui.bdForm;
+        var form = layui.form;
 
-        layui.form.on('radio(ismenu)', function(data) {
+        function toggleMenuConfig() {
             var name = $("input[name='row[name]']");
-            var ismenu = data.value == 1;
+            var ismenu = $("input[name='row[ismenu]']:checked").val() == 1;
+            var type = $("input[name='row[type]']:checked").val();
             name.prop("placeholder", ismenu ? name.data("placeholder-menu") : name.data("placeholder-node"));
             $('div[data-type="menu"]').toggleClass("layui-hide", !ismenu);
-        });
+            $('div[data-quick-menu]').toggleClass("layui-hide", !(ismenu && type === "1"));
+        }
 
-        $("input[name='row[ismenu]']:checked").next().trigger("click");
+        form.on('radio(ismenu)', toggleMenuConfig);
+        form.on('radio(type)', toggleMenuConfig);
+
+        toggleMenuConfig();
 
         bdForm.api.bindevent($("form.layui-form"));
     })

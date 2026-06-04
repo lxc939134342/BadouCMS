@@ -112,6 +112,18 @@
             custom: { 0: "blue", 1: "green", 2: "orange" },
             templet: bdTable.api.formatter.label,
           },
+          { field: "ismenu", title: "菜单", width: 100, templet: bdTable.api.formatter.switch },
+          {
+            field: "is_quick",
+            title: "快捷菜单",
+            width: 110,
+            templet: function (d) {
+              if (parseInt(d.ismenu) !== 1 || parseInt(d.type) !== 1) {
+                return "-";
+              }
+              return bdTable.api.formatter.switch.call(this, d);
+            },
+          },
           {
             field: "weigh",
             title: "权重",

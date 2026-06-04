@@ -126,6 +126,7 @@ CREATE TABLE `bd_admin_rule` (
   `condition` varchar(255) DEFAULT '' COMMENT '条件',
   `remark` varchar(255) DEFAULT '' COMMENT '备注',
   `ismenu` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否为菜单',
+  `is_quick` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT '是否快捷菜单',
   `menutype` enum('_iframe','_blank') DEFAULT NULL COMMENT '菜单类型',
   `extend` varchar(255) DEFAULT '' COMMENT '扩展属性',
   `py` varchar(30) DEFAULT '' COMMENT '拼音首字母',

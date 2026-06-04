@@ -55,16 +55,13 @@ class Dashboard extends Backend
         $dbTableList = Db::query("SHOW TABLE STATUS");
         $installedModules = Server::getInstalldModuleList();
         $totalmodule = count($installedModules);
-        $quickmenuarr = [
-            'general.config',
-            'cms.models',
-            'cms.content_sort'
-        ];
-
         $quickmenu = $this->auth->getOriginAuthRules($this->auth->id);
-        $quickmenu = array_filter($quickmenu, function ($item) use ($quickmenuarr) {
-            return in_array($item['name'], $quickmenuarr);
-        });
+        $quickmenu = array_values(array_filter($quickmenu, static function ($item) {
+            return (int)($item['ismenu'] ?? 0) === 1
+                && (int)($item['type'] ?? -1) === AdminRule::RULE_URL
+                && (int)($item['is_quick'] ?? 0) === 1
+                && !empty($item['href']);
+        }));
 
         $this->view->assign([
             'totaluser'         => User::count(),
