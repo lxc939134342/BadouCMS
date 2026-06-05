@@ -29,6 +29,24 @@ class Server
     }
 
     /**
+     * 批量检测本地插件是否允许在当前域名使用
+     */
+    public static function localModuleCheck(array $names, array $extend = [])
+    {
+        $names = array_filter(array_unique($names));
+        if (!$names) {
+            return ['code' => 1, 'data' => []];
+        }
+
+        $params = array_merge([
+            'names'  => implode(',', $names),
+            'domain' => request()->host(true),
+        ], $extend);
+
+        return self::sendRequest('api/module/localCheck', $params, 'POST');
+    }
+
+    /**
      * 获取本地插件的授权密钥（读取 info.ini 中的 license 字段）
      * @param string $name 插件名称
      * @return string 密钥字符串，不存在则返回空字符串
@@ -621,9 +639,10 @@ class Server
             'token'     => $extend['token'],
             'license'   => $license,
             'domain'    => $domain,
-            'version'   => $extend['version'],
-            'bdversion' => $extend['bdversion'],
-            'isdev'     => $extend['isdev'] ?? 0
+            'version'   => $extend['version'] ?? (self::getModuleInfo($name)['version'] ?? ''),
+            'bdversion' => $extend['bdversion'] ?? config('badouadmin.version'),
+            'isdev'     => $extend['isdev'] ?? 0,
+            'local'     => 1
         ]);
 
         if (!$force) {

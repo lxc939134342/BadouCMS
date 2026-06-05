@@ -59,7 +59,9 @@ class Module extends Backend
                 $list = $res['data'];
             }
 
+            $remoteNames = [];
             foreach ($list as &$item) {
+                $remoteNames[] = $item['name'];
                 $installmodule = $installedModules[$item['name']] ?? [];
                 if ($installmodule) {
                     $item['name'] = $installmodule['name'];
@@ -67,8 +69,81 @@ class Module extends Backend
                     $item['module'] = $installmodule;
                 }
             }
+            unset($item);
 
-            $this->result('ok', $list, $res['total']);
+            $localNames = array_values(array_diff($names, $remoteNames));
+            $localAuthMap = [];
+            if ($localNames && $uid && $token) {
+                try {
+                    $check = Server::localModuleCheck($localNames, [
+                        'uid'       => $uid,
+                        'token'     => $token,
+                        'bdversion' => $bdversion,
+                    ]);
+                    if ($check && isset($check['code']) && $check['code'] == 1) {
+                        $localAuthMap = is_array($check['data'] ?? null) ? $check['data'] : [];
+                    }
+                } catch (Throwable) {
+                    $localAuthMap = [];
+                }
+            }
+
+            foreach ($localNames as $name) {
+                $module = $installedModules[$name] ?? [];
+                if (!$module) {
+                    continue;
+                }
+                $moduleType = $module['type'] ?? 'module';
+                if (in_array($type, ['template', 'module', 'vip_template']) && $moduleType !== $type) {
+                    continue;
+                }
+                if ($type !== 'all' && $type !== 'installed' && !in_array($type, ['template', 'module', 'vip_template'])) {
+                    continue;
+                }
+                if ($keyword) {
+                    $haystack = implode(' ', [
+                        $name,
+                        $module['title'] ?? '',
+                        $module['intro'] ?? '',
+                        $module['author'] ?? '',
+                    ]);
+                    if (stripos($haystack, $keyword) === false) {
+                        continue;
+                    }
+                }
+
+                $auth = $localAuthMap[$name] ?? [
+                    'allow' => true,
+                    'type'  => 'local_develop',
+                    'msg'   => '本地开发插件',
+                ];
+                $blocked = empty($auth['allow']);
+                $list[] = [
+                    'id'            => 0,
+                    'name'          => $name,
+                    'title'         => ($blocked ? '❌【未授权】' : '') . ($module['title'] ?? $name),
+                    'version'       => $module['version'] ?? '',
+                    'price'         => '本地',
+                    'author'        => $module['author'] ?? '',
+                    'releaselist'   => [],
+                    'downloads'     => '-',
+                    'intro'         => $blocked ? ($auth['msg'] ?? '官方插件未授权，禁止启用') : ($module['intro'] ?? '本地插件'),
+                    'images'        => '',
+                    'type'          => $moduleType,
+                    'type_text'     => $moduleType,
+                    'demourl'       => '',
+                    'url'           => '',
+                    'button'        => '',
+                    'state'         => $module['state'] ?? 0,
+                    'webhide'       => 0,
+                    'module'        => $module,
+                    'is_local'      => 1,
+                    'local_auth'    => $auth,
+                    'local_blocked' => $blocked ? 1 : 0,
+                ];
+            }
+
+            $this->result('ok', $list, max((int)($res['total'] ?? 0), count($list)));
         }
 
         $config_keys = [];

@@ -145,7 +145,7 @@
       <i class="fa fa-info-circle"></i>
       {{=d.button}}
     </a>
-    {{ } }} {{ } else {}} {{ if(module.version!=d.version){}} {{ if(typeof
+    {{ } }} {{ } else {}} {{ if(!d.is_local && module.version!=d.version){}} {{ if(typeof
     d.releaselist !="undefined" && d.releaselist.length>1){ }}
     <button
       class="layui-btn layui-bg-orange layui-btn-sm btn-dropdown"
@@ -296,6 +296,9 @@
             if (row.state == -1) {
               return "";
             }
+            if (row.local_blocked) {
+              return '<span class="layui-badge layui-bg-red">未授权</span>';
+            }
             var value = row.state;
             that.checked = that.checked || 1;
             var checked = value === that.checked ? "checked" : "";
@@ -415,7 +418,7 @@
             width: 110,
             align: "left",
             templet: function (data) {
-              return data.module && data.module.version != data.version
+              return !data.is_local && data.module && data.module.version != data.version
                 ? '<p lay-tips="有新版本v' + data.version + '">' + data.module.version +
                 ' <span class="layui-badge-dot" > </span></p>'
                 : data.version;
