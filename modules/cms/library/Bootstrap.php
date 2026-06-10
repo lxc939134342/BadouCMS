@@ -106,7 +106,16 @@ class Bootstrap extends Paginator
     //跳转到哪页
     protected function gopage()
     {
-        return "<li class='page-item'><form class='jumpto' action='' method='get' ><input type='text' class='page_number' name='page' placeholder='".__('Page Number')."'> <input type='submit' class='submit' value='".__('Jump')."'> </form></li>";
+        // 保留当前URL中除page以外的所有查询参数，防止搜索关键词等丢失
+        $hidden = '';
+        $params = request()->param();
+        foreach ($params as $key => $value) {
+            if (is_string($value) && !in_array($key, ['page', 'lg']) && $value !== '') {
+                $hidden .= '<input type="hidden" name="' . htmlspecialchars($key) . '" value="' . htmlspecialchars($value) . '">';
+            }
+        }
+
+        return "<li class='page-item'><form class='jumpto' action='' method='get' >" . $hidden . "<input type='text' class='page_number' name='page' placeholder='".__('Page Number')."'> <input type='submit' class='submit' value='".__('Jump')."'> </form></li>";
     }
 
     /**
