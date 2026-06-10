@@ -8,9 +8,9 @@ use think\facade\Event;
 /* 变量规则 */
 
 Route::pattern([
-    'category' => '\w+',
+    'category' => '[\w\-]+',
     'id'       => '[\w\-]+',
-    'tag'      => '\w+',
+    'tag'      => '[\w\-]+',
 ]);
 
 $cms_domain = [];

@@ -110,7 +110,7 @@ class Base extends Frontend
 
         if (!empty($urlname)) {
             /* 获取当前栏目信息 */
-            $regex = '/^(\w+)_(\d+)$/';
+            $regex = '/^([\w\-]+)_(\d+)$/';
             if (preg_match($regex, $urlname, $match)) {
                 $urlname = $match[2];
             }
