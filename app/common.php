@@ -152,31 +152,50 @@ if (!function_exists('xss_clean')) {
 
             /* ---------- 1. 黑名单：禁用高危标签/属性 ---------- */
             $config->set('HTML.ForbiddenElements',  ['script', 'object', 'embed', 'frame', 'frameset']);
-            $config->set('HTML.ForbiddenAttributes', ['on*']);
+            $config->set('HTML.ForbiddenAttributes', [
+                'onclick', 'ondblclick', 'onmousedown', 'onmouseup', 'onmouseover', 'onmousemove', 'onmouseout',
+                'onmouseenter', 'onmouseleave', 'onkeydown', 'onkeypress', 'onkeyup', 'onload', 'onerror',
+                'onabort', 'onfocus', 'onblur', 'onchange', 'onsubmit', 'onreset', 'onselect', 'oninput',
+                'onpaste', 'oncopy', 'oncut', 'ondrop', 'ondrag', 'ondragstart', 'ondragover',
+            ]);
 
-            /* ---------- 2. 注册 HTML5 <video> / <source> ---------- */
+            /* ---------- 2. 富文本：保留常用排版/Word 粘贴样式 ---------- */
+            $config->set('Attr.EnableID', true);
+            $config->set('Attr.IDPrefix', 'content-');
+            $config->set('Attr.AllowedFrameTargets', ['_blank' => true, '_self' => true, '_parent' => true, '_top' => true]);
+            $config->set('CSS.AllowTricky', true);
+            $config->set('CSS.Proprietary', true);
+
+            /* ---------- 3. 注册 HTML5 <video> / <source> ---------- */
             $config->set('HTML.DefinitionID', 'html5-video');
-            $config->set('HTML.DefinitionRev', 1);
+            $config->set('HTML.DefinitionRev', 2);
             if ($def = $config->maybeGetRawHTMLDefinition()) {
                 // 空元素 <source>
                 $def->addElement('source', 'Inline', 'Empty', 'Common', [
-                    'src'  => 'URI',
-                    'type' => 'Text',
+                    'src'       => 'URI',
+                    'type'      => 'Text',
+                    'media'     => 'Text',
                 ]);
 
                 // 块级元素 <video>
                 $def->addElement('video', 'Block', 'Optional: #PCDATA | source', 'Common', [
-                    'src'      => 'URI',
-                    'controls' => 'CDATA',   // 支持 controls=""
-                    'preload'  => 'Enum#auto,metadata,none',
-                    'width'    => 'Length',
-                    'height'   => 'Length',
-                    'class'    => 'CDATA',
-                    'id'       => 'ID',
-                    'data-setup' => 'CDATA',
+                    'src'         => 'URI',
+                    'poster'      => 'URI',
+                    'controls'    => 'Bool',
+                    'autoplay'    => 'Bool',
+                    'muted'       => 'Bool',
+                    'loop'        => 'Bool',
+                    'playsinline' => 'Bool',
+                    'preload'     => 'Enum#auto,metadata,none',
+                    'width'       => 'Length',
+                    'height'      => 'Length',
+                    'class'       => 'CDATA',
+                    'id'          => 'ID',
+                    'style'       => 'CDATA',
+                    'data-setup'  => 'CDATA',
                 ]);
 
-                /* ---------- 3. 一次性注册常用 HTML5 标签 ---------- */
+                /* ---------- 4. 一次性注册常用 HTML5 标签 ---------- */
                 $html5Block = ['section', 'article', 'aside', 'header', 'footer', 'nav', 'main', 'figure', 'figcaption', 'details', 'summary'];
                 $html5Inline = ['mark', 'time', 'wbr', 'meter', 'progress'];
 
@@ -187,20 +206,75 @@ if (!function_exists('xss_clean')) {
                     $def->addElement($tag, 'Inline', 'Inline', 'Common');
                 }
 
-                /* ---------- 4. 给常用元素批量追加 data-* 属性 ---------- */
+                /* ---------- 5. 给常用元素批量追加富文本属性 ---------- */
                 $commonElements = array_merge(
                     ['video', 'source'],
                     $html5Block,
                     $html5Inline,
-                    ['div', 'span', 'a', 'img', 'p', 'li', 'td', 'th', 'button']
+                    ['div', 'span', 'a', 'img', 'p', 'li', 'td', 'th', 'button', 'table', 'tr', 'tbody', 'thead', 'tfoot', 'ol', 'ul']
                 );
-                $dataAttrs = ['data-id', 'data-toggle', 'data-url', 'data-target', 'data-key', 'data-value']; // 按需继续补
+                $dataAttrs = [
+                    'data-id', 'data-toggle', 'data-url', 'data-target', 'data-key', 'data-value',
+                    'data-src', 'data-type', 'data-name', 'data-width', 'data-height', 'data-align',
+                    'data-setup',
+                ];
+                $ariaAttrs = ['aria-label', 'aria-hidden', 'aria-expanded', 'aria-controls', 'aria-describedby'];
 
                 foreach ($commonElements as $tag) {
-                    foreach ($dataAttrs as $attr) {
+                    foreach (array_merge($dataAttrs, $ariaAttrs) as $attr) {
                         $def->addAttribute($tag, $attr, 'CDATA');
                     }
                 }
+
+                // Word/富文本常见结构属性：表格、段落对齐、列表序号、图片和链接。
+                $extraAttrs = [
+                    'a' => [
+                        'target' => 'Enum#_blank,_self,_parent,_top',
+                        'rel'    => 'Text',
+                    ],
+                    'img' => [
+                        'loading'  => 'Enum#lazy,eager',
+                        'decoding' => 'Enum#async,sync,auto',
+                    ],
+                    'p' => ['align' => 'Enum#left,center,right,justify'],
+                    'div' => ['align' => 'Enum#left,center,right,justify'],
+                    'h1' => ['align' => 'Enum#left,center,right,justify'],
+                    'h2' => ['align' => 'Enum#left,center,right,justify'],
+                    'h3' => ['align' => 'Enum#left,center,right,justify'],
+                    'h4' => ['align' => 'Enum#left,center,right,justify'],
+                    'h5' => ['align' => 'Enum#left,center,right,justify'],
+                    'h6' => ['align' => 'Enum#left,center,right,justify'],
+                    'table' => ['align' => 'Enum#left,center,right', 'bgcolor' => 'Color'],
+                    'tr' => ['bgcolor' => 'Color'],
+                    'td' => ['bgcolor' => 'Color', 'nowrap' => 'Bool'],
+                    'th' => ['bgcolor' => 'Color', 'nowrap' => 'Bool'],
+                    'ol' => ['start' => 'Number', 'type' => 'Text'],
+                    'ul' => ['type' => 'Text'],
+                    'li' => ['type' => 'Text', 'value' => 'Number'],
+                    'span' => ['lang' => 'LanguageCode'],
+                ];
+
+                foreach ($extraAttrs as $tag => $attrs) {
+                    foreach ($attrs as $attr => $type) {
+                        $def->addAttribute($tag, $attr, $type);
+                    }
+                }
+
+                $wordInlineElements = ['b', 'i', 'u', 's', 'sub', 'sup'];
+                foreach ($wordInlineElements as $tag) {
+                    $def->addElement($tag, 'Inline', 'Inline', 'Common');
+                }
+
+                $def->addElement(
+                    'font',
+                    'Inline',
+                    'Inline',
+                    'Common',
+                    ['face' => 'Text', 'size' => 'Text', 'color' => 'Color']
+                );
+
+                // 保留 Word 粘贴出来的注释内容标记，但不保留 Office 私有 XML/VML 标签。
+                $def->addElement('strike', 'Inline', 'Inline', 'Common');
             }
 
             $purifier = new \HTMLPurifier($config);
