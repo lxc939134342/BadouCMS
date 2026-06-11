@@ -105,7 +105,7 @@ class ContentSort extends Base
         }
 
         $ids = $this->request->param('ids');
-        
+
         // 触发观察者 - 删除前
         $res = $this->triggerObserver('BeforeDel', $ids, $this);
         if (is_array($res)) {
@@ -224,7 +224,7 @@ class ContentSort extends Base
                 $this->error($e->getMessage());
             }
             if ($result !== false) {
-                $this->success(__('Added successfully'));
+                $this->success(__('Add successfully'));
             } else {
                 $this->error(__('No rows were added'));
             }

@@ -228,7 +228,7 @@ class Content extends Base
             $this->error($e->getMessage());
         }
         if ($result !== false) {
-            $this->success(__('Added successful'));
+            $this->success(__('Add successful'));
         } else {
             $this->error(__('No rows were added'));
         }
@@ -307,6 +307,8 @@ class Content extends Base
             $data['ico'] ?? $data['ico'] = $row['ico'];
             $data['scode'] ?? $data['scode'] = $row['scode'];
             $data['title'] ?? $data['title'] = $row['title'];
+            $data['acode'] ?? $data['acode'] = $row['acode'];
+            $data['aucode'] ?? $data['aucode'] = $row['aucode'];
             $noFilterData = $this->request->post('row/a', '', 'trim');
             $data['content'] = isset($noFilterData['content']) ? xss_clean($noFilterData['content']) : '';
             $data['update_user'] = $this->auth->username;

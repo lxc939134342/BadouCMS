@@ -66,7 +66,7 @@ class Area extends Base
                 $this->error($e->getMessage());
             }
             if ($result !== false) {
-                $this->success(__('Added successful'));
+                $this->success(__('Add successful'));
             } else {
                 $this->error(__('No rows were added'));
             }
