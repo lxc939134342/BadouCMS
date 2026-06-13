@@ -309,6 +309,10 @@ class Content extends Base
             $data['title'] ?? $data['title'] = $row['title'];
             $data['acode'] ?? $data['acode'] = $row['acode'];
             $data['aucode'] ?? $data['aucode'] = $row['aucode'];
+            // 如果 aucode 未设置或为 0，自动生成唯一编号
+            if (empty($data['aucode']) || $data['aucode'] === '0') {
+                $data['aucode'] = $this->model->getUniqueAucode();
+            }
             $noFilterData = $this->request->post('row/a', '', 'trim');
             $data['content'] = isset($noFilterData['content']) ? xss_clean($noFilterData['content']) : '';
             $data['update_user'] = $this->auth->username;

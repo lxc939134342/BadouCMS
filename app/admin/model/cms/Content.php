@@ -141,7 +141,11 @@ class Content extends Model
      */
     public function getUniqueAucode(): string
     {
-        $aucode = $this->order('aucode', 'desc')->value('aucode');
+        // 跳过 0 和 NULL，找真正有效的最大 aucode
+        $aucode = $this->where('aucode', '>', 0)->order('aucode', 'desc')->value('aucode');
+        if (!$aucode) {
+            $aucode = 0;
+        }
         do {
             $aucode = (int)$aucode + 1;
             $exists = $this->where('aucode', $aucode)->count();

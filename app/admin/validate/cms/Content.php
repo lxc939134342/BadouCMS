@@ -42,7 +42,7 @@ class Content extends Validate
      */
     protected function checkAucodeFormat($value, $rule, $data): bool
     {
-        if ($value === '' || is_null($value)) {
+        if ($value === '' || $value === '0' || $value === 0 || is_null($value)) {
             return true;
         }
 
@@ -58,7 +58,7 @@ class Content extends Validate
      */
     protected function checkAucodeUnique($value, $rule, $data)
     {
-        if ($value === '' || is_null($value)) {
+        if ($value === '' || $value === '0' || $value === 0 || is_null($value)) {
             return true;
         }
 
