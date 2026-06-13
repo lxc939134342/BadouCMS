@@ -16,25 +16,25 @@ return [
     // 开启应用快速访问
     'app_express'    =>    true,
     // 应用映射（自动多应用模式有效）
-    'app_map'          => [
-    ],
+    'app_map'          => [],
     // 域名绑定（自动多应用模式有效）
     'domain_bind'      => [],
     // 禁止URL访问的应用列表（自动多应用模式有效）
     'deny_app_list'    => [
-        'common','admin'
+        'common',
+        'admin'
     ],
     //异常处理页面
     'http_exception_template' => [
         // 定义404错误的模板文件地址
-        404 =>  \think\facade\App::getRootPath() . 'public'.DIRECTORY_SEPARATOR.'404.html',
+        404 =>  \think\facade\App::getRootPath() . 'public' . DIRECTORY_SEPARATOR . '404.html',
     ],
 
     // 异常页面的模板文件
-    'exception_tmpl'   => app()->getRootPath() . 'app'.DIRECTORY_SEPARATOR.'common'.DIRECTORY_SEPARATOR.'view'.DIRECTORY_SEPARATOR.'tpl'.DIRECTORY_SEPARATOR.'think_exception.tpl',
+    'exception_tmpl'   => app()->getRootPath() . 'app' . DIRECTORY_SEPARATOR . 'common' . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR . 'tpl' . DIRECTORY_SEPARATOR . 'think_exception.tpl',
 
     // 错误显示信息,非调试模式有效
     'error_message'    => '页面错误！请稍后再试～',
     // 显示错误信息
-    'show_error_msg'   => env('APP_DEBUG', 'true'),
+    'show_error_msg'   => env('APP_DEBUG', false),
 ];

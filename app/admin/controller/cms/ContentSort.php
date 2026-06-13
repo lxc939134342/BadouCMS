@@ -25,6 +25,7 @@ use badou\EventContext;
  */
 class ContentSort extends Base
 {
+    protected $noNeedRight = ['selectpage'];
     /**
      * ContentSort模型对象
      * @var \app\admin\model\cms\ContentSort
