@@ -361,7 +361,7 @@
             if (!scode) {
                 return false;
             }
-            getFieldHtml('', scode);
+            getFieldHtml('{$row["id"]}', scode);
         })
 
         bdForm.api.bindevent($("form.layui-form"));
