@@ -731,11 +731,20 @@ if (!function_exists('get_backend_lang')) {
     function get_backend_lang(): string
     {
         $lg = cookie('b_lg');
+        $defaultLang = get_default_lang();
+        $lastDefaultLang = cookie('b_lg_default');
         if ($acode = request()->param('acode')) {
             $lg = $acode;
             cookie('b_lg', $acode);
+        } elseif (!$lg || $lastDefaultLang !== $defaultLang) {
+            $lg = $defaultLang;
+            cookie('b_lg', $lg);
         }
-        return $lg ?: 'cn';
+
+        if ($lastDefaultLang !== $defaultLang) {
+            cookie('b_lg_default', $defaultLang);
+        }
+        return $lg;
     }
 }
 

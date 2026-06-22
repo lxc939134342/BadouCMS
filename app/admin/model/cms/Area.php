@@ -13,6 +13,7 @@
 namespace app\admin\model\cms;
 
 use think\Model;
+use think\facade\Cache;
 
 /**
  * Area
@@ -37,6 +38,7 @@ class Area extends Model
     public static function onAfterWrite($model): void
     {
         $data = $model->getData();
+        Cache::delete('cms_default_lang');
         /* 设置默认 */
         if (isset($data['is_default']) && $data['is_default'] == 1) {
             self::where('id', '<>', $model->id)->update(['is_default' => 0]);
