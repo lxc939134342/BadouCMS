@@ -30,6 +30,7 @@ class Base extends Backend
     protected $multiFields = 'status,sorting';
 
     protected $defaultArea = null;
+    protected array $previewDomains = [];
 
     public function initialize()
     {
@@ -92,6 +93,36 @@ class Base extends Backend
         set_backend_lang($acode);
         $this->assignconfig('atitle', $currentArea['name']);
         $this->success('切换语言成功', '', get_backend_lang());
+    }
+
+    /**
+     * 为 CMS 后台预览链接补全当前语言绑定的域名。
+     */
+    protected function buildPreviewUrl(string $url, ?string $acode = null): string
+    {
+        if ($url === '' || preg_match('#^(?:https?:)?//#i', $url)) {
+            return $url;
+        }
+
+        $domain = $this->getPreviewDomain($acode ?: get_backend_lang());
+        if ($domain === '') {
+            return $url;
+        }
+
+        if (!preg_match('#^https?://#i', $domain)) {
+            $domain = $this->request->scheme() . '://' . ltrim($domain, '/');
+        }
+
+        return rtrim($domain, '/') . '/' . ltrim($url, '/');
+    }
+
+    protected function getPreviewDomain(string $acode): string
+    {
+        if (!array_key_exists($acode, $this->previewDomains)) {
+            $this->previewDomains[$acode] = trim((string) Area::where('acode', $acode)->value('domain'));
+        }
+
+        return $this->previewDomains[$acode];
     }
 
     /**

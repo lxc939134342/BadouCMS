@@ -132,13 +132,13 @@ class Content extends Base
             if (!preg_match('#^https?://#i', $outlink)) {
                 $outlink = '/' . ltrim($outlink, '/');
             }
-            return $outlink;
+            return $this->buildPreviewUrl($outlink, $data['acode'] ?? null);
         }
 
         $url = (string) bdurl($data['contentsort']['type'], $data['contentsort']['urlname'], 'content', $data['scode'], $data['contentsort']['filename'], $data['id'], $data['filename']);
 
         $url = preg_replace("/\/((?!index)[\w]+)\.php\//i", "/", $url);
-        return $url;
+        return $this->buildPreviewUrl($url, $data['acode'] ?? null);
     }
 
     /**

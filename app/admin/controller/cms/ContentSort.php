@@ -83,6 +83,11 @@ class ContentSort extends Base
             ->order($sort, $order)
             ->select()->toArray();
 
+        foreach ($res as &$item) {
+            $item['view_url'] = $this->buildPreviewUrl($item['view_url'], $item['acode'] ?? null);
+        }
+        unset($item);
+
         /**
          * 树状表格必看注释一
          * 1. 获取表格数据（没有分页，所以简化了以上的数据查询代码）
