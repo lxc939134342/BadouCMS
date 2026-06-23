@@ -236,7 +236,7 @@ class Backend extends BaseController
         $this->loadlang($controllername, $lang);
 
         // 自动开启令牌验证 (合并基类默认排除与子类排除列表)
-        $noNeedToken = array_unique(array_merge(['login', 'selectpage', 'changelang', 'index', 'logout', 'wipecache', 'getgrouplist', 'roletree', 'multi'], (array)$this->noNeedToken));
+        $noNeedToken = array_unique(array_merge(['login', 'selectpage', 'changelang', 'index', 'logout', 'wipecache', 'getgrouplist', 'roletree'], (array)$this->noNeedToken));
 
         // 令牌初始化：确保 Session 中始终有 token
         $token = \think\facade\Session::get('__token__');

@@ -8,5 +8,5 @@ return [
     'Data'        => '请求数据',
     'IP'          => 'IP',
     'Useragent'   => 'User-Agent',
-    'Deletelog'   => '清空7天前的日志',
+    'Deletelog'   => '清空30天前的日志',
 ];

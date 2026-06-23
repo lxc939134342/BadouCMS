@@ -45,7 +45,7 @@ class Adminlog extends Backend
         if (!$isAdministrator) {
             $where[] = ['admin_id', 'in', $childrenAdminIds];
         }
-        AdminlogModel::where('create_time', '<= time', time() - (86400 * 7))->where($where)->delete();
+        AdminlogModel::where('create_time', '<= time', time() - (86400 * 30))->where($where)->delete();
         $this->success("删除日志成功！");
     }
 

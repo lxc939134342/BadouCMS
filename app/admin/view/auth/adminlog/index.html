@@ -80,7 +80,7 @@
 
         bdTable.table.on('toolbar()', function (obj) {
             if(obj.event == 'deletelog'){
-                var index=layer.confirm('确定要清空7天前的日志吗？', function (index) {
+                var index=layer.confirm('确定要清空30天前的日志吗？', function (index) {
                     badou.api.ajax({
                         url: "{:url('auth.adminlog/deletelog')}",
                     },function() {
