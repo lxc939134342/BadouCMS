@@ -203,11 +203,35 @@ class Content extends Model
         return $fields;
     }
 
+    // 内容图片字段白名单
+    public function isAllowedPicsField(string $field): bool
+    {
+        if ($field === 'pics') {
+            return true;
+        }
+
+        if (!preg_match('/^ext_[a-zA-Z0-9_]+$/D', $field)) {
+            return false;
+        }
+
+        return Extfield::where('name', $field)->where('type', '10')->count() > 0;
+    }
+
     // 内容详情页图片
     public function getContentPics($id, $field, $num = 0, $onlypic = false)
     {
+        $field = (string) $field;
+        if (!$this->isAllowedPicsField($field)) {
+            return [];
+        }
+
+        $picsField = $field === 'pics' ? 'a.pics' : 'b.' . $field;
+        $titleField = $field === 'pics' ? 'a.picstitle' : 'b.' . $field . 'title';
         $result = $this->alias('a')
-            ->field($field . ',picstitle')
+            ->field([
+                $picsField => 'pics',
+                $titleField => 'picstitle',
+            ])
             ->join('cms_content_ext b', 'a.id=b.contentid', 'LEFT')
             ->where('a.id', $id)
             ->where('a.status', 1)
