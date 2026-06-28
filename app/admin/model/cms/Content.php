@@ -68,11 +68,6 @@ class Content extends Model
         return $this->belongsTo(ContentSort::class, 'scode', 'scode');
     }
 
-    public function getIcoAttr($value, $data)
-    {
-        return $value ? cdnurl($value) : '';
-    }
-
     public function getPicstitleAttr($value, $data)
     {
         if (!$value) {

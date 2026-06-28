@@ -372,7 +372,9 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                 image: function (data) {
                     var that = this;
                     that.filter = that.filter || that.field || null;
-                    var html = '<div class="table-image" lay-on="table-image" ><img src="' + getItemField(data, this.field) + '"></div>';
+                    var value = getItemField(data, this.field);
+                    var src = value ? http.api.cdnurl(value) : '';
+                    var html = '<div class="table-image" lay-on="table-image" ><img src="' + src + '"></div>';
 
                     return html;
                 },
