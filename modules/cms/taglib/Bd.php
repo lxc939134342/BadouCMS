@@ -83,6 +83,7 @@ class Bd extends TagLib
         $parent = $tag['parent'] ?? 0;
         $num    = $tag['num'] ?? false;
         $scode  = $tag['scode'] ?? false;
+        $aucode = $tag['aucode'] ?? false;
         $alias  = $tag['alias'] ?? 'nav';
         $empty  = $tag['empty'] ?? '';
         $key    = !empty($tag['key']) ? $tag['key'] : 'i';
@@ -93,9 +94,12 @@ class Bd extends TagLib
         if ($scode) {
             $scode = $this->autoBuildVar($scode);
         }
+        if ($aucode) {
+            $aucode = $this->autoBuildVar($aucode);
+        }
         $var     = Random::build('alnum', 10);
         $parse   = '<?php ';
-        $parse  .= '$__' . $var . '__ = \app\index\model\cms\ContentSort::navList(' . $parent . ',"' . $scode . '","' . $num . '");';
+        $parse  .= '$__' . $var . '__ = \app\index\model\cms\ContentSort::navList(' . $parent . ',"' . $scode . '","' . $num . '","' . $aucode . '");';
         $parse  .= '?>';
         $parse  .= '{volist name="$__' . $var . '__" id="' . $alias . '" empty="' . $empty . '" key="' . $key . '" mod="' . $mod . '"}';
         $parse  .= $content;

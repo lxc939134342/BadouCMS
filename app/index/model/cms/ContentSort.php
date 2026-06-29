@@ -661,14 +661,33 @@ class ContentSort extends Model
      * @param mixed $parent
      * @param mixed $scode
      * @param mixed $num
+     * @param mixed $aucode
      * @return void
      */
-    public static function navList($parent = 0, $scode = false, $num = false): array
+    public static function navList($parent = 0, $scode = false, $num = false, $aucode = false): array
     {
         // 将scode转换为数组，避免重复调用explode
         $scode_arr = [];
         if ($scode) {
             $scode_arr = explode(',', $scode);
+        }
+        if ($aucode) {
+            $aucodemap = cache(self::aucodeMapKey());
+            if (!$aucodemap) {
+                self::getSortsTree(true, 0);
+                $aucodemap = cache(self::aucodeMapKey()) ?: [];
+            }
+            $aucode_arr = explode(',', $aucode);
+            $resolved_parent = [];
+            foreach ($aucode_arr as $v) {
+                $v = trim($v);
+                if ($v !== '' && isset($aucodemap[$v])) {
+                    $resolved_parent[] = $aucodemap[$v];
+                }
+            }
+            if (!$parent && $resolved_parent) {
+                $parent = implode(',', array_values(array_unique($resolved_parent)));
+            }
         }
         $data = ContentSort::getSortsTree();
         if ($parent) { // 非顶级栏目起始,调用子栏目
