@@ -32,6 +32,14 @@ class Detail extends Base
 
     public function index()
     {
+        $hookRes = $this->triggerObserver('BeforeIndex', $this);
+        if ($hookRes === false) {
+            return '';
+        }
+        if ($hookRes !== true && $hookRes !== null) {
+            return (string) $hookRes;
+        }
+
         $id = $this->request->param('id');
         if (!$this->contentInfo) {
             $this->contentInfo = $this->model::getContent($this->contentSort['scode'], $id);
@@ -40,8 +48,6 @@ class Detail extends Base
                 abort(404, __("Not found"));
             }
         }
-        // 避免内容设置自定义 URL 后，旧 ID 地址仍直接展示造成重复页面。
-        $this->redirectCanonicalUrl();
         /*验证内容权限*/
         if ($this->contentInfo['gid']) {
             $this->checkPageLevel($this->contentInfo['gid'], $this->contentInfo['gtype'], $this->contentInfo['gnote']);
@@ -79,45 +85,13 @@ class Detail extends Base
         $this->assignBd();
         $custom_tpl = isset($this->contentInfo['custom_tpl']) && !empty($this->contentInfo['custom_tpl']) ? $this->contentInfo['custom_tpl'] : false;
         $template = $custom_tpl ?: $this->contentSort['contenttpl'];
-        return $this->view->fetch('/' . basename($template, '.html'));
-    }
+        $template = basename($template, '.html');
 
-    protected function redirectCanonicalUrl(): void
-    {
-        if (!$this->contentInfo) {
-            return;
+        $hookRes = $this->triggerObserver('AfterIndex', $this, $template);
+        if ($hookRes !== true && $hookRes !== null) {
+            return (string) $hookRes;
         }
 
-        // 跳转目标允许站内相对地址和 http/https 站外地址，避免其它协议或异常字符进入 Location。
-        $canonicalUrl = (string)$this->contentInfo['link'];
-        $canonicalParts = parse_url($canonicalUrl);
-        if ($canonicalUrl === '' || $canonicalParts === false || preg_match("/[\r\n]/", $canonicalUrl)) {
-            return;
-        }
-
-        $canonicalScheme = strtolower($canonicalParts['scheme'] ?? '');
-        if ($canonicalScheme && !in_array($canonicalScheme, ['http', 'https'])) {
-            return;
-        }
-
-        $canonicalHost = strtolower($canonicalParts['host'] ?? '');
-        if ($canonicalHost && $canonicalHost !== strtolower($this->request->host())) {
-            $this->redirect($canonicalUrl, 301);
-        }
-
-        $canonicalPath = $this->normalizePath($canonicalParts['path'] ?? '');
-        $currentPath = $this->normalizePath(parse_url($this->request->url(), PHP_URL_PATH) ?: '');
-
-        if (!$canonicalPath || !$currentPath || $canonicalPath === $currentPath) {
-            return;
-        }
-
-        $this->redirect($canonicalUrl, 301);
-    }
-
-    protected function normalizePath(string $path): string
-    {
-        $path = '/' . ltrim($path, '/');
-        return rtrim($path, '/') ?: '/';
+        return $this->view->fetch('/' . $template);
     }
 }

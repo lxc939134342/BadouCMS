@@ -227,6 +227,11 @@ class Base extends Frontend
         $this->view->assign('bd', array_merge($bdassign, $api_data, $this->site, $this->company, $this->label));
     }
 
+    public function view()
+    {
+        return $this->view;
+    }
+
     /**
      * 渲染配置信息
      * @param mixed $name  键名或数组

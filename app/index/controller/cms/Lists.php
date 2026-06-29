@@ -19,6 +19,14 @@ class Lists extends Base
     protected $noNeedLogin = ['*'];
     public function index(): string
     {
+        $hookRes = $this->triggerObserver('BeforeIndex', $this);
+        if ($hookRes === false) {
+            return '';
+        }
+        if ($hookRes !== true && $hookRes !== null) {
+            return (string) $hookRes;
+        }
+
         $template = empty($this->contentSort['listtpl']) ? $this->contentSort['contenttpl'] : $this->contentSort['listtpl'];
 
         $this->site['sitekeywords'] = $this->contentSort['keywords'] ? $this->contentSort['keywords'] : $this->site['sitekeywords'];
@@ -42,6 +50,13 @@ class Lists extends Base
         $page = $bootstrap->pageData();
         $this->view->assign('page', $page);
         $this->assignBd();
-        return $this->view->fetch('/'.basename($template, '.html'));
+        $template = basename($template, '.html');
+
+        $hookRes = $this->triggerObserver('AfterIndex', $this, $template);
+        if ($hookRes !== true && $hookRes !== null) {
+            return (string) $hookRes;
+        }
+
+        return $this->view->fetch('/' . $template);
     }
 }
