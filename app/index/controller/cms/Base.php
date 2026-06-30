@@ -32,31 +32,31 @@ class Base extends Frontend
      * 站点配置
      * @var array
      */
-    protected array $site;
+    public array $site;
 
     /**
      * 标签信息
      * @var array
      */
-    protected array $label;
+    public array $label;
 
     /**
      * 公司信息
      * @var array
      */
-    protected array $company;
+    public array $company;
 
     /**
      * 分类信息
      * @var object
      */
-    protected $contentSort;
+    public $contentSort;
 
     /**
      * 内容信息
      * @var
      */
-    protected $contentInfo;
+    public $contentInfo;
 
     /**
      * 当前操作路径
