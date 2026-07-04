@@ -40,13 +40,20 @@ class User extends Model
 
     public static function onBeforeWrite($row)
     {
-        if (isset($row->password)) {
-            if ($row->password) {
-                $row->password = password_hash($row->password, PASSWORD_DEFAULT);
-            } else {
-                unset($row->password);
-            }
+        $changeData = $row->getChangedData();
+
+        if (!array_key_exists('password', $changeData)) {
+            return;
         }
+
+        $password = $changeData['password'];
+
+        if ($password === null || $password === '') {
+            $row->password = $row->getOrigin('password');
+            return;
+        }
+
+        $row->password = password_hash($password, PASSWORD_DEFAULT);
     }
 
     public static function onBeforeUpdate($row)
