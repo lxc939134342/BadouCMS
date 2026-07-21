@@ -12,13 +12,11 @@
 
 namespace app\index\model\cms;
 
-use think\facade\Cache;
 use think\facade\Db;
 use think\Model;
 
 class Content extends Model
 {
-    private const FILTER_CACHE_TTL = 600;
     private const FILTER_RANGE_PATTERN = '/^(?=.*\d)\s*(\d+(?:\.\d+)?)?\s*-\s*(\d+(?:\.\d+)?)?\s*$/';
 
     protected $name = "cms_content";
@@ -47,11 +45,6 @@ class Content extends Model
         $value = preg_replace('/javascript:/i', '', $value);
 
         return $value;
-    }
-
-    public function getDescriptionAttr($value): string
-    {
-        return $value ? strip_tags(parse_markdown($value)) : '';
     }
 
     public function getIcoAttr($value, $data)
@@ -212,11 +205,35 @@ class Content extends Model
         return $fields;
     }
 
+    // 内容图片字段白名单
+    public function isAllowedPicsField(string $field): bool
+    {
+        if ($field === 'pics') {
+            return true;
+        }
+
+        if (!preg_match('/^ext_[a-zA-Z0-9_]+$/D', $field)) {
+            return false;
+        }
+
+        return Extfield::where('name', $field)->where('type', '10')->count() > 0;
+    }
+
     // 内容详情页图片
     public function getContentPics($id, $field, $num = 0, $onlypic = false)
     {
+        $field = (string) $field;
+        if (!$this->isAllowedPicsField($field)) {
+            return [];
+        }
+
+        $picsField = $field === 'pics' ? 'a.pics' : 'b.' . $field;
+        $titleField = $field === 'pics' ? 'a.picstitle' : 'b.' . $field . 'title';
         $result = $this->alias('a')
-            ->field($field . ',picstitle')
+            ->field([
+                $picsField => 'pics',
+                $titleField => 'picstitle',
+            ])
             ->join('cms_content_ext b', 'a.id=b.contentid', 'LEFT')
             ->where('a.id', $id)
             ->where('a.status', 1)
@@ -365,10 +382,6 @@ class Content extends Model
         }
         $result['subsortlink'] = $result['subscode'] ? bdurl($result['type'], $result['urlname'], 'list', $result['subscode'], $result['subfilename'], '', '') : '';
         $result->inc('visits')->save();
-        // 内容详情页解析 markdown
-        if ($result->content) {
-            $result->content = parse_markdown($result->content);
-        }
         $tagsModel = new Tags();
         if (! ! $tags = $tagsModel->getTags()) {
             // 将A链接保护起来,alt、titel保护起来
@@ -489,35 +502,57 @@ class Content extends Model
         }
 
         $ext_where = [];
-        $fuzzy = $params['fuzzy'] ?? false;
-        $filterData = self::normalizeExtFilters((array)$get);
+        $fuzzy = !empty($params['fuzzy']);
 
-        foreach ($filterData['filters'] as $key => $value) {
-            $fieldType = $filterData['types'][$key] ?? 1;
+        // 获取所有的扩展字段配置，用来判断哪些是多选字段（如 4 多选按钮, 14 关联表多选）
+        $extFieldTypes = self::getExtFieldTypes();
+        $extFieldOptions = self::getExtFieldOptions();
+
+        foreach ((array)$get as $key => $rawValue) {
+            // 只允许后台已定义的扩展字段，避免未知参数进入 SQL。
+            if (!is_string($key) || !isset($extFieldTypes[$key])) {
+                continue;
+            }
+            $value = self::normalizeFilterValue($rawValue);
+            if ($value === null) {
+                continue;
+            }
+            // 获取当前字段的类型，判断在数据库中它存的是不是多值（逗号分隔）
+            $fieldType = (int)$extFieldTypes[$key];
             $isMultiDbField = in_array($fieldType, [4, 14], true);
-            $configuredOptions = $filterData['options'][$key] ?? [];
 
-            // 后台存在同名选项时按普通文本处理，例如 10-20ml 不是数值区间。
-            $isConfiguredOption = in_array($value, $configuredOptions, true);
+            // 只有纯数字范围才按区间处理，避免把 "10-20ml" 等选项误判为范围。
+            $isConfiguredOption = in_array($value, $extFieldOptions[$key] ?? [], true);
             if (!$isConfiguredOption && preg_match(self::FILTER_RANGE_PATTERN, $value, $range)) {
                 if ($range[1] !== '') {
                     $ext_where[] = [$key, '>', $range[1]];
                 }
-                if ($range[2] !== '') {
+                if (isset($range[2]) && $range[2] !== '') {
                     $ext_where[] = [$key, '<=', $range[2]];
                 }
-            } elseif (strpos($value, ',') !== false) {
-                $multiValues = array_filter(array_map('trim', explode(',', $value)), static fn($item) => $item !== '');
-                if ($isMultiDbField) {
-                    $ext_where[] = function ($query) use ($key, $multiValues) {
-                        foreach ($multiValues as $item) {
-                            $query->whereOr($key, 'find in set', $item);
-                        }
-                    };
-                } else {
-                    $ext_where[] = [$key, 'in', $multiValues];
+            }
+            // 3. 默认：处理多选入参（入参含有逗号）
+            elseif (strpos($value, ',') !== false) {
+                $multiValues = array_values(array_filter(
+                    array_map('trim', explode(',', $value)),
+                    static fn($item) => $item !== ''
+                ));
+                if ($multiValues) {
+                    if ($isMultiDbField) {
+                        // 同一个多值字段的选项是 OR，不同字段仍由外层 where 按 AND 组合。
+                        $ext_where[] = function ($query) use ($key, $multiValues) {
+                            foreach ($multiValues as $item) {
+                                $query->whereOr($key, 'find in set', $item);
+                            }
+                        };
+                    } else {
+                        // 数据库存的是单值（但筛选器允许勾选多个去找），安全使用 IN 查询。
+                        $ext_where[] = [$key, 'in', $multiValues];
+                    }
                 }
-            } elseif ($fuzzy) {
+            }
+            // 4. 默认：普通单值入参查询
+            elseif ($fuzzy) {
                 $ext_where[] = [$key, 'like', '%' . $value . '%'];
             } elseif ($isMultiDbField) {
                 $ext_where[] = [$key, 'find in set', $value];
@@ -525,105 +560,90 @@ class Content extends Model
                 $ext_where[$key] = $value;
             }
         }
-
         return $ext_where;
     }
 
-    /**
-     * 只规范化扩展筛选：正常选项保持原功能，伪造字段和值不进入数据库查询。
-     */
-    protected static function normalizeExtFilters(array $get): array
+    /** 获取扩展字段类型，类型 4、14 的值以逗号分隔保存。 */
+    protected static function getExtFieldTypes(): array
     {
-        static $requestCache = [];
+        static $types;
 
-        $cacheKey = md5(serialize($get));
-        if (isset($requestCache[$cacheKey])) {
-            return $requestCache[$cacheKey];
+        if ($types === null) {
+            $types = (array)Extfield::column('type', 'name');
         }
 
-        $definitions = [];
-        foreach (Extfield::field('name,type,value')->select()->toArray() as $row) {
-            $name = (string)$row['name'];
-            if (!preg_match('/^ext_[a-zA-Z0-9_]+$/', $name)) {
+        return $types;
+    }
+
+    /** 获取扩展字段配置的选项值，避免带连字符的文本被误判为数字区间。 */
+    protected static function getExtFieldOptions(): array
+    {
+        static $options;
+
+        if ($options === null) {
+            $options = [];
+            foreach (Extfield::field('name,value')->select()->toArray() as $row) {
+                $name = (string)($row['name'] ?? '');
+                if ($name === '') {
+                    continue;
+                }
+                $options[$name] = array_values(array_map(
+                    'strval',
+                    parse_array((string)($row['value'] ?? ''))
+                ));
+            }
+        }
+
+        return $options;
+    }
+
+    /** 将筛选参数规范化为字符串，非法类型直接忽略。 */
+    protected static function normalizeFilterValue($value): ?string
+    {
+        if (is_array($value)) {
+            $values = [];
+            foreach ($value as $item) {
+                if (is_scalar($item)) {
+                    $item = trim((string)$item);
+                    if ($item !== '') {
+                        $values[] = $item;
+                    }
+                }
+            }
+            $value = implode(',', $values);
+        } elseif (is_scalar($value)) {
+            $value = trim((string)$value);
+        } else {
+            return null;
+        }
+
+        return $value === '' ? null : $value;
+    }
+
+    /** 生成分页链接的筛选参数，避免多条件分页丢失或带入非法扩展字段。 */
+    protected static function getFilterQuery(array $query): array
+    {
+        $extFieldTypes = self::getExtFieldTypes();
+
+        foreach ($query as $key => $value) {
+            if (!is_string($key) || strpos($key, 'ext_') !== 0) {
                 continue;
             }
-            $definitions[$name] = [
-                'type' => (int)$row['type'],
-                'options' => array_values(array_map('strval', parse_array((string)$row['value']))),
-            ];
-        }
-
-        $filters = [];
-        $types = [];
-        $options = [];
-        $queryString = (string)request()->server('QUERY_STRING', '');
-        if (strlen($queryString) <= 2048) {
-            foreach ($get as $field => $rawValue) {
-                if (!is_string($field) || !str_starts_with($field, 'ext_') || !isset($definitions[$field])) {
-                    continue;
-                }
-                if (!is_string($rawValue) && !is_numeric($rawValue)) {
-                    continue;
-                }
-
-                $value = trim((string)$rawValue);
-                if ($value === '') {
-                    continue;
-                }
-
-                $allowedValues = $definitions[$field]['options'];
-                $isNumericRange = (bool)preg_match(self::FILTER_RANGE_PATTERN, $value);
-                if ($allowedValues && !$isNumericRange) {
-                    $values = array_values(array_unique(array_intersect(
-                        array_filter(array_map('trim', explode(',', $value)), static fn($item) => $item !== ''),
-                        $allowedValues
-                    ), SORT_STRING));
-                    if (!$values) {
-                        continue;
-                    }
-                    sort($values, SORT_STRING);
-                    $value = implode(',', $values);
-                }
-
-                $filters[$field] = $value;
-                $types[$field] = $definitions[$field]['type'];
-                $options[$field] = $allowedValues;
-            }
-        }
-
-        ksort($filters, SORT_STRING);
-        return $requestCache[$cacheKey] = compact('filters', 'types', 'options');
-    }
-
-    protected static function getFilterQuery(array $query, array $filters): array
-    {
-        foreach (array_keys($query) as $key) {
-            if (is_string($key) && str_starts_with($key, 'ext_')) {
+            if (!isset($extFieldTypes[$key])) {
                 unset($query[$key]);
+                continue;
+            }
+
+            $value = self::normalizeFilterValue($value);
+            if ($value === null) {
+                unset($query[$key]);
+            } else {
+                $query[$key] = $value;
             }
         }
-        foreach ($filters as $field => $value) {
-            $query[$field] = $value;
-        }
+
         ksort($query, SORT_STRING);
         return $query;
-    }
-
-    protected static function getFilterCacheKey(array $params, array $query, string $lang, int $num, $order): string
-    {
-        ksort($params, SORT_STRING);
-        $payload = [
-            'version' => 2,
-            'host' => request()->host(),
-            'path' => request()->baseUrl(),
-            'lang' => $lang,
-            'params' => $params,
-            'query' => $query,
-            'num' => $num,
-            'order' => is_string($order) ? $order : '',
-        ];
-
-        return 'cms-filter-list-' . hash('sha256', serialize($payload));
     }
 
     /**
@@ -811,27 +831,6 @@ class Content extends Model
             }
         }
 
-        $filterQuery = [];
-        $filterCacheKey = null;
-        $filterCacheEnabled = false;
-        if ($page) {
-            $filterData = self::normalizeExtFilters((array)request()->get());
-            $filterQuery = self::getFilterQuery((array)request()->get(), $filterData['filters']);
-            if (!isset($filterQuery['tag']) && request()->param('tag')) {
-                $filterQuery['tag'] = request()->param('tag');
-                ksort($filterQuery, SORT_STRING);
-            }
-            $filterCacheEnabled = ($params['cache'] ?? true) !== false;
-
-            if ($filterCacheEnabled) {
-                $filterCacheKey = self::getFilterCacheKey($params, $filterQuery, $lg, (int)$num, $order);
-                $cachedData = Cache::get($filterCacheKey);
-                if (is_array($cachedData)) {
-                    return $cachedData;
-                }
-            }
-        }
-
         if ($lfield) {
             $lfield .= ',id,outlink,type,scode,sortfilename,filename,urlname'; // 附加必须字段
             $fields = explode(',', $lfield);
@@ -955,35 +954,22 @@ class Content extends Model
             // 扩展字段数据筛选
             $ext_where = self::buildExtWhere(request()->get(), $params);
             $db->where($ext_where);
-            $loadPage = static function () use ($db, $filterQuery, $num, $simple, $data) {
-                $res = $db->paginate([
-                    'query' => $filterQuery,
-                    'list_rows' => $num,
-                ], $simple);
+            $filterQuery = self::getFilterQuery((array)request()->get());
+            $res = $db->paginate([
+                'query' => $filterQuery,
+                'list_rows' => $num,
+            ], $simple);
 
+            if (!$res->isEmpty()) {
                 $data['total'] = $res->total();
-                if (!$res->isEmpty()) {
-                    $data['per_page'] = $res->listRows();
-                    $data['current_page'] = $res->currentPage();
-                    $data['last_page'] = $res->lastPage();
-                    $data['data'] = $res->getCollection()->toArray();
-                    $data['page'] = $res->pageData();
-                }
-                return $data;
-            };
-
-            if ($filterCacheEnabled && $filterCacheKey) {
-                return Cache::tag('cms_cache')->remember(
-                    $filterCacheKey,
-                    static function () use ($filterCacheKey, $loadPage) {
-                        // 等待同一筛选请求完成后再次读缓存，避免并发请求重复执行 SQL。
-                        $cachedData = Cache::get($filterCacheKey);
-                        return is_array($cachedData) ? $cachedData : $loadPage();
-                    },
-                    self::FILTER_CACHE_TTL
-                );
+                $data['per_page'] = $res->listRows();
+                $data['current_page'] = $res->currentPage();
+                $data['last_page'] = $res->lastPage();
+                $data['data'] = $res->getCollection()->toArray();
+                $data['page'] = $res->pageData();
+            } else {
+                $data['total'] = $res->total();
             }
-            $data = $loadPage();
         } else {
             list($cacheKey, $exprie) = self::getCacheKeyExpire('contentList', $params);
             $res = $db->limit($start, $num)->cache($cacheKey, $exprie, 'cms_cache')->select();
@@ -1379,9 +1365,10 @@ class Content extends Model
             // 扩展字段数据筛选
             $ext_where = self::buildExtWhere(request()->get(), $params);
             $db->where($ext_where);
+            $filterQuery = self::getFilterQuery((array)request()->get());
 
             $res = $db->paginate([
-                'query' => request()->get(),
+                'query' => $filterQuery,
                 'list_rows' => $num,
             ], $simple);
 
