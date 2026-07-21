@@ -61,7 +61,7 @@ class ContentSort extends Model
     {
         $data = $model->getData();
         $type = Db::name('cms_model')->where('mcode', $data['mcode'])->value('type');
-        if ($type == 1 && ! $data['outlink']) { // 在填写了外链时不生成单页
+        if ($type == 1) {
             self::addSingle($data['scode'], $data['name']);
         }
         return false;
@@ -73,10 +73,8 @@ class ContentSort extends Model
         $type = Db::name('cms_model')->where('mcode', $data['mcode'])->value('type');
         $content = Db::name('cms_content')->where('scode', $data['scode'])->find();
 
-        // 如果修改为单页并且跳转，则删除单页内容，否则判断是否存在内容，不存在则添加
-        if ($type == 1 && $data['outlink']) {
-            Content::where('scode', $data['scode'])->delete();
-        } elseif ($type == 1 && ! $content) {
+        // 跳转地址只影响栏目链接，不应影响单页内容的创建和编辑
+        if ($type == 1 && ! $content) {
             self::addSingle($data['scode'], $data['name']);
         }
     }
