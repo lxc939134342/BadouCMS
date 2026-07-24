@@ -366,7 +366,7 @@ class Content extends Model
         if ($id) {
             $where[] = ['a.id|a.filename', '=', $id];
         }
-        $result = self::alias('a')
+        $query = self::alias('a')
             ->field($field)
             ->where($where)
             ->where('a.status', 1)
@@ -374,9 +374,18 @@ class Content extends Model
             ->join('cms_content_sort c', 'a.subscode=c.scode', 'LEFT')
             ->join('cms_model d', 'b.mcode=d.mcode', 'LEFT')
             ->join('cms_content_ext e', 'a.id=e.contentid', 'LEFT')
-            ->join('user_level f', 'a.gid=f.id', 'LEFT')
-            ->order('id DESC')
-            ->find();
+            ->join('user_level f', 'a.gid=f.id', 'LEFT');
+
+        // slug 优先当前语言，缺失时回退默认语言；数字 ID 不参与语言回退。
+        $isNumericId = is_numeric($id) && ctype_digit((string)$id);
+        if (!$isNumericId) {
+            $language = get_frontend_lang();
+            $defaultLanguage = get_default_lang();
+            $query->whereIn('a.acode', [$language, $defaultLanguage])
+                ->orderRaw('FIELD(a.acode, ?, ?) ASC', [$language, $defaultLanguage]);
+        }
+
+        $result = $query->order('a.id', 'DESC')->find();
         if (!$result) {
             return [];
         }

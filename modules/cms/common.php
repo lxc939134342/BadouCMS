@@ -865,6 +865,16 @@ if (!function_exists('bdurl')) {
             }
         }
         $link = preg_replace("/\/((?!index)[\w]+)\.php\//i", "/", (string)$link);
+
+        // 目录模式下，默认语言保留根路径，其余语言使用 /{lang}/ 前缀。
+        if ((int)get_sys_config('url_rule_type') === 1) {
+            $language = trim(get_frontend_lang());
+            $defaultLanguage = trim(get_default_lang());
+            if ($language !== '' && $defaultLanguage !== '' && $language !== $defaultLanguage) {
+                $link = '/' . rawurlencode($language) . '/' . ltrim($link, '/');
+            }
+        }
+
         return $link;
     }
 }

@@ -14,6 +14,7 @@ Route::pattern([
 ]);
 
 $cms_domain = [];
+$cms_area = [];
 /* 前台应用获取区域域名 */
 if (strtolower(app('http')->getName()) == 'index') {
     $cms_area = (new Area())->getList();
@@ -27,6 +28,13 @@ $cms_domain   = array_diff($cms_domain, ['']);
 // $cms_domain[get_default_lang()] = $main_domain ;
 
 $lg = get_frontend_lang();
+$defaultLanguage = get_default_lang();
+$urlRuleType = (int)get_sys_config('url_rule_type');
+$languageCodes = array_keys($cms_area);
+$languagePattern = implode('|', array_map(
+    static fn($language) => preg_quote(trim((string)$language), '#'),
+    array_values(array_filter($languageCodes))
+));
 
 /* 路由初始化钩子：允许插件介入并修改当前的语言识别逻辑 */
 $initRes = Event::trigger('cmsRouteInit', ['cms_area' => $cms_area]);
@@ -38,8 +46,18 @@ foreach ($initRes as $res) {
 }
 
 /* 设置语言 */
-if (request()->param('lg')) {
-    $lg = request()->param('lg');
+$queryLanguage = trim((string)request()->param('lg', ''));
+if ($queryLanguage !== '' && isset($cms_area[$queryLanguage])) {
+    $lg = $queryLanguage;
+}
+
+// 目录模式以 URL 首段为准，确保 /en/... 在控制器初始化前就切换语言。
+if ($urlRuleType === 1) {
+    $path = trim((string)request()->pathinfo(), '/');
+    $pathLanguage = $path === '' ? '' : strtok($path, '/');
+    if ($pathLanguage !== false && isset($cms_area[$pathLanguage])) {
+        $lg = $pathLanguage;
+    }
 }
 
 if (!$lg) {
@@ -70,8 +88,50 @@ $route_arr = [
     ':category/:id$' => 'cms.detail/index', // 详情路由
 ];
 
+/**
+ * 注册目录模式下的语言前缀路由。
+ *
+ * 语言码通过 $languagePattern 限制，只允许已配置的前台语言；因此
+ * /en/category/product.html 会被解析为 lg=en、category=category、id=product，
+ * 但任意未知的第一段不会被当成语言。非目录模式不注册该分组，避免普通
+ * 的多段路径被误判为语言路由。CMS、Shop 和 Inquiry 共用此入口，分别传入
+ * 自己的路由表，避免按语言重复构建整套路由。
+ *
+ * @param array<string, string|array> $routes 路由规则及对应的控制器
+ */
+$registerLanguageRoutes = static function (array $routes) use ($languagePattern, $urlRuleType): void {
+    if ($urlRuleType !== 1 || $languagePattern === '') {
+        return;
+    }
+
+    Route::group(':lg', function () use ($routes) {
+        foreach ($routes as $key => $value) {
+            Route::rule($key, $value);
+        }
+    });
+};
+
+if ($urlRuleType === 1 && $languagePattern !== '') {
+    Route::pattern(['lg' => $languagePattern]);
+}
+
 /* 路由开始执行钩子：允许插件注入自定义路由或多语言组 */
-Event::trigger('cmsRouteRun', ['route_arr' => $route_arr, 'param' => $param]);
+Event::trigger('cmsRouteRun', [
+    'route_arr' => $route_arr,
+    'param' => $param,
+    'cms_area' => $cms_area,
+    'languages' => $languageCodes,
+    'url_rule_type' => $urlRuleType,
+    'register_language_routes' => $registerLanguageRoutes,
+]);
+
+// 目录模式：使用一个受语言白名单约束的 /{lang}/ 路由组。
+if ($urlRuleType === 1 && $languagePattern !== '') {
+    Route::rule(':lg$', 'cms.index/index');
+    Route::rule(':lg/$', 'cms.index/index');
+    Route::rule(':lg/index$', 'cms.index/index');
+    $registerLanguageRoutes($route_arr);
+}
 
 /* cms事件执行前 */
 Event::trigger('cms_route_before');
@@ -98,4 +158,9 @@ if ($cms_domain) {
 }
 
 /* 路由执行结束钩子 */
-Event::trigger('cmsRouteEnd');
+Event::trigger('cmsRouteEnd', [
+    'cms_area' => $cms_area,
+    'languages' => $languageCodes,
+    'url_rule_type' => $urlRuleType,
+    'register_language_routes' => $registerLanguageRoutes,
+]);

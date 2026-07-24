@@ -284,7 +284,7 @@ class Bd extends TagLib
         $indextext     = addslashes($tag['indextext'] ?? '');
         $indexicon     = addslashes($tag['indexicon'] ?? '');
         $params = [
-            "'scode'=>\$sort['scode']",
+            "'scode'=>(isset(\$sort['scode']) ? \$sort['scode'] : '')",
             "'separator'=>'{$separator}'",
             "'separatoricon'=>'{$separatoricon}'",
             "'indextext'=>'{$indextext}'",
