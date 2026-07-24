@@ -1,0 +1,35 @@
+{if $default_area['acode'] == $acode}
+<div class="layui-form-item">
+    <label class="layui-form-label">多语同步翻译</label>
+    <div class="layui-input-block">
+        <input type="checkbox" id="c-sync-all" title="全选" {if get_sys_config('default_sync_content')}checked{/if}>
+    </div>
+    <div class="layui-input-block" id="c-sync-select">
+        {volist name="$curralist" id="item" key="k"}
+        {if $item.acode!=$acode}
+        <input type="checkbox" id="c-sync-{$item.acode}" name="row[sync][]" title="{$item.name}" value="{$item.acode}"
+            {if get_sys_config('default_sync_content')}checked{/if}>
+        {/if}
+        {/volist}
+    </div>
+</div>
+
+<script>
+layui.use(["form", "jquery"], function () {
+    var form = layui.form;
+    var $ = layui.jquery;
+
+    $(document).on('change', '#c-sync-all', function () {
+        $('#c-sync-select input[type="checkbox"]').prop('checked', $(this).prop('checked'));
+        form.render('checkbox');
+    });
+
+    $(document).on('change', '#c-sync-select input[type="checkbox"]', function () {
+        var totalCheckboxes = $('#c-sync-select input[type="checkbox"]').length;
+        var checkedCheckboxes = $('#c-sync-select input[type="checkbox"]:checked').length;
+        $('#c-sync-all').prop('checked', totalCheckboxes === checkedCheckboxes);
+        form.render('checkbox');
+    });
+});
+</script>
+{/if}
