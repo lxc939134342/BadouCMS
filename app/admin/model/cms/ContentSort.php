@@ -61,8 +61,8 @@ class ContentSort extends Model
     {
         $data = $model->getData();
         $type = Db::name('cms_model')->where('mcode', $data['mcode'])->value('type');
-        if ($type == 1) {
-            self::addSingle($data['scode'], $data['name']);
+        if ($type == 1) { 
+            self::addSingle($data['scode'], $data['name'], $data['acode']);
         }
         return false;
     }
@@ -73,9 +73,9 @@ class ContentSort extends Model
         $type = Db::name('cms_model')->where('mcode', $data['mcode'])->value('type');
         $content = Db::name('cms_content')->where('scode', $data['scode'])->find();
 
-        // 跳转地址只影响栏目链接，不应影响单页内容的创建和编辑
-        if ($type == 1 && ! $content) {
-            self::addSingle($data['scode'], $data['name']);
+	// 跳转地址只影响栏目链接，不应影响单页内容的创建和编辑
+	if ($type == 1 && ! $content) {
+            self::addSingle($data['scode'], $data['name'], $data['acode']);
         }
     }
 
@@ -154,14 +154,15 @@ class ContentSort extends Model
      * 添加单页内容
      * @param string $scode
      * @param string $title
-     * @return bool
+     * @param string $acode
+     * @return void
      */
-    public static function addSingle(string $scode, string $title): void
+    public static function addSingle(string $scode, string $title, string $acode): void
     {
         $auth = (new AdminAuth())->getUserInfo();
         // 构建数据
         $data = array(
-            'acode' => get_backend_lang(),
+            'acode' => $acode,
             'scode' => $scode,
             'subscode' => '',
             'title' => $title,

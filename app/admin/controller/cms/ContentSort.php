@@ -10,195 +10,382 @@
 // | Author: lande <939134342@qq.com>
 // +----------------------------------------------------------------------
 
-namespace app\admin\model\cms;
+namespace app\admin\controller\cms;
 
-use app\common\library\AdminAuth;
+use app\admin\model\UserLevel;
+use Throwable;
 use badou\Tree;
-use think\Exception;
-use think\Model;
 use think\facade\Db;
-use think\facade\Cache;
+use badou\Filesystem;
+use app\admin\model\cms\Models;
+use badou\EventContext;
 
 /**
- * ContentSort
+ * 栏目管理
  */
-class ContentSort extends Model
+class ContentSort extends Base
 {
-    // 表名
-    protected $name = 'cms_content_sort';
-
-    // 自动写入时间戳字段
-    protected $autoWriteTimestamp = true;
-
-    protected $append = [
-        'view_url'
-    ];
-
-    public function models()
+    /**
+     * ContentSort模型对象
+     * @var \app\admin\model\cms\ContentSort
+     * @phpstan-var \app\admin\model\cms\ContentSort
+     */
+    protected $model;
+    protected $withJoinTable = ['models'];
+    protected $pk = 'scode';
+    protected $modelValidate = true;
+    protected $multiFields = 'status,sorting';
+    /**
+     *
+     * @var \badou\Tree
+     */
+    protected object $tree;
+    public function initialize(): void
     {
-        return $this->belongsTo(Models::class, 'mcode', 'mcode');
+        parent::initialize();
+        $this->tree  = Tree::instance();
+        $this->model = new \app\admin\model\cms\ContentSort();
+        $modelsModel = new Models();
+        $levelModel = new UserLevel();
+
+        $res = $modelsModel->where('status', 1)
+            ->order('id', 'desc')
+            ->select();
+
+        $this->assign('models', $res);
+        $this->assign('levellist', $levelModel->getLevelList());
+        $this->assign('gtypelist', $levelModel->getGtypeList());
+        $this->assign('tpls', $this->getTpls());
+        $this->assignconfig('models', $res);
     }
 
-    public static function onBeforeUpdate($model)
+    public function index()
     {
-        $data = $model->getData();
-
-        // 检查父类不能是自己
-        if (isset($data['pcode']) && isset($data['scode']) && $data['pcode'] == $data['scode']) {
-            throw new Exception(__('The father column can not be yourself'));
+        if (!$this->isAjax()) {
+            $this->assignHook('index');
+            return $this->view->fetch();
         }
-        // 检查父类不能是自己的子类
-        if (isset($data['pcode']) && isset($data['scode'])) {
-            $contentSort = new self();
-            $childrenIds = $contentSort->getChildrenIds($data['scode']);
-            if (in_array($data['pcode'], $childrenIds)) {
-                throw new Exception(__('The parent column cannot be its own sub-column'));
-            }
-        }
-    }
 
-    public static function onAfterInsert($model)
-    {
-        $data = $model->getData();
-        $type = Db::name('cms_model')->where('mcode', $data['mcode'])->value('type');
-        if ($type == 1 && ! $data['outlink']) { // 在填写了外链时不生成单页
-            self::addSingle($data['scode'], $data['name'], $data['acode']);
-        }
-        return false;
-    }
+        list($where, $sort, $order, $offset, $limit, $page, $alias, $bind) = $this->buildparams();
+        $istop = $this->request->param('istop/d', 1);
 
-    public static function onAfterUpdate($model)
-    {
-        $data = $model->getData();
-        $type = Db::name('cms_model')->where('mcode', $data['mcode'])->value('type');
-        $content = Db::name('cms_content')->where('scode', $data['scode'])->find();
+        $where[] = [
+            'acode',
+            '=',
+            get_backend_lang()
+        ];
 
-        // 如果修改为单页并且跳转，则删除单页内容，否则判断是否存在内容，不存在则添加
-        if ($type == 1 && $data['outlink']) {
-            Content::where('scode', $data['scode'])->delete();
-        } elseif ($type == 1 && ! $content) {
-            self::addSingle($data['scode'], $data['name'], $data['acode']);
-        }
-    }
+        $res = $this->model
+            ->withJoin($this->withJoinTable, $this->withJoinType)
+            ->alias($alias)
+            ->where($where)
+            ->order($sort, $order)
+            ->select()->toArray();
 
-    public static function onAfterWrite($model)
-    {
-        // 清除缓存
-        Cache::tag('cms_cache')->clear();
-    }
+        /**
+         * 树状表格必看注释一
+         * 1. 获取表格数据（没有分页，所以简化了以上的数据查询代码）
+         * 2. 递归的根据指定字段组装 children 数组，此时直接给前端，表格就可以正常的渲染为树状了，一个方法搞定
+         */
+        $list = $this->tree->init($res, 'pcode', null, 'scode')->multipleChild();
 
-    public static function onBeforeDelete($model)
-    {
-        $data = $model->getData();
-        $type = Db::name('cms_model')->where('mcode', $data['mcode'])->value('type');
-        if ($type == 1) {
-            Content::where('scode', $data['scode'])->delete();
-            return true;
-        }
-        if ($model->where('pcode', $data['scode'])->count()) {
-            throw new Exception(__('Please delete the sub-column first'));
-        }
-        if(Content::where('scode', $data['scode'])->count()) {
-            throw new Exception(__('Please delete the content first'));
-        }
-    }
-
-    public static function onAfterDelete($model)
-    {
-        // 清除缓存
-        Cache::tag('cms_cache')->clear();
-    }
-
-    public function getViewUrlAttr($value, $data)
-    {
-        // 增加 outlink 前缀处理
-        if (isset($data['outlink']) && $data['outlink']) {
-            $outlink = $data['outlink'];
-            // 如果不是以 http:// 或 https:// 开头，则添加前导 /
-            if (!preg_match('#^https?://#i', $outlink)) {
-                $outlink = '/' . ltrim($outlink, '/');
-            }
-            return $outlink;
-        }
-        $url = (string)bdurl($data['type'], $data['urlname'], 'list', $data['scode'], $data['filename'], '', '');
-
-        $url = preg_replace("/\/((?!index)[\w]+)\.php\//i", "/", $url);
-        return $url;
+        $this->result('', $list);
     }
 
     /**
-     * 获取栏目的所有子节点ID
-     * @param int  $scode       栏目scode
-     * @param bool $withself 是否包含自身
-     * @return array
+     * 删除
+     * @throws Throwable
      */
-    public function getChildrenIds($scode, $withself = false, $is_all = false)
+    public function del()
     {
-        $where = [];
-        if (!$is_all) {
-            $where[] = ['status','=',1];
+        $where             = [];
+        $dataLimitAdminIds = $this->getDataLimitAdminIds();
+        if ($dataLimitAdminIds) {
+            $where[] = [$this->dataLimitField, 'in', $dataLimitAdminIds];
         }
-        // 将 scode 做为 id
-        $datalist = $this->where($where)->field('scode as id,pcode as pid')->select()->toArray();
-        $tree = Tree::instance();
-        $tree->init($datalist);
-        $data = $tree->getChildrenIds($scode, $withself);
-        return $data;
-    }
 
-    // 获取最后一个code
-    public function getLastCode()
-    {
-        return $this->orderRaw('CAST(scode AS UNSIGNED) DESC')->value('scode');
+        $ids = $this->request->param('ids');
+
+        // 触发观察者 - 删除前
+        $res = $this->triggerObserver('BeforeDel', $ids, $this);
+        if (is_array($res)) {
+            $ids = $res;
+        }
+
+        $where[] = [$this->pk, 'in', $ids];
+        $data    = $this->model->where($where)->select();
+
+        $count = 0;
+        $this->model->startTrans();
+        try {
+            foreach ($data as $v) {
+                $count += $v->delete();
+            }
+            $this->model->commit();
+        } catch (Throwable $e) {
+            $this->model->rollback();
+            $this->error($e->getMessage());
+        }
+        if ($count) {
+            $this->success(__('Delete successful'));
+        } else {
+            $this->error(__('No rows were deleted'));
+        }
     }
 
     /**
-     * 添加单页内容
-     * @param string $scode
-     * @param string $title
-     * @param string $acode
-     * @return void
+     * 获取模版文件列表
      */
-    public static function addSingle(string $scode, string $title, string $acode): void
+    protected function getTpls()
     {
-        $auth = (new AdminAuth())->getUserInfo();
-        // 构建数据
-        $data = array(
-            'acode' => $acode,
-            'scode' => $scode,
-            'subscode' => '',
-            'title' => $title,
-            'titlecolor' => '#333333',
-            'subtitle' => '',
-            'filename' => '',
-            'author' => $auth['nickname'],
-            'source' => '本站',
-            'outlink' => '',
-            'date' => date('Y-m-d H:i:s'),
-            'ico' => '',
-            'pics' => '',
-            'picstitle' => '',
-            'content' => '',
-            'tags' => '',
-            'enclosure' => '',
-            'keywords' => '',
-            'description' => '',
-            'sorting' => 255,
-            'status' => 1,
-            'istop' => 0,
-            'isrecommend' => 0,
-            'isheadline' => 0,
-            'gid' => 0,
-            'gtype' => 4,
-            'gnote' => '',
-            'visits' => 0,
-            'likes' => 0,
-            'oppose' => 0,
-            'create_user' => $auth['nickname'],
-            'update_user' => $auth['nickname'],
-            'create_time' => date('Y-m-d H:i:s'),
-            'update_time' => date('Y-m-d H:i:s'),
-        );
-        Db::name('cms_content')->insert($data);
+        $acode = get_backend_lang();
+        $template = Db::name('cms_site')->where('acode', $acode)->value('theme');
+        if ($template == '') {
+            $template = 'default';
+            Db::name('cms_site')->where('acode', $acode)->update(['theme' => 'default']);
+        }
+
+        $path = root_path() . 'template' . DIRECTORY_SEPARATOR . 'cms' . DIRECTORY_SEPARATOR . $template . DIRECTORY_SEPARATOR;
+        $list = [];
+        if (is_dir($path)) {
+            $files = Filesystem::getDirFiles($path, ['html']);
+            $list = [];
+            foreach ($files as $key => $value) {
+                $list[] = ['id' => $key, 'name' => $value];
+            }
+        }
+
+        return $list;
+    }
+
+    /**
+     * 添加
+     */
+    public function add()
+    {
+        if (!$this->isAjax()) {
+            $this->assignHook('add', ['main_top', 'main_mid', 'main_bottom', 'side_top', 'side_bottom', 'footer', 'scripts'], []);
+            return $this->view->fetch();
+        }
+
+        if ($this->request->isPost()) {
+            $data = $this->getPostData('row/a');
+            $result = false;
+            $this->model->startTrans();
+            try {
+                // 触发观察者 - 添加前
+                $context = new EventContext($data);
+                $this->triggerObserver('BeforeAdd', $context, $this);
+                if ($context->isIntercepted()) {
+                    $this->error($context->getMessage());
+                }
+                $data = $context->getData();
+
+                // 模型验证
+                $this->modelValidateFunction($data);
+                $lastcode = $this->model->getLastCode();
+                $scode = get_auto_code($lastcode);
+                $default = [
+                    'acode'       => get_backend_lang(),
+                    'pcode'       => 0,
+                    'scode'       => $scode,
+                    'name'        => '',
+                    'mcode'       => 0,
+                    'listtpl'     => '',
+                    'contenttpl'  => '',
+                    'status'      => 1,
+                    'gid'         => 0,
+                    'gtype'       => 4,
+                    'subname'     => '',
+                    'filename'    => '',
+                    'outlink'     => '',
+                    'ico'         => '',
+                    'pic'         => '',
+                    'title'       => '',
+                    'keywords'    => '',
+                    'description' => '',
+                    'sorting'     => '255',
+                    'create_user' => $this->auth->username,
+                    'update_user' => $this->auth->username,
+                    'def1' => '',
+                    'def2' => '',
+                    'def3' => '',
+                ];
+
+                $data = array_merge($default, $data);
+
+                $result = $this->model->save($data);
+                if ($result !== false) {
+                    $this->triggerObserver('AfterAdd', $data, $this);
+                }
+                $this->model->commit();
+            } catch (Throwable $e) {
+                $this->model->rollback();
+                $this->error($e->getMessage());
+            }
+            if ($result !== false) {
+                $this->success(__('Add successfully'));
+            } else {
+                $this->error(__('No rows were added'));
+            }
+        }
+        $this->assignHook('add', ['main_top', 'main_mid', 'main_bottom', 'side_top', 'side_bottom', 'footer', 'scripts'], []);
+        return $this->view->fetch();
+    }
+
+    /**
+     * 编辑
+     * @throws Throwable
+     */
+    public function edit()
+    {
+        $id  = $this->request->param('ids');
+        $row = $this->model->where($this->pk, 'in', $id)->find();
+        if (!$row) {
+            $this->error(__('Record not found'));
+        }
+
+        $adminIds = $this->getDataLimitAdminIds();
+        if (is_array($adminIds) && !in_array($row[$this->dataLimitField], $adminIds)) {
+            $this->error(__('You have no permission'));
+        }
+
+        if ($this->request->isPost()) {
+            $data = $this->getPostData('row/a');
+            if (!$data) {
+                $this->error(__('Parameter %s can not be empty', ['']));
+            }
+
+            $data   = $this->preExcludeFields($data);
+            $data['listtpl']    = $data['listtpl'] ?? '';
+            $data['contenttpl'] = $data['contenttpl'] ?? '';
+            $data['pcode'] = isset($data['pcode']) ? (int)$data['pcode'] : 0;
+            $result = false;
+            $this->model->startTrans();
+            try {
+                // 模型验证
+                if ($this->modelValidate) {
+                    $this->modelValidateFunction($data);
+                }
+
+                // 触发观察者 - 修改前
+                $context = new EventContext($data, ['row' => $row]);
+                $this->triggerObserver('BeforeEdit', $context, $this);
+                if ($context->isIntercepted()) {
+                    $this->error($context->getMessage());
+                }
+                $data = $context->getData();
+
+                $result = $row->save($data);
+                $this->triggerObserver('AfterEdit', $row, $data, $this);
+                $this->model->commit();
+            } catch (Throwable $e) {
+                $this->model->rollback();
+                $this->error($e->getMessage());
+            }
+            if ($result !== false) {
+                $this->success(__('Update successful'));
+            } else {
+                $this->error(__('No rows updated'));
+            }
+        }
+        $this->view->assign('row', $row);
+        $this->assignHook('edit', ['main_top', 'main_mid', 'main_bottom', 'side_top', 'side_bottom', 'footer', 'scripts'], $row->toArray());
+        return $this->view->fetch();
+    }
+
+    /**
+     * 批量添加
+     */
+    public function batchAdd()
+    {
+        if ($this->request->isPost()) {
+            $data = $this->getPostData('row/a');
+            $result = false;
+            $this->model->startTrans();
+            try {
+                // 触发观察者 - 添加前
+                $context = new EventContext($data);
+                $this->triggerObserver('BeforeBatchAdd', $context, $this);
+                if ($context->isIntercepted()) {
+                    $this->error($context->getMessage());
+                }
+                $data = $context->getData();
+
+                // 模型验证
+                $this->modelValidateFunction($data);
+                $multiplename = str_replace('，', ',', $data['name']);
+                $names = explode(',', $multiplename);
+                $listtpl    = isset($data['listtpl']) ? $data['listtpl'] : '';
+                $contenttpl = isset($data['contenttpl']) ? $data['contenttpl'] : '';
+
+                $lastcode = $this->model->getLastCode();
+                $scode = get_auto_code($lastcode);
+                $datalist = [];
+                foreach ($names as $key => $value) {
+                    $datalist[] = array(
+                        'acode'      => get_backend_lang(),
+                        'pcode'      => $data['pcode'] ?? 0,
+                        'scode'      => $scode,
+                        'name'       => $value,
+                        'mcode'      => $data['mcode'],
+                        'listtpl'    => $listtpl,
+                        'contenttpl' => $contenttpl,
+                        'status' => $data['status'],
+                        'gid' => 0,
+                        'gtype' => 4,
+                        'subname' => '',
+                        'filename' => '',
+                        'outlink' => '',
+                        'ico' => '',
+                        'pic' => '',
+                        'title' => '',
+                        'keywords' => '',
+                        'description' => '',
+                        'sorting' => '255',
+                        'create_user' => '',
+                        'update_user' => '',
+                        'def1' => '',
+                        'def2' => '',
+                        'def3' => '',
+                    );
+                    $scode = get_auto_code($scode);
+                }
+                $result = $this->model->saveAll($datalist);
+                $this->triggerObserver('AfterBatchAdd', $datalist, $this);
+                $this->model->commit();
+            } catch (Throwable $e) {
+                $this->model->rollback();
+                $this->error($e->getMessage());
+            }
+            if ($result !== false) {
+                $this->success(__('Add successful'));
+            } else {
+                $this->error(__('No rows were added'));
+            }
+        }
+        $this->assignHook('batchadd', ['main_top',  'main_bottom',  'footer', 'scripts'], []);
+        return $this->view->fetch();
+    }
+
+
+    public function selectpage()
+    {
+        $custom = (array)$this->request->request("custom/a");
+        $where = [
+            'acode' => $custom['acode'],
+        ];
+        if (isset($custom['mcode'])) {
+            $where['mcode'] = $custom['mcode'];
+        }
+        $res = $this->model
+            ->where($where)
+            ->order('scode', 'desc')
+            ->select();
+
+        $list = $this->tree->init($res->toArray(), 'pcode', null, 'scode', 'children')->multipleChild();
+        $top = ['scode' => 0, 'name' => '顶级栏目'];
+        array_unshift($list, $top);
+        $this->success('', '', ['list' => $list, 'total' => $res->count() + 1]);
     }
 }
