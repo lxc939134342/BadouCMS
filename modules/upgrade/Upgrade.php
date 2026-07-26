@@ -36,6 +36,10 @@ class Upgrade
         'extend',
         'vendor'
     ];
+    protected $files = [
+        'composer.json',
+        'think',
+    ];
     public function appInit()
     {
         if (app('http')->getName() == 'admin') {
@@ -87,10 +91,26 @@ class Upgrade
                 Filesystem::copydirs($moduleDir . $dir, root_path() . $dir);
             }
         }
+        foreach ($this->files as $file) {
+            $sourceFile = $moduleDir . $file;
+            if (!is_file($sourceFile)) {
+                continue;
+            }
+            $destinationFile = root_path() . $file;
+            if (!copy($sourceFile, $destinationFile)) {
+                throw new Exception("Unable to copy upgrade file: {$file}");
+            }
+            if ($file === 'think') {
+                @chmod($destinationFile, 0755);
+            }
+        }
 
         // 删除模块目录已复制到全局的文件
         foreach ($this->dirs as $k => $dir) {
             Filesystem::delDir($moduleDir . $dir);
+        }
+        foreach ($this->files as $file) {
+            @unlink($moduleDir . $file);
         }
 
         // 修改版本号
@@ -140,6 +160,26 @@ class Upgrade
                 }
             }
         }
+        foreach ($this->files as $file) {
+            $sourceFile = $moduleDir . $file;
+            if (!is_file($sourceFile)) {
+                continue;
+            }
+            if ($onlyconflict) {
+                $destinationFile = root_path() . $file;
+                if (
+                    is_file($destinationFile)
+                    && (
+                        filesize($sourceFile) !== filesize($destinationFile)
+                        || md5_file($sourceFile) !== md5_file($destinationFile)
+                    )
+                ) {
+                    $list[] = $file;
+                }
+            } else {
+                $list[] = $file;
+            }
+        }
         $list = array_filter(array_unique($list));
         return $list;
     }
@@ -176,8 +216,6 @@ class Upgrade
             ];
             Db::name('config')->where('name', 'config_group')->update(['value' => json_encode($config_group)]);
         }
-
-        $this->importsql('upgrade');
 
         Db::startTrans();
         try {
