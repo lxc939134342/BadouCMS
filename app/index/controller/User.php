@@ -61,7 +61,7 @@ class User extends Frontend
     public function index()
     {
         $this->view->assign('title', __('User center'));
-        return $this->view->fetch();
+        return $this->fetch();
     }
 
     /**
@@ -109,7 +109,7 @@ class User extends Frontend
         }
         $this->view->assign('url', $url);
         $this->view->assign('title', __('Login'));
-        return $this->view->fetch('user/login');
+        return $this->fetch('user/login');
     }
 
     /**
@@ -173,7 +173,7 @@ class User extends Frontend
         $this->view->assign('captcha_type', config('badouadmin.user_register_captcha'));
         $this->view->assign('url', $url);
         $this->view->assign('title', __('Register'));
-        return $this->view->fetch();
+        return $this->fetch();
     }
 
     /**
@@ -255,7 +255,7 @@ class User extends Frontend
     public function profile()
     {
         $this->view->assign('title', __('Profile'));
-        return $this->view->fetch();
+        return $this->fetch();
     }
 
     public function changepwd()
@@ -288,6 +288,40 @@ class User extends Frontend
             }
         }
         $this->view->assign('title', __('Change password'));
-        return $this->view->fetch();
+        return $this->fetch();
+    }
+
+    /**
+     * Keep the normal controller fetch syntax while adding member template overrides.
+     */
+    protected function fetch($template = '', $vars = [], $replace = [], $config = []): string
+    {
+        $template = $template ?: 'user/' . $this->request->action();
+        $action = pathinfo($template, PATHINFO_FILENAME);
+        $override = Event::until('user_template_resolve', [
+            'route'      => 'index/user/' . $action,
+            'action'     => $action,
+            'template'   => $template,
+            'controller' => $this,
+            'vars'       => is_array($vars) ? $vars : [],
+            'is_login'   => $this->auth->isLogin(),
+        ]);
+
+        if (is_array($override)) {
+            $override = $override['template'] ?? null;
+        }
+
+        if (!is_string($override) || trim($override) === '' || !is_file($override)) {
+            return $this->view->fetch($template, is_array($vars) ? $vars : []);
+        }
+
+        $originalViewPath = $this->view->getConfig('view_path');
+        $templateRoot = dirname(dirname($override)) . DIRECTORY_SEPARATOR;
+        $this->view->config(['view_path' => $templateRoot]);
+        try {
+            return $this->view->fetch($template, is_array($vars) ? $vars : []);
+        } finally {
+            $this->view->config(['view_path' => $originalViewPath]);
+        }
     }
 }
