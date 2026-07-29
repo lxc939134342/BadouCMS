@@ -59,7 +59,10 @@ class Message extends Base
                 $field_data = implode(',', $field_data);
             }
             if ($value['required'] && ! $field_data) {
-                $this->error(__('%s cannot be empty', [__($value['name'])]));
+                $fieldTitle = $this->app->lang->has($value['name'])
+                    ? $this->app->lang->get($value['name'])
+                    : ($value['description'] ?: $value['name']);
+                $this->error(__('%s cannot be empty', [$fieldTitle]));
             } else {
                 $data[$value['name']] = $field_data;
                 $mail_body .= $value['description'] . '：' . $field_data . '<br>';
