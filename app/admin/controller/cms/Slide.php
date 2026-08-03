@@ -85,7 +85,11 @@ class Slide extends Base
 
             $slideModel = $this->model;
             if ($post['gid'] == 0) {
-                $post['gid'] = ((int) $slideModel->max('gid')) + 1;
+                $gid = $slideModel
+                    ->where('acode', get_backend_lang())
+                    ->order('gid', 'desc')
+                    ->value('gid');
+                $post['gid'] = ((int) $gid) + 1;
             }
             $result = false;
             $this->model->startTrans();
@@ -139,6 +143,15 @@ class Slide extends Base
                     $this->error($context->getMessage());
                 }
                 $post = $context->getData();
+
+                if ((int) ($post['gid'] ?? 0) <= 0) {
+                    $post['gid'] = (int) $row->getAttr('gid');
+                }
+                if ((int) $post['gid'] <= 0) {
+                    $post['gid'] = ((int) $this->model
+                        ->where('acode', $row->getAttr('acode') ?: get_backend_lang())
+                        ->max('gid')) + 1;
+                }
 
                 $result = $row->save($post);
                 $this->syncSlides($row->toArray(), get_backend_lang(), $previous, $sync);
