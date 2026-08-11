@@ -1,492 +1,475 @@
 {layout name="layout/default" /}
 <style>
-    /* 栏目树样式 */
-    #contentSortTree .layui-tree-icon .layui-icon {
-        font-size: 12px !important;
-    }
-    #contentSortTree .layui-tree-entry {
-        box-sizing: content-box;
-    }
-    #contentSortTree .layui-tree-entry .layui-tree-main {
-        width: 100%;
-    }
-    #contentSortTree .layui-tree-entry .layui-tree-main .layui-tree-txt {
-        width: calc(100% - 36px);
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    #contentSortTree
-        .layui-tree-spread.active
-        > .layui-tree-entry
-        .layui-tree-txt {
-        font-weight: 600;
-        color: #333;
-    }
+  /* 栏目树样式 */
+  #contentSortTree .layui-tree-icon .layui-icon {
+    font-size: 12px !important;
+  }
+  #contentSortTree .layui-tree-entry {
+    box-sizing: content-box;
+  }
+  #contentSortTree .layui-tree-entry .layui-tree-main {
+    width: 100%;
+  }
+  #contentSortTree .layui-tree-entry .layui-tree-main .layui-tree-txt {
+    width: calc(100% - 36px);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  #contentSortTree
+    .layui-tree-spread.active
+    > .layui-tree-entry
+    .layui-tree-txt {
+    font-weight: 600;
+    color: #333;
+  }
 
-    /* 容器 */
-    .contentSortTreeBox {
-        position: relative;
-        height: calc(100% - 45px);
-    }
+  /* 容器 */
+  .contentSortTreeBox {
+    position: relative;
+    height: calc(100% - 45px);
+  }
 
-    /* 开关按钮（宽度 15px，便于点击） */
-    .contentSortTreeBox .on-off {
-        cursor: pointer;
-        position: absolute;
-        text-align: center;
-        display: block;
-        right: 0;
-        top: 50%;
-        margin-top: -13px;
-        width: 15px;
-        height: 26px;
-        line-height: 26px;
-        background-color: var(--primary-color);
-        border-radius: 4px 0 0 4px;
-        transition:
-            right 0.25s ease,
-            border-radius 0.25s ease,
-            transform 0.25s ease;
-        z-index: 5;
-    }
-    .contentSortTreeBox .on-off .fa {
-        color: #fff;
-    }
+  /* 开关按钮（宽度 15px，便于点击） */
+  .contentSortTreeBox .on-off {
+    cursor: pointer;
+    position: absolute;
+    text-align: center;
+    display: block;
+    right: 0;
+    top: 50%;
+    margin-top: -13px;
+    width: 15px;
+    height: 26px;
+    line-height: 26px;
+    background-color: var(--primary-color);
+    border-radius: 4px 0 0 4px;
+    transition:
+      right 0.25s ease,
+      border-radius 0.25s ease,
+      transform 0.25s ease;
+    z-index: 5;
+  }
+  .contentSortTreeBox .on-off .fa {
+    color: #fff;
+  }
 
-    .layui-col-md2.collapsed {
-        flex: 0 0 0;
-        width: 0;
-        min-width: 0;
-        overflow: visible;
-        padding: 0;
-    }
-    .layui-col-md2.collapsed .layui-card-header,
-    .layui-col-md2.collapsed #contentSortTree {
-        display: none;
-        opacity: 0;
-    }
-    .layui-col-md2.collapsed .contentSortTreeBox {
-        padding: 0;
-    }
-    .layui-col-md2.collapsed .contentSortTreeBox .on-off {
-        right: -20px;
-        border-radius: 0 4px 4px 0;
-    }
+  .layui-col-md2.collapsed {
+    flex: 0 0 0;
+    width: 0;
+    min-width: 0;
+    overflow: visible;
+    padding: 0;
+  }
+  .layui-col-md2.collapsed .layui-card-header,
+  .layui-col-md2.collapsed #contentSortTree {
+    display: none;
+    opacity: 0;
+  }
+  .layui-col-md2.collapsed .contentSortTreeBox {
+    padding: 0;
+  }
+  .layui-col-md2.collapsed .contentSortTreeBox .on-off {
+    right: -20px;
+    border-radius: 0 4px 4px 0;
+  }
 
-    /* 折叠时右侧区域占满剩余宽度（100%） */
-    .layui-col-md2.collapsed ~ .layui-col-md10,
-    .layui-col-md2.collapsed + .layui-col-md10 {
-        flex: 1 0 100%;
-        max-width: 100%;
-    }
+  /* 折叠时右侧区域占满剩余宽度（100%） */
+  .layui-col-md2.collapsed ~ .layui-col-md10,
+  .layui-col-md2.collapsed + .layui-col-md10 {
+    flex: 1 0 100%;
+    max-width: 100%;
+  }
 
-    /* 让树区域淡入淡出 */
-    #contentSortTree {
-        transition: opacity 0.18s ease;
-    }
+  /* 让树区域淡入淡出 */
+  #contentSortTree {
+    transition: opacity 0.18s ease;
+  }
 </style>
 <script src="__CDN__/modules/cms/js/change_lang.js"></script>
-{if isset($view_hooks.main_top)}
-    {$view_hooks.main_top|raw}
-{/if}
+{if isset($view_hooks.main_top)} {$view_hooks.main_top|raw} {/if}
 <div class="layui-row layui-col-space10 d-flex">
-    <div class="layui-col-md2">
-        <div class="layui-card h-100">
-            <div class="layui-card-header" style="background-color: #e9e9f0">
-                栏目列表
-            </div>
-            <div class="layui-card-body contentSortTreeBox">
-                <div id="contentSortTree"></div>
-                <div class="on-off">
-                    <i class="fa fa-angle-left"></i>
-                </div>
-            </div>
+  <div class="layui-col-md2">
+    <div class="layui-card h-100">
+      <div class="layui-card-header" style="background-color: #e9e9f0">
+        栏目列表
+      </div>
+      <div class="layui-card-body contentSortTreeBox">
+        <div id="contentSortTree"></div>
+        <div class="on-off">
+          <i class="fa fa-angle-left"></i>
         </div>
+      </div>
     </div>
-    <div class="layui-col-md10">
-        <div class="layui-card">
-            <div class="layui-card-body">
-                <table
-                    class="layui-hide"
-                    id="content"
-                    data-operate-edit="{:$auth->check('cms.content/edit')}"
-                    data-operate-del="{:$auth->check('cms.content/del')}"
-                ></table>
-            </div>
-        </div>
+  </div>
+  <div class="layui-col-md10">
+    <div class="layui-card">
+      <div class="layui-card-body">
+        <table
+          class="layui-hide"
+          id="content"
+          data-operate-edit="{:$auth->check('cms.content/edit')}"
+          data-operate-del="{:$auth->check('cms.content/del')}"
+        ></table>
+      </div>
     </div>
+  </div>
 </div>
-{if isset($view_hooks.main_bottom)}
-    {$view_hooks.main_bottom|raw}
-{/if}
+{if isset($view_hooks.main_bottom)} {$view_hooks.main_bottom|raw} {/if}
 <!-- 表格左侧按钮 toolbar  -->
 <script type="text/html" id="toolbar">
-    <a
-        href="javascript:;"
-        lay-event="refresh"
-        class="layui-btn btn-refresh layui-bg-black"
-    >
-        <i class="fa fa-refresh"></i>
-    </a>
-    <button
-        class="layui-btn layui-btn-primary layui-border-black"
-        id="changeLang"
-    >
-        <span class="lang-title">{$area_title}</span>
-        <i class="layui-icon layui-icon-down layui-font-12"></i>
-    </button>
-    <button
-        class="layui-btn btn-theme-color {:$auth->check('cms.content/add')?'':'hide'}"
-        lay-event="add"
-    >
-        <i class="fa fa-plus"></i>
-        {:__('Add')}
-    </button>
-    <button
-        class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('cms.content/edit')?'':'hide'}"
-        lay-event="edit"
-    >
-        <i class="fa fa-pencil"></i>
-        {:__('Edit')}
-    </button>
-    <button
-        class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('cms.content/del')?'':'hide'}"
-        lay-event="del"
-    >
-        <i class="fa fa-trash"></i>
-        {:__('Del')}
-    </button>
-    <a
-        href="{:url('cms.content/copy',['mcode'=>$mcode])}"
-        class="layui-btn btn-copy btn-disabled disabled {:$auth->check('cms.content/copy')?'':'hide'}"
-    >
-        <i class="fa fa-copy"></i>
-        {:__('Copy')}
-    </a>
-    <a
-        href="{:url('cms.content/move',['mcode'=>$mcode])}"
-        class="layui-btn btn-move btn-disabled disabled {:$auth->check('cms.content/move')?'':'hide'}"
-    >
-        <i class="fa fa-magnet"></i>
-        {:__('Move')}
-    </a>
-    <!-- 钩子 -->
-    {foreach :hook('content_top_btn',[],true) as $hook} {$hook|raw} {/foreach}
+  <a
+    href="javascript:;"
+    lay-event="refresh"
+    class="layui-btn btn-refresh layui-bg-black"
+  >
+    <i class="fa fa-refresh"></i>
+  </a>
+  <button
+    class="layui-btn layui-btn-primary layui-border-black"
+    id="changeLang"
+  >
+    <span class="lang-title">{$area_title}</span>
+    <i class="layui-icon layui-icon-down layui-font-12"></i>
+  </button>
+  <button
+    class="layui-btn btn-theme-color {:$auth->check('cms.content/add')?'':'hide'}"
+    lay-event="add"
+  >
+    <i class="fa fa-plus"></i>
+    {:__('Add')}
+  </button>
+  <button
+    class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('cms.content/edit')?'':'hide'}"
+    lay-event="edit"
+  >
+    <i class="fa fa-pencil"></i>
+    {:__('Edit')}
+  </button>
+  <button
+    class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('cms.content/del')?'':'hide'}"
+    lay-event="del"
+  >
+    <i class="fa fa-trash"></i>
+    {:__('Del')}
+  </button>
+  <a
+    href="{:url('cms.content/copy',['mcode'=>$mcode])}"
+    class="layui-btn btn-copy btn-disabled disabled {:$auth->check('cms.content/copy')?'':'hide'}"
+  >
+    <i class="fa fa-copy"></i>
+    {:__('Copy')}
+  </a>
+  <a
+    href="{:url('cms.content/move',['mcode'=>$mcode])}"
+    class="layui-btn btn-move btn-disabled disabled {:$auth->check('cms.content/move')?'':'hide'}"
+  >
+    <i class="fa fa-magnet"></i>
+    {:__('Move')}
+  </a>
+  <!-- 钩子 -->
+  {foreach :hook('content_top_btn',[],true) as $hook} {$hook|raw} {/foreach}
 </script>
 
 <script>
-    layui.use(["badou", "changeLang"], function () {
-        var bdTable = layui.bdTable;
-        var table = layui.table;
-        var layer = layui.layer;
-        var dropdown = layui.dropdown;
-        var badou = layui.badou;
-        var laytpl = layui.laytpl;
-        var form = layui.form;
-        var changeLang = layui.changeLang;
-        var tree = layui.tree;
-        badou.http.config.open.area = ["99%", "98%"];
+  layui.use(["badou", "changeLang"], function () {
+    var bdTable = layui.bdTable;
+    var table = layui.table;
+    var layer = layui.layer;
+    var dropdown = layui.dropdown;
+    var badou = layui.badou;
+    var laytpl = layui.laytpl;
+    var form = layui.form;
+    var changeLang = layui.changeLang;
+    var tree = layui.tree;
+    badou.http.config.open.area = ["99%", "98%"];
 
-        bdTable.api.init({
-            table: table,
-            extend: {
-                index_url: "cms.content/index",
-                add_url: "cms.content/add",
-                edit_url: "cms.content/edit",
-                del_url: "cms.content/del",
-                multi_url: "cms.content/multi",
-                table: "cms_content",
-            },
-        });
-        bdTable.render({
-            elem: "#content",
-            url: bdTable.extend.index_url,
-            pk: "id",
-            even: true,
-            sortName: "sorting asc,id desc",
-            searchFormVisible: true,
-            toolbar: "#toolbar",
-            page: true,
-            cols: [
-                [
-                    { type: "checkbox" },
-                    { field: "id", title: "ID", width: 80, sort: true },
-                    {
-                        field: "aucode",
-                        title: __("Aucode"),
-                        width: 110,
-                        sort: true,
-                    },
-                    {
-                        field: "scode",
-                        hide: true,
-                        title: __("Scode name"),
-                        width: 90,
-                        searchType: "remoteSelect",
-                        extend: 'data-source="cms.content/getContentSort" data-primary-key="scode" data-field="name" data-is-tree="true" data-pidname="pcode" data-params=\'{"acode":"{$acode}"}\'',
-                    },
-                    {
-                        field: "contentsort.name",
-                        operate: false,
-                        title: __("Scode name"),
-                        width: 150,
-                    },
-                    {
-                        field: "title",
-                        title: __("Title"),
-                        width: "250",
-                        operate: "like",
-                    },
-                    {
-                        field: "ico",
-                        title: __("Ico"),
-                        width: 80,
-                        templet: bdTable.api.formatter.image,
-                        operate: false,
-                    },
-                    {
-                        field: "date",
-                        title: __("Release time"),
-                        width: 180,
-                        templet: bdTable.api.formatter.datetime,
-                        operate: "RANGE",
-                        searchType: "time",
-                    },
-                    {
-                        field: "sorting",
-                        title: __("Sorting"),
-                        width: 100,
-                        templet: bdTable.api.formatter.input,
-                    },
-                    {
-                        field: "status",
-                        title: __("Status"),
-                        width: 80,
-                        searchList: { 0: __("Off"), 1: __("On") },
-                        templet: bdTable.api.formatter.switch,
-                    },
-                    {
-                        field: "istop",
-                        title: __("Istop"),
-                        width: 80,
-                        searchList: { 0: __("Off"), 1: __("On") },
-                        templet: bdTable.api.formatter.switch,
-                    },
-                    {
-                        field: "isrecommend",
-                        title: __("Isrecommend"),
-                        width: 80,
-                        searchList: { 0: __("Off"), 1: __("On") },
-                        templet: bdTable.api.formatter.switch,
-                    },
-                    {
-                        field: "isheadline",
-                        title: __("Isheadline"),
-                        width: 80,
-                        searchList: { 0: __("Off"), 1: __("On") },
-                        templet: bdTable.api.formatter.switch,
-                    },
-                    { field: "visits", title: __("Visits"), width: 80 },
-                    {
-                        title: __("Operate"),
-                        align: "center",
-                        width: 150,
-                        fixed: "right",
-                        templet: bdTable.api.formatter.operate,
-                        buttons: [
-                            {
-                                name: "view",
-                                icon: "fa fa-search-plus",
-                                title: __("View"),
-                                url: function (row, j) {
-                                    return row.view_url;
-                                },
-                                extend: 'target="_blank"',
-                                classname:
-                                    "layui-btn layui-bg-green layui-btn-sm",
-                            },
-                        ],
-                    },
-                ],
-            ],
-            done: function (res, curr, count) {
-                changeLang({
-                    click: function () {
-                        bdTable.table.reloadData(bdTable.initTable.config.id, {
-                            where: {},
-                        });
-                        contentSortTreeRender();
-                    },
-                });
-            },
-        });
-
-        var contentSortTreeRender = function () {
-            badou.api.ajax(
-                {
-                    type: "get",
-                    url: "cms.content/getContentSort",
-                },
-                function (ret) {
-                    tree.render({
-                        elem: "#contentSortTree",
-                        data: ret.list,
-                        showCheckbox: false, // 是否显示复选框
-                        id: "contentSortTree",
-                        onlyIconControl: true,
-                        showLine: false,
-                        customName: {
-                            id: "scode",
-                            title: "name",
-                            children: "children",
-                        },
-                        click: function (obj) {
-                            $(".layui-tree-spread").removeClass("active");
-                            obj.elem.addClass("active");
-                            var data = obj.data;
-
-                            // 辅助函数：处理URL参数
-                            function handleUrlParam(
-                                url,
-                                paramName,
-                                paramValue,
-                            ) {
-                                // 检查URL中是否已包含该参数
-                                var regex = new RegExp(
-                                    "([?&])" + paramName + "=[^&]*",
-                                );
-                                if (regex.test(url)) {
-                                    // 如果已存在，替换参数值
-                                    return url.replace(
-                                        regex,
-                                        "$1" + paramName + "=" + paramValue,
-                                    );
-                                } else {
-                                    // 如果不存在，添加参数
-                                    var separator =
-                                        url.indexOf("?") !== -1 ? "&" : "?";
-                                    return (
-                                        url +
-                                        separator +
-                                        paramName +
-                                        "=" +
-                                        paramValue
-                                    );
-                                }
-                            }
-
-                            // 使用辅助函数处理各个URL
-                            bdTable.extend.add_url = handleUrlParam(
-                                bdTable.extend.add_url,
-                                "scode",
-                                data.scode,
-                            );
-                            bdTable.extend.edit_url = handleUrlParam(
-                                bdTable.extend.edit_url,
-                                "scode",
-                                data.scode,
-                            );
-                            bdTable.extend.del_url = handleUrlParam(
-                                bdTable.extend.del_url,
-                                "scode",
-                                data.scode,
-                            );
-                            bdTable.extend.multi_url = handleUrlParam(
-                                bdTable.extend.multi_url,
-                                "scode",
-                                data.scode,
-                            );
-
-                            bdTable.table.reloadData(
-                                bdTable.initTable.config.id,
-                                {
-                                    where: {
-                                        mcode: data.mcode,
-                                        op: JSON.stringify({ scode: "=" }),
-                                        filter: JSON.stringify({
-                                            scode: data.scode,
-                                        }),
-                                        sort: bdTable.initTable.config.sortName,
-                                    },
-                                },
-                            );
-                        },
-                    });
-                    return false;
-                },
-            );
-        };
-        contentSortTreeRender();
-
-
-        // 移动&复制
-        $(document).on("click", ".btn-copy,.btn-move", function () {
-            var that = this;
-            if ($(this).hasClass("disabled")) {
-                return false;
-            }
-            var table = bdTable.initTable;
-            var ids = bdTable.api.selectedids();
-            if (ids.length === 0) {
-                layer.msg(__("Please select at least one item"));
-                return false;
-            }
-            var idarr = [];
-            $.each(ids, function (i, v) {
-                idarr.push(v[table.config.pk]);
-            });
-            var url = $(this).attr("href") + "&ids=" + idarr.join(",");
-            var title = $(this).text();
-
-            badou.api.open(url, title, {
-                area: ["550px", "500px"],
-            });
-            return false;
-        });
-
-        // 切换左侧栏目树显示
-        var storageKey = "cms.content.left.collapsed";
-        // 读取缓存状态并应用
-        var initCollapsed = localStorage.getItem(storageKey) === "1";
-        if (initCollapsed) {
-            $(".layui-col-md2").addClass("collapsed");
-            $(".contentSortTreeBox .on-off")
-                .addClass("collapsed")
-                .find("i.fa")
-                .removeClass("fa-angle-left")
-                .addClass("fa-angle-right");
-        }
-        // 绑定点击事件
-        $(document).on("click", ".contentSortTreeBox .on-off", function (e) {
-            e.preventDefault();
-            var $btn = $(this);
-            var $col = $btn.closest(".layui-col-md2");
-            var $icon = $btn.find("i.fa");
-
-            var collapsed = $col.hasClass("collapsed");
-            if (collapsed) {
-                // 展开
-                $col.removeClass("collapsed");
-                $btn.removeClass("collapsed");
-                $icon.removeClass("fa-angle-right").addClass("fa-angle-left");
-                localStorage.setItem(storageKey, "0");
-            } else {
-                // 收起
-                $col.addClass("collapsed");
-                $btn.addClass("collapsed");
-                $icon.removeClass("fa-angle-left").addClass("fa-angle-right");
-                localStorage.setItem(storageKey, "1");
-            }
-        });
+    bdTable.api.init({
+      table: table,
+      extend: {
+        index_url: "cms.content/index",
+        add_url: "cms.content/add",
+        edit_url: "cms.content/edit",
+        del_url: "cms.content/del",
+        multi_url: "cms.content/multi",
+        table: "cms_content",
+      },
     });
+    bdTable.render({
+      elem: "#content",
+      url: bdTable.extend.index_url,
+      pk: "id",
+      even: true,
+      sortName: "sorting asc,id desc",
+      searchFormVisible: true,
+      toolbar: "#toolbar",
+      page: true,
+      cols: [
+        [
+          { type: "checkbox" },
+          { field: "id", title: "ID", width: 80, sort: true },
+          {
+            field: "aucode",
+            title: __("Aucode"),
+            width: 110,
+            sort: true,
+          },
+          {
+            field: "scode",
+            hide: true,
+            title: __("Scode name"),
+            width: 90,
+            searchType: "remoteSelect",
+            extend:
+              'data-source="cms.content/getContentSort" data-primary-key="scode" data-field="name" data-is-tree="true" data-pidname="pcode" data-params=\'{"acode":"{$acode}"}\'',
+          },
+          {
+            field: "contentsort.name",
+            operate: false,
+            title: __("Scode name"),
+            width: 150,
+          },
+          {
+            field: "title",
+            title: __("Title"),
+            width: "250",
+            operate: "like",
+          },
+          {
+            field: "ico",
+            title: __("Ico"),
+            width: 80,
+            templet: bdTable.api.formatter.image,
+            operate: false,
+          },
+          {
+            field: "date",
+            title: __("Release time"),
+            width: 180,
+            templet: bdTable.api.formatter.datetime,
+            operate: "RANGE",
+            searchType: "time",
+          },
+          {
+            field: "sorting",
+            title: __("Sorting"),
+            width: 100,
+            templet: bdTable.api.formatter.input,
+          },
+          {
+            field: "status",
+            title: __("Status"),
+            width: 80,
+            searchList: { 0: __("Off"), 1: __("On") },
+            templet: bdTable.api.formatter.switch,
+          },
+          {
+            field: "istop",
+            title: __("Istop"),
+            width: 80,
+            searchList: { 0: __("Off"), 1: __("On") },
+            templet: bdTable.api.formatter.switch,
+          },
+          {
+            field: "isrecommend",
+            title: __("Isrecommend"),
+            width: 80,
+            searchList: { 0: __("Off"), 1: __("On") },
+            templet: bdTable.api.formatter.switch,
+          },
+          {
+            field: "isheadline",
+            title: __("Isheadline"),
+            width: 80,
+            searchList: { 0: __("Off"), 1: __("On") },
+            templet: bdTable.api.formatter.switch,
+          },
+          { field: "visits", title: __("Visits"), width: 80 },
+          {
+            title: __("Operate"),
+            align: "center",
+            width: 150,
+            fixed: "right",
+            templet: bdTable.api.formatter.operate,
+            buttons: [
+              {
+                name: "view",
+                icon: "fa fa-search-plus",
+                title: __("View"),
+                url: function (row, j) {
+                  return row.view_url;
+                },
+                extend: 'target="_blank"',
+                classname: "layui-btn layui-bg-green layui-btn-sm",
+              },
+            ],
+          },
+        ],
+      ],
+      done: function (res, curr, count) {
+        changeLang({
+          click: function () {
+            bdTable.table.reloadData(bdTable.initTable.config.id, {
+              page: { curr: 1 },
+              where: {},
+            });
+            contentSortTreeRender();
+          },
+        });
+      },
+    });
+
+    var contentSortTreeRender = function () {
+      badou.api.ajax(
+        {
+          type: "get",
+          url: "cms.content/getContentSort",
+        },
+        function (ret) {
+          tree.render({
+            elem: "#contentSortTree",
+            data: ret.list,
+            showCheckbox: false, // 是否显示复选框
+            id: "contentSortTree",
+            onlyIconControl: true,
+            showLine: false,
+            customName: {
+              id: "scode",
+              title: "name",
+              children: "children",
+            },
+            click: function (obj) {
+              $(".layui-tree-spread").removeClass("active");
+              obj.elem.addClass("active");
+              var data = obj.data;
+
+              // 辅助函数：处理URL参数
+              function handleUrlParam(url, paramName, paramValue) {
+                // 检查URL中是否已包含该参数
+                var regex = new RegExp("([?&])" + paramName + "=[^&]*");
+                if (regex.test(url)) {
+                  // 如果已存在，替换参数值
+                  return url.replace(
+                    regex,
+                    "$1" + paramName + "=" + paramValue,
+                  );
+                } else {
+                  // 如果不存在，添加参数
+                  var separator = url.indexOf("?") !== -1 ? "&" : "?";
+                  return url + separator + paramName + "=" + paramValue;
+                }
+              }
+
+              // 使用辅助函数处理各个URL
+              bdTable.extend.add_url = handleUrlParam(
+                bdTable.extend.add_url,
+                "scode",
+                data.scode,
+              );
+              bdTable.extend.edit_url = handleUrlParam(
+                bdTable.extend.edit_url,
+                "scode",
+                data.scode,
+              );
+              bdTable.extend.del_url = handleUrlParam(
+                bdTable.extend.del_url,
+                "scode",
+                data.scode,
+              );
+              bdTable.extend.multi_url = handleUrlParam(
+                bdTable.extend.multi_url,
+                "scode",
+                data.scode,
+              );
+
+              bdTable.table.reloadData(bdTable.initTable.config.id, {
+                page: { curr: 1 }, //修复：xw.design（https://gitee.com/xiaowuailanlan）
+                where: {
+                  mcode: data.mcode,
+                  op: JSON.stringify({ scode: "=" }),
+                  filter: JSON.stringify({
+                    scode: data.scode,
+                  }),
+                  sort: bdTable.initTable.config.sortName,
+                },
+              });
+            },
+          });
+          return false;
+        },
+      );
+    };
+    contentSortTreeRender();
+
+    // 移动&复制
+    $(document).on("click", ".btn-copy,.btn-move", function () {
+      var that = this;
+      if ($(this).hasClass("disabled")) {
+        return false;
+      }
+      var table = bdTable.initTable;
+      var ids = bdTable.api.selectedids();
+      if (ids.length === 0) {
+        layer.msg(__("Please select at least one item"));
+        return false;
+      }
+      var idarr = [];
+      $.each(ids, function (i, v) {
+        idarr.push(v[table.config.pk]);
+      });
+      var url = $(this).attr("href") + "&ids=" + idarr.join(",");
+      var title = $(this).text();
+
+      badou.api.open(url, title, {
+        area: ["550px", "500px"],
+      });
+      return false;
+    });
+
+    // 切换左侧栏目树显示
+    var storageKey = "cms.content.left.collapsed";
+    // 读取缓存状态并应用
+    var initCollapsed = localStorage.getItem(storageKey) === "1";
+    if (initCollapsed) {
+      $(".layui-col-md2").addClass("collapsed");
+      $(".contentSortTreeBox .on-off")
+        .addClass("collapsed")
+        .find("i.fa")
+        .removeClass("fa-angle-left")
+        .addClass("fa-angle-right");
+    }
+    // 绑定点击事件
+    $(document).on("click", ".contentSortTreeBox .on-off", function (e) {
+      e.preventDefault();
+      var $btn = $(this);
+      var $col = $btn.closest(".layui-col-md2");
+      var $icon = $btn.find("i.fa");
+
+      var collapsed = $col.hasClass("collapsed");
+      if (collapsed) {
+        // 展开
+        $col.removeClass("collapsed");
+        $btn.removeClass("collapsed");
+        $icon.removeClass("fa-angle-right").addClass("fa-angle-left");
+        localStorage.setItem(storageKey, "0");
+      } else {
+        // 收起
+        $col.addClass("collapsed");
+        $btn.addClass("collapsed");
+        $icon.removeClass("fa-angle-left").addClass("fa-angle-right");
+        localStorage.setItem(storageKey, "1");
+      }
+    });
+  });
 </script>
 {if isset($view_hooks.scripts)}
 <script>
-    layui.use(['badou', 'bdTable'], function() {
-        var badou = layui.badou;
-        var bdTable = layui.bdTable;
-        {$view_hooks.scripts|raw}
-    });
+  layui.use(["badou", "bdTable"], function () {
+    var badou = layui.badou;
+    var bdTable = layui.bdTable;
+    {
+      $view_hooks.scripts | raw;
+    }
+  });
 </script>
 {/if}
