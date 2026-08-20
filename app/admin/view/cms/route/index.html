@@ -1,0 +1,118 @@
+{layout name="layout/default" /}
+<style>
+    .route-editor {
+        max-width: 930px;
+    }
+
+    .route-grid {
+        display: grid;
+        grid-template-columns: minmax(240px, 1fr) minmax(240px, 1fr) 112px;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .route-heading {
+        margin-bottom: 8px;
+        color: #666;
+        font-weight: 600;
+    }
+
+    .route-row {
+        margin-bottom: 10px;
+    }
+
+    .route-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .route-actions .layui-btn {
+        margin: 0;
+    }
+
+    @media screen and (max-width: 768px) {
+        .route-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+<div class="layui-card">
+    <div class="layui-card-body">
+        <form class="layui-form route-editor" action="{:url('cms.route/index')}" method="post">
+            {:token_field()}
+            <div class="layui-form-item">
+                <label class="layui-form-label">前台扩展路由</label>
+                <div class="layui-input-block">
+                    <div class="route-grid route-heading">
+                        <span>路由规则</span>
+                        <span>路由目标</span>
+                        <span>操作</span>
+                    </div>
+                    <div id="route-list"></div>
+                    <button type="button" class="layui-btn" id="add-route"><i class="fa fa-plus"></i> 添加</button>
+                    <textarea name="routes" class="hide">{$routes|raw}</textarea>
+                    <p class="help-block">规则与目标均使用 ThinkPHP 路由格式，例如 configurator$ =&gt; configurator/index，或 :configurator/:action$ =&gt; configurator/:action。</p>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-input-block">
+                    <button class="layui-btn btn-theme-color" lay-submit>保存</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<script type="text/html" id="route-template">
+    <div class="route-grid route-row">
+        <input type="text" class="layui-input route-rule" placeholder="路由规则">
+        <input type="text" class="layui-input route-target" placeholder="路由目标">
+        <div class="route-actions">
+            <button type="button" class="layui-btn layui-bg-red delete-route" title="删除"><i class="fa fa-times"></i></button>
+        </div>
+    </div>
+</script>
+<script>
+    layui.use(['badou'], function () {
+        var form = $('form.layui-form');
+        var routeList = $('#route-list');
+        var routeTemplate = $('#route-template').html();
+
+        function addRoute(route) {
+            var row = $(routeTemplate);
+            row.find('.route-rule').val(route && route.rule ? route.rule : '');
+            row.find('.route-target').val(route && route.target ? route.target : '');
+            routeList.append(row);
+        }
+
+        function syncRoutes() {
+            var routes = [];
+            routeList.find('.route-row').each(function () {
+                var rule = $.trim($(this).find('.route-rule').val());
+                var target = $.trim($(this).find('.route-target').val());
+                if (rule || target) {
+                    routes.push({ rule: rule, target: target });
+                }
+            });
+            $('textarea[name="routes"]', form).val(JSON.stringify(routes));
+        }
+
+        var routes = [];
+        try {
+            routes = JSON.parse($('textarea[name="routes"]', form).val());
+        } catch (error) {
+            routes = [];
+        }
+        $.each(routes, function (_, route) {
+            addRoute(route);
+        });
+
+        $('#add-route').on('click', function () {
+            addRoute();
+        });
+        routeList.on('click', '.delete-route', function () {
+            $(this).closest('.route-row').remove();
+        });
+        form.on('submit', syncRoutes);
+        layui.bdForm.api.bindevent(form);
+    });
+</script>

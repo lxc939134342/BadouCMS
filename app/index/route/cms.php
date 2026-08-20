@@ -105,6 +105,7 @@ $registerLanguageRoutes = static function (array $routes) use ($languagePattern,
     }
 
     Route::group(':lg', function () use ($routes) {
+        Event::trigger('cms_route_before');
         foreach ($routes as $key => $value) {
             Route::rule($key, $value);
         }
