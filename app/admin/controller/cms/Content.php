@@ -192,7 +192,10 @@ class Content extends Base
         ];
 
         $data = array_merge($default, $data);
-        $data['sorting'] = $data['sorting'] ?? 255;
+        // 排序为空时使用默认值 255（前端空输入会以空字符串提交，不能只用 ?? 判断）
+        if ($data['sorting'] === '' || $data['sorting'] === null) {
+            $data['sorting'] = 255;
+        }
         $result = false;
         Db::startTrans();
         try {
