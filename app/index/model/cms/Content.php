@@ -76,7 +76,7 @@ class Content extends Model
         if (isset($data['outlink']) && $data['outlink']) {
             return $data['outlink'];
         }
-        return (string) bdurl($data['type'], $data['urlname'], 'content', $data['scode'], $data['sortfilename'], $data['id'], $data['filename']);
+        return (string) bdurl($data['type'], $data['urlname'], 'content', $data['scode'], $data['sortfilename'], $data['id'], $data['filename'], $data['acode'] ?? null);
     }
 
     public function getSortLinkAttr($value, $data)
@@ -996,11 +996,13 @@ class Content extends Model
      * @param mixed $scode
      * @return array|\think\Collection
      */
-    public function getSortContent($scode)
+    public function getSortContent($scode, ?string $language = null)
     {
         $fields = array(
             'a.id',
+            'a.acode',
             'a.filename',
+            'a.outlink',
             'a.date',
             'c.type',
             'c.urlname',
@@ -1008,17 +1010,20 @@ class Content extends Model
             'b.filename as sortfilename'
         );
 
+        $language = $language ?: get_frontend_lang();
         $where = [
             ['a.status', '=', 1],
+            ['a.acode', '=', $language],
             ['c.type', '=', 2],
             ['a.date', '<', date('Y-m-d H:i:s')],
             ['a.scode', '=', $scode],
+            ['b.acode', '=', $language],
         ];
 
         return $this->alias('a')
             ->field($fields)
             ->where($where)
-            ->join('cms_content_sort b', 'a.scode=b.scode', 'LEFT')
+            ->join('cms_content_sort b', 'a.scode=b.scode AND a.acode=b.acode', 'LEFT')
             ->join('cms_model c', 'b.mcode=c.mcode', 'LEFT')
             ->select();
     }

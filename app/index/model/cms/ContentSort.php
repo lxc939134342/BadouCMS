@@ -30,7 +30,7 @@ class ContentSort extends Model
         if ($data['outlink']) {
             return $data['outlink'];
         }
-        return bdurl($data['type'], $data['urlname'], 'list', $data['scode'], $data['filename'], '', '');
+        return bdurl($data['type'], $data['urlname'], 'list', $data['scode'], $data['filename'], '', '', $data['acode'] ?? null);
     }
 
 
@@ -360,10 +360,11 @@ class ContentSort extends Model
         return $nodes;
     }
 
-    public function getSortList(): array
+    public function getSortList(?string $language = null): array
     {
         $fields = array(
             'a.id',
+            'a.acode',
             'a.pcode',
             'a.scode',
             'a.name',
@@ -373,12 +374,13 @@ class ContentSort extends Model
             'b.urlname'
         );
         $order = 'a.pcode,a.sorting,a.id desc';
+        $language = $language ?: get_frontend_lang();
         $sorts = $this->alias('a')
-            ->where('a.acode', get_frontend_lang())
+            ->where('a.acode', $language)
             ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
             ->field($fields)
             ->order($order)
-            ->cache('__CACHE_CMS_SORTS_' . get_frontend_lang(), 3600, 'cms_cache')
+            ->cache('__CACHE_CMS_SORTS_' . $language, 3600, 'cms_cache')
             ->select();
         if ($sorts->isEmpty()) {
             return [];
@@ -390,6 +392,35 @@ class ContentSort extends Model
             $result[$value['scode']] = $value;
         }
         return $result;
+    }
+
+    /**
+     * 获取所有语言的栏目，不依赖当前前台语言。
+     */
+    public function getSortListAll(): array
+    {
+        $fields = array(
+            'a.id',
+            'a.acode',
+            'a.pcode',
+            'a.scode',
+            'a.name',
+            'a.filename',
+            'a.outlink',
+            'b.type',
+            'b.urlname'
+        );
+        $sorts = $this->alias('a')
+            ->join('cms_model b', 'a.mcode=b.mcode', 'LEFT')
+            ->field($fields)
+            ->order('a.acode,a.pcode,a.sorting,a.id desc')
+            ->cache('__CACHE_CMS_SORTS_ALL', 3600, 'cms_cache')
+            ->select();
+        if ($sorts->isEmpty()) {
+            return [];
+        }
+
+        return $sorts->toArray();
     }
 
     // 获取分类名称

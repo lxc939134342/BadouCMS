@@ -820,7 +820,7 @@ if (!function_exists('bdurl')) {
      * @param mixed $contentfilename    内容定义的urlname
      * @return string|think\route\Url
      */
-    function bdurl($type, $urlname, $pagetype, $scode, $sortfilename, $id = '', $contentfilename = '')
+    function bdurl($type, $urlname, $pagetype, $scode, $sortfilename, $id = '', $contentfilename = '', $language = null)
     {
         $url_break_char = '_';
         $url_rule_content_path = false;
@@ -867,8 +867,9 @@ if (!function_exists('bdurl')) {
         $link = preg_replace("/\/((?!index)[\w]+)\.php\//i", "/", (string)$link);
 
         // 目录模式下，默认语言保留根路径，其余语言使用 /{lang}/ 前缀。
+        // 传入语言时不依赖当前请求的语言 Cookie，便于 Sitemap 等场景一次生成多语言 URL。
         if ((int)get_sys_config('url_rule_type') === 1) {
-            $language = trim(get_frontend_lang());
+            $language = trim((string)($language ?: get_frontend_lang()));
             $defaultLanguage = trim(get_default_lang());
             if ($language !== '' && $defaultLanguage !== '' && $language !== $defaultLanguage) {
                 $link = '/' . rawurlencode($language) . '/' . ltrim($link, '/');
