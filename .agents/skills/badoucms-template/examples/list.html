@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{$sort.name} - {$bd.pagetitle}</title>
+</head>
+<body>
+  {include file="comm/head" /}
+  {include file="comm/nav" /}
+  {include file="comm/breadcrumb" /}
+
+  <div class="page-content">
+    {bd:list alias="item"}
+    <article class="list-item">
+      <a href="{$item.link}">
+        {if $item.ico}
+        <img src="{$item.ico}" alt="{$item.title}" class="item-thumb">
+        {/if}
+        <h3>{$item.title}</h3>
+        <p>{$item.description}</p>
+        <time>{$item.date}</time>
+      </a>
+    </article>
+    {/bd:list}
+
+    <div class="pagination">{$page.bar |raw}</div>
+  </div>
+
+  {include file="comm/foot" /}
+</body>
+</html>

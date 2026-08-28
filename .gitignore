@@ -26,4 +26,8 @@ moduledev
 .claude/
 CLAUDE.md
 AGENTS.md
-.agents/
+.agents/*
+!.agents/skills/
+.agents/skills/*
+!.agents/skills/badoucms-plugin/
+!.agents/skills/badoucms-template/

@@ -1,0 +1,72 @@
+{
+  "sort": {
+    "attrs": ["scode", "aucode", "alias", "empty", "key", "mod"],
+    "oneOf": [["scode", "aucode"]]
+  },
+  "nav": {
+    "attrs": ["parent", "num", "scode", "aucode", "alias", "empty", "key", "mod"]
+  },
+  "list": {
+    "attrs": ["alias", "empty", "key", "mod", "scode", "page", "start", "filter", "tags", "fuzzy", "order", "num", "isico", "ispics", "istop", "isrecommend", "isheadline"]
+  },
+  "slide": {
+    "attrs": ["gid", "num", "alias", "empty", "key", "mod"],
+    "required": ["gid"]
+  },
+  "link": {
+    "attrs": ["gid", "num", "alias", "empty", "key", "mod"],
+    "required": ["gid"]
+  },
+  "content": {
+    "attrs": ["id", "scode", "alias", "empty"],
+    "oneOf": [["id", "scode"]]
+  },
+  "position": {
+    "attrs": ["separator", "separatoricon", "indextext", "indexicon"]
+  },
+  "select": {
+    "attrs": ["field", "multiple", "alias", "empty", "key", "mod"],
+    "required": ["field"]
+  },
+  "selectall": {
+    "attrs": ["field", "text", "class", "active"],
+    "required": ["field"]
+  },
+  "search": {
+    "attrs": ["alias", "empty", "key", "mod", "page", "start", "num", "filter", "tags", "fuzzy", "order"]
+  },
+  "comment": {
+    "attrs": ["contentid", "alias", "empty", "key", "num", "mod", "page", "start", "pid", "order"],
+    "required": ["contentid"]
+  },
+  "commentsub": {
+    "attrs": ["contentid", "pid", "alias", "key", "num", "mod", "start", "order"]
+  },
+  "message": {
+    "attrs": ["alias", "empty", "key", "num", "mod", "page", "start", "order"]
+  },
+  "form": {
+    "attrs": ["fcode"],
+    "required": ["fcode"]
+  },
+  "formlist": {
+    "attrs": ["fcode", "alias", "empty", "key", "num", "mod", "page", "start", "order"],
+    "required": ["fcode"]
+  },
+  "tags": {
+    "attrs": ["id", "scode", "target", "alias", "empty", "key", "num", "mod"],
+    "oneOf": []
+  },
+  "pics": {
+    "attrs": ["id", "field", "alias", "empty", "key", "num", "mod"],
+    "required": ["id"]
+  },
+  "qrcode": {
+    "attrs": ["string"],
+    "required": ["string"]
+  },
+  "loop": {
+    "attrs": ["start", "end"],
+    "required": ["end"]
+  }
+}

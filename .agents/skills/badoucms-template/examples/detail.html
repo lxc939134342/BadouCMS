@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{$content.title} - {$bd.pagetitle}</title>
+  <meta name="description" content="{$content.description}">
+</head>
+<body>
+  {include file="comm/head" /}
+  {include file="comm/nav" /}
+  {include file="comm/breadcrumb" /}
+
+  <article class="detail">
+    <h1>{$content.title}</h1>
+    <time>{$content.date}</time>
+    <div class="content-body">{$content.content|raw}</div>
+
+    <!-- 图片集 -->
+    {bd:pics id="$content.id"}
+    <img src="{$pics.src}" alt="{$pics.title}">
+    {/bd:pics}
+
+    <!-- 相关内容 -->
+    {if $content.tags}
+    <section class="related">
+      <h3>相关内容</h3>
+      {bd:list tags="$content.tags" num="5" alias="related"}
+      <a href="{$related.link}">{$related.title}</a>
+      {/bd:list}
+    </section>
+    {/if}
+  </article>
+
+  {include file="comm/foot" /}
+</body>
+</html>

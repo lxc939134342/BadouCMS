@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>{$bd.pagetitle}</title>
+  <meta name="description" content="{$bd.pagedescription}">
+  <meta name="keywords" content="{$bd.pagekeywords}">
+  <link rel="stylesheet" href="{$bd.sitetplpath}/css/style.css">
+</head>
+<body>
+  {include file="comm/head" /}
+  {include file="comm/nav" /}
+
+  <!-- 幻灯片 -->
+  <section class="hero">
+    {bd:slide gid="1"}
+    <div class="slide-item">
+      <img src="{$slide.pic}" alt="{$slide.title}">
+      <p>{$slide.title}</p>
+    </div>
+    {/bd:slide}
+  </section>
+
+  <!-- 产品推荐 -->
+  <section class="products">
+    <h2>产品中心</h2>
+    {bd:sort aucode="product" alias="productSort"}
+    {bd:list scode="$productSort.scode" num="8" alias="product"}
+    <div class="product-card">
+      <a href="{$product.link}">
+        <img src="{$product.ico}" alt="{$product.title}">
+        <h3>{$product.title}</h3>
+      </a>
+    </div>
+    {/bd:list}
+    {/bd:sort}
+  </section>
+
+  <!-- 最新资讯 -->
+  <section class="news">
+    <h2>新闻动态</h2>
+    {bd:sort aucode="news" alias="newsSort"}
+    {bd:list scode="$newsSort.scode" num="5" alias="news"}
+    <article>
+      <a href="{$news.link}">{$news.title}</a>
+      <time>{$news.date}</time>
+    </article>
+    {/bd:list}
+    {/bd:sort}
+  </section>
+
+  {include file="comm/foot" /}
+</body>
+</html>
