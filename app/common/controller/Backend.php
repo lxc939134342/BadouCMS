@@ -191,6 +191,7 @@ class Backend extends BaseController
 
         $site = get_sys_config();
         $upload = \app\common\model\Config::upload();
+        $appUrl = rtrim((string) Config::get('badouadmin.app_url'), '/');
 
         // 上传信息配置后
         $upload_config_event = Event::trigger('upload_config_init', $upload, true);
@@ -209,7 +210,7 @@ class Backend extends BaseController
             'moduleurl'      => rtrim(url("/", [], false), '/'),
             'language'       => $lang,
             'referer'        => Session::get("referer"),
-            'app_url'        => $this->request->scheme() . '://' . $this->request->host() . $this->request->root(),
+            'app_url'        => ($appUrl ?: $this->request->scheme() . '://' . $this->request->host()) . $this->request->root(),
             'token'          => '',
         ];
         $config = array_merge($config, Config::get("view_replace_str"));

@@ -1,6 +1,8 @@
 <?php
 
 return [
+    //用于设置后台接口请求，（当CDN开启了https服务器端未开启https时会造成接口访问失败，这是可以在这里设置与 cdn一致的 https路径） 
+    'app_url' => env('badouadmin.app_url', ''),
     //跨域域名
     'cors_request_domain' => 'localhost,127.0.0.1,*',
     //后台登录失败尝试次数
