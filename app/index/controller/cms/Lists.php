@@ -29,8 +29,6 @@ class Lists extends Base
 
         $template = empty($this->contentSort['listtpl']) ? $this->contentSort['contenttpl'] : $this->contentSort['listtpl'];
 
-        $this->site['sitekeywords'] = $this->contentSort['keywords'] ? $this->contentSort['keywords'] : $this->site['sitekeywords'];
-        $this->site['sitedescription'] = $this->contentSort['description'] ? $this->contentSort['description'] : $this->site['sitedescription'];
         $sorttitle = $this->contentSort['title'] ? $this->contentSort['title'] : $this->contentSort['name'];
 
         // 页面标题
@@ -43,9 +41,11 @@ class Lists extends Base
             $pagetitle = implode('-', $titleParts);
         }
 
-        $this->site['pagetitle'] = $pagetitle;
-        $this->site['pagedescription'] = $this->site['sitedescription'];
-        $this->site['pagekeywords'] = $this->site['sitekeywords'];
+        $this->pageSeo = [
+            'pagetitle' => $pagetitle,
+            'pagedescription' => $this->contentSort['description'] ?: $this->site['sitedescription'],
+            'pagekeywords' => $this->contentSort['keywords'] ?: $this->site['sitekeywords'],
+        ];
         $bootstrap = new Bootstrap(0, 10);
         $page = $bootstrap->pageData();
         $this->view->assign('page', $page);

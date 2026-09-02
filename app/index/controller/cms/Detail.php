@@ -61,8 +61,6 @@ class Detail extends Base
         $pre = $this->model::getContentPreNext($scodes, $this->contentInfo['id'], 'pre');
         $this->contentInfo = array_merge($this->contentInfo, $next, $pre);
 
-        $this->site['sitekeywords'] = $this->contentInfo['keywords'] ? $this->contentInfo['keywords'] : $this->site['sitekeywords'];
-        $this->site['sitedescription'] = $this->contentInfo['description'] ? $this->contentInfo['description'] : $this->site['sitedescription'];
         $this->contentInfo['sortlink'] = $this->contentSort['link'];
         $this->view->assign('content', $this->contentInfo);
 
@@ -78,9 +76,11 @@ class Detail extends Base
             $pagetitle = implode('-', $titleParts);
         }
 
-        $this->site['pagetitle'] = $pagetitle;
-        $this->site['pagedescription'] = $this->site['sitedescription'];
-        $this->site['pagekeywords'] = $this->site['sitekeywords'];
+        $this->pageSeo = [
+            'pagetitle' => $pagetitle,
+            'pagedescription' => $this->contentInfo['description'] ?: $this->site['sitedescription'],
+            'pagekeywords' => $this->contentInfo['keywords'] ?: $this->site['sitekeywords'],
+        ];
 
         $this->assignBd();
         $custom_tpl = isset($this->contentInfo['custom_tpl']) && !empty($this->contentInfo['custom_tpl']) ? $this->contentInfo['custom_tpl'] : false;

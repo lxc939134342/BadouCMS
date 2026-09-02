@@ -57,7 +57,11 @@ class Search extends Base
         } else {
             $pagetitle = '搜索-' . $this->site['sitetitle'];
         }
-        $this->site['pagetitle'] = $pagetitle;
+        $this->pageSeo = [
+            'pagetitle' => $pagetitle,
+            'pagedescription' => $this->site['sitedescription'],
+            'pagekeywords' => $this->site['sitekeywords'],
+        ];
         $this->assignBd();
         return $this->view->fetch('/' . basename($tpl, '.html'));
     }

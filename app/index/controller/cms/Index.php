@@ -27,10 +27,12 @@ class Index extends Base
             $pagetitle = implode('-', $titleParts);
         }
 
-        $this->site['pagetitle'] = $pagetitle;
-        $this->site['pagedescription'] = $this->site['sitedescription'];
-        $this->site['pagekeywords'] = $this->site['sitekeywords'];
-        $this->site['is_home'] = 1;
+        $this->pageSeo = [
+            'pagetitle' => $pagetitle,
+            'pagedescription' => $this->site['sitedescription'],
+            'pagekeywords' => $this->site['sitekeywords'],
+            'is_home' => 1,
+        ];
         $this->assignBd();
 
         return $this->view->fetch('/index');

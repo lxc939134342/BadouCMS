@@ -35,6 +35,12 @@ class Base extends Frontend
     public array $site;
 
     /**
+     * 当前页面 SEO 信息，不修改原始站点配置
+     * @var array
+     */
+    public array $pageSeo = [];
+
+    /**
      * 标签信息
      * @var array
      */
@@ -217,6 +223,11 @@ class Base extends Frontend
             'is_home' => 0
         ];
 
+        // 页面 SEO 可以按页面临时覆盖，但不修改 $this->site 中的原始站点配置
+        if ($this->pageSeo) {
+            $bdassign = array_merge($bdassign, $this->pageSeo);
+        }
+
         // BeforeAssignBd 钩子：允许修改全局变量数组
         $hookRes = $this->triggerObserver('BeforeAssignBd', $bdassign);
         if (is_array($hookRes)) {
@@ -224,7 +235,8 @@ class Base extends Frontend
         }
 
         $api_data = $this->apiSecret();
-        $this->view->assign('bd', array_merge($bdassign, $api_data, $this->site, $this->company, $this->label));
+        // 先合并站点原始配置，再用页面变量覆盖 page* 字段，避免两者相互污染
+        $this->view->assign('bd', array_merge($api_data, $this->site, $this->company, $this->label, $bdassign));
     }
 
     public function view()
