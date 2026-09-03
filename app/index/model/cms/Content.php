@@ -36,8 +36,9 @@ class Content extends Model
             return '';
         }
 
-        $value = replace_keyword($value);
+        // 先还原实体，再只过滤最终 HTML 中的可见文本；标签属性中的内容不处理。
         $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $value = replace_keyword($value);
 
         // 移除危险的事件属性和 script 标签
         $value = preg_replace('/<script\b[^>]*>(.*?)<\/script>/is', '', $value);
@@ -422,7 +423,6 @@ class Content extends Model
                 }
             }
         }
-        $result->content = html_entity_decode($result->content);
 
         return $result;
     }

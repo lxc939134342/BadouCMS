@@ -6,18 +6,176 @@ use think\facade\Request;
 
 if (!function_exists('replace_keyword')) {
     /**
-     * 替换内容中的敏感词
+     * 替换 HTML 可见文本中的敏感词。
+     *
+     * HTML 标签、标签属性以及 script/style 内容都保持不变，避免敏感词
+     * 恰好出现在 CSS 数值（例如 width:100%）或 URL、class 等属性中时
+     * 破坏富文本结构。
+     *
      * @param string $content 内容
      * @return string 替换后的内容
      */
     function replace_keyword($content)
     {
-        $keys = get_sys_config('content_keyword_replace');
-        $keys_arr = explode(',', strip_tags($keys));
-        foreach ($keys_arr as $key => $value) {
-            $content = str_replace($value, str_repeat('*', mb_strlen($value)), $content);
+        if ($content === '') {
+            return $content;
         }
-        return $content;
+
+        $keys = get_sys_config('content_keyword_replace');
+        $keys = is_array($keys) ? $keys : explode(',', strip_tags((string)$keys));
+        $replacements = [];
+
+        foreach ($keys as $key) {
+            $key = trim((string)$key);
+            if ($key === '') {
+                continue;
+            }
+            $replacements[$key] = str_repeat('*', mb_strlen($key, 'UTF-8'));
+        }
+
+        if (!$replacements) {
+            return $content;
+        }
+
+        $replaceText = static function (string $text) use ($replacements): string {
+            // 保持原有逐个 str_replace 的行为，避免重叠敏感词改变过滤结果。
+            foreach ($replacements as $key => $replacement) {
+                $text = str_replace($key, $replacement, $text);
+            }
+            return $text;
+        };
+
+        $length = strlen($content);
+        $result = '';
+        $cursor = 0;
+        $textStart = 0;
+        $rawTextTag = null;
+
+        // 只扫描标签边界；确认是标签后，结构片段直接从原字符串复制，绝不重排 HTML。
+        while ($cursor < $length) {
+            $tagStart = strpos($content, '<', $cursor);
+            if ($tagStart === false) {
+                $text = substr($content, $textStart);
+                $result .= $rawTextTag === null ? $replaceText($text) : $text;
+                break;
+            }
+
+            // script/style 是 HTML raw-text 元素。其内容（包括普通 “<”）全部原样保留，
+            // 只有对应的结束标签才重新回到可见文本扫描模式。
+            if ($rawTextTag !== null) {
+                $closingPattern = '/^<\/\s*' . preg_quote($rawTextTag, '/') . '\b/i';
+                if (preg_match($closingPattern, substr($content, $tagStart)) !== 1) {
+                    $cursor = $tagStart + 1;
+                    continue;
+                }
+
+                // raw-text 中只认对应结束标签；找到后仍按原字符串边界复制。
+                $quote = null;
+                $tagEnd = null;
+                for ($scan = $tagStart + 1; $scan < $length; $scan++) {
+                    $character = $content[$scan];
+                    if ($quote !== null) {
+                        if ($character === $quote) {
+                            $quote = null;
+                        }
+                    } elseif ($character === '"' || $character === "'") {
+                        $quote = $character;
+                    } elseif ($character === '>') {
+                        $tagEnd = $scan;
+                        break;
+                    }
+                }
+
+                if ($tagEnd === null) {
+                    $result .= substr($content, $textStart);
+                    break;
+                }
+            } else {
+                $isHtmlTag = false;
+                $isClosingTag = false;
+                $isOpeningTag = false;
+                $closingMatch = [];
+                $openingMatch = [];
+
+                // 注释和 CDATA 不是可见文案，原样保留。
+                if (substr($content, $tagStart, 4) === '<!--') {
+                    $tagEnd = strpos($content, '-->', $tagStart + 4);
+                    if ($tagEnd === false) {
+                        $result .= $replaceText(substr($content, $textStart, $tagStart - $textStart));
+                        $result .= substr($content, $tagStart);
+                        break;
+                    }
+                    $tagEnd += 2;
+                } elseif (substr($content, $tagStart, 9) === '<![CDATA[') {
+                    $tagEnd = strpos($content, ']]>', $tagStart + 9);
+                    if ($tagEnd === false) {
+                        $result .= $replaceText(substr($content, $textStart, $tagStart - $textStart));
+                        $result .= substr($content, $tagStart);
+                        break;
+                    }
+                    $tagEnd += 2;
+                } else {
+                    // “< b >” 这类普通文本不是合法标签，不能吞掉后面的可见文案。
+                    $tagSource = substr($content, $tagStart);
+                    $isDeclaration = preg_match('/^<(!|\?)/', $tagSource) === 1;
+                    $isClosingTag = preg_match('/^<\/([a-z][a-z0-9:-]*)\b/i', $tagSource, $closingMatch) === 1;
+                    $isOpeningTag = preg_match('/^<([a-z][a-z0-9:-]*)\b/i', $tagSource, $openingMatch) === 1;
+                    $isHtmlTag = $isClosingTag || $isOpeningTag;
+                    if (!$isDeclaration && !$isHtmlTag) {
+                        $cursor = $tagStart + 1;
+                        continue;
+                    }
+
+                    $quote = null;
+                    $tagEnd = null;
+                    for ($scan = $tagStart + 1; $scan < $length; $scan++) {
+                        $character = $content[$scan];
+                        if ($quote !== null) {
+                            if ($character === $quote) {
+                                $quote = null;
+                            }
+                        } elseif ($character === '"' || $character === "'") {
+                            $quote = $character;
+                        } elseif ($character === '>') {
+                            $tagEnd = $scan;
+                            break;
+                        }
+                    }
+
+                    if ($tagEnd === null) {
+                        $result .= $replaceText(substr($content, $textStart, $tagStart - $textStart));
+                        $result .= substr($content, $tagStart);
+                        break;
+                    }
+                }
+            }
+
+            $result .= $rawTextTag === null
+                ? $replaceText(substr($content, $textStart, $tagStart - $textStart))
+                : substr($content, $textStart, $tagStart - $textStart);
+            $result .= substr($content, $tagStart, $tagEnd - $tagStart + 1);
+
+            if ($rawTextTag !== null) {
+                $rawTextTag = null;
+            } else {
+                if ($isClosingTag) {
+                    $tagName = strtolower($closingMatch[1]);
+                } elseif ($isOpeningTag) {
+                    $tagName = strtolower($openingMatch[1]);
+                } else {
+                    $tagName = '';
+                }
+                $isSelfClosingTag = preg_match('/\/\s*>$/', substr($content, $tagStart, $tagEnd - $tagStart + 1)) === 1;
+                if (!$isClosingTag && !$isSelfClosingTag && in_array($tagName, ['script', 'style'], true)) {
+                    $rawTextTag = $tagName;
+                }
+            }
+
+            $cursor = $tagEnd + 1;
+            $textStart = $cursor;
+        }
+
+        return $result;
     }
 }
 
