@@ -1,6 +1,0 @@
-interface:
-  display_name: "BadouCMS Plugin"
-  short_description: "BadouCMS 模块插件结构与安全开发"
-  default_prompt: "Use $badoucms-plugin to scaffold a new BadouCMS module plugin."
-policy:
-  allow_implicit_invocation: true

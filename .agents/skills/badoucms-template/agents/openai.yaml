@@ -1,6 +1,0 @@
-interface:
-  display_name: "BadouCMS Template"
-  short_description: "BadouCMS 前台模板标签与校验"
-  default_prompt: "Use $badoucms-template to help me write or fix a BadouCMS template page."
-policy:
-  allow_implicit_invocation: true

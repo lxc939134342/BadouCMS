@@ -1,0 +1,6 @@
+interface:
+  display_name: "BadouCMS"
+  short_description: "BadouCMS 核心、模块插件与前台模板开发"
+  default_prompt: "Use $badoucms to implement, review, or fix a BadouCMS feature, module plugin, or CMS template."
+policy:
+  allow_implicit_invocation: true

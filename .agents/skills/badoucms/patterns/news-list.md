@@ -4,4 +4,4 @@
 
 关键标签：`list`（省略 `scode` 使用当前栏目）、`{$page.bar |raw}` 输出分页。
 
-参考默认实现：`template/cms/default/newslist.html`、`skill/badoucms-template/examples/list.html`。
+参考默认实现：`template/cms/default/newslist.html`、`examples/list.html`。

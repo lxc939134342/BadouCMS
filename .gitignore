@@ -29,5 +29,5 @@ AGENTS.md
 .agents/*
 !.agents/skills/
 .agents/skills/*
-!.agents/skills/badoucms-plugin/
-!.agents/skills/badoucms-template/
+!.agents/skills/badoucms/
+!.agents/skills/badoucms/**

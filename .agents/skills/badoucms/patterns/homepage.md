@@ -4,4 +4,4 @@
 
 关键标签：`slide`（`gid` 必填）、`sort` + `list`（按栏目分组输出内容）、`link`。
 
-参考默认实现：`template/cms/default/index.html`、`skill/badoucms-template/examples/homepage.html`。
+参考默认实现：`template/cms/default/index.html`、`examples/homepage.html`。
