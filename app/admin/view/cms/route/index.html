@@ -112,7 +112,9 @@
         routeList.on('click', '.delete-route', function () {
             $(this).closest('.route-row').remove();
         });
-        form.on('submit', syncRoutes);
-        layui.bdForm.api.bindevent(form);
+        layui.bdForm.api.bindevent(form, null, null, function () {
+            syncRoutes();
+            return true;
+        });
     });
 </script>
