@@ -9,22 +9,20 @@ description: "开发、维护或扩展 BadouCMS 时使用：覆盖 ThinkPHP MVC�
 
 ## 不可违反的规则
 
-### 1. `try/catch` 内禁止直接结束页面执行
+### 1. `try {}` 内禁止直接结束页面执行
 
-在 `try {}`、`catch {}` 及事务处理的异常分支中，禁止调用会直接返回响应或抛出响应异常的控制器方法，包括但不限于：
+在 `try {}` 代码块中，禁止调用会直接返回响应或抛出响应异常的控制器方法，包括但不限于：
 
 - `$this->success(...)`
 - `$this->error(...)`
 - 用户常写错的 `$this->succsess(...)`
 - 其他项目中具有相同“立即输出响应并结束执行”效果的 helper
 
-`try/catch` 内只负责执行、提交/回滚和记录结果；统一在 `try/catch` 之后返回页面响应。
+`try {}` 内只负责执行和提交。`catch {}` 中应先完成回滚、日志等异常清理；清理完成后允许直接调用 `$this->error()` 返回错误。成功响应通常放在完整的 `try/catch` 之后。
 
 #### 推荐写法
 
 ```php
-$result = false;
-$errorMessage = null;
 $this->model->startTrans();
 
 try {
@@ -44,11 +42,7 @@ try {
     $this->model->commit();
 } catch (\Throwable $e) {
     $this->model->rollback();
-    $errorMessage = $e->getMessage();
-}
-
-if ($errorMessage !== null) {
-    $this->error($errorMessage);
+    $this->error($e->getMessage());
 }
 
 $this->success(__('Operation completed'));
@@ -57,8 +51,8 @@ $this->success(__('Operation completed'));
 要点：
 
 - 需要中止事务时，抛出 `\RuntimeException` 或项目已有的业务异常，不要在 `try` 中调用 `$this->error()`。
-- `catch` 中先回滚，再把错误保存到变量；不要在 `catch` 中直接 `$this->error()`。
-- `success/error` 可以在 `try/catch` 完整结束后使用。
+- `catch` 中先完成回滚、日志和必要清理，之后可以直接调用 `$this->error()`。
+- `$this->success()` 应放在 `try/catch` 完整结束后，避免成功响应被异常处理逻辑捕获。
 - 使用事务时，提交成功后才清理缓存、发送通知或触发后置动作；失败必须回滚。
 - 不要为了绕过规则把响应 helper 改名、包装后继续放进 `try`。
 
@@ -399,7 +393,7 @@ form.on('select', updateCondition);
 
 1. 先确定数据流：请求 → Controller → Validate/Service → Model → 响应/视图。
 2. 把查询和数据写操作放入 Model，把跨 Model 流程放入 Service。
-3. 事务用“执行/提交或回滚/最后响应”的模式，禁止在 `try/catch` 中直接响应。
+3. 事务用“`try` 中执行和提交，`catch` 中回滚并返回错误，成功响应放在外部”的模式；禁止在 `try {}` 中直接响应。
 4. 视图先复用 BadouAdmin 组件，再考虑扩展组件。
 5. 遵循附近文件的命名、命名空间、路由、权限、返回格式、token、缓存和多租户约定。
 6. 修改现有功能时保持改动聚焦，不要顺手大范围重构无关遗留代码。
@@ -413,7 +407,7 @@ form.on('select', updateCondition);
 php -l app/admin/controller/xxx.php
 php -l app/admin/model/xxx.php
 
-# 检查 try/catch 内是否混入响应终止方法；同时覆盖常见拼写错误
+# 检索响应终止方法；人工确认命中未处于 try 块内，同时覆盖常见拼写错误
 rg -n '\$this->(success|succsess|error)\s*\(' app modules
 
 # 检查 Controller 是否新增直接数据库访问
@@ -425,7 +419,7 @@ rg -n "data-operate-|\$auth->check" app/admin/view/<module>
 rg -n "\$\.ajax\(|fetch\(|form\.on\(['\"]submit" app/admin/view/<module>
 ```
 
-上面的 `rg` 是人工复核入口，不是替代 AST/代码审查；需要判断命中是否位于 `try/catch`、旧代码兼容场景或页面专属的合理实现中。
+上面的 `rg` 是人工复核入口，不是替代 AST/代码审查；需要判断命中是否位于 `try {}` 代码块中。`catch {}` 中完成回滚和清理后直接调用 `$this->error()` 是允许的。
 
 如果准备提交代码，必须在提交前运行 `gitnexus_detect_changes()`，确认变更只影响预期的文件、符号和执行流程；发现意外影响时先修正，不要直接提交。
 
@@ -470,8 +464,8 @@ rg -n "\$\.ajax\(|fetch\(|form\.on\(['\"]submit" app/admin/view/<module>
 ## Review 清单
 
 - [ ] 复杂需求已明确目标、影响范围、实施顺序、兼容/回退方案与验收方式；规划与实际改动一致。
-- [ ] `try/catch` 内没有 `$this->success()`、`$this->succsess()`、`$this->error()` 或同类立即响应 helper。
-- [ ] 异常分支使用抛异常/变量传递，事务已正确 rollback，最终响应位于 `try/catch` 之后。
+- [ ] `try {}` 内没有 `$this->success()`、`$this->succsess()`、`$this->error()` 或同类立即响应 helper。
+- [ ] 异常分支在响应前已正确 rollback 并完成必要清理；成功响应位于 `try/catch` 之后。
 - [ ] Controller 没有新增 `Db::name()`、`db()`、原始 SQL 或散落的复杂查询/写操作。
 - [ ] Model 承担数据访问，方法有清晰语义；跨 Model 流程由 Service 编排。
 - [ ] 后台页面使用项目既有布局，未重建后台框架或引入无关 UI 框架。
