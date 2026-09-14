@@ -168,7 +168,7 @@ if (!function_exists('xss_clean')) {
 
             /* ---------- 3. 注册 HTML5 <video> / <source> ---------- */
             $config->set('HTML.DefinitionID', 'html5-video');
-            $config->set('HTML.DefinitionRev', 2);
+             $config->set('HTML.DefinitionRev', 3);
             if ($def = $config->maybeGetRawHTMLDefinition()) {
                 // 空元素 <source>
                 $def->addElement('source', 'Inline', 'Empty', 'Common', [
@@ -193,6 +193,14 @@ if (!function_exists('xss_clean')) {
                     'id'          => 'ID',
                     'style'       => 'CDATA',
                     'data-setup'  => 'CDATA',
+                ]);
+
+                // HTML5 允许链接包裹块级内容，避免 Purifier 将卡片链接拆开并复制到内部元素。
+                $def->addElement('a', 'Inline', 'Flow', 'Common', [
+                    'href'   => 'URI',
+                    'target' => 'Enum#_blank,_self,_parent,_top',
+                    'rel'    => 'Text',
+                    'name'   => 'CDATA',
                 ]);
 
                 /* ---------- 4. 一次性注册常用 HTML5 标签 ---------- */
