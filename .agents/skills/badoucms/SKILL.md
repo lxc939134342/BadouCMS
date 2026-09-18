@@ -1,6 +1,6 @@
 ---
 name: badoucms
-description: "开发、维护或扩展 BadouCMS 时使用：覆盖 ThinkPHP MVC、BadouAdmin 后台页面、模块插件以及 CMS 前台模板标签与校验。"
+description: "BadouCMS 项目开发规范：ThinkPHP 8 MVC 分层、Model 数据访问、try/catch 响应控制，以及 BadouAdmin 表单、表格、上传和后台交互组件优先使用。适用于新增功能、接口、后台页面、Bug 修复和重构。"
 ---
 
 # BadouCMS 开发规范
@@ -103,7 +103,16 @@ $model->where(...)->save(...); // 复杂查询/持久化不得直接散落在 Co
 
 Service 适合承载：跨表业务、事务边界、幂等、第三方 API、队列/通知、复杂状态流转。Service 不应成为“另一个 Controller”，也不要把所有查询重新写成 `Db::name()`；优先调用 Model 的语义方法。
 
-### 3. 视图优先使用 BadouAdmin 封装组件
+### 3. 代码注释与复杂度
+
+- 新增代码中的注释一律使用中文；不要新增英文注释。已有英文注释无需为了统一风格而修改。
+- 只为关键业务规则、状态流转、兼容逻辑、安全边界和不直观的实现补充注释；显而易见的赋值、判断和框架调用不写注释。
+- 注释应说明“为什么这样做”或约束条件，避免逐行复述代码本身。
+- 实现以简约、易读为优先：在一个 Controller、Model 或 Service 方法内能清晰完成的局部逻辑，不要为了形式上的分层再拆成多个私有方法、包装类或单用途 Service。
+- 仅当逻辑会复用、承担独立业务语义、需要独立事务/错误处理，或拆分后能明显降低理解成本时，才抽离方法或 Service。方法粒度应与业务步骤匹配，不追求过细。
+- 优先使用清晰的变量名、顺序流程和有限层级的条件判断表达意图；不要用过度抽象、回调链或无意义的中间层替代直接可读的代码。
+
+### 4. 视图优先使用 BadouAdmin 封装组件
 
 表单、表格列表和常用交互必须先查找并优先复用项目已有的 BadouAdmin 封装：
 
@@ -226,7 +235,7 @@ layui.use(['badou'], function () {
 </script>
 ```
 
-### 4. BadouAdmin 开发细则
+### 5. BadouAdmin 开发细则
 
 以下规则在保留上述视图约束的基础上，补充本项目实际 BadouAdmin 组件的使用边界。
 
@@ -321,8 +330,23 @@ form.on('select', updateCondition);
 - 不要每页重新封装上传 token、上传结果解析、预览、删除、排序或字段回填；保持项目既有的 URL、附件 ID 或逗号分隔多值格式。
 - 常规新增、编辑、删除由 `bdTable` 接管。特殊详情、预览和业务弹窗才直接使用 `layui.badou`、`badou.api` 或当前模块已有的 `layer` 模式。
 - 请求优先用 `badou.api.ajax` / `badou.http`，保持统一 loading、错误提示、登录态和回调行为；不得新建另一套全局请求封装。
+- `badou.api.ajax(options, success)` 在成功回调执行后默认显示成功 Toast。若请求只用于页面初始化、静默刷新概览或回填数据，可在 `success` 回调末尾 `return false;` 阻止该默认提示；仍由组件关闭 loading。用户主动触发且没有自定义反馈的操作不要返回 `false`，以保留成功提示。
+
+  ```js
+  layui.badou.api.ajax({url: summaryUrl}, function (data) {
+    updateSummary(data);
+    return false; // 静默刷新，不显示默认“操作成功”提示
+  });
+  ```
+
 - 弹窗尺寸、关闭和父页刷新先参考同模块已有页面；大尺寸页面可在当前页面局部配置 `badou.http.config.open.area`。
 - 日期/时间选择优先使用 Layui `laydate`；远程下拉、选择器和通用工具先检查 `bdTool` 和既有实现。
+
+#### 标签页与弹窗跳转
+
+- `btn-addtab` 由后台框架转换为 hash 标签页路由，`href` 必须使用项目内部路由名，例如 `href="geo.content_pool"` 或 `href="geo.keyword_library"`。不要对 `btn-addtab` 使用 `{:url('geo.content_pool/index')}`：该 helper 会生成带后台入口文件的完整 URL，进入 hash 后会让入口文件名被误解析为控制器。
+- `btn-dialog` 打开的是 iframe 弹窗，应使用 `{:url('geo.content_create/add')}` 这类完整 URL；普通页面跳转则跟随相邻页面的既有写法。
+- 新增跳转前，先检索同一后台模块中 `btn-addtab` 和 `btn-dialog` 的现有链接格式，保持同一跳转机制使用同一种 URL 形式。
 
 #### 权限显隐
 
@@ -355,30 +379,6 @@ form.on('select', updateCondition);
 - 不污染 `window`；如果当前模块已有全局扩展模式，才依照它的既有约定扩展。
 - 不因单个特殊页面直接改动 `public/assets/libs/badouadmin` 公共组件；只有跨页面通用、现有 API 无法支持且影响范围明确时才考虑扩展。
 
-## 需求开发规划
-
-对于新功能、新模块、跨应用改动、数据表或状态流转变更、第三方集成、权限调整，或验收标准不明确的需求，编码前先输出一份可执行的开发规划。小型且影响范围明确的修复可以简写，但仍要说明目标、修改范围和验证方式。除非用户要求交付独立文档，规划直接在回复中提供，不额外创建计划文件。
-
-### 规划内容
-
-1. **目标与边界**：说明要解决的问题、涉及的用户或角色、明确包含与不包含的范围，以及可验证的验收标准。
-2. **现状与影响**：列出需要复用或修改的模块、路由、Controller、Model、Service、Validate、视图、模板、事件、配置和数据表。修改既有函数、类或方法前，按 `AGENTS.md` 运行 GitNexus 影响分析；若结果为 HIGH/CRITICAL，先向用户说明风险和波及范围，再开始编辑。
-3. **实现设计**：按职责说明数据如何流转，以及每类文件的改动目的。需要时明确：
-   - 数据库表、字段、索引、状态值及数据迁移/升级策略；
-   - Validate、Model、Service、Controller、路由、接口请求与响应契约；
-   - 后台菜单、权限节点、BadouAdmin 页面与前台模板标签；
-   - 模块插件入口、配置、安装/升级/卸载以及静态资源。
-4. **兼容性与安全**：覆盖旧数据、幂等性、租户隔离、权限、缓存、token、并发、失败回滚和第三方异常；指出不兼容变更及对应的回退办法。
-5. **实施顺序**：按依赖关系排列可执行步骤，例如“数据结构 → Model/Validate → Service → Controller/Route → 后台或模板 → 数据迁移 → 验证”，并标出需要用户确认或外部条件的步骤。
-6. **验证与交付**：列出 PHP 语法、接口/页面场景、权限边界、异常路径、升级或迁移验证，以及提交前需要执行的 GitNexus 变更检测。
-
-### 执行原则
-
-- 规划必须基于当前代码和已有约定；不确定的表结构、路由、权限或接口先查证，不凭记忆补全。
-- 规划中的文件路径、符号和数据变更应具体到可以直接实施，但不要把未确认的推测写成既有事实。
-- 实施中如果发现影响范围、数据迁移策略或接口契约与规划不一致，先更新规划并说明变化，再继续处理受影响部分。
-- 用户明确要求直接实现时，可在回复中先给出精简实施摘要后开始；发现 HIGH/CRITICAL 风险、破坏性数据操作或必须由用户选择的业务规则时，仍须先说明并等待确认。
-
 ## 推荐开发流程
 
 ### 开始编码前
@@ -397,6 +397,7 @@ form.on('select', updateCondition);
 4. 视图先复用 BadouAdmin 组件，再考虑扩展组件。
 5. 遵循附近文件的命名、命名空间、路由、权限、返回格式、token、缓存和多租户约定。
 6. 修改现有功能时保持改动聚焦，不要顺手大范围重构无关遗留代码。
+7. 新增关键注释使用中文，并在提交前删除无实际说明价值的注释；保持方法和类的粒度与业务复杂度相称。
 
 ### 完成编码后
 
@@ -423,51 +424,14 @@ rg -n "\$\.ajax\(|fetch\(|form\.on\(['\"]submit" app/admin/view/<module>
 
 如果准备提交代码，必须在提交前运行 `gitnexus_detect_changes()`，确认变更只影响预期的文件、符号和执行流程；发现意外影响时先修正，不要直接提交。
 
-## 按场景补充规则
-
-### 模块插件
-
-开发、安装或修改 `modules/<插件名>/` 下的模块插件时，保持功能闭环：不修改 `app/` 核心文件，不把业务 SQL 放进模板。
-
-1. 先读 `docs/BADOUCMS_PLUGIN_SPEC.md`，并选同类型现有模块作结构参照：后台能力优先参考 `alioss` 或 `cmsdataio`，前台业务优先参考 `inquiry` 或 `shop`。
-2. 模块入口为 `<Module>.php`，命名空间为 `modules\<插件名>`；实现 `AppInit()`，并按实际需要实现 `enable()`、`disable()`、`install()`、`upgrade()`、`uninstall()`。
-3. 控制器放在模块内 `app/admin/controller/`、`app/index/controller/`、`app/api/controller/`。命名空间必须以同类模块实际的入口注册和路由为准，不要只凭记忆假设。
-4. 数据库访问使用模型或 `think\facade\Db`；动态读取表前缀，安装脚本使用 `__PREFIX__` 占位，字段名使用 `snake_case`。
-5. 配置写入模块 `config.php`，基础信息写入 `info.ini`；菜单、配置和升级逻辑必须可重复执行，或先判断目标是否已存在。
-6. 前台模板放在模块 `template/`，公开资源放在 `public/modules/<插件名>/`；后台 UI 复用现有 Layui/BadouAdmin 组件。
-
-安全边界：优先通过事件、观察者、路由注册或模板标签扩展 CMS；输入先白名单校验，查询必须参数绑定或使用查询构建器；后台接口检查权限，前台接口明确 `noNeedLogin` / `noNeedRight`，公开接口只返回必要字段。卸载逻辑必须说明是否删除数据；默认保留业务数据，删除前需要安装声明或用户确认。
-
-### CMS 前台模板
-
-修改 `template/cms/<主题>/` 下的前台页面时，不使用后台 Layui 组件，也不在模板中直接访问数据库。
-
-1. 先读 `references/templates.md`，确认主题根目录、公共目录兼容层、WAP 子目录及 `searchtpl`、`tagstpl`、`custom_tpl` 的解析规则。
-2. 确定页面类型（首页、列表、详情、单页、搜索、标签或用户中心），阅读对应的 `patterns/` 场景文件。
-3. 按数据用途选择标签，只读取当前任务所需的 `references/` 文档，确认可用参数和字段；优先使用当前上下文或明确指定栏目/内容，避免无关查询。
-4. 分页 HTML 使用 `{$page.bar|raw}` 输出，避免被转义。
-5. 仅使用 `scripts/tag-contracts.json` 与参考文档中有来源的标签、参数和字段。文档与 `modules/cms/taglib/Bd.php` 不一致时，以参考文档标明的当前实现限制为准。
-6. 在项目根目录执行 `node .agents/skills/badoucms/scripts/check-skill-sync.js`，再执行 `node .agents/skills/badoucms/scripts/validate-template.js <模板文件...>`；最后对照默认主题的同场景页面。
-
-模板资料索引：
-
-- 全局变量、站点/公司信息、链接和工具：`references/global.md`
-- 主题解析、入口模板和可切换模板：`references/templates.md`
-- 栏目和导航：`references/sort.md`、`references/nav.md`
-- 内容列表、详情和上一篇/下一篇：`references/list.md`、`references/content.md`
-- 幻灯片和友情链接：`references/slide.md`
-- 选项筛选、搜索与分页：`references/page.md`
-- 留言、评论和自定义表单：`references/form.md`
-- 多语言、条件和远程 API：`references/language.md`、`references/condition.md`、`references/api.md`
-- 内容标签与图片集：`references/tags.md`、`references/pics.md`
-
 ## Review 清单
 
-- [ ] 复杂需求已明确目标、影响范围、实施顺序、兼容/回退方案与验收方式；规划与实际改动一致。
 - [ ] `try {}` 内没有 `$this->success()`、`$this->succsess()`、`$this->error()` 或同类立即响应 helper。
 - [ ] 异常分支在响应前已正确 rollback 并完成必要清理；成功响应位于 `try/catch` 之后。
 - [ ] Controller 没有新增 `Db::name()`、`db()`、原始 SQL 或散落的复杂查询/写操作。
 - [ ] Model 承担数据访问，方法有清晰语义；跨 Model 流程由 Service 编排。
+- [ ] 新增关键注释均为中文且说明必要的业务原因；未新增英文注释或逐行复述代码的无效注释。
+- [ ] 实现保持直接易读，没有为形式上的抽象而拆出过多函数、方法或单用途 Service。
 - [ ] 后台页面使用项目既有布局，未重建后台框架或引入无关 UI 框架。
 - [ ] 视图表单使用项目约定的 `layui-form` 和 `bdForm`，字段、令牌与回显格式正确。
 - [ ] 视图表格使用 `bdTable`，复用了已有 formatter、搜索、权限和批量操作能力。
