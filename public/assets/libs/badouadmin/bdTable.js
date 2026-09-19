@@ -19,6 +19,8 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
         table_elem: null,
         // 是否仅重载数据
         reloadData: false,
+        // 同一个筛选器只绑定一次开关事件，避免按行渲染时重复提交。
+        switchEvents: {},
         extend: {
             index_url: '',
             add_url: '',
@@ -487,11 +489,11 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                             { icon: 3, title: __('Warning'), offset: 0, shadeClose: true, btn: [__('OK'), __('Cancel')] },
                             function (index) {
                                 // 在确认删除时，同步最新的 token（从父窗口和顶层窗口）
-                                if (typeof parent !== "undefined" && parent.Config && parent.Config.token) {
-                                    Config.token = parent.Config.token;
+                                if (window.parent.Config && window.parent.Config.token) {
+                                    Config.token = window.parent.Config.token;
                                 }
-                                if (typeof top !== "undefined" && top.Config && top.Config.token) {
-                                    Config.token = top.Config.token;
+                                if (window.top.Config && window.top.Config.token) {
+                                    Config.token = window.top.Config.token;
                                 }
                                 bdTable.api.multi("del", idarr, table, that);
                                 Layer.close(index);
@@ -518,22 +520,22 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                     'btn-delone': function (id, obj) {
                         var table = bdTable.initTable;
                         var data = obj.data;
-                        var top = $(this).offset().top - $(window).scrollTop();
+                        var offsetTop = $(this).offset().top - $(window).scrollTop();
                         var left = $(this).offset().left - $(window).scrollLeft() - 260;
-                        if (top + 154 > $(window).height()) {
-                            top = top - 154;
+                        if (offsetTop + 154 > $(window).height()) {
+                            offsetTop = offsetTop - 154;
                         }
                         if ($(window).width() < 480) {
-                            top = left = undefined;
+                            offsetTop = left = undefined;
                         }
-                        Layer.confirm(__('Are you sure you want to delete this item?'), { icon: 3, title: __('Warning'), offset: [top, left], shadeClose: true, btn: [__('OK'), __('Cancel')] },
+                        Layer.confirm(__('Are you sure you want to delete this item?'), { icon: 3, title: __('Warning'), offset: [offsetTop, left], shadeClose: true, btn: [__('OK'), __('Cancel')] },
                             function (index) {
                                 // 在确认删除时，同步最新的 token（从父窗口和顶层窗口）
-                                if (typeof parent !== "undefined" && parent.Config && parent.Config.token) {
-                                    Config.token = parent.Config.token;
+                                if (window.parent.Config && window.parent.Config.token) {
+                                    Config.token = window.parent.Config.token;
                                 }
-                                if (typeof top !== "undefined" && top.Config && top.Config.token) {
-                                    Config.token = top.Config.token;
+                                if (window.top.Config && window.top.Config.token) {
+                                    Config.token = window.top.Config.token;
                                 }
                                 bdTable.api.multi("del", data[table.config.pk], table, this);
                                 Layer.close(index);
@@ -543,6 +545,10 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                 },
 
                 switch: function (filter) {
+                    if (bdTable.switchEvents[filter]) {
+                        return;
+                    }
+                    bdTable.switchEvents[filter] = true;
                     var table = bdTable.initTable;
                     var id = table.config.id;
                     layui.form.on('switch(' + filter + ')', function (obj) {
@@ -559,7 +565,7 @@ layui.define(['jquery', 'bdHttp', 'tableSearch'], function (exports) {
                         }, function (data, ret) {
                             bdTable.api.events.toolbar.refresh(id);
                         }, function (data, ret) {
-                            that.trigger('click');
+                            obj.elem.checked = !obj.elem.checked;
                             layui.form.render('checkbox');
                         });
                     });

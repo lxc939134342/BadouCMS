@@ -489,42 +489,33 @@ layui.define(["toast"], function (exports) {
         }
       });
 
-      // 令牌同步逻辑：优先从当前页面表单获取最新令牌并同步给母窗口
-      var latestToken =
-        $("input[name='__token__']").val() ||
-        (typeof Config !== "undefined" ? Config.token : "");
+      // token_field() 在页面主体渲染时生成新令牌，必须等 DOM 就绪后再同步。
+      $(function () {
+        var latestToken =
+          $("input[name='__token__']").first().val() ||
+          (typeof Config !== "undefined" ? Config.token : "");
 
-      if (latestToken) {
-        // 更新当前页面的 JS 变量
+        if (!latestToken) {
+          return;
+        }
         if (typeof Config !== "undefined") {
           Config.token = latestToken;
         }
+        $("input[name='__token__']").val(latestToken);
 
-        // 同步给父窗口
-        if (
-          typeof parent !== "undefined" &&
-          parent.Config &&
-          parent.Config !== Config
-        ) {
+        if (typeof parent !== "undefined" && parent.Config) {
           parent.Config.token = latestToken;
-          // 同时也更新父窗口表单里的隐藏域，确保万无一失
           if (typeof parent.$ === "function") {
             parent.$("input[name='__token__']").val(latestToken);
           }
         }
-
-        // 同步给顶层窗口
-        if (
-          typeof top !== "undefined" &&
-          top.Config &&
-          top.Config !== Config
-        ) {
+        if (typeof top !== "undefined" && top.Config) {
           top.Config.token = latestToken;
           if (typeof top.$ === "function") {
             top.$("input[name='__token__']").val(latestToken);
           }
         }
-      }
+      });
     },
   };
   bdHttp.init();
