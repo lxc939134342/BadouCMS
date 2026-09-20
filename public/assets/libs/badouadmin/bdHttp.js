@@ -55,6 +55,88 @@ layui.define(["toast"], function (exports) {
 
         toast.error({ message: ret.msg });
       },
+      // 需要用户选择后继续的响应处理
+      onAjaxConfirm: function (ret, options, success, error) {
+        var confirm = ret.data && ret.data.confirm;
+        if (
+          ret.code !== 2 ||
+          !confirm ||
+          !Array.isArray(confirm.actions) ||
+          confirm.actions.length === 0 ||
+          options.__confirmReplayed
+        ) {
+          return false;
+        }
+
+        // Layui 原生弹层最多稳定支持两个操作按钮，取消按钮由框架统一提供。
+        var actions = confirm.actions.slice(0, 2);
+        var labels = $.map(actions, function (action) {
+          return action.text || __('Confirm');
+        });
+        labels.push(confirm.cancelText || __('Cancel'));
+
+        function mergeRequestData(data, params) {
+          params = params || {};
+          if (data instanceof FormData) {
+            var formData = new FormData();
+            data.forEach(function (value, key) {
+              formData.append(key, value);
+            });
+            $.each(params, function (key, value) {
+              formData.set(key, value);
+            });
+            return formData;
+          }
+
+          if (typeof data === 'string') {
+            var query = $.param(params);
+            return data + (data && query ? '&' : '') + query;
+          }
+
+          if (Array.isArray(data)) {
+            var list = data.slice();
+            $.each(params, function (key, value) {
+              list.push({ name: key, value: value });
+            });
+            return list;
+          }
+
+          return $.extend({}, data || {}, params);
+        }
+
+        function replay(action) {
+          var requestOptions = $.extend({}, options);
+          // 重新走公共请求流程，保留调用方原有的成功、失败回调。
+          delete requestOptions.success;
+          delete requestOptions.error;
+          requestOptions.data = mergeRequestData(options.data, action.params);
+          requestOptions.__confirmReplayed = true;
+          bdHttp.api.ajax(requestOptions, success, error);
+        }
+
+        var dialogOptions = {
+          type: 0,
+          title: confirm.title || __('Confirm'),
+          content: ret.msg,
+          btn: labels,
+          yes: function (index) {
+            Layer.close(index);
+            replay(actions[0]);
+            return false;
+          },
+        };
+
+        if (actions[1]) {
+          dialogOptions.btn2 = function (index) {
+            Layer.close(index);
+            replay(actions[1]);
+            return false;
+          };
+        }
+
+        Layer.open(dialogOptions);
+        return true;
+      },
       //服务器响应数据后
       onAjaxResponse: function (response) {
         try {
@@ -109,6 +191,8 @@ layui.define(["toast"], function (exports) {
                   layui.badou.hooks.run(hookName, ret.data);
                 }
                 bdHttp.events.onAjaxSuccess(ret, success);
+              } else if (bdHttp.events.onAjaxConfirm(ret, options, success, error)) {
+                return;
               } else {
                 bdHttp.events.onAjaxError(ret, error);
               }

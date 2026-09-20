@@ -330,6 +330,22 @@ form.on('select', updateCondition);
 - 不要每页重新封装上传 token、上传结果解析、预览、删除、排序或字段回填；保持项目既有的 URL、附件 ID 或逗号分隔多值格式。
 - 常规新增、编辑、删除由 `bdTable` 接管。特殊详情、预览和业务弹窗才直接使用 `layui.badou`、`badou.api` 或当前模块已有的 `layer` 模式。
 - 请求优先用 `badou.api.ajax` / `badou.http`，保持统一 loading、错误提示、登录态和回调行为；不得新建另一套全局请求封装。
+- 需要用户选择后才能继续的请求，后端返回 `code: 2` 和 `data.confirm`，由 `bdHttp` 统一弹窗并重放原请求；不要在页面中覆盖 `bdTable` 删除事件或重复编写 Ajax 错误回调。协议如下：
+
+  ```php
+  $this->result('检测到关联数据，是否继续？', [
+      'confirm' => [
+          'title' => '关联数据确认',
+          'actions' => [
+              ['text' => '处理全部关联数据', 'params' => ['all' => 1]],
+              ['text' => '仅处理当前数据', 'params' => ['all' => 0]],
+          ],
+          'cancelText' => '取消',
+      ],
+  ], 0, 2);
+  ```
+
+  `actions` 最多两个，框架统一提供取消按钮。`params` 只能合并到原请求，不可由响应指定 URL、请求方法或前端代码；缺少 `data.confirm` 的 `code: 2` 保持普通错误处理。
 - `badou.api.ajax(options, success)` 在成功回调执行后默认显示成功 Toast。若请求只用于页面初始化、静默刷新概览或回填数据，可在 `success` 回调末尾 `return false;` 阻止该默认提示；仍由组件关闭 loading。用户主动触发且没有自定义反馈的操作不要返回 `false`，以保留成功提示。
 
   ```js
