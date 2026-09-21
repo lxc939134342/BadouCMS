@@ -151,6 +151,23 @@ class ContentSort extends Model
     }
 
     /**
+     * 根据栏目编码获取所属内容模型编码
+     *
+     * 内容表单通常仅提交 scode，不能依赖 URL 中可缺省的 mcode。
+     *
+     * @param int|string $scode 栏目编码
+     * @return int
+     */
+    public function getMcodeByScode(int|string $scode): int
+    {
+        if (empty($scode)) {
+            return 0;
+        }
+
+        return (int)$this->where('scode', $scode)->value('mcode');
+    }
+
+    /**
      * 添加单页内容
      * @param string $scode
      * @param string $title

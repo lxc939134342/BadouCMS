@@ -13,6 +13,7 @@
 namespace app\admin\controller\cms;
 
 use app\admin\model\cms\Models;
+use app\admin\model\cms\ContentSort;
 use Throwable;
 use badou\Tree;
 use think\facade\Db;
@@ -63,7 +64,8 @@ class Content extends Base
         $this->contentExtModel = new \app\admin\model\cms\ContentExt();
         $this->extfieldModel = new \app\admin\model\cms\Extfield();
         $levelModel = new UserLevel();
-        $this->mcode = $this->request->param('mcode') ?? 0;
+        $scode = $this->request->param('scode');
+        $this->mcode = $scode ? $this->resolveMcodeByScode($scode) : (int)$this->request->param('mcode', 0);
         $this->assign('mcode', $this->mcode);
         $this->assign('levellist', $levelModel->getLevelList());
         $this->assign('gtypelist', $levelModel->getGtypeList());
@@ -196,6 +198,11 @@ class Content extends Base
         if ($data['sorting'] === '' || $data['sorting'] === null) {
             $data['sorting'] = 255;
         }
+
+        // 表单仅保证提交 row[scode]，不能依赖 URL 中可缺省的 mcode。
+        // inquiry 等观察器也会读取控制器 mcode，因此须在触发前同步。
+        $this->mcode = $this->resolveMcodeByScode($data['scode']);
+
         $result = false;
         Db::startTrans();
         try {
@@ -289,6 +296,9 @@ class Content extends Base
             $this->error(__('Record not found'));
         }
 
+        $this->mcode = $this->resolveMcodeByScode($row['scode']);
+        $this->assign('mcode', $this->mcode);
+
         /* 获取扩展数据 */
         $extRow = $this->contentExtModel->where('contentid', $row['id'])->find();
         if ($extRow) {
@@ -320,6 +330,10 @@ class Content extends Base
             $data['content'] = isset($noFilterData['content']) ? xss_clean($noFilterData['content']) : '';
             $data['update_user'] = $this->auth->username;
             $data['sorting'] = $data['sorting'] ?? $row['sorting'];
+
+            // 栏目允许调整，保存时必须按最终 scode 再次解析模型。
+            $this->mcode = $this->resolveMcodeByScode($data['scode']);
+
             $result = false;
             $this->model->startTrans();
             try {
@@ -422,9 +436,9 @@ class Content extends Base
         if (!$mcode && !$scode) {
             $this->error(__('Invalid parameters'));
         }
-        if (!$mcode) {
-            $contentSortModel = new \app\admin\model\cms\ContentSort();
-            $mcode = $contentSortModel::where('scode', $scode)->value('mcode');
+        // scode 是模型归属的真实来源，不能让 URL mcode 覆盖它。
+        if ($scode) {
+            $mcode = $this->resolveMcodeByScode($scode);
         }
         if ($id) {
             $rowitem = $this->model->find($id);
@@ -454,6 +468,17 @@ class Content extends Base
         // p($custom_fields);
 
         $this->success('', null, ['html' => $this->view->fetch('cms/common/builder/fields')]);
+    }
+
+    /**
+     * 栏目是内容模型的唯一可靠来源，mcode 查询参数仅用于界面筛选。
+     *
+     * @param int|string $scode
+     * @return int
+     */
+    protected function resolveMcodeByScode(int|string $scode): int
+    {
+        return (new ContentSort())->getMcodeByScode($scode);
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace app\admin\controller\cms;
 
+use app\admin\model\cms\ContentSort;
 use Throwable;
 use think\Exception;
 use badou\EventContext;
@@ -31,7 +32,8 @@ class Single extends Base
     {
         parent::initialize();
         $this->model = new \app\admin\model\cms\Content();
-        $this->mcode = $this->request->param('mcode') ?? 0;
+        $scode = $this->request->param('scode');
+        $this->mcode = $scode ? $this->resolveMcodeByScode($scode) : (int)$this->request->param('mcode', 0);
         $this->contentExtModel = new \app\admin\model\cms\ContentExt();
         $this->extfieldModel = new \app\admin\model\cms\Extfield();
         $this->assign('mcode', $this->mcode);
@@ -97,6 +99,9 @@ class Single extends Base
             $this->error(__('Record not found'));
         }
 
+        $this->mcode = $this->resolveMcodeByScode($row['scode']);
+        $this->assign('mcode', $this->mcode);
+
         /* 获取扩展数据 */
         $extRow = $this->contentExtModel->where('contentid', $row['id'])->find();
         if ($extRow) {
@@ -121,6 +126,10 @@ class Single extends Base
             $noFilterData = $this->request->post('row/a', '', 'trim');
             $data['content'] = isset($noFilterData['content']) ? xss_clean($noFilterData['content']) : '';
             $data['update_user'] = $this->auth->username;
+
+            // 单页栏目可随编辑表单切换，扩展字段和 inquiry 同步均按最终栏目模型处理。
+            $this->mcode = $this->resolveMcodeByScode($data['scode']);
+
             $result = false;
             $this->model->startTrans();
             try {
@@ -179,9 +188,9 @@ class Single extends Base
         if (!$mcode && !$scode) {
             $this->error(__('Invalid parameters'));
         }
-        if (!$mcode) {
-            $contentSortModel = new \app\admin\model\cms\ContentSort();
-            $mcode = $contentSortModel::where('scode', $scode)->value('mcode');
+        // scode 是模型归属的真实来源，不能让 URL mcode 覆盖它。
+        if ($scode) {
+            $mcode = $this->resolveMcodeByScode($scode);
         }
         if ($id) {
             $rowitem = $this->model->find($id);
@@ -211,5 +220,16 @@ class Single extends Base
         // p($custom_fields);
 
         $this->success('', null, ['html' => $this->view->fetch('cms/common/builder/fields')]);
+    }
+
+    /**
+     * 栏目是内容模型的唯一可靠来源，mcode 查询参数仅用于界面筛选。
+     *
+     * @param int|string $scode
+     * @return int
+     */
+    protected function resolveMcodeByScode(int|string $scode): int
+    {
+        return (new ContentSort())->getMcodeByScode($scode);
     }
 }
