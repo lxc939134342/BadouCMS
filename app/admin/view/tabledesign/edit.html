@@ -1,0 +1,36 @@
+{layout name="layout/form" /}
+<form class="layui-form" method="post">
+    {:token_field()}
+    <div class="layui-form-item">
+        <label class="layui-form-label">表名</label>
+        <div class="layui-input-block">
+            <input type="text" value="{$row.name|htmlentities}" class="layui-input layui-disabled" disabled>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">表注释</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[comment]" value="{$row.comment|default=''|htmlentities}" class="layui-input" autocomplete="off">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">引擎</label>
+        <div class="layui-input-block">
+            <select name="row[engine]">
+                <option value="InnoDB" {if $row.engine == 'InnoDB'}selected{/if}>InnoDB</option>
+                <option value="MyISAM" {if $row.engine == 'MyISAM'}selected{/if}>MyISAM</option>
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item layer-footer hide">
+        <div class="layui-input-block">
+            <button class="layui-btn pear-btn-primary layui-btn-sm" lay-submit>保存</button>
+            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
+        </div>
+    </div>
+</form>
+<script>
+layui.use(['badou'], function () {
+    layui.bdForm.api.bindevent($('form.layui-form'));
+});
+</script>

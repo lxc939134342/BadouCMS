@@ -1,0 +1,39 @@
+{layout name="layout/form" /}
+<form class="layui-form" method="post">
+    {:token_field()}
+    <div class="layui-form-item">
+        <label class="layui-form-label">数据表</label>
+        <div class="layui-input-block">
+            <input type="text" value="{$table|htmlentities}" class="layui-input layui-disabled" disabled>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">控制器</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[controller]" value="{$table|htmlentities}" placeholder="如 cms.article，留空按表名生成" class="layui-input" autocomplete="off">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">菜单标题</label>
+        <div class="layui-input-block">
+            <input type="text" name="row[menu]" value="{$comment|default=''|htmlentities}" placeholder="留空使用表注释" class="layui-input" autocomplete="off">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">覆盖</label>
+        <div class="layui-input-block">
+            <input type="checkbox" name="row[force]" value="1" title="已存在时强制覆盖重新生成" lay-skin="primary">
+        </div>
+    </div>
+    <blockquote class="layui-elem-quote">将生成控制器、模型、验证器、列表和表单页面，并创建对应后台菜单。</blockquote>
+    <div class="layui-form-item layer-footer hide">
+        <div class="layui-input-block">
+            <button class="layui-btn pear-btn-primary layui-btn-sm" lay-submit>开始生成</button>
+        </div>
+    </div>
+</form>
+<script>
+layui.use(['badou'], function () {
+    layui.bdForm.api.bindevent($('form.layui-form'));
+});
+</script>

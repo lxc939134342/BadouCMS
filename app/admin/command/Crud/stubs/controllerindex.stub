@@ -1,0 +1,22 @@
+
+    /**
+     * 查看
+     */
+    public function index()
+    {
+        $this->relationSearch = {%relationSearch%};
+        if (!$this->request->isAjax()) {
+            return $this->view->fetch();
+        }
+        if ($this->request->param('select') || $this->request->request('keyField')) {
+            return $this->selectpage();
+        }
+        [$where, $sort, $order, $offset, $limit] = $this->buildparams();
+        $list = $this->model
+            {%relationWithList%}
+            ->where($where)
+            ->order($sort, $order)
+            ->paginate($limit);
+
+        $this->result('', $list->items(), $list->total());
+    }

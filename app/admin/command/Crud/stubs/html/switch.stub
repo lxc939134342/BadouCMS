@@ -1,0 +1,2 @@
+<input type="hidden" name="{%fieldName%}" value="{%fieldNo%}">
+            <input type="checkbox" name="{%fieldName%}" value="{%fieldYes%}" lay-skin="switch" lay-text="{:__('Yes')}|{:__('No')}" {eq name="{%fieldValue%}" value="{%fieldYes%}"}checked{/eq}>

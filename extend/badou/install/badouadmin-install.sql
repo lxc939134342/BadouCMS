@@ -139,7 +139,7 @@ CREATE TABLE `bd_admin_rule` (
   UNIQUE KEY `name` (`name`) USING BTREE,
   KEY `pid` (`pid`),
   KEY `weigh` (`weigh`)
-) ENGINE=InnoDB AUTO_INCREMENT=992 DEFAULT CHARSET=utf8mb4 COMMENT='节点表';
+) ENGINE=InnoDB AUTO_INCREMENT=1916 DEFAULT CHARSET=utf8mb4 COMMENT='节点表';
 
 -- ----------------------------
 -- Records of bd_admin_rule
@@ -244,6 +244,16 @@ INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`
 INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `is_quick`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (1003, '2', 998, 'database/restore', '恢复', '', '', '', '', 0, 0, '_iframe', '', '', '', 1752553058, 1752553058, 0, 'normal');
 INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `is_quick`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (1004, '2', 998, 'database/optimize', '优化表', '', '', '', '', 0, 0, '_iframe', '', '', '', 1752553086, 1752553086, 0, 'normal');
 INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `is_quick`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (1005, '2', 998, 'database/repair', '修复表', '', '', '', '', 0, 0, '_iframe', '', '', '', 1752553110, 1752553110, 0, 'normal');
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `is_quick`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (1895, '1', 279, 'tabledesign', '数据表设计', 'fa fa-table', '', '', '', 1, 0, NULL, '', '', '', 1758892800, 1758892800, 0, 'normal');
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `is_quick`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (1896, '2', 1895, 'tabledesign/index', '查看', 'fa fa-circle-o', '', '', '', 0, 0, NULL, '', '', '', 1758892800, 1758892800, 0, 'normal');
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `is_quick`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (1897, '2', 1895, 'tabledesign/add', '添加', 'fa fa-circle-o', '', '', '', 0, 0, NULL, '', '', '', 1758892800, 1758892800, 0, 'normal');
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `is_quick`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (1898, '2', 1895, 'tabledesign/edit', '编辑', 'fa fa-circle-o', '', '', '', 0, 0, NULL, '', '', '', 1758892800, 1758892800, 0, 'normal');
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `is_quick`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (1899, '2', 1895, 'tabledesign/del', '删除', 'fa fa-circle-o', '', '', '', 0, 0, NULL, '', '', '', 1758892800, 1758892800, 0, 'normal');
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `is_quick`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (1900, '2', 1895, 'tabledesign/fields', '字段', 'fa fa-circle-o', '', '', '', 0, 0, NULL, '', '', '', 1758892800, 1758892800, 0, 'normal');
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `is_quick`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (1901, '2', 1895, 'tabledesign/fieldadd', '添加字段', 'fa fa-circle-o', '', '', '', 0, 0, NULL, '', '', '', 1758892800, 1758892800, 0, 'normal');
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `is_quick`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (1902, '2', 1895, 'tabledesign/fieldedit', '编辑字段', 'fa fa-circle-o', '', '', '', 0, 0, NULL, '', '', '', 1758892800, 1758892800, 0, 'normal');
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `is_quick`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (1903, '2', 1895, 'tabledesign/fielddel', '删除字段', 'fa fa-circle-o', '', '', '', 0, 0, NULL, '', '', '', 1758892800, 1758892800, 0, 'normal');
+INSERT INTO `bd_admin_rule` (`id`, `type`, `pid`, `name`, `title`, `icon`, `url`, `condition`, `remark`, `ismenu`, `is_quick`, `menutype`, `extend`, `py`, `pinyin`, `create_time`, `update_time`, `weigh`, `status`) VALUES (1904, '2', 1895, 'tabledesign/build', '生成代码', 'fa fa-circle-o', '', '', '', 0, 0, NULL, '', '', '', 1758892800, 1758892800, 0, 'normal');
 COMMIT;
 
 -- ----------------------------

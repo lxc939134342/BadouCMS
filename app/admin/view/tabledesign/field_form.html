@@ -1,0 +1,61 @@
+{layout name="layout/form" /}
+<form class="layui-form" method="post">
+    {:token_field()}
+    {if isset($origin)}<input type="hidden" name="origin" value="{$origin|htmlentities}">{/if}
+    <div class="layui-form-item">
+        <label class="layui-form-label">字段名</label>
+        <div class="layui-input-block">
+            <input type="text" name="field[name]" value="{$origin|default=''|htmlentities}" lay-verify="required" class="layui-input" autocomplete="off">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">类型</label>
+        <div class="layui-input-inline">
+            <select name="field[type]">
+                {foreach $typeList as $type}
+                <option value="{$type}">{$type}</option>
+                {/foreach}
+            </select>
+        </div>
+        <label class="layui-form-label">长度</label>
+        <div class="layui-input-inline">
+            <input type="number" name="field[length]" value="255" class="layui-input" autocomplete="off">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">默认值</label>
+        <div class="layui-input-inline">
+            <input type="text" name="field[default]" class="layui-input" autocomplete="off">
+        </div>
+        <label class="layui-form-label">枚举值</label>
+        <div class="layui-input-inline">
+            <input type="text" name="field[values]" placeholder="enum/set 用逗号分隔" class="layui-input" autocomplete="off">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">注释</label>
+        <div class="layui-input-block">
+            <input type="text" name="field[comment]" value="{if isset($column)}{$column.COLUMN_COMMENT|default=''|htmlentities}{/if}" class="layui-input" autocomplete="off">
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">选项</label>
+        <div class="layui-input-block">
+            <input type="checkbox" name="field[required]" value="1" title="必填" {if !isset($column) || $column.IS_NULLABLE == 'NO'}checked{/if}>
+            <input type="radio" name="field[index]" value="" title="无索引" checked>
+            <input type="radio" name="field[index]" value="index" title="普通索引">
+            <input type="radio" name="field[index]" value="unique" title="唯一索引">
+        </div>
+    </div>
+    <div class="layui-form-item layer-footer hide">
+        <div class="layui-input-block">
+            <button class="layui-btn pear-btn-primary layui-btn-sm" lay-submit>保存</button>
+            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
+        </div>
+    </div>
+</form>
+<script>
+layui.use(['badou'], function () {
+    layui.bdForm.api.bindevent($('form.layui-form'));
+});
+</script>

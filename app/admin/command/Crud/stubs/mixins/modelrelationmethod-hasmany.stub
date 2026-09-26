@@ -1,0 +1,5 @@
+
+    public function {%relationMethod%}()
+    {
+        return $this->hasMany({%relationClassName%}::class, '{%relationForeignKey%}', '{%relationPrimaryKey%}');
+    }

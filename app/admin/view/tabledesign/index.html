@@ -1,0 +1,58 @@
+{layout name="layout/default" /}
+
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table class="layui-hide" id="tabledesign" data-operate-edit="{:$auth->check('tabledesign/edit')}" data-operate-del="{:$auth->check('tabledesign/del')}"></table>
+    </div>
+</div>
+
+<script type="text/html" id="toolbar-tabledesign">
+    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black"><i class="fa fa-refresh"></i></a>
+    <button class="layui-btn layui-bg-green {:$auth->check('tabledesign/add')?'':'hide'}" lay-event="add"><i class="fa fa-plus"></i> 新建数据表</button>
+</script>
+
+<script type="text/html" id="tabledesign-operate">
+    <a class="layui-btn layui-btn-sm layui-bg-blue btn-dialog {:$auth->check('tabledesign/fields')?'':'hide'}" href="{:url('tabledesign/fields')}?table={{d.name}}" data-area='["90%","90%"]' title="字段"><i class="fa fa-list"></i> 字段</a>
+    <a class="layui-btn layui-btn-sm layui-bg-orange btn-dialog {:$auth->check('tabledesign/build')?'':'hide'}" href="{:url('tabledesign/build')}?name={{d.name}}" title="生成代码"><i class="fa fa-code"></i> 生成</a>
+    <a class="layui-btn layui-btn-sm btn-dialog {:$auth->check('tabledesign/edit')?'':'hide'}" href="{:url('tabledesign/edit')}?name={{d.name}}" title="编辑"><i class="fa fa-pencil"></i> {:__('Edit')}</a>
+    <a class="layui-btn layui-btn-sm layui-bg-red btn-ajax {:$auth->check('tabledesign/del')?'':'hide'}" href="{:url('tabledesign/del')}?name={{d.name}}" data-confirm="确认删除数据表 {{d.full_name}}？表中数据将全部丢失" title="删除"><i class="fa fa-trash"></i> {:__('Del')}</a>
+</script>
+
+<script>
+layui.use(['badou'], function () {
+    var bdTable = layui.bdTable;
+    var table = layui.table;
+    var badou = layui.badou;
+
+    badou.http.config.open.area = ['90%', '90%'];
+
+    bdTable.api.init({
+        table: table,
+        extend: {
+            index_url: 'tabledesign/index',
+            add_url: 'tabledesign/add',
+            edit_url: 'tabledesign/edit',
+            del_url: 'tabledesign/del',
+            table: 'tabledesign',
+        },
+    });
+
+    bdTable.render({
+        elem: '#tabledesign',
+        url: "{:url('tabledesign/index')}",
+        pk: 'name',
+        toolbar: '#toolbar-tabledesign',
+        page: false,
+        commonSearch: false,
+        cols: [[
+            {field: 'name', title: '表名', width: 220},
+            {field: 'full_name', title: '完整表名', width: 240},
+            {field: 'comment', title: '表注释', minWidth: 160},
+            {field: 'engine', title: '引擎', width: 110},
+            {field: 'collation', title: '排序规则', width: 200},
+            {field: 'update_time', title: '更新时间', width: 180, templet: bdTable.api.formatter.datetime},
+            {title: '操作', width: 360, templet: '#tabledesign-operate'},
+        ]],
+    });
+});
+</script>

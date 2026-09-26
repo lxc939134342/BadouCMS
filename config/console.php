@@ -5,5 +5,6 @@
 return [
     // 指令定义
     'commands' => [
+        'crud' => 'app\\admin\\command\\Crud',
     ],
 ];

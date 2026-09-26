@@ -1,0 +1,44 @@
+{layout name="layout/default" /}
+
+<div class="layui-card">
+    <div class="layui-card-body">
+        <table class="layui-hide" id="{%tableId%}" data-operate-edit="{:$auth->check('{%controllerUrl%}/edit')}" data-operate-del="{:$auth->check('{%controllerUrl%}/del')}"></table>
+    </div>
+</div>
+
+<script type="text/html" id="toolbar">
+    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black"><i class="fa fa-refresh"></i></a>
+    <button class="layui-btn layui-bg-green {:$auth->check('{%controllerUrl%}/add')?'':'hide'}" lay-event="add"><i class="fa fa-plus"></i> {:__('Add')}</button>
+    <button class="layui-btn layui-bg-blue btn-disabled disabled {:$auth->check('{%controllerUrl%}/edit')?'':'hide'}" lay-event="edit"><i class="fa fa-pencil"></i> {:__('Edit')}</button>
+    <button class="layui-btn layui-bg-red btn-disabled disabled {:$auth->check('{%controllerUrl%}/del')?'':'hide'}" lay-event="del"><i class="fa fa-trash"></i> {:__('Del')}</button>
+    {%importHtml%}
+</script>
+
+<script>
+layui.use(["badou", "table"], function () {
+    var bdTable = layui.bdTable;
+    var table = layui.table;
+    bdTable.api.init({
+        table: table,
+        extend: {
+            index_url: "{%controllerUrl%}/index",
+            add_url: "{%controllerUrl%}/add",
+            edit_url: "{%controllerUrl%}/edit",
+            del_url: "{%controllerUrl%}/del",
+            multi_url: "{%controllerUrl%}/multi",
+            table: "{%table%}",
+        },
+    });
+    bdTable.render({
+        elem: "#{%tableId%}",
+        url: "{:url('{%controllerUrl%}/index')}",
+        pk: "{%pk%}",
+        sortName: "{%order%}",
+        even: true,
+        toolbar: "#toolbar",
+        cols: [[
+{%javascriptList%}
+        ]],
+    });
+});
+</script>

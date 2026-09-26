@@ -1,0 +1,37 @@
+<?php
+
+namespace {%modelNamespace%};
+
+use think\Model;
+{%softDeleteClassPath%}
+
+class {%modelName%} extends Model
+{
+{%softDelete%}
+{%modelConnection%}
+    protected ${%modelTableType%} = '{%modelTableTypeName%}';
+
+    protected $autoWriteTimestamp = {%modelAutoWriteTimestamp%};
+
+    protected $type = [
+{%modelTypeList%}
+    ];
+
+    protected $createTime = {%createTime%};
+    protected $updateTime = {%updateTime%};
+    protected $deleteTime = {%deleteTime%};
+
+    protected $append = [
+{%appendAttrList%}
+    ];
+
+{%modelInit%}
+
+{%getEnumList%}
+
+{%getAttrList%}
+
+{%setAttrList%}
+
+{%relationMethodList%}
+}

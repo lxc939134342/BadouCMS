@@ -1,0 +1,16 @@
+{layout name="layout/form" /}
+<form class="layui-form" method="post">
+    {:token_field()}
+{%addList%}
+    <div class="layui-form-item layer-footer hide">
+        <div class="layui-input-block">
+            <button class="layui-btn btn-theme-color" lay-submit>{:__('OK')}</button>
+            <button type="reset" class="layui-btn layui-btn-primary">{:__('Reset')}</button>
+        </div>
+    </div>
+</form>
+<script>
+layui.use(["badou"], function () {
+    layui.bdForm.api.bindevent($("form.layui-form"));
+});
+</script>

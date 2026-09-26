@@ -1,0 +1,10 @@
+<?php
+
+namespace {%modelNamespace%};
+
+use think\Model;
+
+class {%relationName%} extends Model
+{
+    protected ${%relationTableType%} = '{%relationTableTypeName%}';
+}

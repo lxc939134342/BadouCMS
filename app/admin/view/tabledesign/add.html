@@ -1,0 +1,106 @@
+{layout name="layout/form" /}
+<form class="layui-form" method="post">
+    {:token_field()}
+    <div class="layui-form-item">
+        <label class="layui-form-label">表名</label>
+        <div class="layui-input-inline">
+            <input type="text" name="row[name]" lay-verify="required" placeholder="不含表前缀，如 article" class="layui-input" autocomplete="off">
+        </div>
+        <label class="layui-form-label">表注释</label>
+        <div class="layui-input-inline">
+            <input type="text" name="row[comment]" placeholder="生成菜单时作为标题" class="layui-input" autocomplete="off">
+        </div>
+        <label class="layui-form-label">引擎</label>
+        <div class="layui-input-inline">
+            <select name="row[engine]">
+                <option value="InnoDB">InnoDB</option>
+                <option value="MyISAM">MyISAM</option>
+            </select>
+        </div>
+    </div>
+
+    <table class="layui-table" id="field-table">
+        <thead>
+        <tr>
+            <th>字段名</th>
+            <th>类型</th>
+            <th>长度/精度</th>
+            <th>默认值</th>
+            <th>注释</th>
+            <th>必填</th>
+            <th>主键</th>
+            <th>索引</th>
+            <th>枚举值</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <button type="button" class="layui-btn layui-btn-sm layui-bg-blue" id="field-add"><i class="fa fa-plus"></i> 添加字段</button>
+
+    <div class="layui-form-item layer-footer hide">
+        <div class="layui-input-block">
+            <button class="layui-btn pear-btn-primary layui-btn-sm" lay-submit>保存</button>
+            <button type="reset" class="layui-btn layui-btn-primary layui-btn-sm">重置</button>
+        </div>
+    </div>
+</form>
+
+<script type="text/html" id="field-row">
+    <tr>
+        <td><input type="text" name="fields[{{d.index}}][name]" value="{{d.name}}" class="layui-input" lay-verify="required" autocomplete="off"></td>
+        <td>
+            <select name="fields[{{d.index}}][type]" lay-filter="field-type">
+                {foreach $typeList as $type}
+                <option value="{$type}" {{d.type == '{$type}' ? 'selected' : ''}}>{$type}</option>
+                {/foreach}
+            </select>
+        </td>
+        <td><input type="number" name="fields[{{d.index}}][length]" value="{{d.length}}" class="layui-input" autocomplete="off"></td>
+        <td><input type="text" name="fields[{{d.index}}][default]" value="{{d.default}}" class="layui-input" autocomplete="off"></td>
+        <td><input type="text" name="fields[{{d.index}}][comment]" value="{{d.comment}}" class="layui-input" autocomplete="off"></td>
+        <td><input type="checkbox" name="fields[{{d.index}}][required]" value="1" title="是" {{d.required ? 'checked' : ''}}></td>
+        <td><input type="checkbox" name="fields[{{d.index}}][primary]" value="1" title="是" {{d.primary ? 'checked' : ''}}></td>
+        <td>
+            <select name="fields[{{d.index}}][index]">
+                <option value="">无</option>
+                <option value="index">普通索引</option>
+                <option value="unique">唯一索引</option>
+            </select>
+        </td>
+        <td><input type="text" name="fields[{{d.index}}][values]" placeholder="a,b,c" class="layui-input" autocomplete="off"></td>
+        <td><a href="javascript:;" class="layui-btn layui-btn-xs layui-bg-red field-remove">移除</a></td>
+    </tr>
+</script>
+
+<script>
+layui.use(['badou', 'laytpl', 'form'], function () {
+    var bdForm = layui.bdForm;
+    var laytpl = layui.laytpl;
+    var form = layui.form;
+    var $ = layui.$;
+    var index = 0;
+    var tpl = document.getElementById('field-row').innerHTML;
+
+    function addRow(data) {
+        data.index = index++;
+        laytpl(tpl).render(data, function (html) {
+            $('#field-table tbody').append(html);
+            form.render();
+        });
+    }
+
+    addRow({name: 'id', type: 'int', length: 11, default: '', comment: 'ID', required: true, primary: true});
+    addRow({name: 'create_time', type: 'bigint', length: 16, default: '', comment: '创建时间', required: false, primary: false});
+    addRow({name: 'update_time', type: 'bigint', length: 16, default: '', comment: '更新时间', required: false, primary: false});
+
+    $('#field-add').on('click', function () {
+        addRow({name: '', type: 'varchar', length: 255, default: '', comment: '', required: false, primary: false});
+    });
+    $('#field-table').on('click', '.field-remove', function () {
+        $(this).closest('tr').remove();
+    });
+
+    bdForm.api.bindevent($('form.layui-form'));
+});
+</script>

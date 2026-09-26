@@ -1,0 +1,54 @@
+{layout name="layout/default" /}
+
+<div class="layui-card">
+    <div class="layui-card-header">数据表：{$table|htmlentities}</div>
+    <div class="layui-card-body">
+        <table class="layui-hide" id="tabledesign-fields"></table>
+    </div>
+</div>
+
+<script type="text/html" id="toolbar-fields">
+    <a href="javascript:;" lay-event="refresh" class="layui-btn btn-refresh layui-bg-black"><i class="fa fa-refresh"></i></a>
+    <a class="layui-btn layui-bg-green btn-dialog {:$auth->check('tabledesign/fieldadd')?'':'hide'}" href="{:url('tabledesign/fieldadd', ['table' => $table])}" title="添加字段"><i class="fa fa-plus"></i> 添加字段</a>
+</script>
+
+<script type="text/html" id="fields-operate">
+    <a class="layui-btn layui-btn-sm btn-dialog {:$auth->check('tabledesign/fieldedit')?'':'hide'}" href="{:url('tabledesign/fieldedit', ['table' => $table])}&field={{d.name}}" title="编辑"><i class="fa fa-pencil"></i> {:__('Edit')}</a>
+    {{# if(d.key !== 'PRI'){ }}
+    <a class="layui-btn layui-btn-sm layui-bg-red btn-ajax {:$auth->check('tabledesign/fielddel')?'':'hide'}" href="{:url('tabledesign/fielddel', ['table' => $table])}&field={{d.name}}" data-confirm="确认删除字段 {{d.name}}？" title="删除"><i class="fa fa-trash"></i> {:__('Del')}</a>
+    {{# } }}
+</script>
+
+<script>
+layui.use(['badou'], function () {
+    var bdTable = layui.bdTable;
+    var table = layui.table;
+
+    bdTable.api.init({
+        table: table,
+        extend: {
+            index_url: 'tabledesign/fields?table={$table|htmlentities}',
+            table: 'tabledesign_fields',
+        },
+    });
+
+    bdTable.render({
+        elem: '#tabledesign-fields',
+        url: "{:url('tabledesign/fields', ['table' => $table])}",
+        pk: 'name',
+        toolbar: '#toolbar-fields',
+        page: false,
+        commonSearch: false,
+        cols: [[
+            {field: 'name', title: '字段名', width: 180},
+            {field: 'type', title: '类型', width: 180},
+            {field: 'nullable', title: '允许为空', width: 110},
+            {field: 'key', title: '键', width: 90},
+            {field: 'default', title: '默认值', width: 140},
+            {field: 'extra', title: '附加', width: 140},
+            {field: 'comment', title: '注释', minWidth: 160},
+            {title: '操作', width: 200, templet: '#fields-operate'},
+        ]],
+    });
+});
+</script>

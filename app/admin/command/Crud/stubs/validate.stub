@@ -1,0 +1,21 @@
+<?php
+
+namespace {%validateNamespace%};
+
+use think\Validate;
+
+class {%validateName%} extends Validate
+{
+    protected $failException = true;
+
+    protected $rule = [
+    ];
+
+    protected $message = [
+    ];
+
+    protected $scene = [
+        'add'  => [],
+        'edit' => [],
+    ];
+}
