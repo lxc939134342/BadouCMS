@@ -399,11 +399,8 @@ form.on('select', updateCondition);
 
 ### 开始编码前
 
-1. 阅读根目录 `AGENTS.md`，确认 GitNexus 和项目约束。
-2. 在 `app`、`modules` 和 `public/assets/libs` 中查找相近功能，优先复用现有实现。
-3. 明确本次修改涉及的 Controller、Model、Service、View 和 JS 文件。
-4. 如果要修改已有 PHP 函数、类或方法，先按项目 AGENTS 要求运行 GitNexus impact analysis，并查看直接调用方、执行流程和风险级别；若为 HIGH/CRITICAL，先向用户明确报告影响后再编辑。
-5. 如果 GitNexus 报索引过期，先在项目根目录运行 `npx gitnexus analyze`。
+1. 在 `app`、`modules` 和 `public/assets/libs` 中查找相近功能，优先复用现有实现。
+2. 明确本次修改涉及的 Controller、Model、Service、View 和 JS 文件。
 
 ### 编码时
 
@@ -438,8 +435,6 @@ rg -n "\$\.ajax\(|fetch\(|form\.on\(['\"]submit" app/admin/view/<module>
 
 上面的 `rg` 是人工复核入口，不是替代 AST/代码审查；需要判断命中是否位于 `try {}` 代码块中。`catch {}` 中完成回滚和清理后直接调用 `$this->error()` 是允许的。
 
-如果准备提交代码，必须在提交前运行 `gitnexus_detect_changes()`，确认变更只影响预期的文件、符号和执行流程；发现意外影响时先修正，不要直接提交。
-
 ## Review 清单
 
 - [ ] `try {}` 内没有 `$this->success()`、`$this->succsess()`、`$this->error()` 或同类立即响应 helper。
@@ -455,4 +450,3 @@ rg -n "\$\.ajax\(|fetch\(|form\.on\(['\"]submit" app/admin/view/<module>
 - [ ] 新组件确实是现有 `public/assets/libs` 中没有的能力，且实现可复用。
 - [ ] 页面专属 CSS/JS 已限制作用域，不影响其他后台页面。
 - [ ] PHP 语法、接口返回格式、权限、token、缓存、租户隔离和相关页面行为已检查。
-- [ ] 提交前已执行 GitNexus 变更检测。
