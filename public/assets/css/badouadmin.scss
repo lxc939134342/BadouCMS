@@ -21,6 +21,10 @@
   border-color: var(--primary-color) !important;
   box-shadow: 0 0 0 3px #fffaf3 !important;
 }
+
+.pear-container {
+  height: calc(100vh - 20px) !important;
+}
 .pear-admin {
   &.banner-layout .layui-header {
     border: none !important;
