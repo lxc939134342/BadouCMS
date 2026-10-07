@@ -137,7 +137,8 @@ class ContentSort extends Model
             $where[] = ['status','=',1];
         }
         // 将 scode 做为 id
-        $datalist = $this->where($where)->field('scode as id,pcode as pid')->select()->toArray();
+        // 层级检查仅需编号，不能触发依赖完整栏目和模型字段的链接计算。
+        $datalist = $this->where($where)->field('scode as id,pcode as pid')->select()->append([])->toArray();
         $tree = Tree::instance();
         $tree->init($datalist);
         $data = $tree->getChildrenIds($scode, $withself);

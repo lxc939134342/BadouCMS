@@ -7,6 +7,7 @@ use think\facade\Route;
 use app\common\library\Menu;
 use app\admin\model\Config as ConfigModel;
 use modules\cms\library\RouteRegistry;
+use badou\Server;
 
 class Cms
 {
@@ -20,6 +21,10 @@ class Cms
                 Route::rule($rule, $target);
             }
         });
+        // 固定扩展入口需随插件版本保留，具体定制代码放在升级保护目录中。
+        if (is_file(__DIR__ . '/custom/bootstrap.php')) {
+            include_once __DIR__ . '/custom/bootstrap.php';
+        }
     }
 
     public function enable()

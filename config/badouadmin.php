@@ -66,11 +66,11 @@ return [
     ],
     //插件启用禁用时是否备份对应的全局文件
     'backup_global_files'   => true,
-    // 升级时忽略升级的目录
-    'upgrade_ignore_dirs' => ['/template/cms/default/'],
+    // 路径相对于插件根目录，custom 下所有文件和子目录均保留。
+    'upgrade_ignore_dirs' => ['/template/cms/default/', '/custom/'],
     // 升级时忽略升级的文件
-    'upgrade_ignore_files' => ['bd_functions.php'],
-    'version' => 'v2.3.5',
+    'upgrade_ignore_files' => [],
+    'version' => 'v2.4.0',
     'api_url' => 'https://sq.badoucms.com/',
     'module_init_key' => 'bW9kdWxlSW5pdA=='
 ];
