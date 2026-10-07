@@ -153,6 +153,152 @@
     <a href="#" class="layui-icon layui-icon-shrink-right"></a>
   </div>
 
+  {if $auth->check('agent/index')}
+  <style>
+    #badou-agent-launcher {
+      position: fixed;
+      right: 22px;
+      bottom: 24px;
+      z-index: 19890;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: 44px;
+      padding: 0 16px;
+      border: 0;
+      border-radius: 22px;
+      background: #4E73DF;
+      box-shadow: 0 6px 18px rgba(49, 77, 159, .22);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    #badou-agent-launcher:hover,
+    #badou-agent-launcher:focus-visible {
+      background: #3F62C8;
+      box-shadow: 0 8px 22px rgba(49, 77, 159, .3);
+    }
+
+    #badou-agent-launcher i {
+      font-size: 15px;
+    }
+
+    #badou-agent-launcher.is-open {
+      display: none !important;
+    }
+
+    .layui-layer.badou-agent-layer {
+      overflow: hidden;
+      border: 1px solid #DCE4FA;
+      border-radius: 10px;
+      box-shadow: 0 16px 48px rgba(35, 52, 101, .22);
+    }
+
+    .badou-agent-layer .layui-layer-title {
+      height: 46px;
+      padding-left: 16px;
+      border-bottom: 1px solid #E8ECF7;
+      background: #fff;
+      color: #27334F;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 46px;
+    }
+
+    .badou-agent-layer .layui-layer-setwin {
+      top: 16px;
+    }
+
+    .badou-agent-layer__menu {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      height: 26px;
+      margin-left: 14px;
+      padding: 0 7px;
+      border: 0;
+      border-radius: 5px;
+      background: #EEF2FF;
+      color: #3554AA;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 26px;
+      cursor: pointer;
+    }
+
+    .badou-agent-layer__menu:hover {
+      background: #E1E9FF;
+    }
+
+    @media (max-width: 640px) {
+      #badou-agent-launcher {
+        right: 14px;
+        bottom: 14px;
+      }
+
+      .layui-layer.badou-agent-layer {
+        border: 0;
+        border-radius: 0;
+      }
+    }
+  </style>
+
+  <button type="button" id="badou-agent-launcher" aria-label="打开 AI 助手">
+    <i class="fa fa-magic" aria-hidden="true"></i><span>AI 助手</span>
+  </button>
+  <script>
+    layui.use(['layer', 'jquery'], function () {
+      var layer = layui.layer;
+      var $ = layui.jquery;
+      var $launcher = $('#badou-agent-launcher');
+      var activeLayer = null;
+      var fullPageUrl = "{:url('agent/index', [], false, true)}";
+
+      $launcher.on('click', function () {
+        if (activeLayer !== null) return;
+        var width = Math.min(760, Math.max(320, window.innerWidth - 24));
+        var height = Math.min(820, Math.max(320, window.innerHeight - 24));
+        var mobile = window.innerWidth <= 640;
+        if (mobile) {
+          width = window.innerWidth;
+          height = window.innerHeight;
+        }
+        activeLayer = layer.open({
+          type: 2,
+          title: 'AI 助手',
+          content: "{:url('agent/index', ['drawer' => 1])}",
+          area: [width + 'px', height + 'px'],
+          offset: mobile ? ['0px', '0px'] : ['12px', Math.max(12, window.innerWidth - width - 12) + 'px'],
+          shade: false,
+          resize: !mobile,
+          maxmin: true,
+          skin: 'badou-agent-layer',
+          success: function (layero, index) {
+            var $menu = $('<button type="button" class="badou-agent-layer__menu" title="在后台菜单中打开"><i class="fa fa-external-link" aria-hidden="true"></i>完整页面</button>');
+            layero.find('.layui-layer-title').append($menu);
+            $menu.on('mousedown', function (event) { event.stopPropagation(); });
+            $menu.on('click', function (event) {
+              event.stopPropagation();
+              layer.close(index);
+              var $menuLink = top.$('#sideMenu').find('a[menu-url="agent/index"]');
+              var menuId = $menuLink.attr('menu-id') || 'agent_index';
+              var menuTitle = $menuLink.attr('menu-title') || 'AI 助手';
+              top.layui.admin.jump(menuId, menuTitle, fullPageUrl);
+            });
+          },
+          end: function () {
+            activeLayer = null;
+            $launcher.removeClass('is-open');
+          }
+        });
+        $launcher.addClass('is-open');
+      });
+    });
+  </script>
+  {/if}
+
   <!-- 框 架 初 始 化 -->
   <script>
     layui.use(["admin", "jquery", "drawer", "badou", "toast"], function () {

@@ -550,21 +550,18 @@
                         },
                       },
                       function () {
-                        return false;
-                      },
-                      function () {
+                        badou.api.badouStorage.set({
+                          key: "userinfo",
+                          value: data,
+                        });
+                        layer.closeAll();
+                        layer.alert(ret.msg, {
+                          title: __("Warning"),
+                          icon: 1,
+                        });
                         return false;
                       },
                     );
-                    badou.api.badouStorage.set({
-                      key: "userinfo",
-                      value: data,
-                    });
-                    layer.closeAll();
-                    layer.alert(ret.msg, {
-                      title: __("Warning"),
-                      icon: 1,
-                    });
                     return false;
                   },
                   function (data, ret) { },

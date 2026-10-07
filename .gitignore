@@ -5,7 +5,6 @@
 .DS_Store
 .idea
 .trae
-composer.lock
 *.log
 *.css.map
 !.gitkeep
@@ -31,3 +30,5 @@ AGENTS.md
 .agents/skills/*
 !.agents/skills/badoucms/
 !.agents/skills/badoucms/**
+/tests/
+composer.lock

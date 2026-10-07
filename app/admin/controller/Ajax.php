@@ -118,7 +118,7 @@ class Ajax extends Backend
         } catch (UploadException $e) {
             $this->error($e->getMessage());
         }
-        $this->result(__('Uploaded successful'), ['url' => $attachment->url, 'fullurl' => cdnurl($attachment->url, true)]);
+        $this->result(__('Uploaded successful'), ['id' => (int)$attachment->id, 'url' => $attachment->url, 'fullurl' => cdnurl($attachment->url, true)]);
     }
 
     /**

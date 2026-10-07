@@ -172,7 +172,9 @@ class Server
 
     public static function saveUserInfo($uid, $token)
     {
-        Cache::set('bd_u', ['uid' => $uid, 'token' => $token]);
+        if (!Cache::set('bd_u', ['uid' => (int)$uid, 'token' => (string)$token])) {
+            throw new \RuntimeException('登录状态保存失败');
+        }
     }
 
     /**
@@ -458,12 +460,17 @@ class Server
      *
      * @param string $name     模块名称
      * @param string $fileName SQL文件名称
+     * @param bool   $strict   是否在文件缺失或执行失败时抛出异常
      * @return  boolean
      */
-    public static function importsql($name, $fileName = null)
+    public static function importsql($name, $fileName = null, bool $strict = false)
     {
         $fileName = is_null($fileName) ? 'install.sql' : $fileName;
         $sqlFile = self::getModuleDir($name) . $fileName;
+        // 升级入口可要求导入成功；旧插件保持原有容错行为。
+        if ($strict && !is_file($sqlFile)) {
+            throw new Exception('SQL 文件不存在：' . $name . '/' . $fileName);
+        }
         if (is_file($sqlFile)) {
             $lines = file($sqlFile);
             $templine = '';
@@ -480,7 +487,9 @@ class Server
                     try {
                         Db::getPdo()->exec($templine);
                     } catch (\PDOException $e) {
-                        //$e->getMessage();
+                        if ($strict) {
+                            throw new Exception('SQL 执行失败：' . $name . '/' . $fileName . '，' . $e->getMessage(), 0, $e);
+                        }
                     }
                     $templine = '';
                 }

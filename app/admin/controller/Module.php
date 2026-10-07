@@ -430,9 +430,20 @@ class Module extends Backend
 
     public function saveUserInfo()
     {
-        $uid = $this->request->param('uid');
-        $token = $this->request->param('token');
-        Server::saveUserInfo($uid, $token);
+        if (!$this->request->isPost()) {
+            $this->error('请求方式错误');
+        }
+        $uid = (int)$this->request->post('uid');
+        $token = trim((string)$this->request->post('token'));
+        if ($uid <= 0 || $token === '') {
+            $this->error('插件市场登录信息无效，请重新登录');
+        }
+        try {
+            Server::saveUserInfo($uid, $token);
+        } catch (Throwable $e) {
+            $this->error('登录状态同步失败，请重试');
+        }
+        $this->success('登录状态同步成功');
     }
 
     /**

@@ -1,0 +1,102 @@
+{layout name="layout/form" /}
+<style>
+  .agent-recharge { padding: 20px; }
+  .agent-recharge .agent-recharge__intro { margin-bottom: 20px; color: #666; line-height: 22px; }
+  .agent-recharge .agent-recharge__summary { margin: 0 0 18px 110px; padding: 12px 16px; background: #f6f6f6; line-height: 28px; border-radius: 4px; }
+  .agent-recharge .agent-recharge__price { color: #FF5722; font-size: 18px; }
+  .agent-recharge .agent-recharge__empty { padding: 24px 0; text-align: center; color: #999; }
+  @media (max-width: 420px) {
+    .agent-recharge { padding: 12px; }
+    .agent-recharge .layui-form-label { width: 60px; }
+    .agent-recharge .layui-input-block, .agent-recharge .agent-recharge__summary { margin-left: 90px; }
+  }
+</style>
+<div class="agent-recharge">
+  <p class="agent-recharge__intro">选择套餐查看售价和到账 AI 积分，扫码支付后积分会自动更新。</p>
+  <div class="agent-recharge__empty" id="agent-recharge-status">正在加载套餐…</div>
+  <form class="layui-form" method="post" action="{:url('agent/order')}" id="agent-recharge-form" style="display:none;">
+    {:token_field()}
+    <div class="layui-form-item">
+      <label class="layui-form-label">积分套餐</label>
+      <div class="layui-input-block">
+        <select name="package_id" lay-filter="agent-package" lay-verify="required" id="agent-recharge-package"></select>
+      </div>
+    </div>
+    <div class="agent-recharge__summary">
+      <p>AI 积分：<span id="agent-recharge-points"></span> 积分</p>
+      <p>支付金额：<strong class="agent-recharge__price" id="agent-recharge-price"></strong></p>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">支付方式</label>
+      <div class="layui-input-block" id="agent-recharge-paytypes"></div>
+    </div>
+    <div class="layui-form-item layer-footer hide">
+      <div class="layui-input-block">
+        <button type="submit" class="layui-btn btn-theme-color" lay-submit lay-filter="agent-recharge-submit" disabled>立即支付</button>
+      </div>
+    </div>
+  </form>
+</div>
+<script>
+  layui.use(['badou', 'form'], function () {
+    var $ = layui.jquery;
+    var badou = layui.badou;
+    var form = layui.form;
+    var $form = $('#agent-recharge-form');
+    var $status = $('#agent-recharge-status');
+    var packages = [];
+
+    function renderPackage(id) {
+      var item = packages.find(function (item) { return item.id === id; });
+      if (!item) return;
+      $form.find('#agent-recharge-points').text(Number(item.points || 0).toLocaleString());
+      $('#agent-recharge-price').text('￥' + item.price);
+      var $paytypes = $('#agent-recharge-paytypes').empty();
+      var methods = item.paytypes || [];
+      methods.forEach(function (method, index) {
+        $paytypes.append($('<input type="radio" name="paytype">')
+          .val(method).attr('title', method === 'alipay' ? '支付宝' : '微信支付').prop('checked', index === 0));
+      });
+      if (!methods.length) $paytypes.text('支付方式尚未开放');
+      $form.find('button[type="submit"]').prop('disabled', !methods.length);
+      form.render();
+    }
+
+    form.on('select(agent-package)', function (data) { renderPackage(data.value); });
+    layui.bdForm.api.bindevent($form, function (data) {
+      badou.api.close(data);
+      return false;
+    }, function (data) {
+      if (data && data.need_login) {
+        badou.api.close({ need_login: true });
+        return false;
+      }
+    });
+
+    badou.api.ajax({
+      url: '{:url("agent/packages")}',
+      type: 'get',
+      loading: false
+    }, function (data) {
+      packages = data && Array.isArray(data.packages) ? data.packages : [];
+      if (!packages.length) {
+        $status.text('AI 积分套餐尚未开放');
+        return false;
+      }
+      var $select = $('#agent-recharge-package').empty();
+      packages.forEach(function (item) {
+        $select.append($('<option>').val(item.id).text(item.name));
+      });
+      $status.hide();
+      $form.show();
+      renderPackage(packages[0].id);
+      return false;
+    }, function (data) {
+      if (data && data.need_login) {
+        badou.api.close({ need_login: true });
+        return false;
+      }
+      $status.text('套餐加载失败，请稍后重新打开');
+    });
+  });
+</script>
