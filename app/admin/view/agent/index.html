@@ -1008,6 +1008,25 @@
     display: flex;
   }
 
+  .geo-agent-demo__message-attachments {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .geo-agent-demo__message-attachments .geo-agent-demo__attachment {
+    display: block;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+
+  .geo-agent-demo__message-attachments .geo-agent-demo__attachment:focus-visible {
+    outline: 2px solid var(--agent-primary);
+    outline-offset: 2px;
+  }
+
   .geo-agent-demo__attachment {
     position: relative;
     width: 58px;
@@ -1399,6 +1418,7 @@
     var pendingApproval = null;
     var chatRevision = '';
     var editingMessage = null;
+    var attachmentFullUrls = Object.create(null);
     var languageTaskTimer = null;
     var wakingLanguageTask = false;
     var canSend = Number('{:$canSend ? 1 : 0}') === 1;
@@ -1609,7 +1629,7 @@
           loading: false
         }, function (data) {
           var balance = Number(data.remain_points || 0);
-          $('#geo-agent-demo-balance').text('剩余 ' + balance.toLocaleString(undefined, { maximumFractionDigits: 4 }) + ' 积分')
+          $('#geo-agent-demo-balance').text('剩余 ' + balance.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' 积分')
             .attr('title', '到账积分以购买套餐为准。每次按模型、输入输出和历史对话扣费；余额需满足本次请求的预扣额度。');
           if (callback) callback(null, balance);
           return false;
@@ -1758,7 +1778,7 @@
             return false;
           }
           badou.api.open('{:url("agent/recharge")}', '购买 AI 积分', {
-            area: [Math.min(600, window.innerWidth - 30) + 'px', Math.min(400, window.innerHeight - 30) + 'px'],
+            area: [Math.min(680, window.innerWidth - 30) + 'px', Math.min(310, window.innerHeight - 30) + 'px'],
             shade: 0.6,
             callback: function (order) {
               if (order && order.need_login) {
@@ -1998,11 +2018,19 @@
         parts.elapsed = $elapsed;
         parts.tools = $tools;
         parts.content = $content;
-      } else {
-        $box.append($('<div></div>').text(item.content || ''));
       }
       if (item.role === 'user') {
-        var $wrap = $('<div class="geo-agent-demo__user-wrap"></div>').append($box);
+        // 展示时将附件标记转为卡片，原消息仍完整保留，供模型读取、复制和编辑。
+        var message = splitMessageAttachments(item.content || '');
+        var $wrap = $('<div class="geo-agent-demo__user-wrap"></div>');
+        if (message.attachments.length) {
+          var $attachments = $('<div class="geo-agent-demo__message-attachments" aria-label="本条消息的附件"></div>');
+          message.attachments.forEach(function (url) {
+            $attachments.append(createAttachmentThumb(url, attachmentFullUrls[url] || url, true));
+          });
+          $wrap.append($attachments);
+        }
+        if (message.text) $wrap.append($box.append($('<div></div>').text(message.text)));
         var $actions = $('<div class="geo-agent-demo__message-actions"></div>');
         $turn.data('messageId', item.message_id || '').data('messageText', item.content || '');
         $actions.append($('<button type="button" class="geo-agent-demo__message-action" title="复制消息" aria-label="复制消息"><i class="fa fa-copy" aria-hidden="true"></i></button>')
@@ -2046,11 +2074,13 @@
       $turn.addClass('is-editing');
       $('#geo-agent-demo-edit-banner').prop('hidden', false);
       $input.val($turn.data('messageText')).focus();
+      syncComposerAttachments();
       $('#geo-agent-demo-send').attr('title', '编辑并重新发送').attr('aria-label', '编辑并重新发送');
     }
 
     function cancelMessageEdit(restoreDraft) {
       if (restoreDraft && editingMessage) $input.val(editingMessage.draft);
+      syncComposerAttachments();
       editingMessage = null;
       $messages.find('.is-editing').removeClass('is-editing');
       $('#geo-agent-demo-edit-banner').prop('hidden', true);
@@ -2494,6 +2524,7 @@
       var userTurn = null;
       if (!approvalDecision) {
         $input.val('');
+        syncComposerAttachments();
         userTurn = addMessage({ role: 'user', content: question }).turn;
       }
       $messages.find('.geo-agent-demo__patch-actions button').prop('disabled', true);
@@ -2638,7 +2669,10 @@
             }));
         }
         pending.elapsed.text(formatDuration(Date.now() - startedAt));
-        if (!approvalDecision) $input.val(question);
+        if (!approvalDecision) {
+          $input.val(question);
+          syncComposerAttachments();
+        }
         finish();
         if (approvalDecision) openChat(chatId);
         renderAccount();
@@ -2654,20 +2688,56 @@
     }
 
     function appendAttachment(url, fullurl, id) {
+      attachmentFullUrls[url] = fullurl || url;
       var value = $.trim($input.val());
       var label = isImageUrl(url) ? '已上传图片' : '已上传文件';
       var idText = id ? '，附件ID：' + id : '';
-      $input.val((value ? value + '\n' : '') + label + idText + '：' + url).focus();
-      addAttachmentThumb(url, fullurl || url);
+      $input.val((value ? value + '\n' : '') + label + idText + '：' + url + '\n').focus();
+      if ($input[0]) $input[0].setSelectionRange($input.val().length, $input.val().length);
+      syncComposerAttachments();
     }
 
-    function addAttachmentThumb(url, fullurl) {
-      var $wrap = $('#geo-agent-demo-attachments');
-      var $item = $('<div class="geo-agent-demo__attachment"></div>');
+    function splitMessageAttachments(text) {
+      var attachments = [];
+      var lines = String(text || '').split('\n').map(function (line) {
+        var match = line.trim().match(/^已上传(?:图片|文件)(?:，附件ID：\d+)?：((?:https?:\/\/|\/(?!\/))[^\s<>"']+)([\s\S]*)$/i);
+        if (!match) return line;
+        var url = match[1];
+        var remainder = match[2];
+        // 兼容旧消息中紧贴附件地址输入的提问，优先以本次上传的真实地址划分。
+        var known = Object.keys(attachmentFullUrls).sort(function (a, b) { return b.length - a.length; }).find(function (key) {
+          return url.indexOf(key) === 0 && !/^[.\/?#%&]/.test(url.slice(key.length));
+        });
+        var glued = null;
+        if (!known && !/[?#]/.test(url) && !/\.[a-z\d]{1,12}$/i.test(url)) {
+          glued = url.match(/^((?:https?:\/\/|\/(?!\/))[^\s<>"']+?\.(?:docx?|xlsx?|csv|pdf|jpe?g|png|gif|bmp|webp|zip|rar|wav|mp[34]|webm))([^\x00-\x7f][\s\S]*)$/i);
+        }
+        if (known || glued) {
+          var actualUrl = known || glued[1];
+          remainder = url.slice(actualUrl.length) + remainder;
+          url = actualUrl;
+        }
+        if (attachments.indexOf(url) < 0) attachments.push(url);
+        return remainder;
+      });
+      return { text: lines.join('\n').trim(), attachments: attachments };
+    }
+
+    function syncComposerAttachments() {
+      $('#geo-agent-demo-attachments').empty().removeClass('has-items');
+      splitMessageAttachments($input.val()).attachments.forEach(function (url) {
+        addAttachmentThumb(url, attachmentFullUrls[url] || url);
+      });
+    }
+
+    function createAttachmentThumb(url, fullurl, sent) {
+      var name = String(url).split('?')[0].split('/').pop();
+      var $item = $(sent ? '<a class="geo-agent-demo__attachment"></a>' : '<div class="geo-agent-demo__attachment"></div>');
+      if (sent) $item.attr('href', fullurl || url).attr('target', '_blank').attr('rel', 'noopener noreferrer')
+        .attr('title', '查看附件：' + name).attr('aria-label', '查看附件：' + name);
       if (isImageUrl(url)) {
         $item.append($('<img alt="" />').attr('src', fullurl || url));
       } else {
-        var name = String(url).split('?')[0].split('/').pop();
         var ext = name.split('.').pop().toLowerCase();
         var icons = { xls: 'fa-file-excel-o', xlsx: 'fa-file-excel-o', csv: 'fa-file-excel-o', doc: 'fa-file-word-o', docx: 'fa-file-word-o', pdf: 'fa-file-pdf-o' };
         $item.append($('<div class="geo-agent-demo__file"></div>')
@@ -2675,12 +2745,20 @@
           .append('<i class="fa ' + (icons[ext] || 'fa-file-o') + '"></i>')
           .append($('<span></span>').text(ext.toUpperCase())));
       }
+      return $item;
+    }
+
+    function addAttachmentThumb(url, fullurl) {
+      var $wrap = $('#geo-agent-demo-attachments');
+      var $item = createAttachmentThumb(url, fullurl, false);
       $item.append($('<a href="javascript:;" class="btn-remove" title="移除"></a>')
         .append('<i class="fa fa-times"></i>')
         .on('click', function () {
-          $input.val(String($input.val() || '').split('\n').filter(function (line) { return line.indexOf(url) === -1; }).join('\n'));
-          $item.remove();
-          $wrap.toggleClass('has-items', $wrap.children().length > 0);
+          $input.val(String($input.val() || '').split('\n').map(function (line) {
+            var message = splitMessageAttachments(line);
+            return message.attachments.indexOf(url) < 0 ? line : message.text;
+          }).join('\n'));
+          syncComposerAttachments();
         }));
       $wrap.append($item).addClass('has-items');
     }
@@ -2803,6 +2881,8 @@
       });
     });
     $input.on('keydown', function (event) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); send(); } });
+    $input.on('input', syncComposerAttachments);
+    syncComposerAttachments();
     showWelcome();
     loadSessions(true);
   });

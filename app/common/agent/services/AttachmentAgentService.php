@@ -52,6 +52,10 @@ class AttachmentAgentService
             throw new \DomainException('请使用已上传附件的 ID 或 /uploads/ 开头的附件地址');
         }
         if (!$row) throw new \DomainException('附件不存在，请先上传文件或查询附件');
+        $extension = strtolower(pathinfo((string)$row->url, PATHINFO_EXTENSION));
+        if (in_array($extension, ['xls', 'xlsx', 'csv'], true)) {
+            return (new SpreadsheetAttachmentReader())->read($row->getData(), $offset, $limit);
+        }
         return (new WordAttachmentReader())->read($row->getData(), $offset, $limit);
     }
 

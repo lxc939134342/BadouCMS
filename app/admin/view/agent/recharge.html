@@ -1,38 +1,41 @@
 {layout name="layout/form" /}
 <style>
-  .agent-recharge { padding: 20px; }
-  .agent-recharge .agent-recharge__intro { margin-bottom: 20px; color: #666; line-height: 22px; }
-  .agent-recharge .agent-recharge__summary { margin: 0 0 18px 110px; padding: 12px 16px; background: #f6f6f6; line-height: 28px; border-radius: 4px; }
-  .agent-recharge .agent-recharge__price { color: #FF5722; font-size: 18px; }
-  .agent-recharge .agent-recharge__empty { padding: 24px 0; text-align: center; color: #999; }
-  @media (max-width: 420px) {
-    .agent-recharge { padding: 12px; }
-    .agent-recharge .layui-form-label { width: 60px; }
-    .agent-recharge .layui-input-block, .agent-recharge .agent-recharge__summary { margin-left: 90px; }
+  .agent-recharge { padding: 28px; color: #202632; }
+  .agent-recharge * { box-sizing: border-box; }
+  .agent-recharge .agent-recharge__packages { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .agent-recharge .agent-recharge__package { position: relative; min-width: 0; padding: 26px 12px 20px; overflow: hidden; border: 1px solid #e5e7ec; border-radius: 8px; background: #f5f6f8; color: inherit; text-align: center; cursor: pointer; }
+  .agent-recharge .agent-recharge__package:hover { border-color: #edc479; }
+  .agent-recharge .agent-recharge__package:focus-visible { outline: 2px solid #e8a638; outline-offset: 3px; }
+  .agent-recharge .agent-recharge__package.is-selected { border-color: #edae45; background: #fff9ed; }
+  .agent-recharge .agent-recharge__package.is-selected::after { content: '✓'; position: absolute; top: 9px; right: 9px; width: 14px; height: 14px; border-radius: 50%; background: #e7a12f; color: #fff; font-size: 10px; line-height: 14px; }
+  .agent-recharge .agent-recharge__points { display: flex; align-items: baseline; justify-content: center; gap: 5px; color: #3b475d; }
+  .agent-recharge .agent-recharge__points-value { min-width: 0; overflow-wrap: anywhere; font: 600 24px/1.2 Arial, sans-serif; letter-spacing: -.3px; font-variant-numeric: tabular-nums; }
+  .agent-recharge .agent-recharge__points-unit { flex-shrink: 0; color: #8c97a9; font-size: 12px; }
+  .agent-recharge .agent-recharge__package.is-selected .agent-recharge__points-value { color: #293347; }
+  .agent-recharge .agent-recharge__price { display: block; margin: 18px 6px 0; padding-top: 14px; border-top: 1px solid #eceef2; color: #bf630b; font: 500 16px/1.3 Arial, sans-serif; font-variant-numeric: tabular-nums; }
+  .agent-recharge .agent-recharge__package.is-selected .agent-recharge__price { border-top-color: #f1e3c8; color: #b85d08; }
+  .agent-recharge .agent-recharge__currency { margin-right: 3px; font-size: 12px; font-weight: 400; }
+  .agent-recharge .agent-recharge__status { padding: 32px 0; color: #777f8d; text-align: center; }
+  @media (max-width: 480px) {
+    .agent-recharge { padding: 20px 16px; }
+    .agent-recharge .agent-recharge__packages { gap: 8px; overflow-x: auto; padding: 4px; grid-template-columns: repeat(4, minmax(105px, 1fr)); }
+    .agent-recharge .agent-recharge__package { padding: 22px 8px 18px; }
+    .agent-recharge .agent-recharge__points { display: block; }
+    .agent-recharge .agent-recharge__points-value { display: block; font-size: 22px; }
+    .agent-recharge .agent-recharge__points-unit { display: block; margin-top: 4px; line-height: 16px; }
+    .agent-recharge .agent-recharge__price { margin-top: 14px; padding-top: 12px; font-size: 16px; }
   }
 </style>
 <div class="agent-recharge">
-  <p class="agent-recharge__intro">选择套餐查看售价和到账 AI 积分，扫码支付后积分会自动更新。</p>
-  <div class="agent-recharge__empty" id="agent-recharge-status">正在加载套餐…</div>
+  <div class="agent-recharge__status" id="agent-recharge-status">正在加载套餐…</div>
   <form class="layui-form" method="post" action="{:url('agent/order')}" id="agent-recharge-form" style="display:none;">
     {:token_field()}
-    <div class="layui-form-item">
-      <label class="layui-form-label">积分套餐</label>
-      <div class="layui-input-block">
-        <select name="package_id" lay-filter="agent-package" lay-verify="required" id="agent-recharge-package"></select>
-      </div>
-    </div>
-    <div class="agent-recharge__summary">
-      <p>AI 积分：<span id="agent-recharge-points"></span> 积分</p>
-      <p>支付金额：<strong class="agent-recharge__price" id="agent-recharge-price"></strong></p>
-    </div>
-    <div class="layui-form-item">
-      <label class="layui-form-label">支付方式</label>
-      <div class="layui-input-block" id="agent-recharge-paytypes"></div>
-    </div>
+    <input type="hidden" name="package_id" id="agent-recharge-package">
+    <input type="hidden" name="paytype" id="agent-recharge-paytype">
+    <div class="agent-recharge__packages" id="agent-recharge-packages" role="group" aria-label="选择积分套餐"></div>
     <div class="layui-form-item layer-footer hide">
-      <div class="layui-input-block">
-        <button type="submit" class="layui-btn btn-theme-color" lay-submit lay-filter="agent-recharge-submit" disabled>立即支付</button>
+      <div style="display:flex;justify-content:flex-end;">
+        <button type="submit" class="layui-btn btn-theme-color" style="min-width:140px;height:40px;border-radius:6px;" lay-submit lay-filter="agent-recharge-submit" disabled>立即支付</button>
       </div>
     </div>
   </form>
@@ -41,28 +44,26 @@
   layui.use(['badou', 'form'], function () {
     var $ = layui.jquery;
     var badou = layui.badou;
-    var form = layui.form;
     var $form = $('#agent-recharge-form');
     var $status = $('#agent-recharge-status');
+    var $packages = $form.find('#agent-recharge-packages');
     var packages = [];
 
-    function renderPackage(id) {
+    function selectPackage(id) {
       var item = packages.find(function (item) { return item.id === id; });
       if (!item) return;
-      $form.find('#agent-recharge-points').text(Number(item.points || 0).toLocaleString());
-      $('#agent-recharge-price').text('￥' + item.price);
-      var $paytypes = $('#agent-recharge-paytypes').empty();
       var methods = item.paytypes || [];
-      methods.forEach(function (method, index) {
-        $paytypes.append($('<input type="radio" name="paytype">')
-          .val(method).attr('title', method === 'alipay' ? '支付宝' : '微信支付').prop('checked', index === 0));
+      $form.find('#agent-recharge-package').val(item.id);
+      $form.find('#agent-recharge-paytype').val(methods.indexOf('alipay') !== -1 ? 'alipay' : (methods[0] || ''));
+      $packages.find('.agent-recharge__package').each(function () {
+        var selected = $(this).attr('data-package-id') === id;
+        $(this).toggleClass('is-selected', selected).attr('aria-pressed', String(selected));
       });
-      if (!methods.length) $paytypes.text('支付方式尚未开放');
       $form.find('button[type="submit"]').prop('disabled', !methods.length);
-      form.render();
+      $status.text('支付方式尚未开放').toggle(!methods.length);
     }
 
-    form.on('select(agent-package)', function (data) { renderPackage(data.value); });
+    $packages.on('click', '.agent-recharge__package', function () { selectPackage($(this).attr('data-package-id')); });
     layui.bdForm.api.bindevent($form, function (data) {
       badou.api.close(data);
       return false;
@@ -83,13 +84,21 @@
         $status.text('AI 积分套餐尚未开放');
         return false;
       }
-      var $select = $('#agent-recharge-package').empty();
+      $packages.empty();
       packages.forEach(function (item) {
-        $select.append($('<option>').val(item.id).text(item.name));
+        var price = Number(item.price || 0).toLocaleString(undefined, { maximumFractionDigits: 2 });
+        var points = Number(item.points || 0).toLocaleString(undefined, { maximumFractionDigits: 0 });
+        var $card = $('<button type="button" class="agent-recharge__package" aria-pressed="false">')
+          .attr('data-package-id', item.id).attr('aria-label', item.name + '，' + price + '元，' + points + '积分');
+        var $points = $('<span class="agent-recharge__points">')
+          .append($('<span class="agent-recharge__points-value">').text(points))
+          .append($('<span class="agent-recharge__points-unit">').text('积分'));
+        var $price = $('<span class="agent-recharge__price">').append($('<span class="agent-recharge__currency">').text('￥')).append(document.createTextNode(price));
+        $card.append($points).append($price);
+        $packages.append($card);
       });
-      $status.hide();
       $form.show();
-      renderPackage(packages[0].id);
+      selectPackage(packages[0].id);
       return false;
     }, function (data) {
       if (data && data.need_login) {

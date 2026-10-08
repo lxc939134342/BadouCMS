@@ -174,9 +174,9 @@ CMS 的 `agent/config.php` 通过 `resident_tools` 为后台总助手和 CMS 专
 
 后台总助手和 CMS 专属助手均常驻语言复制、手动翻译和 `cms_language_task_preview`、`cms_language_task_start`、`cms_language_task_status`，避免下一轮模型根据历史直接调用时工具尚未加载。批量翻译默认提交整项后台任务；复制后翻译使用 `copy_first=true`，只确认一次，内部批次自动保存。仅明确要求逐批审阅时使用手动翻译工具。只复制栏目使用 `include_content=false`、`include_settings=false`，任务使用 `kind=categories`。仍受模块启用状态和后台权限过滤。
 
-后台总助手和 CMS 专属助手均常驻 `attachment_search`、`attachment_read_text`，受 `general.attachment/index` 权限过滤。上传接口返回附件 ID，正文工具的 `attachment` 接受该 ID 的字符串或已注册的 `/uploads/` 地址。读取本地 `.docx` 的正文、段落和表格文字，每次默认 12000 字，最多 16000 字；`has_more=true` 时按 `next_offset` 继续读取。不会自动导入图片、页眉页脚和 Word 排版，旧版 `.doc` 需另存为 `.docx`。该工具使用 PHP zip、xmlreader 扩展（现有 PhpSpreadsheet 的依赖），兼容 FPM，不需要 CLI 或新增数据库表。
+后台总助手和 CMS 专属助手均常驻 `attachment_search`、`attachment_read_text`，受 `general.attachment/index` 权限过滤。上传接口返回附件 ID，正文工具的 `attachment` 接受该 ID 的字符串或已注册的 `/uploads/` 地址。支持本地 Word `.doc`（Word 97–2003）、`.docx` 的正文、段落和表格文字，以及 Excel `.xls`、`.xlsx`、`.csv` 的多个工作表和行列文字，每次默认 12000 字，最多 16000 字；`has_more=true` 时按 `next_offset` 继续读取。不会自动导入图片、页眉页脚和 Word 排版；旧版 `.doc` 直接按二进制文本块提取正文，无需转换，不还原表格布局或区分修订状态，拒绝加密、损坏或 Word 97 之前的文件。Excel 保留日期等显示格式和公式原文，不执行公式、宏或外部链接；CSV 支持 UTF-8 与 GBK。助手必须实际调用工具后根据返回结果判断能否读取，不能根据历史回复猜测格式或版本是否支持。该工具使用 PHP zip、xmlreader 扩展及现有 PhpSpreadsheet，兼容 FPM，不需要 CLI 或新增数据库表。
 
-附件正文读取独立于 `source_read` 的代码访问策略：必须存在附件记录，只允许本地上传目录内的真实文件，不接受外部 URL、路径越界或越界软链接；同时限制压缩包正文大小并禁止 XML 外部实体。CMS 场景只增加这两个只读附件工具，不开放源码工具。读到正文后，再调用现有 CMS 工具和审批流程写入内容，不能仅根据文件名声称已读取或已保存。
+附件正文读取独立于 `source_read` 的代码访问策略：必须存在附件记录，只允许本地上传目录内的真实文件，不接受外部 URL、路径越界或越界软链接；同时限制压缩包正文大小并禁止 XML 外部实体。Excel 文件最多 20 MB，工作表最多 50 张，合计数据范围最多 100000 个单元格，提取文字最多 8 MB；超限时要求拆分，不默默截断。CMS 场景只增加这两个只读附件工具，不开放源码工具。读到正文后，再调用现有 CMS 工具和审批流程写入内容，不能仅根据文件名声称已读取或已保存。
 
 工具定义可提供只读的 `approval_display(context, inputs)` 回调，用当前数据生成审批摘要。公共层仅调用已授权工具的回调，详情失效时返回错误提示；原生审批参数不变，浏览器仍只提交决策。CMS 复制卡展示实际范围与数量，翻译卡展示原文/译文；内部校验标识保留在折叠参数详情中。
 
