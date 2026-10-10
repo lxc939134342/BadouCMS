@@ -28,7 +28,7 @@
                                     <button type="button" id="upload-avatar" class="upload" data-input-id="c-avatar">
                                         上传
                                     </button>
-                                    <input type="hidden" id="c-avatar" name="avatar" value="{$user.avatar}" />
+                                    <input type="hidden" id="c-avatar" name="avatar" value="{:htmlentities($user->getData('avatar') ?? '')}" />
                                 </div>
                             </div>
                         </div>
