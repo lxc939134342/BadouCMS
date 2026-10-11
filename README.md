@@ -23,6 +23,8 @@
 
 ### 官网地址
 
+部署文档：[AI Agent 宝塔安装与 FPM／CLI 使用](docs/AI-Agent-宝塔部署.md)、[当前框架 Docker 部署](docs/Docker部署.md)。Docker 配置入口为项目根目录 `compose.yaml`。
+
 http://www.badoucms.com/
 
 ### 演示站点

@@ -1,0 +1,4 @@
+*
+!Dockerfile
+!php.ini
+!php-fpm.conf
