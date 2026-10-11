@@ -14,7 +14,7 @@
  Date: 04/07/2025 07:32:55
 */
 
-SET NAMES utf8mb4;
+SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci;
 SET FOREIGN_KEY_CHECKS = 0;
 
 -- ----------------------------
@@ -38,7 +38,7 @@ CREATE TABLE `bd_admin` (
   `status` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'normal' COMMENT '状态',
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='管理员表';
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='管理员表';
 
 -- ----------------------------
 -- Records of bd_admin
@@ -62,7 +62,7 @@ CREATE TABLE `bd_admin_group` (
   `update_time` bigint(16) DEFAULT NULL COMMENT '更新时间',
   `status` varchar(30) DEFAULT '' COMMENT '状态',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COMMENT='分组表';
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='分组表';
 
 -- ----------------------------
 -- Records of bd_admin_group
@@ -83,7 +83,7 @@ CREATE TABLE `bd_admin_group_access` (
   UNIQUE KEY `uid_group_id` (`uid`,`group_id`),
   KEY `uid` (`uid`),
   KEY `group_id` (`group_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='权限分组表';
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='权限分组表';
 
 -- ----------------------------
 -- Records of bd_admin_group_access
@@ -139,7 +139,7 @@ CREATE TABLE `bd_admin_rule` (
   UNIQUE KEY `name` (`name`) USING BTREE,
   KEY `pid` (`pid`),
   KEY `weigh` (`weigh`)
-) ENGINE=InnoDB AUTO_INCREMENT=1916 DEFAULT CHARSET=utf8mb4 COMMENT='节点表';
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC AUTO_INCREMENT=1916 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='节点表';
 
 -- ----------------------------
 -- Records of bd_admin_rule
@@ -280,7 +280,7 @@ CREATE TABLE `bd_attachment` (
   `storage` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'local' COMMENT '存储位置',
   `sha1` varchar(40) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '文件 sha1编码',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=173 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='附件表';
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC AUTO_INCREMENT=173 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='附件表';
 
 -- ----------------------------
 -- Records of bd_attachment
@@ -375,7 +375,7 @@ CREATE TABLE `bd_ems` (
   `ip` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT 'IP',
   `create_time` bigint(16) DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='邮箱验证码表';
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='邮箱验证码表';
 
 -- ----------------------------
 -- Records of bd_ems
@@ -399,7 +399,7 @@ CREATE TABLE `bd_migrations` (
   `end_time` timestamp NULL DEFAULT NULL,
   `breakpoint` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`version`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ----------------------------
 -- Records of bd_migrations
@@ -420,7 +420,7 @@ CREATE TABLE `bd_sms` (
   `ip` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT 'IP',
   `create_time` bigint(16) unsigned DEFAULT '0' COMMENT '创建时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='短信验证码表';
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='短信验证码表';
 
 -- ----------------------------
 -- Records of bd_sms
@@ -501,7 +501,7 @@ CREATE TABLE `bd_user` (
   KEY `username` (`username`),
   KEY `email` (`email`),
   KEY `mobile` (`mobile`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COMMENT='会员表';
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员表';
 
 -- ----------------------------
 -- Records of bd_user
@@ -525,7 +525,7 @@ CREATE TABLE `bd_user_group` (
   `update_time` bigint(20) DEFAULT NULL COMMENT '更新时间',
   `status` enum('normal','hidden') DEFAULT NULL COMMENT '状态',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COMMENT='会员组表';
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员组表';
 
 -- ----------------------------
 -- Records of bd_user_group
@@ -550,7 +550,7 @@ CREATE TABLE `bd_user_level` (
   `update_time` datetime NOT NULL,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE KEY `user_level_gcode` (`gcode`) USING BTREE
-) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='会员等级';
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci ROW_FORMAT=DYNAMIC COMMENT='会员等级';
 
 -- ----------------------------
 -- Records of bd_user_level
@@ -574,7 +574,7 @@ CREATE TABLE `bd_user_money_log` (
   `memo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '备注',
   `createtime` bigint(16) DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员余额变动表';
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员余额变动表';
 
 -- ----------------------------
 -- Records of bd_user_money_log
@@ -606,7 +606,7 @@ CREATE TABLE `bd_user_rule` (
   `weigh` int(11) DEFAULT '0' COMMENT '权重',
   `status` enum('normal','hidden') DEFAULT NULL COMMENT '状态',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COMMENT='会员规则表';
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员规则表';
 
 -- ----------------------------
 -- Records of bd_user_rule
@@ -639,7 +639,7 @@ CREATE TABLE `bd_user_score_log` (
   `memo` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT '' COMMENT '备注',
   `createtime` bigint(16) DEFAULT NULL COMMENT '创建时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员积分变动表';
+) ENGINE=InnoDB ROW_FORMAT=DYNAMIC AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='会员积分变动表';
 
 -- ----------------------------
 -- Records of bd_user_score_log
