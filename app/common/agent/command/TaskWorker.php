@@ -25,6 +25,11 @@ class TaskWorker extends Command
 
     protected function execute(Input $input, Output $output)
     {
+        if (!\modules\aiagent\library\Runtime::enabled()) {
+            $output->error('AI 后台助手插件未启用');
+            return 1;
+        }
+        \modules\aiagent\library\Runtime::boot();
         $this->prepareRuntime();
         
         if (function_exists('set_time_limit')) {
@@ -44,7 +49,7 @@ class TaskWorker extends Command
         if ($input->getOption('watch')) {
             $output->writeln('守护进程模式启动，等待任务...');
             
-            while (true) {
+            while (\modules\aiagent\library\Runtime::enabled()) {
                 $taskId = AgentTask::fetchNextId();
                 
                 if ($taskId) {

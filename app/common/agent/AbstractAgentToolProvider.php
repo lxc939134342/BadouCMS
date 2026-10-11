@@ -15,4 +15,13 @@ abstract class AbstractAgentToolProvider implements AgentToolProviderInterface
     {
         return [];
     }
+
+    /**
+     * 后台助手首页的能力卡片，默认不展示。
+     * 结构：['title' => '', 'icon' => 'fa-*', 'description' => '', 'prompts' => [['text' => '', 'tools' => ['工具名']]]]
+     */
+    public function showcase(): array
+    {
+        return [];
+    }
 }

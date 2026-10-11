@@ -13,6 +13,17 @@ class ModuleToolProvider extends AbstractAgentToolProvider
         return '插件管理：module_list 只看【已安装】插件，用户问“该用什么插件/有没有某功能插件”时必须先用 module_store 搜插件市场，不要只凭已安装列表就下结论，也不要凭猜测的插件名反复调用 module_info（查不到会浪费时间）；推荐“建站要装哪些插件”这类整体方案时，可用 module_store 传空关键词拿全量描述（来自本地缓存，不会重复请求）；用户问“做什么行业的网站/该用什么模板”时，也优先用 module_store 搜市场（type=template 是付费模版、type=vip_template 是 VIP 模版，可用行业词如“五金/机械/纺织”搜简介匹配），价格和 type_text 会告诉你免费/付费/VIP；module_info 看详情（已安装看本地，未安装看市场缓存）、module_config 读或改配置、module_tables 看数据表；回答插件问题时只能使用工具返回的字段和简介原文，不要新增或编造“依赖/必装前提”等字段，不要使用资料里没出现的插件名，简介里的“需安装 XX”只是说明而非硬依赖；安装(module_install)、卸载(module_uninstall)、启用/禁用(module_toggle)、升级(module_upgrade)、导入测试数据(module_import_testdata) 这些写操作必须真正调用对应工具并以工具返回为准：先向用户复述、传 confirm=true，由系统请求人工审批后执行；禁用插件不需要官方账号，启用/安装/卸载/升级/导入需要站点已登录badoucms官方账号。用户回复“确认/同意”时，你必须立刻调用对应工具，不能只口头确认；只有在工具成功返回后（例如 module_toggle 返回 toggled=true 和 state_text）才能对用户说已完成，并按 state_text 复述真实状态；不确定就重新调用 module_list 查看真实状态。绝对禁止在没有工具成功返回的情况下声称已禁用/已启用/已安装。';
     }
 
+    public function showcase(): array
+    {
+        return [
+            'title' => '插件管理', 'icon' => 'fa-puzzle-piece', 'description' => '查看已装插件功能，搜索插件市场',
+            'prompts' => [
+                ['text' => '已安装插件有哪些可以通过 AI 操作的功能？', 'tools' => ['module_capabilities']],
+                ['text' => '列出已安装的插件', 'tools' => ['module_list']],
+            ],
+        ];
+    }
+
     public function agentTools(): array
     {
         $modules = new ModuleAgentService();

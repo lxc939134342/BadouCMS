@@ -12,6 +12,16 @@ class CrudToolProvider extends AbstractAgentToolProvider
         return '用户要求设计数据表或创建后台管理功能时使用 crud_design_info 查看类型与命名规则，根据业务需求设计 fields（包含自增 id、必要业务字段和时间字段），调用 crud_preview 展示方案，再以完全相同的参数和 snapshot 调用 crud_generate 等待批准。直接调用项目 CRUD 生成器，不通过代码编辑工具手写 CRUD。不覆盖已有表或文件，不猜测业务必需字段，需求不清楚时先询问。只有生成工具成功才报告已创建。';
     }
 
+    public function showcase(): array
+    {
+        return [
+            'title' => '一键 CRUD', 'icon' => 'fa-table', 'description' => '描述业务需求，生成数据表和后台管理功能',
+            'prompts' => [
+                ['text' => '帮我设计一个客户管理功能，包含姓名、电话和备注', 'tools' => ['crud_design_info', 'crud_preview']],
+            ],
+        ];
+    }
+
     public function agentTools(): array
     {
         $properties = [

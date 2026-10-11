@@ -10,7 +10,17 @@ class CodeToolProvider extends AbstractAgentToolProvider
 {
     public function guidelines(): string
     {
-        return '遇到用户粘贴的报错：先用 log_tail 看最新日志；需要定位文件时用 source_find 按文件名或路径搜索（不要凭记忆猜路径），再用 source_read 读源码定位原因；需要改代码时用 source_edit 生成改动（old_string 必须与源码逐字一致且在文件中唯一，改前务必先 source_read 确认），并提示用户在改动卡片上点“批准”应用；只有用户开启“自动批准”时才会先自审再自动应用。用户反馈改错了就用 source_rollback 回退。可修改范围由 config/agent.php 配置，不确定先用 source_policy 检查。代码读写仅超级管理员可用。';
+        return '遇到用户粘贴的报错：先用 log_tail 看最新日志；需要定位文件时用 source_find 按文件名或路径搜索（不要凭记忆猜路径），再用 source_read 读源码定位原因；需要改代码时用 source_edit 生成改动（old_string 必须与源码逐字一致且在文件中唯一，改前务必先 source_read 确认），并提示用户在改动卡片上点“批准”应用；只有用户开启“自动批准”时才会先自审再自动应用。用户反馈改错了就用 source_rollback 回退。可修改范围在根目录 config/agent.php 中配置，不确定先用 source_policy 检查。代码读写仅超级管理员可用。';
+    }
+
+    public function showcase(): array
+    {
+        return [
+            'title' => '排查问题', 'icon' => 'fa-bug', 'description' => '查看错误日志，定位相关源码',
+            'prompts' => [
+                ['text' => '看看最近的错误日志有什么问题', 'tools' => ['log_tail']],
+            ],
+        ];
     }
 
     public function agentTools(): array
@@ -80,7 +90,7 @@ class CodeToolProvider extends AbstractAgentToolProvider
             [
                 'name' => 'source_policy',
                 'label' => '查看可修改规则',
-                'description' => '查看 Agent 可修改文件的规则（允许的后缀、禁止的目录/文件），或检查某个文件能否被修改。规则在 config/agent.php 里配置。',
+                'description' => '查看 Agent 可修改文件的规则（允许的后缀、禁止的目录/文件），或检查某个文件能否被修改。规则在根目录 config/agent.php 中配置。',
                 'permission' => 'auth.rule/index',
                 'properties' => [
                     ['name' => 'file', 'type' => 'string', 'description' => '可选：要检查的文件路径；留空则只返回规则'],

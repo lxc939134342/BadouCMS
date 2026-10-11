@@ -10,24 +10,50 @@ class AgentToolRegistry
 {
     public function available(AgentContext $context, AgentToolExecutor $executor, string $scene = 'admin', array $modules = ['*']): array
     {
-        if ($modules === []) return [];
+        return array_values($this->gather($context, $executor, $scene, $modules)[0]);
+    }
+
+    /** 首页能力卡片：只保留依赖工具全部可用的示例，没有示例的卡片不展示。 */
+    public function showcases(AgentContext $context, AgentToolExecutor $executor, string $scene = 'admin', array $modules = ['*']): array
+    {
+        [$tools, $cards] = $this->gather($context, $executor, $scene, $modules, true);
+        $names = array_keys($tools);
+        $result = [];
+        foreach ($cards as $card) {
+            $prompts = [];
+            foreach ($card['prompts'] as $prompt) {
+                if (array_diff($prompt['tools'], $names) === []) $prompts[] = $prompt['text'];
+            }
+            if ($prompts === []) continue;
+            $result[] = ['module' => $card['module'], 'title' => $card['title'], 'icon' => $card['icon'],
+                'description' => $card['description'], 'prompts' => $prompts];
+        }
+        return $result;
+    }
+
+    /** @return array{0: array<string, array>, 1: array<int, array>} */
+    private function gather(AgentContext $context, AgentToolExecutor $executor, string $scene, array $modules, bool $withShowcases = false): array
+    {
+        if ($modules === []) return [[], []];
         $available = [];
+        $cards = [];
         if (in_array('*', $modules, true) || in_array('core', $modules, true)) {
-            $available = $this->collect($this->coreProviders(), 'core', $scene, $context, $executor);
+            [$available, $cards] = $this->collect($this->coreProviders(), 'core', $scene, $context, $executor, $withShowcases);
         }
         foreach ($this->modules() as $module) {
             $name = (string)$module['name'];
             if ((int)($module['state'] ?? 0) !== 1 || (!in_array('*', $modules, true) && !in_array($name, $modules, true))) continue;
             try {
-                $tools = $this->collect($this->moduleProviders($name), $name, $scene, $context, $executor);
+                [$tools, $moduleCards] = $this->collect($this->moduleProviders($name), $name, $scene, $context, $executor, $withShowcases);
                 if (array_intersect_key($available, $tools) !== []) throw new \LogicException('Agent 工具名称重复');
                 $available += $tools;
+                $cards = array_merge($cards, $moduleCards);
             } catch (\Throwable $e) {
                 // 一个插件注册失败只隔离该插件，不影响其他插件和后台助手。
                 Log::error('Agent 插件工具注册失败：模块={module}，异常={type}', ['module' => $name, 'type' => $e::class]);
             }
         }
-        return array_values($available);
+        return [$available, $cards];
     }
 
     protected function modules(): array { return Server::getInstalldModuleList(); }
@@ -73,14 +99,27 @@ class AgentToolRegistry
         return array_map(fn ($file) => app()->make(__NAMESPACE__ . '\\tools\\' . basename($file, '.php')), $files);
     }
 
-    private function collect(array $providers, string $module, string $scene, AgentContext $context, AgentToolExecutor $executor): array
+    private function collect(array $providers, string $module, string $scene, AgentContext $context, AgentToolExecutor $executor, bool $withShowcases): array
     {
         $tools = [];
+        $cards = [];
         $names = [];
         foreach ($providers as $provider) {
             $definitions = $provider instanceof AgentToolProviderInterface ? $provider->agentTools() : [$provider];
             $guidelines = $provider instanceof AbstractAgentToolProvider ? $provider->guidelines() : '';
             $residentTools = $provider instanceof AbstractAgentToolProvider ? $provider->residentTools() : [];
+            if ($withShowcases && $provider instanceof AbstractAgentToolProvider) {
+                // 展示配置独立隔离，卡片异常不能导致该组工具失效。
+                try {
+                    $showcase = $provider->showcase();
+                    if ($showcase !== []) {
+                        $card = $this->showcaseCard($showcase, $module);
+                        if ($card !== null) $cards[] = $card;
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('Agent 能力卡片加载失败：模块={module}，异常={type}', ['module' => $module, 'type' => $e::class]);
+                }
+            }
             foreach ($definitions as $tool) {
                 if ($tool instanceof AbstractAgentTool) $tool = $tool->definition();
                 elseif ($tool instanceof AgentToolInterface) $tool = [
@@ -107,6 +146,36 @@ class AgentToolRegistry
                 if (in_array($scene, $tool['scenes'], true) && $executor->allowed($tool, $context)) $tools[$tool['name']] = $tool;
             }
         }
-        return $tools;
+        return [$tools, $cards];
+    }
+
+    /** 展示信息不影响工具注册：格式错误只丢弃该卡片并记录日志。 */
+    private function showcaseCard(array $showcase, string $module): ?array
+    {
+        $title = $showcase['title'] ?? null;
+        $icon = $showcase['icon'] ?? 'fa-cube';
+        $description = $showcase['description'] ?? '';
+        $prompts = $showcase['prompts'] ?? null;
+        $valid = is_string($title) && trim($title) !== '' && mb_strlen($title) <= 20
+            && is_string($icon) && preg_match('/^fa-[a-z0-9-]{1,40}$/D', $icon)
+            && is_string($description) && mb_strlen($description) <= 80
+            && is_array($prompts) && $prompts !== [] && count($prompts) <= 4;
+        $items = [];
+        foreach ($valid ? $prompts : [] as $prompt) {
+            $text = is_array($prompt) ? ($prompt['text'] ?? null) : null;
+            $needs = is_array($prompt) ? ($prompt['tools'] ?? null) : null;
+            if (!is_string($text) || trim($text) === '' || mb_strlen($text) > 120 || !is_array($needs) || $needs === []
+                || array_filter($needs, static fn ($name) => is_string($name)
+                    && preg_match('/^[a-zA-Z0-9_-]{1,64}$/D', $name)) !== $needs) {
+                $valid = false;
+                break;
+            }
+            $items[] = ['text' => trim($text), 'tools' => array_values($needs)];
+        }
+        if (!$valid) {
+            Log::warning('Agent 能力卡片配置无效：模块={module}', ['module' => $module]);
+            return null;
+        }
+        return ['module' => $module, 'title' => $title, 'icon' => $icon, 'description' => $description, 'prompts' => $items];
     }
 }

@@ -1,7 +1,7 @@
 <?php
 
 // Agent 代码改动工具（source_read / source_edit / source_find）的访问策略。
-// 在这里增删允许修改的文件后缀、禁止访问的目录前缀和文件名即可，改完即时生效。
+// 在这里增删允许修改的文件后缀、禁止访问的目录前缀和文件名即可。
 return [
     // 默认实时输出文字；工具参数不完整时由模型提供器校验并尝试一次普通响应恢复。
     // 仅在网关不支持流式响应时设为 false，此时文字会等完整回答生成后显示。
@@ -22,6 +22,7 @@ return [
         // 禁止 Agent 访问（读与写）的目录前缀，相对项目根目录
         'deny_prefix' => [
             'vendor/',
+            'modules/aiagent/vendor/',
             'config/',
             'runtime/',
             'node_modules/',

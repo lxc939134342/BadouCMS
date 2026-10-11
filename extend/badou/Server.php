@@ -269,6 +269,7 @@ class Server
 
         // 解压模块压缩包
         try {
+            self::assertPluginFilesAllowed($zip->getListFiles());
             $zip->extractTo($dir);
         } catch (ZipException $e) {
             throw new Exception('Unable to extract the file');
@@ -316,6 +317,7 @@ class Server
         // 解压模块压缩包
         try {
             $fileList = $zip->getListFiles();
+            self::assertPluginFilesAllowed($fileList);
             foreach ($fileList as $file) {
                 $destPath = $dir . $file;
                 if ($ignoreList && self::isIgnoreDirs($ignoreList, $file)) {
@@ -425,6 +427,7 @@ class Server
         if (!$name || !is_dir(MODULE_PATH . $name)) {
             throw new Exception(__('Module not exists'));
         }
+        self::getGlobalFiles($name);
         $moduleClass = self::getModuleClass($name);
         if (!$moduleClass) {
             throw new Exception(__("The module file does not exist"));
@@ -635,6 +638,8 @@ class Server
             throw new Exception(__('Module not exists'));
         }
 
+        // 先检查文件权限，强制覆盖和官网授权都不能放行框架核心配置。
+        self::getGlobalFiles($name);
         $uid = $extend['uid'];
         if (!$uid) {
             throw new Exception(__('Please log in to Badou official website first'));
@@ -989,6 +994,7 @@ class Server
      */
     public static function getGlobalFiles($name, $onlyconflict = false)
     {
+        self::assertPluginFilesAllowed((array)(self::config($name)['files'] ?? []));
         $list = [];
         $moduleDir = self::getModuleDir($name);
         $checkDirList = self::getCheckDirs();
@@ -1017,6 +1023,7 @@ class Server
                     } else {
                         $path = str_replace($moduleDir, '', $filePath);
                     }
+                    self::assertPluginFilesAllowed([$path]);
                     if ($onlyconflict) {
                         $destPath = root_path() . $path;
                         if (is_file($destPath)) {
@@ -1240,10 +1247,28 @@ class Server
     {
         return [
             'app',
+            'config',
             'public',
             'template',
             'public/modules'
         ];
+    }
+
+    private static function assertPluginFilesAllowed(array $files): void
+    {
+        // 同时检查安装包、磁盘文件与归属清单，防止启停时覆盖或删除核心配置。
+        foreach ($files as $file) {
+            $parts = [];
+            foreach (explode('/', str_replace('\\', '/', (string)$file)) as $part) {
+                if ($part === '' || $part === '.') continue;
+                if ($part === '..') { array_pop($parts); continue; }
+                $parts[] = strtolower($part);
+            }
+            $path = implode('/', $parts);
+            if (in_array($path, ['config/app.php', 'config/badouadmin.php'], true)) {
+                throw new Exception('插件禁止写入或替换框架配置：' . $path);
+            }
+        }
     }
 
     /**

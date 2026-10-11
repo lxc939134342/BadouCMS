@@ -9,15 +9,20 @@
     --agent-primary-pale: #F6F8FF;
     --agent-primary-border: #DCE4FA;
     --agent-ink: #27334F;
-    --agent-muted: #7D89A3;
+    --agent-muted: #69778E;
     box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
     display: grid;
-    grid-template-columns: 238px minmax(0, 1fr);
-    height: 100%;
+    position: fixed;
+    inset: 0;
+    grid-template-columns: 76px 248px minmax(0, 1fr);
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
     min-height: 0;
     overflow: hidden;
-    border: 1px solid #E3E8F5;
-    border-radius: 10px;
+    border: 0;
+    border-radius: 0;
     background: #fff;
   }
 
@@ -43,18 +48,108 @@
     background: #F7F8FC;
   }
 
-  .geo-agent-demo__side-head {
-    padding: 18px 14px 12px;
+  .geo-agent-demo__rail {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    min-height: 0;
+    padding: 20px 8px 14px;
+    border-right: 1px solid #E5EAF2;
+    background: #F7F9FC;
   }
 
-  .geo-agent-demo__side-head .layui-btn {
-    width: 100%;
+  .geo-agent-demo__brand {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    margin-bottom: 14px;
+    border-radius: 11px;
+    background: var(--agent-primary);
+    color: #fff;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .geo-agent-demo__nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: 58px;
+    min-height: 54px;
+    padding: 8px 0;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--agent-muted);
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  .geo-agent-demo__nav i {
+    font-size: 18px;
+  }
+
+  .geo-agent-demo__nav:hover,
+  .geo-agent-demo__nav[aria-pressed="true"],
+  .geo-agent-demo__nav[aria-expanded="true"] {
+    background: var(--agent-primary-soft);
+    color: var(--agent-primary-deep);
+  }
+
+  .geo-agent-demo__nav--account {
+    margin-top: auto;
+  }
+
+  .geo-agent-demo__side-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 20px 16px 10px;
+    color: var(--agent-ink);
+    font-size: 14px;
+    font-weight: 600;
   }
 
   .geo-agent-demo__side-title {
-    padding: 10px 16px;
+    padding: 8px 16px 12px;
     color: var(--agent-muted);
     font-size: 12px;
+  }
+
+  .geo-agent-demo__sessions-collapse {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--agent-muted);
+    cursor: pointer;
+  }
+
+  .geo-agent-demo__sessions-collapse:hover {
+    background: var(--agent-primary-soft);
+    color: var(--agent-primary-deep);
+  }
+
+  .geo-agent-demo.is-session-collapsed {
+    grid-template-columns: 76px 0 minmax(0, 1fr);
+  }
+
+  .geo-agent-demo.is-session-collapsed .geo-agent-demo__side {
+    visibility: hidden;
+    overflow: hidden;
+  }
+
+  .geo-agent-demo__history-shade {
+    display: none;
   }
 
   .geo-agent-demo__sessions {
@@ -190,51 +285,208 @@
   }
 
   .geo-agent-demo__main {
+    position: relative;
     display: flex;
     flex-direction: column;
     min-width: 0;
     min-height: 0;
   }
 
-  .geo-agent-demo__messages {
+  .geo-agent-demo__messages,
+  .geo-agent-demo__page {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
-    padding: 22px max(20px, calc((100% - 820px) / 2));
+    padding: 28px max(28px, calc((100% - 1060px) / 2));
+    padding-bottom: calc(var(--agent-composer-height, 150px) + 16px);
+    scroll-padding-bottom: var(--agent-composer-height, 150px);
+  }
+
+  .geo-agent-demo [hidden] {
+    display: none !important;
   }
 
   .geo-agent-demo__welcome {
-    max-width: 660px;
-    margin: 12vh auto 0;
-    text-align: center;
+    width: 100%;
+    max-width: 1060px;
+    box-sizing: border-box;
+    margin: 12px auto 0;
+  }
+
+  .geo-agent-demo__welcome-hero {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 12px 0 26px;
+  }
+
+  .geo-agent-demo__welcome-mark {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: var(--agent-primary-soft);
+    color: var(--agent-primary);
+    font-size: 28px;
+  }
+
+  .geo-agent-demo__all-features {
+    padding: 4px 0;
+    border: 0;
+    background: transparent;
+    color: var(--agent-primary);
+    font-size: 13px;
+    cursor: pointer;
   }
 
   .geo-agent-demo__welcome h2 {
-    margin-bottom: 12px;
+    margin: 0 0 10px;
     color: var(--agent-ink);
-    font-size: 22px;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: .5px;
   }
 
   .geo-agent-demo__welcome p {
-    color: var(--agent-muted);
+    margin: 0;
+    color: #687998;
+    font-size: 13px;
     line-height: 1.8;
   }
 
-  .geo-agent-demo__examples {
+  .geo-agent-demo__capabilities-head {
     display: flex;
-    justify-content: center;
-    gap: 8px;
+    align-items: baseline;
+    justify-content: space-between;
     flex-wrap: wrap;
-    margin-top: 22px;
+    gap: 6px 12px;
+    margin: 10px 0 16px;
+  }
+
+  .geo-agent-demo__capabilities-head h3 {
+    margin: 0;
+    color: var(--agent-ink);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .geo-agent-demo__cards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    text-align: left;
+  }
+
+  .geo-agent-demo__card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding: 20px;
+    border: 1px solid #E3E8F5;
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  .geo-agent-demo__card-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .geo-agent-demo__card-icon {
+    display: inline-flex;
+    flex: 0 0 36px;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: var(--agent-primary-soft);
+    color: var(--agent-primary);
+    font-size: 20px;
+  }
+
+  .geo-agent-demo__card h4 {
+    margin: 0;
+    color: var(--agent-ink);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .geo-agent-demo__welcome .geo-agent-demo__card p {
+    margin: 10px 0 16px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .geo-agent-demo__card-prompts {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: auto;
   }
 
   .geo-agent-demo__example {
-    padding: 8px 12px;
-    border: 1px solid var(--agent-primary-border);
-    border-radius: 7px;
-    background: #fff;
-    color: var(--agent-primary-deep);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: #F7F8FC;
+    color: #4B5B78;
+    font-size: 12px;
+    line-height: 1.6;
+    text-align: left;
     cursor: pointer;
+    overflow-wrap: anywhere;
+  }
+
+  .geo-agent-demo__example i {
+    flex-shrink: 0;
+    color: var(--agent-primary);
+  }
+
+  .geo-agent-demo__example:hover:not(:disabled) {
+    border-color: var(--agent-primary-border);
+    background: var(--agent-primary-soft);
+    color: var(--agent-primary-deep);
+  }
+
+  .geo-agent-demo__example:focus-visible,
+  .geo-agent-demo__nav:focus-visible,
+  .geo-agent-demo__all-features:focus-visible,
+  .geo-agent-demo__sessions-collapse:focus-visible {
+    outline: 2px solid var(--agent-primary);
+    outline-offset: 2px;
+  }
+
+  .geo-agent-demo__example:disabled {
+    color: var(--agent-muted);
+    cursor: not-allowed;
+  }
+
+  .geo-agent-demo__welcome .geo-agent-demo__welcome-tip {
+    margin-top: 16px;
+    font-size: 12px;
+  }
+
+  .geo-agent-demo__welcome .geo-agent-demo__welcome-status {
+    margin-top: 10px;
+    color: var(--agent-primary-deep);
+    font-size: 12px;
+  }
+
+  .geo-agent-demo__welcome-empty {
+    margin-top: 24px;
+    padding: 20px;
+    border: 1px dashed var(--agent-primary-border);
+    border-radius: 10px;
   }
 
   .geo-agent-demo__turn {
@@ -501,9 +753,19 @@
   }
 
   .geo-agent-demo__composer {
-    flex-shrink: 0;
-    padding: 12px max(20px, calc((100% - 820px) / 2)) 16px;
-    border-top: 1px solid #E8EBF4;
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 10;
+    padding: 16px max(28px, calc((100% - 1060px) / 2)) calc(20px + env(safe-area-inset-bottom));
+    border: 0;
+    background: transparent;
+    pointer-events: none;
+  }
+
+  .geo-agent-demo__composer > * {
+    pointer-events: auto;
   }
 
   .geo-agent-demo__box {
@@ -512,12 +774,13 @@
     border-radius: 14px;
     background: #fff;
     padding: 6px 8px 8px;
+    box-shadow: 0 8px 28px rgba(39, 51, 79, .1);
     transition: border-color .15s, box-shadow .15s;
   }
 
   .geo-agent-demo__box:focus-within {
     border-color: var(--agent-primary);
-    box-shadow: 0 0 0 3px rgba(78, 115, 223, .12);
+    box-shadow: 0 0 0 3px rgba(78, 115, 223, .12), 0 8px 28px rgba(39, 51, 79, .1);
   }
 
   .geo-agent-demo__box textarea {
@@ -1076,30 +1339,350 @@
     text-align: center;
   }
 
-  @media (max-width: 680px) {
-    .geo-agent-demo {
-      grid-template-columns: 1fr;
-      height: calc(100vh - 36px);
-      height: calc(100dvh - 36px);
-      margin: 8px;
+  .geo-agent-demo *,
+  .geo-agent-demo *::before,
+  .geo-agent-demo *::after {
+    box-sizing: border-box;
+  }
+
+  .geo-agent-demo__empty-chat {
+    width: 100%;
+    max-width: 840px;
+    margin: clamp(20px, 8vh, 88px) auto 32px;
+    color: var(--agent-muted);
+    text-align: center;
+    line-height: 1.8;
+  }
+
+  .geo-agent-demo__start-mark {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 18px;
+    border: 1px solid var(--agent-primary-border);
+    border-radius: 20px;
+    background: var(--agent-primary-soft);
+    color: var(--agent-primary);
+    font-size: 28px;
+  }
+
+  .geo-agent-demo__start-label {
+    margin: 0 0 8px;
+    color: var(--agent-primary-deep);
+    font-size: 12px;
+    letter-spacing: 1px;
+  }
+
+  .geo-agent-demo__empty-chat h2 {
+    margin: 0 0 12px;
+    color: var(--agent-ink);
+    font-size: clamp(24px, 2.4vw, 32px);
+    font-weight: 600;
+    letter-spacing: .5px;
+    line-height: 1.4;
+  }
+
+  .geo-agent-demo__start-description {
+    margin: 0;
+    font-size: 14px;
+  }
+
+  .geo-agent-demo__start-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 36px 0 12px;
+    text-align: left;
+    font-size: 12px;
+  }
+
+  .geo-agent-demo__start-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+    gap: 14px;
+    text-align: left;
+  }
+
+  .geo-agent-demo__start-option {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+    padding: 20px;
+    border: 1px solid #E3E8F5;
+    border-radius: 14px;
+    background: #fff;
+    color: var(--agent-ink);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+  }
+
+  .geo-agent-demo__start-option:hover:not(:disabled) {
+    border-color: var(--agent-primary);
+    background: var(--agent-primary-pale);
+  }
+
+  .geo-agent-demo__start-option:focus-visible {
+    outline: 2px solid var(--agent-primary);
+    outline-offset: 3px;
+  }
+
+  .geo-agent-demo__start-option:disabled {
+    opacity: .65;
+    cursor: not-allowed;
+  }
+
+  .geo-agent-demo__start-option-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .geo-agent-demo__start-question {
+    flex: 1;
+    color: #687998;
+    font-size: 12px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+  }
+
+  .geo-agent-demo__start-action {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 12px;
+    border-top: 1px solid #EEF1F7;
+    color: var(--agent-primary-deep);
+    font-size: 12px;
+  }
+
+  .geo-agent-demo__start-tip {
+    margin: 22px 0 0;
+    font-size: 12px;
+  }
+
+  .geo-agent-demo__start-keys {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 18px;
+    margin-top: 16px;
+    font-size: 11px;
+    color: #8793A9;
+  }
+
+  .geo-agent-demo__start-keys kbd {
+    margin-right: 5px;
+    padding: 2px 5px;
+    border: 1px solid #E3E8F5;
+    border-radius: 4px;
+    font-family: inherit;
+  }
+
+  .geo-agent-profile {
+    padding: 24px;
+    color: #27334F;
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+  }
+
+  .geo-agent-profile__summary {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+
+  .geo-agent-profile__avatar {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: #EEF2FF;
+    color: #4E73DF;
+    font-size: 22px;
+    font-weight: 600;
+  }
+
+  .geo-agent-profile__name {
+    margin: 0 0 4px;
+    font-size: 17px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  .geo-agent-profile__caption {
+    margin: 0;
+    color: #69778E;
+    font-size: 12px;
+  }
+
+  .geo-agent-profile__balance {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 16px;
+    padding: 16px;
+    border: 1px solid #DCE4FA;
+    border-radius: 10px;
+    background: #F6F8FF;
+    font-size: 13px;
+  }
+
+  .geo-agent-profile__points {
+    color: #3554AA;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .geo-agent-profile__details {
+    margin-top: 20px;
+  }
+
+  .geo-agent-profile__status {
+    margin: 12px 0;
+    color: #69778E;
+    font-size: 13px;
+    line-height: 1.7;
+  }
+
+  .geo-agent-demo__session-empty {
+    padding: 12px 8px;
+    color: var(--agent-muted);
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  @media (max-width: 1000px) {
+    .geo-agent-demo,
+    .geo-agent-demo.is-session-collapsed {
+      grid-template-columns: 76px 0 minmax(0, 1fr);
     }
 
-    .geo-agent-demo__side {
-      display: none;
+    .geo-agent-demo.is-session-expanded .geo-agent-demo__side {
+      position: absolute;
+      z-index: 20;
+      top: 0;
+      bottom: 0;
+      left: 76px;
+      width: 248px;
+      box-shadow: 8px 0 24px rgba(39, 51, 79, .12);
     }
 
-    .geo-agent-demo__messages {
-      padding: 16px;
+    .geo-agent-demo.is-session-expanded .geo-agent-demo__history-shade {
+      position: absolute;
+      z-index: 15;
+      inset: 0 0 0 76px;
+      display: block;
+      padding: 0;
+      border: 0;
+      background: rgba(39, 51, 79, .15);
+      cursor: pointer;
+    }
+
+    .geo-agent-demo__messages,
+    .geo-agent-demo__page {
+      padding-top: 22px;
+      padding-inline: 22px;
     }
 
     .geo-agent-demo__composer {
-      padding: 12px 16px;
+      padding: 12px 22px calc(16px + env(safe-area-inset-bottom));
+    }
+
+    .geo-agent-demo__welcome-hero {
+      gap: 14px;
+      padding-bottom: 16px;
+    }
+
+    .geo-agent-demo__welcome h2 {
+      font-size: 24px;
+    }
+
+    .geo-agent-demo__card {
+      padding: 16px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .geo-agent-demo,
+    .geo-agent-demo.is-session-collapsed {
+      grid-template-columns: 58px 0 minmax(0, 1fr);
+    }
+
+    .geo-agent-demo__rail {
+      padding: 14px 4px 10px;
+      gap: 5px;
+    }
+
+    .geo-agent-demo__brand {
+      width: 34px;
+      height: 34px;
+      margin-bottom: 8px;
+      font-size: 20px;
+    }
+
+    .geo-agent-demo__nav {
+      width: 48px;
+      min-height: 48px;
+      font-size: 11px;
+    }
+
+    .geo-agent-demo.is-session-expanded .geo-agent-demo__side {
+      left: 58px;
+      width: min(248px, calc(100% - 58px));
+    }
+
+    .geo-agent-demo.is-session-expanded .geo-agent-demo__history-shade {
+      left: 58px;
+    }
+
+    .geo-agent-demo__messages,
+    .geo-agent-demo__page {
+      padding-top: 16px;
+      padding-inline: 14px;
+    }
+
+    .geo-agent-demo__composer {
+      padding: 10px 12px calc(12px + env(safe-area-inset-bottom));
+    }
+
+    .geo-agent-demo__cards {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .geo-agent-demo__welcome {
+      margin-top: 0;
+    }
+
+    .geo-agent-demo__welcome h2 {
+      font-size: 22px;
+    }
+
+    .geo-agent-demo__welcome-mark {
+      display: none;
+    }
+
+    .geo-agent-demo__card {
+      padding: 14px;
+    }
+
+    .geo-agent-demo__session-del {
+      display: block;
     }
   }
 
   @media (max-height: 420px) {
     .geo-agent-demo__composer {
-      flex-shrink: 1;
+      max-height: calc(100% - 16px);
       min-height: 0;
       overflow-y: auto;
       padding: 8px 14px;
@@ -1109,253 +1692,47 @@
       height: 44px;
       min-height: 44px;
     }
-  }
-</style>
 
-{if $drawerMode}
-<style>
-  html,
-  body {
-    width: 100% !important;
-    height: 100% !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-  }
-
-  body.pear-container {
-    width: 100% !important;
-    height: 100vh !important;
-    height: 100dvh !important;
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  .geo-agent-demo--drawer,
-  .geo-agent-demo--drawer *,
-  .geo-agent-demo--drawer *::before,
-  .geo-agent-demo--drawer *::after {
-    box-sizing: border-box;
-  }
-
-  .geo-agent-demo {
-    grid-template-columns: 44px minmax(0, 1fr);
-    width: 100%;
-    height: 100vh !important;
-    height: 100dvh !important;
-    min-height: 0;
-    margin: 0;
-    border: 0;
-    border-radius: 0;
-  }
-
-  .geo-agent-demo__side {
-    display: flex !important;
-    overflow: hidden;
-    background: #F8FAFD;
-  }
-
-  .geo-agent-demo--drawer.is-session-expanded {
-    grid-template-columns: 238px minmax(0, 1fr);
-  }
-
-  .geo-agent-demo__side-head {
-    display: flex;
-    justify-content: center;
-    padding: 13px 10px 11px;
-  }
-
-  .geo-agent-demo__side-head .layui-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    border-radius: 9px;
-    font-size: 0;
-    line-height: 1;
-  }
-
-  .geo-agent-demo__side-head .layui-btn i {
-    font-size: 14px;
-  }
-
-  .geo-agent-demo--drawer.is-session-expanded .geo-agent-demo__side-head .layui-btn {
-    width: 100%;
-    height: 36px;
-    font-size: 13px;
-  }
-
-  .geo-agent-demo--drawer.is-session-expanded .geo-agent-demo__side-head .layui-btn i {
-    margin-right: 5px;
-  }
-
-  .geo-agent-demo__side-title {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 2px 12px;
-    white-space: nowrap;
-  }
-
-  .geo-agent-demo__sessions-expand,
-  .geo-agent-demo__sessions-collapse {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0;
-    border: 0;
-    border-radius: 7px;
-    background: transparent;
-    color: #6F7F9D;
-    cursor: pointer;
-  }
-
-  .geo-agent-demo__sessions-expand {
-    width: 40px;
-    height: 36px;
-    color: #4B64A7;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 1px;
-  }
-
-  .geo-agent-demo__sessions-expand:hover,
-  .geo-agent-demo__sessions-expand:focus-visible,
-  .geo-agent-demo__sessions-collapse:hover,
-  .geo-agent-demo__sessions-collapse:focus-visible {
-    background: #E8EDFF;
-    color: #3554AA;
-  }
-
-  .geo-agent-demo__sessions-collapse {
-    width: 28px;
-    height: 28px;
-    margin-left: auto;
-    font-size: 13px;
-  }
-
-  .geo-agent-demo--drawer.is-session-collapsed .geo-agent-demo__sessions-label,
-  .geo-agent-demo--drawer.is-session-collapsed .geo-agent-demo__sessions-collapse,
-  .geo-agent-demo--drawer.is-session-collapsed .geo-agent-demo__side-head,
-  .geo-agent-demo--drawer.is-session-collapsed .geo-agent-demo__sessions,
-  .geo-agent-demo--drawer.is-session-collapsed .geo-agent-demo__account {
-    display: none;
-  }
-
-  .geo-agent-demo--drawer.is-session-collapsed .geo-agent-demo__side-title {
-    padding-top: 15px;
-  }
-
-  .geo-agent-demo--drawer.is-session-expanded .geo-agent-demo__side-title {
-    justify-content: space-between;
-    padding: 0 12px 12px;
-  }
-
-  .geo-agent-demo__sessions-label {
-    color: #687998;
-    font-size: 12px;
-    font-weight: 600;
-  }
-
-  .geo-agent-demo--drawer.is-session-expanded .geo-agent-demo__sessions-expand {
-    display: none;
-  }
-
-  .geo-agent-demo__account {
-    margin: 6px 8px 10px;
-    padding: 9px;
-  }
-
-  .geo-agent-demo__main,
-  .geo-agent-demo__messages,
-  .geo-agent-demo__composer {
-    min-width: 0;
-  }
-
-  .geo-agent-demo__messages {
-    padding: 14px 14px;
-    overflow-x: hidden;
-  }
-
-  .geo-agent-demo__welcome {
-    width: 100%;
-    max-width: 480px;
-    margin: 8vh auto 0;
-    padding: 0 10px;
-  }
-
-  .geo-agent-demo__welcome h2 {
-    font-size: 20px;
-  }
-
-  .geo-agent-demo__welcome p {
-    font-size: 13px;
-    line-height: 1.65;
-  }
-
-  .geo-agent-demo__examples {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    margin-top: 18px;
-  }
-
-  .geo-agent-demo__example {
-    min-width: 0;
-    padding: 9px 10px;
-    font-size: 12px;
-    line-height: 1.5;
-    text-align: left;
-    overflow-wrap: anywhere;
-  }
-
-  .geo-agent-demo__composer {
-    padding: 10px 12px 12px;
-  }
-
-  @media (max-width: 520px) {
-    .geo-agent-demo {
-      grid-template-columns: 44px minmax(0, 1fr);
+    .geo-agent-demo__rail {
+      overflow-y: auto;
     }
+  }
 
-    .geo-agent-demo--drawer.is-session-expanded {
-      grid-template-columns: 238px minmax(0, 1fr);
+  @media (prefers-reduced-motion: reduce) {
+    .geo-agent-demo__start-option {
+      transition: none;
     }
-
-    .geo-agent-demo__messages {
-      padding: 10px;
-    }
-
-    .geo-agent-demo__composer {
-      padding: 8px;
-    }
-
-    .geo-agent-demo__examples {
-      grid-template-columns: 1fr;
+    .geo-agent-demo__content.is-streaming::after,
+    .geo-agent-demo__activity.is-running .geo-agent-demo__status::before {
+      animation: none;
     }
   }
 </style>
-{/if}
 
-<div class="geo-agent-demo{if $drawerMode} geo-agent-demo--drawer is-session-collapsed{/if}">
-  <aside class="geo-agent-demo__side">
-    <div class="geo-agent-demo__side-head"><button type="button" class="layui-btn geo-agent-demo__primary"
-        id="geo-agent-demo-new"><i class="fa fa-plus"></i> 新对话</button></div>
-    <div class="geo-agent-demo__side-title">
-      {if $drawerMode}
-      <button type="button" class="geo-agent-demo__sessions-expand" id="geo-agent-demo-sessions-expand" title="展开对话列表" aria-label="展开对话列表" aria-controls="geo-agent-demo-sessions" aria-expanded="false">对话</button>
-      <span class="geo-agent-demo__sessions-label">对话</span>
-      <button type="button" class="geo-agent-demo__sessions-collapse" id="geo-agent-demo-sessions-collapse" title="收起对话列表" aria-label="收起对话列表" aria-controls="geo-agent-demo-sessions" aria-expanded="true"><i class="fa fa-angle-left" aria-hidden="true"></i></button>
-      {else /}
-      最近会话
-      {/if}
+<div class="geo-agent-demo{if $drawerMode} geo-agent-demo--drawer is-session-collapsed{else /} is-session-expanded{/if}">
+  <nav class="geo-agent-demo__rail" aria-label="AI 助手导航">
+    <div class="geo-agent-demo__brand" aria-label="BadouCMS">B</div>
+    <button type="button" class="geo-agent-demo__nav" data-agent-view="home" aria-pressed="true" aria-controls="geo-agent-demo-home"><i class="fa fa-home" aria-hidden="true"></i><span>首页</span></button>
+    <button type="button" class="geo-agent-demo__nav" id="geo-agent-demo-new" title="新对话"><i class="fa fa-plus" aria-hidden="true"></i><span>新对话</span></button>
+    <button type="button" class="geo-agent-demo__nav" data-agent-view="chat" aria-pressed="false" aria-controls="geo-agent-demo-messages"><i class="fa fa-comment-o" aria-hidden="true"></i><span>对话</span></button>
+    <button type="button" class="geo-agent-demo__nav" data-agent-view="tools" aria-pressed="false" aria-controls="geo-agent-demo-tools"><i class="fa fa-th-large" aria-hidden="true"></i><span>功能</span></button>
+    <button type="button" class="geo-agent-demo__nav" id="geo-agent-demo-sessions-expand" title="展开或收起对话记录" aria-controls="geo-agent-demo-history" aria-expanded="{if $drawerMode}false{else /}true{/if}"><i class="fa fa-history" aria-hidden="true"></i><span>历史</span></button>
+    <button type="button" class="geo-agent-demo__nav geo-agent-demo__nav--account" id="geo-agent-demo-account-open" aria-haspopup="dialog" title="查看官网账号信息"><i class="fa fa-user-circle-o" aria-hidden="true"></i><span>账号</span></button>
+  </nav>
+  <button type="button" class="geo-agent-demo__history-shade" id="geo-agent-demo-history-shade" aria-label="收起对话记录"></button>
+  <aside class="geo-agent-demo__side" id="geo-agent-demo-history" aria-label="对话记录">
+    <div class="geo-agent-demo__side-head">
+      <span>对话记录</span>
+      <button type="button" class="geo-agent-demo__sessions-collapse" id="geo-agent-demo-sessions-collapse" title="收起对话记录" aria-label="收起对话记录" aria-controls="geo-agent-demo-history"><i class="fa fa-angle-left" aria-hidden="true"></i></button>
     </div>
+    <div class="geo-agent-demo__side-title">最近对话</div>
     <div class="geo-agent-demo__sessions" id="geo-agent-demo-sessions"></div>
-    <div class="geo-agent-demo__account" id="geo-agent-demo-account"></div>
+    <div class="geo-agent-demo__account" id="geo-agent-demo-account" role="region" aria-label="官网账号与 AI 积分"></div>
   </aside>
   <main class="geo-agent-demo__main">
-    <div class="geo-agent-demo__messages" id="geo-agent-demo-messages"></div>
+    <div class="geo-agent-demo__page" id="geo-agent-demo-home"></div>
+    <div class="geo-agent-demo__page" id="geo-agent-demo-tools" hidden></div>
+    <div class="geo-agent-demo__messages" id="geo-agent-demo-messages" hidden></div>
     <div class="geo-agent-demo__composer" id="geo-agent-demo-composer">
       <div class="geo-agent-demo__edit-banner" id="geo-agent-demo-edit-banner" hidden role="status">
         <span>正在编辑消息。发送后从这里重新回答，后续问答将更新；已执行操作不会撤销。</span>
@@ -1365,8 +1742,8 @@
       </div>{/if}
        <div class="geo-agent-demo__attachments" id="geo-agent-demo-attachments"></div>
        <div class="geo-agent-demo__box">
-         <textarea id="geo-agent-demo-input" maxlength="3000" placeholder="随便问点什么… Enter 发送，Shift+Enter 换行；也可拖入图片或文件" {if
-           !$modelReady}disabled{/if}></textarea>
+         <textarea id="geo-agent-demo-input" maxlength="3000" aria-label="描述你要处理的任务" placeholder="描述你要处理的任务… Enter 发送，Shift+Enter 换行" {if
+           !$modelReady || !$canSend}disabled{/if}></textarea>
          <div class="geo-agent-demo__bar">
           <div class="geo-agent-demo__bar-left">
             {if $canEditUsers}
@@ -1390,12 +1767,14 @@
             {/if}
           </div>
           <button type="button" class="geo-agent-demo__send" id="geo-agent-demo-send" title="发送" {if
-            !$modelReady}disabled{/if}><i class="fa fa-arrow-up"></i></button>
+            !$modelReady || !$canSend}disabled{/if}><i class="fa fa-arrow-up"></i></button>
         </div>
       </div>
     </div>
   </main>
 </div>
+
+<script type="application/json" id="geo-agent-showcases">{$showcasesJson|raw}</script>
 
 <script>
   layui.use(['badou', 'jquery', 'bdUpload', 'layer', 'laytpl'], function () {
@@ -1423,13 +1802,19 @@
     var wakingLanguageTask = false;
     var canSend = Number('{:$canSend ? 1 : 0}') === 1;
     var startedNewChat = false;
+    var accountDialogIndex = null;
     var $messages = $('#geo-agent-demo-messages');
+    var $home = $('#geo-agent-demo-home');
+    var $toolsPage = $('#geo-agent-demo-tools');
     var $input = $('#geo-agent-demo-input');
     var $account = $('#geo-agent-demo-account');
     var $agentView = $('.geo-agent-demo');
     var modelReady = '{if $modelReady}true{else}false{/if}' === 'true';
+    var showcases = JSON.parse(document.getElementById('geo-agent-showcases').textContent);
+    var showcaseLoadFailed = '{if $showcaseLoadFailed}true{else}false{/if}' === 'true';
     var drawerMode = $agentView.hasClass('geo-agent-demo--drawer');
-    var drawerSessionsKey = 'badou.agent.drawer.sessions.' + Number('{$adminId}');
+    var drawerSessionsKey = 'badou.agent.' + (drawerMode ? 'drawer' : 'page') + '.sessions.' + Number('{$adminId}');
+    var sessionsManuallySet = false;
     var draftKey = 'badou.agent.draft.' + Number('{$adminId}');
 
     try {
@@ -1535,20 +1920,13 @@
     }
 
     function setDrawerSessionsExpanded(expanded, persist) {
-      if (!drawerMode) return;
       $agentView.toggleClass('is-session-expanded', expanded).toggleClass('is-session-collapsed', !expanded);
-      $('#geo-agent-demo-sessions-expand, #geo-agent-demo-sessions-collapse').attr('aria-expanded', expanded ? 'true' : 'false');
+      $('#geo-agent-demo-sessions-expand').attr('aria-expanded', expanded ? 'true' : 'false');
+      $('#geo-agent-demo-history').attr('aria-hidden', expanded ? 'false' : 'true');
       if (persist) {
+        sessionsManuallySet = true;
         try { localStorage.setItem(drawerSessionsKey, expanded ? '1' : '0'); } catch (ignored) { }
       }
-    }
-
-    if (drawerMode) {
-      var expandedSessions = false;
-      try { expandedSessions = localStorage.getItem(drawerSessionsKey) === '1'; } catch (ignored) { }
-      setDrawerSessionsExpanded(expandedSessions, false);
-      $('#geo-agent-demo-sessions-expand').on('click', function () { setDrawerSessionsExpanded(true, true); });
-      $('#geo-agent-demo-sessions-collapse').on('click', function () { setDrawerSessionsExpanded(false, true); });
     }
 
     function syncChatState(action) {
@@ -1576,6 +1954,7 @@
     });
 
     var aiRechargePoll = null;
+    var aiPaymentWindow = null;
     var rechargeAfterLoginKey = 'badou.agent.recharge.afterLogin.' + Number('{$adminId}');
 
     function rememberRecharge() {
@@ -1642,7 +2021,7 @@
       });
     }
 
-    function watchAiOrder(orderNo) {
+    function watchAiOrder(orderNo, paymentWindow) {
       if (aiRechargePoll) {
         window.clearInterval(aiRechargePoll);
       }
@@ -1654,11 +2033,13 @@
           loading: false,
           data: { order_no: orderNo }
         }, function (data) {
+          if (aiPaymentWindow !== paymentWindow) return false;
           if (data.status === 'credited') {
             window.clearInterval(aiRechargePoll);
             aiRechargePoll = null;
-            fetchAiBalance();
-            (top.layer || layer).msg('AI 积分已到账');
+            // 后台确认到账后关闭自己打开的支付弹窗，保留助手当前对话。
+            paymentWindow.layer.close(paymentWindow.index);
+            badou.api.success({ message: 'AI 积分已到账' });
           } else if (data.status === 'paid') {
             $('#geo-agent-demo-balance').text('支付成功，积分到账中…');
           }
@@ -1679,13 +2060,22 @@
       var popupApi = popup === top ? top.layui.badou.api : badou.api;
       var width = Math.min(650, popup.innerWidth - 30);
       var height = Math.min(480, popup.innerHeight - 30);
-      popupApi.open(order.payurl, '支付 AI 积分', {
+      var paymentWindow = { layer: popup.layer || popup.layui.layer || layer, index: null };
+      paymentWindow.index = popupApi.open(order.payurl, '支付 AI 积分', {
         area: [width + 'px', height + 'px'],
         shade: 0.65,
         shadeClose: false,
-        end: function () { fetchAiBalance(); }
+        end: function () {
+          if (aiPaymentWindow === paymentWindow) {
+            window.clearInterval(aiRechargePoll);
+            aiRechargePoll = null;
+            aiPaymentWindow = null;
+          }
+          fetchAiBalance();
+        }
       });
-      watchAiOrder(order.order_no);
+      aiPaymentWindow = paymentWindow;
+      watchAiOrder(order.order_no, paymentWindow);
     }
 
     function openAgentLogin(afterLogin) {
@@ -1977,22 +2367,202 @@
       return html.join('');
     }
 
+    function renderShowcases($target, all) {
+      var promptReady = canSend && modelReady;
+      var $welcome = $('<div class="geo-agent-demo__welcome"></div>');
+      var $hero = $('<div class="geo-agent-demo__welcome-hero"></div>');
+      $hero.append($('<span class="geo-agent-demo__welcome-mark" aria-hidden="true"></span>').append('<i class="fa fa-commenting-o"></i>'));
+      var $intro = $('<div></div>');
+      $intro.append($('<h2></h2>').text(all ? '功能中心' : '今天想处理什么？'));
+      $intro.append($('<p></p>').text(all ? '查看当前账号可用的功能，点击示例会新建对话并直接开始处理。' : '写文章、查资料、处理后台事务。点击功能示例，新建对话并直接开始。'));
+      $hero.append($intro);
+      $welcome.append($hero);
+      var $status = $('<p class="geo-agent-demo__welcome-status" role="status" aria-live="polite"></p>');
+      var unavailableReason = !canSend ? '当前账号没有发送消息的权限，请联系管理员开通。'
+        : (!modelReady ? '登录官网账号后即可使用，入口在下方输入区。' : '');
+      if (showcases.length) {
+        var $section = $('<div class="geo-agent-demo__capabilities-head"></div>');
+        $section.append($('<h3></h3>').text(all ? '可用功能' : '常用功能'));
+        if (!all) $section.append($('<button type="button" class="geo-agent-demo__all-features"></button>').text('查看全部 →')
+          .on('click', function () { setAgentView('tools'); }));
+        else $section.append($('<p></p>').text('共 ' + showcases.length + ' 项功能'));
+        $welcome.append($section);
+        var $cards = $('<div class="geo-agent-demo__cards" role="list" aria-label="可用功能"></div>');
+        (all ? showcases : showcases.slice(0, 6)).forEach(function (card) {
+          var $card = $('<section class="geo-agent-demo__card" role="listitem"></section>');
+          var $head = $('<div class="geo-agent-demo__card-head"></div>');
+          // 图标经服务端校验，所有展示文字使用 text 写入。
+          $head.append($('<span class="geo-agent-demo__card-icon" aria-hidden="true"></span>').append($('<i class="fa"></i>').addClass(card.icon)));
+          $head.append($('<h4></h4>').text(card.title));
+          $card.append($head);
+          if (card.description) $card.append($('<p></p>').text(card.description));
+          var $prompts = $('<div class="geo-agent-demo__card-prompts"></div>');
+          (all ? card.prompts : card.prompts.slice(0, 1)).forEach(function (question) {
+            var $button = $('<button type="button" class="geo-agent-demo__example"></button>')
+              .attr('aria-label', '新建对话并开始：' + question).prop('disabled', !promptReady)
+              .append($('<span></span>').text(question))
+              .append($('<i class="fa fa-arrow-right" aria-hidden="true"></i>'));
+            if (!promptReady) $button.attr('title', unavailableReason);
+            $button.on('click', function () {
+              startShowcase(question);
+            });
+            $prompts.append($button);
+          });
+          $card.append($prompts);
+          $cards.append($card);
+        });
+        $welcome.append($cards);
+        $welcome.append($('<p class="geo-agent-demo__welcome-tip"></p>').text('功能按账号权限和已启用插件展示。需要审批的操作会显示批准卡片；自动批准按当前设置执行。'));
+      } else {
+        var emptyMessage = showcaseLoadFailed ? '功能列表暂时无法加载，请刷新页面重试。'
+          : '暂无可展示的功能示例。你仍可直接描述需求，后台操作以当前账号权限为准。';
+        $welcome.append($('<div class="geo-agent-demo__welcome-empty"></div>').append($('<p></p>').text(emptyMessage)));
+      }
+      $status.text(unavailableReason);
+      $welcome.append($status);
+      $target.empty().append($welcome).scrollTop(0);
+    }
+
+    function syncComposerLayout() {
+      var composer = document.getElementById('geo-agent-demo-composer');
+      // 输入区包含附件和编辑提示时高度会变化，留出滚动空间让最后一条消息完整可见。
+      $agentView[0].style.setProperty('--agent-composer-height', composer.getBoundingClientRect().height + 'px');
+    }
+
+    function setAgentView(view) {
+      if (['home', 'tools', 'chat'].indexOf(view) === -1) return;
+      // 切换展示区不销毁聊天节点，保留流式回复、审批卡片和任务进度。
+      $home.prop('hidden', view !== 'home');
+      $toolsPage.prop('hidden', view !== 'tools');
+      $messages.prop('hidden', view !== 'chat');
+      $agentView.find('[data-agent-view]').each(function () {
+        $(this).attr('aria-pressed', $(this).attr('data-agent-view') === view ? 'true' : 'false');
+      });
+      if (view === 'chat' && !$messages.children().length) {
+        renderNewChat();
+      }
+    }
+
+    function renderNewChat() {
+      var $start = $('<section class="geo-agent-demo__empty-chat" aria-label="开始新对话"></section>');
+      $start.append($('<div class="geo-agent-demo__start-mark" aria-hidden="true"></div>').append('<i class="fa fa-commenting-o"></i>'));
+      $start.append($('<p class="geo-agent-demo__start-label"></p>').text('新对话 · AI 后台助手'));
+      $start.append($('<h2></h2>').text('今天，先处理哪件事？'));
+      $start.append($('<p class="geo-agent-demo__start-description"></p>').text('查询信息、整理资料、处理后台事务，把具体需求交给我。'));
+      var unavailableReason = !canSend ? '当前账号没有发送消息的权限，请联系管理员开通。'
+        : (!modelReady ? '登录官网账号后即可开始对话。' : '');
+      if (showcases.length) {
+        var $head = $('<div class="geo-agent-demo__start-head"></div>').append($('<span></span>').text('选一项任务，直接开始'));
+        $head.append($('<button type="button" class="geo-agent-demo__all-features"></button>').text('全部功能 →')
+          .on('click', function () { setAgentView('tools'); }));
+        $start.append($head);
+        var $options = $('<div class="geo-agent-demo__start-options"></div>');
+        showcases.slice(0, 3).forEach(function (card) {
+          var question = card.prompts[0];
+          var $button = $('<button type="button" class="geo-agent-demo__start-option"></button>')
+            .prop('disabled', !canSend || !modelReady).attr('aria-label', '新建对话并开始：' + question)
+            .attr('title', unavailableReason || question);
+          var $title = $('<span class="geo-agent-demo__start-option-head"></span>');
+          $title.append($('<span class="geo-agent-demo__card-icon" aria-hidden="true"></span>').append($('<i class="fa"></i>').addClass(card.icon)));
+          $title.append($('<span></span>').text(card.title));
+          $button.append($title, $('<span class="geo-agent-demo__start-question"></span>').text(question));
+          $button.append($('<span class="geo-agent-demo__start-action"></span>').append(
+            $('<span></span>').text('开始对话'), '<i class="fa fa-arrow-right" aria-hidden="true"></i>'));
+          $button.on('click', function () { startShowcase(question); });
+          $options.append($button);
+        });
+        $start.append($options);
+      }
+      var tip = unavailableReason || (showcaseLoadFailed ? '功能示例暂时无法加载，你可以直接在下方描述需求。' : '也可以在下方自由输入需求，补充对象、范围和期望结果。');
+      $start.append($('<p class="geo-agent-demo__start-tip" role="status"></p>').text(tip));
+      $start.append($('<div class="geo-agent-demo__start-keys" aria-label="输入快捷键"></div>').append(
+        '<span><kbd>Enter</kbd>发送</span>', '<span><kbd>Shift + Enter</kbd>换行</span>'));
+      $messages.append($start).scrollTop(0);
+    }
+
     function showWelcome() {
       pendingApproval = null;
       $messages.empty();
-      var $welcome = $('<div class="geo-agent-demo__welcome"></div>');
-      $welcome.append($('<h2></h2>').text('用对话操作后台'));
-      $welcome.append($('<p></p>').text('Agent 只能调用当前账号有权限的工具。修改会员资料前会先确认目标会员。'));
-      var $examples = $('<div class="geo-agent-demo__examples"></div>');
-      ['查找昵称叫张三的会员', '把会员 12 的昵称改为小张', '当前系统是什么版本？'].forEach(function (question) {
-        $examples.append($('<button type="button" class="geo-agent-demo__example"></button>').text(question).on('click', function () { $input.val(question).focus(); }));
+      renderShowcases($home, false);
+      renderShowcases($toolsPage, true);
+      setAgentView('home');
+    }
+
+    function startNewChat() {
+      if (sending) {
+        layui.layer.msg('AI 正在回复，请先停止生成再新建对话');
+        return false;
+      }
+      openChat(0);
+      $input.focus();
+      return true;
+    }
+
+    function startShowcase(question) {
+      if (!canSend || !modelReady) {
+        layui.layer.msg(!canSend ? '当前账号没有发送消息的权限' : '请先登录官网账号');
+        return;
+      }
+      // 使用正常发送流程，保留停止生成、审批模式和失败重试行为。
+      if (!startNewChat()) return;
+      $input.val(question);
+      syncComposerAttachments();
+      send();
+    }
+
+    function openAccount() {
+      if (accountDialogIndex !== null) return;
+      var user = badou.api.badouStorage.get('userinfo') || {};
+      if (!user.id || !user.token) { openAgentLogin(false); return; }
+      var name = String(user.nickname || user.username || 'badoucms会员');
+      var $panel = $('<div class="geo-agent-profile"></div>');
+      var $summary = $('<div class="geo-agent-profile__summary"></div>');
+      $summary.append($('<div class="geo-agent-profile__avatar" aria-hidden="true"></div>').text(name.slice(0, 1)));
+      $summary.append($('<div></div>').append($('<p class="geo-agent-profile__name"></p>').text(name),
+        $('<p class="geo-agent-profile__caption"></p>').text('BadouCMS 官网账号 · ID ' + user.id)));
+      $panel.append($summary);
+      var $points = $('<span class="geo-agent-profile__points" role="status" aria-live="polite"></span>').text('查询中…');
+      $panel.append($('<div class="geo-agent-profile__balance"></div>').append($('<span></span>').text('剩余 AI 积分'), $points));
+      var $details = $('<div class="geo-agent-profile__details"></div>').append($('<p class="geo-agent-profile__status" role="status"></p>').text('正在读取账号资料…'));
+      $panel.append($details);
+      // 放到 body 让弹窗与遮罩处于同一层级，避免全屏页面的定位层挡住弹窗。
+      $panel.attr('style', 'display:none').appendTo($(document.body));
+      var dialogIndex = accountDialogIndex = layui.layer.open({
+        type: 1,
+        title: '账号信息',
+        area: [Math.min(540, window.innerWidth - 30) + 'px', Math.min(560, window.innerHeight - 30) + 'px'],
+        content: $panel,
+        resize: false,
+        btn: ['购买 AI 积分', '关闭'],
+        yes: function (index) { layui.layer.close(index); openAiPackages(); },
+        end: function () { $panel.remove(); accountDialogIndex = null; $('#geo-agent-demo-account-open').focus(); }
       });
-      $welcome.append($examples);
-      $messages.append($welcome);
+      fetchAiBalance(function (error, balance) {
+        if (accountDialogIndex !== dialogIndex) return;
+        $points.text(error ? '暂时无法查询' : balance.toLocaleString(undefined, { maximumFractionDigits: 0 }) + ' 积分');
+      });
+      // 复用插件管理的官网会员资料模板，展示同一份账号信息；登录令牌只用于请求。
+      badou.api.ajax({
+        url: Config.api_url + '/api/member/userinfotpl', type: 'post', loading: false,
+        data: { uid: user.id, token: user.token, version: Config.bdversion, sid: badou.api.badouStorage.getSid() }
+      }, function (tpldata) {
+        if (accountDialogIndex !== dialogIndex) return false;
+        $details.html(laytpl(tpldata).render(user));
+        return false;
+      }, function (data, ret) {
+        if (accountDialogIndex !== dialogIndex) return false;
+        $details.empty().append($('<p class="geo-agent-profile__status" role="status"></p>').text((ret && ret.msg) || '账号资料暂时无法读取，请关闭后重试。'));
+        if (ret && (Number(ret.code) === 401 || Number(ret.code) === -2)) {
+          $details.append($('<button type="button" class="geo-agent-demo__all-features"></button>').text('重新登录官网账号')
+            .on('click', function () { layui.layer.close(dialogIndex); openAgentLogin(false); }));
+        }
+        return false;
+      });
     }
 
     function addMessage(item) {
-      $messages.find('.geo-agent-demo__welcome').remove();
+      setAgentView('chat');
+      $messages.find('.geo-agent-demo__empty-chat').remove();
       var $turn = $('<div class="geo-agent-demo__turn"></div>').addClass(item.role === 'user' ? 'is-user' : 'is-assistant');
       // 记录本轮调用过的工具，供代码改动卡片锚定到本轮回答下面。
       $turn.data('tools', item.tools || []);
@@ -2136,12 +2706,16 @@
             .text(title)
             .attr('title', title)
             .attr('aria-label', title)
-            .on('click', function () { openChat(id); });
+            .on('click', function () {
+              openChat(id);
+              if (!sending && window.innerWidth <= 1000) setDrawerSessionsExpanded(false, true);
+            });
           var $del = $('<button type="button" class="geo-agent-demo__session-del" title="删除会话"><i class="fa fa-trash-o"></i></button>')
             .on('click', function (event) { event.stopPropagation(); deleteSession(id); });
           $row.append($button, $del);
           $list.append($row);
         });
+        if (!sessions.length) $list.append($('<p class="geo-agent-demo__session-empty"></p>').text('还没有对话记录，点击“新对话”开始。'));
         if (resumeLatest && !chatId && !startedNewChat && sessions.length) {
           var preferredId = storedChatId();
           var preferredSession = sessions.find(function (session) { return Number(session.id) === preferredId; });
@@ -2268,7 +2842,21 @@
       chatId = id;
       pendingApproval = null;
       if (sync !== false) syncChatState(id ? 'select' : 'new');
-      if (!id) { loadLanguageTasks(); showWelcome(); loadSessions(); loadPatches(); return; }
+      if (!id) {
+        // 空白会话与首页分开；清除编辑草稿和附件，阻止首次列表加载恢复旧对话。
+        startedNewChat = true;
+        // 新建后收起历史面板及遮罩，让空白对话和输入框立即可见、可操作。
+        setDrawerSessionsExpanded(false, true);
+        $input.val('');
+        syncComposerAttachments();
+        try { sessionStorage.removeItem(draftKey); } catch (ignored) { }
+        $messages.empty();
+        setAgentView('chat');
+        loadLanguageTasks();
+        loadSessions();
+        loadPatches();
+        return;
+      }
       badou.api.ajax({ url: 'agent/history', type: 'GET', data: { id: id } }, function (data) {
         if (Number(chatId) !== Number(id)) return false;
         renderChatMessages(data);
@@ -2545,7 +3133,7 @@
           $(this).prop('disabled', !$(this).closest('.geo-agent-demo__turn').data('messageId'));
         });
         $('#geo-agent-demo-edit-cancel').prop('disabled', false);
-        $send.prop('disabled', !modelReady).attr('title', '发送').attr('aria-label', '发送').html('<i class="fa fa-arrow-up"></i>');
+        $send.prop('disabled', !modelReady || !canSend).attr('title', '发送').attr('aria-label', '发送').html('<i class="fa fa-arrow-up"></i>');
         if (editingMessage) $send.attr('title', '编辑并重新发送').attr('aria-label', '编辑并重新发送');
         $messages.scrollTop($messages[0].scrollHeight);
       }
@@ -2800,7 +3388,35 @@
       });
     }
 
-    $('#geo-agent-demo-new').on('click', function () { startedNewChat = true; openChat(0); });
+    $agentView.find('#geo-agent-demo-new').on('click', startNewChat);
+    $agentView.find('[data-agent-view]').on('click', function () { setAgentView($(this).attr('data-agent-view')); });
+    var expandedSessions = window.innerWidth > 1000;
+    try {
+      var savedSessions = localStorage.getItem(drawerSessionsKey);
+      if (savedSessions === '1' || savedSessions === '0') {
+        expandedSessions = savedSessions === '1';
+        sessionsManuallySet = true;
+      }
+    } catch (ignored) { }
+    setDrawerSessionsExpanded(expandedSessions, false);
+    $('#geo-agent-demo-sessions-expand').on('click', function () {
+      setDrawerSessionsExpanded(!$agentView.hasClass('is-session-expanded'), true);
+    });
+    $('#geo-agent-demo-sessions-collapse, #geo-agent-demo-history-shade').on('click', function () {
+      setDrawerSessionsExpanded(false, true);
+    });
+    $('#geo-agent-demo-account-open').on('click', openAccount);
+    $agentView.on('keydown', function (event) {
+      if (event.key === 'Escape' && $agentView.hasClass('is-session-expanded')) {
+        setDrawerSessionsExpanded(false, true);
+        $('#geo-agent-demo-sessions-expand').focus();
+      }
+    });
+    window.addEventListener('resize', function () {
+      // 浮窗放大时默认展开记录；用户手动选择的展开状态保持不变。
+      if (!sessionsManuallySet) setDrawerSessionsExpanded(window.innerWidth > 1000, false);
+    });
+
     $('#geo-agent-demo-edit-cancel').on('click', function () { if (!sending) cancelMessageEdit(true); });
     if ($('#geo-agent-demo-upload').length) {
       layui.bdUpload.render({
@@ -2882,6 +3498,11 @@
     });
     $input.on('keydown', function (event) { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); send(); } });
     $input.on('input', syncComposerAttachments);
+    syncComposerLayout();
+    if (window.ResizeObserver) {
+      new window.ResizeObserver(syncComposerLayout).observe(document.getElementById('geo-agent-demo-composer'));
+    }
+    window.addEventListener('resize', syncComposerLayout);
     syncComposerAttachments();
     showWelcome();
     loadSessions(true);

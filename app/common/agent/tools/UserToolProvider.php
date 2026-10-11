@@ -13,6 +13,16 @@ class UserToolProvider extends AbstractAgentToolProvider
         return 'user_search 返回的 total 是匹配总数，users 只是本次返回的一页；has_more 为 true 时不能说已经列出全部会员，默认排序可用 next_before_id 继续查询。需要按金额、积分、注册时间等排序时传 sort 和 order，此时用 next_page 翻页、不再用 before_id。会员很多时先报告总数并请用户缩小范围，不要把大量会员资料一次写进回答。用户明确要求修改会员资料时，先通过查询确定会员 ID；目标不唯一时询问用户，不要猜测。修改会员时使用 user_update_field，field 填会员字段名，每次只修改一个字段。删除会员必须二次确认：先用 user_search 确定唯一目标并向用户复述该会员信息，使用 user_delete 的 confirm=false 预览，confirm=true 将触发人工审批。用户名是登录名，昵称是展示名。展示会员头像时用 Markdown 图片语法 ![昵称](avatar 地址) 直接渲染图片，avatar 为空时显示“无”，不要用“已设置”之类的文字代替头像。图片由聊天框先上传到附件库；只有拿到附件 URL 后才能修改 avatar。';
     }
 
+    public function showcase(): array
+    {
+        return [
+            'title' => '会员管理', 'icon' => 'fa-users', 'description' => '查询会员、按条件排序，修改资料',
+            'prompts' => [
+                ['text' => '查询最近注册的 10 个会员', 'tools' => ['user_search']],
+            ],
+        ];
+    }
+
     public function agentTools(): array
     {
         $users = new UserAgentService();

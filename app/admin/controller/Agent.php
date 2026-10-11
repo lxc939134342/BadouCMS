@@ -4,6 +4,8 @@ namespace app\admin\controller;
 
 use app\common\agent\AgentContext;
 use app\common\agent\AgentRunControl;
+use app\common\agent\AgentToolExecutor;
+use app\common\agent\AgentToolRegistry;
 use app\common\agent\AdminAgent;
 use app\admin\model\AgentStorage;
 use app\common\agent\services\AgentPatchService;
@@ -21,6 +23,15 @@ class Agent extends Backend
 {
     protected $noNeedRight = ['syncAccount', 'balance', 'packages', 'order', 'orderStatus', 'recharge', 'taskStatus'];
 
+    public function initialize()
+    {
+        parent::initialize();
+        if (!\modules\aiagent\library\Runtime::enabled()) {
+            $this->error('AI 后台助手插件未启用');
+        }
+        \modules\aiagent\library\Runtime::boot();
+    }
+
     public function index()
     {
         $this->assign('canSend', $this->auth->check('agent/send'));
@@ -29,6 +40,18 @@ class Agent extends Backend
         $this->assign('modelReady', AiGateway::ready());
         $this->assign('canEditUsers', $this->auth->check('user.user/edit'));
         $this->assign('isSuperAdmin', $this->auth->isSuperAdmin());
+        // 能力卡片与 AdminAgent 使用相同的场景和模块范围，按插件启用状态与当前账号权限过滤。
+        $showcases = [];
+        $showcaseLoadFailed = false;
+        try {
+            $showcases = (new AgentToolRegistry())->showcases(AgentContext::fromAuth($this->auth), new AgentToolExecutor());
+        } catch (\Throwable $e) {
+            $showcaseLoadFailed = true;
+            Log::error('Agent 能力卡片加载失败：异常={type}', ['type' => $e::class]);
+        }
+        // HEX 标志避免卡片文字中的 </script> 等字符破坏页面脚本。
+        $this->assign('showcaseLoadFailed', $showcaseLoadFailed);
+        $this->assign('showcasesJson', json_encode($showcases, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT));
         $this->assignconfig([
             'api_url' => rtrim((string)config('badouadmin.api_url'), '/'),
             'bdversion' => config('badouadmin.version'),

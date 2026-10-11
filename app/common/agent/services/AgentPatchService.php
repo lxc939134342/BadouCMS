@@ -16,7 +16,7 @@ use NeuronAI\Chat\Messages\UserMessage;
 class AgentPatchService
 {
     private const DEFAULT_ALLOWED_EXT = ['php', 'html', 'htm', 'js', 'css', 'json', 'ini', 'sql', 'md'];
-    private const DEFAULT_DENY_PREFIX = ['vendor/', 'config/', 'runtime/', 'node_modules/', 'public/uploads/', 'public/dist/', 'public/assets/', '.git/'];
+    private const DEFAULT_DENY_PREFIX = ['vendor/', 'modules/aiagent/vendor/', 'config/', 'runtime/', 'node_modules/', 'public/uploads/', 'public/dist/', 'public/assets/', '.git/'];
     private const DEFAULT_DENY_FILES = ['.env', 'composer.json', 'composer.lock', 'package-lock.json', 'pnpm-lock.yaml'];
     private const SCAN_ROOTS = ['app', 'modules', 'extend', 'config', 'route', 'template', 'public', 'data', 'docs'];
 

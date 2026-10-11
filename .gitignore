@@ -20,6 +20,7 @@ moduledev
 !/modules/cms
 !/modules/nkeditor
 !/modules/upgrade
+!/modules/aiagent
 .cursor/
 .roo/
 .claude/

@@ -9,21 +9,24 @@ class AgentToolConfig extends AbstractAgentToolProvider
     private array $scenes;
     private array $residentTools;
     private string $guidelines;
+    private array $showcase;
 
     public function __construct(array $config, ?self $parent = null)
     {
         $config += ['tools' => [], 'guidelines' => '', 'scenes' => $parent?->scenes ?? ['admin'],
-            'resident_tools' => $parent?->residentTools() ?? []];
-        if (array_diff(array_keys($config), ['tools', 'guidelines', 'scenes', 'groups', 'resident_tools']) !== []
+            'resident_tools' => $parent?->residentTools() ?? [], 'showcase' => []];
+        if (array_diff(array_keys($config), ['tools', 'guidelines', 'scenes', 'groups', 'resident_tools', 'showcase']) !== []
             || !is_array($config['tools']) || !is_string($config['guidelines']) || !is_array($config['scenes'])
             || array_filter($config['scenes'], 'is_string') !== $config['scenes']
-            || !is_array($config['resident_tools'])
+            || !is_array($config['resident_tools']) || !is_array($config['showcase'])
             || array_filter($config['resident_tools'], static fn ($name) => is_string($name)
                 && preg_match('/^[a-zA-Z0-9_-]{1,64}$/D', $name)) !== $config['resident_tools']) {
             throw new \LogicException('Agent 配置字段无效');
         }
         $this->tools = $config['tools'];
         $this->scenes = $config['scenes'];
+        // 卡片属于当前分组，不向子分组继承；内部结构由注册中心校验，错误时只丢弃卡片。
+        $this->showcase = $config['showcase'];
         $this->residentTools = array_values(array_unique($config['resident_tools']));
         $this->guidelines = trim(($parent?->guidelines() ?? '') . "\n" . $config['guidelines']);
     }
@@ -35,4 +38,5 @@ class AgentToolConfig extends AbstractAgentToolProvider
 
     public function guidelines(): string { return $this->guidelines; }
     public function residentTools(): array { return $this->residentTools; }
+    public function showcase(): array { return $this->showcase; }
 }

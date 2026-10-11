@@ -6,6 +6,5 @@ return [
     // 指令定义
     'commands' => [
         'crud' => 'app\\admin\\command\\Crud',
-        'agent:task' => 'app\\common\\agent\\command\\TaskWorker',
     ],
 ];
